@@ -1,4 +1,4 @@
-# Breaking changes before 0.1.1
+# Breaking changes in 0.2.0
 
 ## Tag consolidated into Badge
 
