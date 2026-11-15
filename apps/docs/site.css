@@ -156,6 +156,10 @@ a:hover {
   font-size: 13px;
   color: #6c6b65;
 }
+.docs-sidebar nav > a + a,
+.docs-sidebar nav > div > a + a {
+  margin-top: 3px;
+}
 .docs-sidebar nav a:hover {
   background: #f0f0ed;
   color: #37352f;
