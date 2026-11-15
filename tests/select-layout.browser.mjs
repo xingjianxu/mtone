@@ -6,15 +6,6 @@ const server = await createServer({
   server: { port: 5187, host: "127.0.0.1", strictPort: true },
   logLevel: "error",
 });
-server.middlewares.use("/__select-layout.html", async (_req, res) => {
-  res.setHeader("Content-Type", "text/html");
-  res.end(
-    await server.transformIndexHtml(
-      "/__select-layout.html",
-      '<html><body><div id="root"></div><script type="module" src="/tests/fixtures/select-layout.tsx"></script></body></html>',
-    ),
-  );
-});
 await server.listen();
 let browser;
 try {
@@ -27,7 +18,10 @@ try {
   const page = await browser.newPage({
     viewport: { width: 900, height: 1000 },
   });
-  await page.goto("http://127.0.0.1:5187/__select-layout.html");
+  page.on("pageerror", (error) => console.error(error));
+  page.on("console", (message) => { if (message.type() === "error") console.error(message.text()); });
+  const response = await page.goto("http://127.0.0.1:5187/tests/fixtures/select-layout.html");
+  assert.equal(response.status(), 200, "Fixture must be served successfully");
   await page.locator(".mt-select").first().waitFor();
   const check = async () => {
     const results = await page.locator(".mt-select").evaluateAll((nodes) =>
