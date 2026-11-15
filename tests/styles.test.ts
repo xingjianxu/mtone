@@ -51,3 +51,12 @@ it('keeps semantic error borders separate from the blue focus ring', () => {
   expect(errorRule).toContain('border-color: #c66660');
   expect(css).toContain('--mt-focus: #5378aa');
 });
+it('keeps toast icons centered on the first text row with compact spacing', () => {
+  const css = readFileSync('packages/mtone/src/toast.css', 'utf8');
+  expect(css).toContain('grid-template-columns: 18px minmax(0, 1fr)');
+  expect(css).toContain('align-self: center');
+  expect(css).toContain('padding: 10px 36px 10px 12px');
+  const title = css.slice(css.indexOf('.mt-toast-title {')).split('}')[0];
+  expect(title).toContain('margin: 0');
+  expect(title).toContain('font-size: inherit');
+});

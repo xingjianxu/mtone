@@ -239,3 +239,36 @@ it("preserves custom child state and focus when a toast moves position", () => {
     "center",
   );
 });
+it("supports body-only and custom-only notifications without empty headings", () => {
+  function Minimal() {
+    const toast = useToast();
+    return (
+      <button
+        onClick={() => {
+          toast.add({ body: "Body only", timeout: 0 });
+          toast.add({ children: <button>Custom action</button>, timeout: 0 });
+        }}
+      >
+        Minimal
+      </button>
+    );
+  }
+  render(
+    <ToastProvider>
+      <Minimal />
+    </ToastProvider>,
+  );
+  fireEvent.click(screen.getByText("Minimal"));
+  expect(
+    screen
+      .getByText("Body only")
+      .closest(".mt-toast")
+      ?.querySelector(".mt-toast-title"),
+  ).toBeNull();
+  expect(
+    screen.getByText("Custom action").closest(".mt-toast-custom"),
+  ).not.toBeNull();
+  expect(
+    document.querySelectorAll('.mt-toast-icon[aria-hidden="true"]'),
+  ).toHaveLength(2);
+});

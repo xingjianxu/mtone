@@ -209,21 +209,23 @@ function ToastViewport({
                   <BToast.Content className="mt-toast-content">
                     <Icon
                       className={`mt-toast-icon${type === "loading" ? " mt-spin" : ""}`}
-                      size={19}
+                      size={18}
                       aria-hidden="true"
                     />
-                    <div className="mt-toast-message">
-                      {t.title != null && (
-                        <BToast.Title className="mt-toast-title" />
-                      )}
-                      {t.description != null && (
-                        <BToast.Description className="mt-toast-description" />
-                      )}
-                      {t.data?.__mtoneToast?.children}
-                      {t.actionProps && (
-                        <BToast.Action className="mt-action mt-toast-action" />
-                      )}
-                    </div>
+                    {t.title != null && (
+                      <BToast.Title className="mt-toast-title" />
+                    )}
+                    {t.description != null && (
+                      <BToast.Description className="mt-toast-description" />
+                    )}
+                    {t.data?.__mtoneToast?.children != null && (
+                      <div key="custom" className="mt-toast-custom">
+                        {t.data.__mtoneToast.children}
+                      </div>
+                    )}
+                    {t.actionProps && (
+                      <BToast.Action className="mt-action mt-toast-action" />
+                    )}
                     <BToast.Close
                       className="mt-dialog-close"
                       aria-label={locale === "zh" ? "关闭" : "Close"}
