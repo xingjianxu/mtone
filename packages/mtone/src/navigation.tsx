@@ -1,12 +1,38 @@
 import * as React from "react";
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight, X, PanelLeftClose, PanelLeftOpen, Circle } from "lucide-react";
 import { cn, IconButton, useMtone } from "./basic";
-export const Sidebar = ({
-  className,
-  ...p
-}: React.HTMLAttributes<HTMLElement>) => (
-  <aside {...p} className={cn("mt-sidebar", className)} />
-);
+import { Tooltip } from "./interactive";
+const SidebarContext = React.createContext(false);
+export type SidebarProps = React.HTMLAttributes<HTMLElement> & {
+  collapsible?: boolean;
+  collapsed?: boolean;
+  defaultCollapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+  collapseLabel?: string;
+  expandLabel?: string;
+};
+export function Sidebar({ className, children, collapsible = false, collapsed,
+  defaultCollapsed = false, onCollapsedChange, collapseLabel = "收起侧边栏",
+  expandLabel = "展开侧边栏", ...p }: SidebarProps) {
+  const [internal, setInternal] = React.useState(defaultCollapsed);
+  const isCollapsed = collapsible && (collapsed ?? internal);
+  const contentId = React.useId();
+  return <SidebarContext.Provider value={isCollapsed}>
+    <aside {...p} className={cn("mt-sidebar", className)} data-collapsed={isCollapsed}>
+      {collapsible && <IconButton className="mt-sidebar-toggle" variant="ghost"
+        aria-label={isCollapsed ? expandLabel : collapseLabel}
+        title={isCollapsed ? expandLabel : collapseLabel}
+        aria-expanded={!isCollapsed} aria-controls={contentId}
+        onClick={() => {
+          if (collapsed === undefined) setInternal(!isCollapsed);
+          onCollapsedChange?.(!isCollapsed);
+        }}>
+        {isCollapsed ? <PanelLeftOpen size={16} aria-hidden="true" /> : <PanelLeftClose size={16} aria-hidden="true" />}
+      </IconButton>}
+      {collapsible ? <div id={contentId} className="mt-sidebar-content">{children}</div> : children}
+    </aside>
+  </SidebarContext.Provider>;
+}
 export const NavItem = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -14,29 +40,29 @@ export const NavItem = React.forwardRef<
     icon?: React.ReactNode;
   }
 >(function NavItem({ active, icon, children, className, ...p }, ref) {
-  return (
+  const collapsed = React.useContext(SidebarContext);
+  const [tipOpen, setTipOpen] = React.useState(false);
+  const label = p["aria-label"] ?? (typeof children === "string" || typeof children === "number" ? String(children) : undefined);
+  const button = (
     <button
       type="button"
       {...p}
       ref={ref}
       aria-current={active ? "page" : undefined}
-      className={cn("mt-nav-item", active && "mt-active", className)}
+      className={cn("mt-nav-item", active && "mt-active", collapsed && "mt-nav-item-collapsed", className)}
     >
-      {icon}
-      {children}
+      {icon || (collapsed ? <Circle size={16} aria-hidden="true" /> : null)}
+      {collapsed ? <span className="mt-sidebar-sr-only">{children}</span> : children}
     </button>
   );
+  return label ? <Tooltip content={label} side="right" open={collapsed && tipOpen}
+    onOpenChange={(open) => setTipOpen(collapsed && open)}>{button}</Tooltip> : button;
 });
-export function NavGroup({
-  label,
-  children,
-}: {
-  label?: React.ReactNode;
-  children: React.ReactNode;
-}) {
+export function NavGroup({ label, children }: { label?: React.ReactNode; children: React.ReactNode; }) {
+  const collapsed = React.useContext(SidebarContext);
   return (
-    <div className="mt-nav-group">
-      {label && <div className="mt-nav-label">{label}</div>}
+    <div className={cn("mt-nav-group", collapsed && "mt-nav-group-collapsed")}>
+      {label && <div className={collapsed ? "mt-sidebar-sr-only" : "mt-nav-label"}>{label}</div>}
       {children}
     </div>
   );

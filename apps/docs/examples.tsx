@@ -338,7 +338,7 @@ function ExampleBody({ name }: { name: string }) {
       );
     case "Sidebar":
       return (
-        <M.Sidebar style={{ maxWidth: 240 }}>
+        <M.Sidebar collapsible aria-label="工作空间导航" style={{ maxWidth: 240 }}>
           <M.NavGroup label="工作空间">
             <M.NavItem
               active={value === "design"}

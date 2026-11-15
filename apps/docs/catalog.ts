@@ -873,10 +873,15 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "Sidebar",
     category: "导航与筛选",
-    description: "用于应用侧栏的样式容器。",
+    description: "支持展开与图标窄栏切换的应用侧栏。",
     importNames: ["Sidebar", "NavItem"],
-    code: 'import { Sidebar, NavItem } from "mtone";\nimport "mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
+    code: 'import { Sidebar, NavItem } from "mtone";\nimport "mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
     props: [
+      { name: "collapsible", type: "boolean", default: "false", description: "启用内置收起/展开按钮；未启用时保持原有容器行为。" },
+      { name: "collapsed", type: "boolean", description: "受控收起状态；搭配 onCollapsedChange 更新。" },
+      { name: "defaultCollapsed", type: "boolean", default: "false", description: "非受控模式的初始收起状态。" },
+      { name: "onCollapsedChange", type: "(collapsed: boolean) => void", description: "点击切换按钮时触发。" },
+      { name: "collapseLabel / expandLabel", type: "string", default: "收起侧边栏 / 展开侧边栏", description: "切换按钮的可访问名称和提示，可本地化。" },
       {
         name: "children",
         type: "ReactNode",
@@ -889,7 +894,12 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["不接管路由、固定定位或移动端折叠，布局由应用决定。"],
+    notes: [
+      "收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题并保留分组分隔。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。",
+      "收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。",
+      "受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。",
+      "不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。",
+    ],
   },
   {
     name: "NavItem",
