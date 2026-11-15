@@ -144,6 +144,39 @@ try {
       .isDisabled(),
     true,
   );
+  for (const density of ["compact", "comfortable"]) {
+    const field = page.locator(`.multi-${density}`);
+    const trigger = field.getByRole("button", { name: "展开选项" });
+    const arrow = await trigger.evaluate(el => {
+      const b=el.getBoundingClientRect(), svg=el.querySelector("svg"), s=svg.getBoundingClientRect();
+      return {w:s.width,h:s.height,delta:Math.abs((s.top+s.bottom-b.top-b.bottom)/2),hidden:svg.getAttribute("aria-hidden"),kind:svg.classList.contains("lucide-chevron-down")};
+    });
+    assert.deepEqual(arrow, {w:16,h:16,delta:0,hidden:"true",kind:true});
+    await trigger.click();
+    const list = page.getByRole("listbox").filter({visible:true});
+    await list.waitFor();
+    const alpha = list.getByRole("option", {name:"Alpha",exact:true});
+    const marker = await alpha.locator(".mt-select-item-indicator").evaluate(el => {
+      const svg=el.querySelector("svg"), r=svg.getBoundingClientRect();
+      return {w:r.width,h:r.height,stroke:svg.getAttribute("stroke-width"),hidden:el.getAttribute("aria-hidden"),kind:svg.classList.contains("lucide-check")};
+    });
+    assert.deepEqual(marker,{w:16,h:16,stroke:"1.5",hidden:"true",kind:true});
+    assert.equal(await list.getByRole("option",{name:"Beta",exact:true}).locator(".mt-select-item-indicator").count(),0);
+    await list.getByRole("option",{name:"Beta",exact:true}).click();
+    await field.getByRole("button",{name:"移除 Beta",exact:true}).waitFor();
+    await page.keyboard.press("Escape");
+    await field.getByRole("button",{name:"移除 Beta",exact:true}).click();
+    assert.equal(await field.getByRole("button",{name:"移除 Beta",exact:true}).count(),0);
+    for (const type of ["check","mixed"]) {
+      const control = field.getByRole("checkbox",{name:`${density}-${type}`});
+      const geometry = await control.evaluate(el => {
+        const b=el.getBoundingClientRect(), svg=el.querySelector("svg"), s=svg.getBoundingClientRect();
+        return {w:s.width,h:s.height,delta:Math.abs((s.top+s.bottom-b.top-b.bottom)/2),stroke:svg.getAttribute("stroke-width")};
+      });
+      assert.deepEqual(geometry,{w:12,h:12,delta:0,stroke:"1.5"});
+    }
+    assert(await page.getByRole("combobox",{name:`${density}-multi-disabled`}).isDisabled());
+  }
   console.log("Select geometry, open, selection and disabled checks passed");
 } finally {
   await browser?.close();

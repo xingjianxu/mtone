@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Select } from "../../packages/mtone/src/interactive";
+import { Select, MultiSelect, Checkbox } from "../../packages/mtone/src/interactive";
 import { MtoneProvider } from "../../packages/mtone/src/basic";
 import "../../packages/mtone/dist/styles.css";
 const text =
@@ -55,6 +55,12 @@ createRoot(document.getElementById("root")!).render(
             placeholder={text}
           />
         </div>
+        <div className={`case multi-${density}`} style={{ width: 250 }}>
+          <MultiSelect label={`${density}-multi`} options={[{value:"a",label:"Alpha"},{value:"b",label:"Beta"},{value:"c",label:"Disabled",disabled:true}]} defaultValue={["a"]} />
+          <Checkbox label={`${density}-check`} defaultChecked />
+          <Checkbox label={`${density}-mixed`} indeterminate />
+        </div>
+        <div className="case"><MultiSelect label={`${density}-multi-disabled`} options={[]} disabled /></div>
       </MtoneProvider>
     ))}
   </>,

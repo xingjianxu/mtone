@@ -130,3 +130,10 @@ Set `modal={false}` to allow outside clicks to close it. This option only contro
 outside dismissal. Focus trapping, the backdrop, scroll locking, Escape, the close
 button, and controlled `open` updates remain unchanged in both modes. It is not
 forwarded as Base UI's `modal` option. Drawer and ConfirmDialog are unaffected.
+
+### Selection icons
+
+Select and MultiSelect use the same decorative 16px Lucide ChevronDown and
+16px Check (1.5px stroke), keeping accessible labels unchanged. Checkbox uses
+the same thin-line Check/Minus in a 12px icon to fit its 16px control. Native
+table selection checkboxes and non-selection disclosure icons are unchanged.

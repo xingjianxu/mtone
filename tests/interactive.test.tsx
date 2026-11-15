@@ -327,3 +327,30 @@ it("keeps Escape dismissal when outside dismissal is disabled", async () => {
   await user.keyboard("{Escape}");
   expect(screen.queryByRole("dialog")).toBeNull();
 });
+
+it("multiselect uses the same decorative arrow and selection check as Select", async () => {
+  render(<UI.MultiSelect label="Vector tags" options={options} defaultValue={["a"]} />);
+  const trigger = screen.getByRole("button", { name: "展开选项" });
+  expect(trigger.querySelector("svg")).toHaveClass("lucide-chevron-down");
+  expect(trigger.querySelector("svg")).toHaveAttribute("width", "16");
+  await userEvent.click(trigger);
+  const selected = await screen.findByRole("option", { name: "Alpha" });
+  const marker = selected.querySelector(".mt-select-item-indicator");
+  expect(marker).toHaveAttribute("aria-hidden", "true");
+  expect(marker?.querySelector("svg")).toHaveClass("lucide-check");
+  expect(marker?.querySelector("svg")).toHaveAttribute("stroke-width", "1.5");
+  expect(screen.getByRole("option", { name: "Charlie" }).querySelector(".mt-select-item-indicator")).toBeNull();
+  await userEvent.click(screen.getByRole("option", { name: "Charlie" }));
+  expect(screen.getByRole("option", { name: "Charlie" }).querySelector(".mt-select-item-indicator svg")).not.toBeNull();
+});
+it("checkbox uses thin vector checked and indeterminate indicators", () => {
+  const { rerender } = render(<UI.Checkbox label="Vector check" checked />);
+  let marker = screen.getByRole("checkbox").querySelector(".mt-check-indicator");
+  expect(marker).toHaveAttribute("aria-hidden", "true");
+  expect(marker?.querySelector("svg")).toHaveClass("lucide-check");
+  expect(marker?.querySelector("svg")).toHaveAttribute("stroke-width", "1.5");
+  rerender(<UI.Checkbox label="Vector check" indeterminate />);
+  expect(screen.getByRole("checkbox")).toHaveAttribute("aria-checked", "mixed");
+  marker = screen.getByRole("checkbox").querySelector(".mt-check-indicator");
+  expect(marker?.querySelector("svg")).toHaveClass("lucide-minus");
+});

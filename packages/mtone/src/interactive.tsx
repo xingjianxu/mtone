@@ -1,5 +1,5 @@
 import React, { useId, useState } from "react";
-import { Check, ChevronDown, X } from "lucide-react";
+import { Check, ChevronDown, Minus, X } from "lucide-react";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BSwitch } from "@base-ui/react/switch";
 import { Radio as BRadio } from "@base-ui/react/radio";
@@ -55,8 +55,8 @@ export function Checkbox({
   return (
     <label className={cn("mt-check-label", className)}>
       <BCheckbox.Root className="mt-checkbox" {...props}>
-        <BCheckbox.Indicator className="mt-check-indicator">
-          {props.indeterminate ? "−" : "✓"}
+        <BCheckbox.Indicator className="mt-check-indicator" aria-hidden="true">
+          {props.indeterminate ? <Minus size={12} strokeWidth={1.5} aria-hidden="true" /> : <Check size={12} strokeWidth={1.5} aria-hidden="true" />}
         </BCheckbox.Indicator>
       </BCheckbox.Root>
       {label ?? children}
@@ -220,7 +220,7 @@ export function MultiSelect({
           className="mt-combobox-trigger"
           aria-label={locale === "zh" ? "展开选项" : "Show options"}
         >
-          ⌄
+          <ChevronDown size={16} aria-hidden="true" />
         </Combobox.Trigger>
       </Combobox.Chips>
       <Combobox.Portal>
@@ -239,7 +239,7 @@ export function MultiSelect({
                     disabled={options.find((o) => o.value === v)?.disabled}
                   >
                     {labelFor(v)}
-                    <Combobox.ItemIndicator>✓</Combobox.ItemIndicator>
+                    <Combobox.ItemIndicator className="mt-select-item-indicator" aria-hidden="true"><Check size={16} strokeWidth={1.5} aria-hidden="true" /></Combobox.ItemIndicator>
                   </Combobox.Item>
                 )}
               </Combobox.List>
