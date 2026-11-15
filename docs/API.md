@@ -32,7 +32,7 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 
 - `Checkbox`, `Switch`: `checked`, `defaultChecked`, `onCheckedChange`, `label` or children, disabled; Checkbox also indeterminate.
 - `RadioGroup`: options, value/defaultValue/onValueChange, label, orientation horizontal/vertical.
-- `Select`: options, string/null value, defaultValue, onValueChange, placeholder, label, disabled, open/defaultOpen/onOpenChange. The dropdown chevron is a fixed 16px vector icon; long selected labels and placeholders truncate within constrained trigger widths without stretching or pushing out the icon.
+- `Select`: options, string/null value, defaultValue, onValueChange, placeholder, label, disabled, open/defaultOpen/onOpenChange. The dropdown chevron is a fixed 16px vector icon; long selected labels and placeholders truncate within constrained trigger widths without stretching or pushing out the icon. Selected options use a vertically centered 16px Lucide Check with a thin 1.5px stroke; selection semantics and APIs are unchanged.
 - `MultiSelect`: options, string[] value, defaultValue, onValueChange, placeholder, label; searchable with removable chips. Use textual option labels for reliable filtering.
 - `Slider`: number value/defaultValue/onValueChange, min/max/step, label, disabled.
 - `NumberInput`: number/null value/defaultValue/onValueChange, min/max/step, label, disabled.

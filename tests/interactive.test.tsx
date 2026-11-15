@@ -286,3 +286,19 @@ it("select preserves long values and disabled semantics with its decorative arro
   expect(trigger).toBeDisabled();
   expect(trigger.querySelector(".mt-select-value")).toHaveTextContent(long);
 });
+
+it("select marks only the selected option with a thin decorative vector check", async () => {
+  render(<UI.Select label="Checked choice" options={options} defaultValue="a" />);
+  await userEvent.click(screen.getByRole("combobox", {name:"Checked choice"}));
+  const selected = await screen.findByRole("option", {name:/Alpha/});
+  expect(selected).toHaveAttribute("aria-selected", "true");
+  const indicator = selected.querySelector(".mt-select-item-indicator");
+  expect(indicator).toHaveAttribute("aria-hidden", "true");
+  const svg = indicator?.querySelector("svg");
+  expect(svg).toHaveClass("lucide-check");
+  expect(svg).toHaveAttribute("width", "16");
+  expect(svg).toHaveAttribute("height", "16");
+  expect(svg).toHaveAttribute("stroke-width", "1.5");
+  expect(indicator).not.toHaveTextContent("✓");
+  expect(screen.getByRole("option", {name:/Charlie/}).querySelector(".mt-select-item-indicator")).toBeNull();
+});

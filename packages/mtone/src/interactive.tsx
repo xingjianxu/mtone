@@ -1,5 +1,5 @@
 import React, { useId, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BSwitch } from "@base-ui/react/switch";
 import { Radio as BRadio } from "@base-ui/react/radio";
@@ -154,7 +154,12 @@ export function Select({
                     disabled={o.disabled}
                   >
                     <BSelect.ItemText>{o.label}</BSelect.ItemText>
-                    <BSelect.ItemIndicator>✓</BSelect.ItemIndicator>
+                    <BSelect.ItemIndicator
+                      className="mt-select-item-indicator"
+                      aria-hidden="true"
+                    >
+                      <Check size={16} strokeWidth={1.5} aria-hidden="true" />
+                    </BSelect.ItemIndicator>
                   </BSelect.Item>
                 ))}
               </BSelect.List>

@@ -740,7 +740,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "开关变化回调。",
       },
     ],
-    notes: ["支持键盘选择、禁用选项和焦点恢复。"],
+    notes: ["支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
   {
     name: "MultiSelect",

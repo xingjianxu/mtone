@@ -96,7 +96,8 @@
   white-space: nowrap;
   text-align: start;
 }
-.mt-select-icon {
+.mt-select-icon,
+.mt-select-item-indicator {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -104,9 +105,12 @@
   width: 16px;
   height: 16px;
   line-height: 1;
+}
+.mt-select-icon {
   color: var(--mt-muted, #787774);
 }
-.mt-select-icon > svg {
+.mt-select-icon > svg,
+.mt-select-item-indicator > svg {
   display: block;
   flex: none;
   width: 16px;

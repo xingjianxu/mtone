@@ -19,8 +19,12 @@ try {
     viewport: { width: 900, height: 1000 },
   });
   page.on("pageerror", (error) => console.error(error));
-  page.on("console", (message) => { if (message.type() === "error") console.error(message.text()); });
-  const response = await page.goto("http://127.0.0.1:5187/tests/fixtures/select-layout.html");
+  page.on("console", (message) => {
+    if (message.type() === "error") console.error(message.text());
+  });
+  const response = await page.goto(
+    "http://127.0.0.1:5187/tests/fixtures/select-layout.html",
+  );
   assert.equal(response.status(), 200, "Fixture must be served successfully");
   await page.locator(".mt-select").first().waitFor();
   const check = async () => {
@@ -68,6 +72,47 @@ try {
     .getByRole("combobox", { name: "compact-160", exact: true })
     .click();
   await page.getByRole("listbox").waitFor();
+  const checkSelection = async () => {
+    const selected = page.getByRole("option", { selected: true });
+    assert.equal(
+      await selected.count(),
+      1,
+      "Exactly one option must be selected",
+    );
+    assert.equal(await page.locator(".mt-select-item-indicator").count(), 1);
+    const result = await selected.evaluate((option) => {
+      const marker = option.querySelector(".mt-select-item-indicator");
+      const svg = marker.querySelector("svg");
+      const row = option.getBoundingClientRect();
+      const box = marker.getBoundingClientRect();
+      const vector = svg.getBoundingClientRect();
+      return {
+        width: box.width,
+        height: box.height,
+        svgWidth: vector.width,
+        svgHeight: vector.height,
+        centered:
+          Math.abs((box.top + box.bottom - row.top - row.bottom) / 2) < 1,
+        contained: box.left >= row.left && box.right <= row.right,
+        hidden: marker.getAttribute("aria-hidden"),
+        stroke: svg.getAttribute("stroke-width"),
+        checkShape: svg.classList.contains("lucide-check"),
+      };
+    });
+    assert.deepEqual(result, {
+      width: 16,
+      height: 16,
+      svgWidth: 16,
+      svgHeight: 16,
+      centered: true,
+      contained: true,
+      hidden: "true",
+      stroke: "1.5",
+      checkShape: true,
+    });
+    console.log("Selected item marker:", result);
+  };
+  await checkSelection();
   await check();
   await page.getByRole("option", { name: "Short", exact: true }).click();
   assert.equal(
@@ -77,6 +122,16 @@ try {
     "Short",
   );
   await check();
+  await page
+    .getByRole("combobox", { name: "compact-160", exact: true })
+    .click();
+  await page.getByRole("listbox").waitFor();
+  await checkSelection();
+  await page.keyboard.press("Escape");
+  await page.getByRole("combobox", {name:"comfortable-160", exact:true}).click();
+  await page.getByRole("listbox").waitFor();
+  await checkSelection();
+  await page.keyboard.press("Escape");
   assert.equal(
     await page
       .getByRole("combobox", { name: "compact-disabled", exact: true })
