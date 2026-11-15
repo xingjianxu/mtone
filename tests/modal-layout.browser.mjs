@@ -24,16 +24,19 @@ try {
         groupGaps = { top: Math.min(...buttons.map(b => b.top)) - f.top - parseFloat(style.borderTopWidth), bottom: f.bottom - Math.max(...buttons.map(b => b.bottom)) - parseFloat(style.borderBottomWidth), wrapped: buttons[0].top !== buttons[1].top };
         gaps = [...footer.querySelectorAll("button")].map(button => { const b = button.getBoundingClientRect(); return { top: b.top - f.top - parseFloat(style.borderTopWidth), bottom: f.bottom - b.bottom - parseFloat(style.borderBottomWidth) }; });
       }
-      return { gaps, groupGaps, delta: Math.abs((title.top + title.bottom - close.top - close.bottom) / 2), right: box.right, left: box.left, overflow: el.scrollWidth > el.clientWidth, closeInside: close.left >= box.left && close.right <= box.right, titleGap: close.left - title.right };
+      const header = el.querySelector(".mt-modal-header").getBoundingClientRect();
+      const topInset = header.top - box.top - parseFloat(getComputedStyle(el).borderTopWidth);
+      return { topInset, gaps, groupGaps, delta: Math.abs((title.top + title.bottom - close.top - close.bottom) / 2), right: box.right, left: box.left, overflow: el.scrollWidth > el.clientWidth, closeInside: close.left >= box.left && close.right <= box.right, titleGap: close.left - title.right };
     });
     console.log({ width, density, mode, ...result });
+    assert.equal(result.topInset, 12, "Modal top padding");
     assert(result.left >= 0 && result.right <= width && !result.overflow && result.closeInside, "Responsive containment");
     if (mode !== "empty") {
       assert(result.delta < 0.5, "Title and close must share vertical center");
       assert(result.titleGap >= 8, "Title must not overlap close");
       assert.equal(result.gaps.length, 2);
-      assert.equal(result.groupGaps.top, 12);
-      assert.equal(result.groupGaps.bottom, 12);
+      assert.equal(result.groupGaps.top, 8);
+      assert.equal(result.groupGaps.bottom, 8);
       if (mode === "wrap" && width === 360) assert(result.groupGaps.wrapped, "Long buttons must wrap on narrow screens");
       if (!result.groupGaps.wrapped) for (const gap of result.gaps) assert(Math.abs(gap.top - gap.bottom) < 0.5, "Footer button gaps must be equal");
     } else { assert.equal(result.gaps.length, 0); await page.getByRole("dialog", { name: "对话框", exact: true }).waitFor(); }

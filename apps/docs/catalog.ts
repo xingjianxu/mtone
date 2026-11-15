@@ -1913,7 +1913,7 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "footer",
         type: "ReactNode",
-        description: "可选页脚操作区，分隔线上下独立布局；按钮上下内边距均为 12px。",
+        description: "可选页脚操作区，分隔线上下独立布局；按钮上下内边距均为 8px。",
       },
       {
         name: "className",
@@ -1939,7 +1939,7 @@ export const componentDocs: ComponentDoc[] = [
     notes: [
       "支持 Esc 关闭、焦点管理与关闭后焦点恢复。",
       "复杂受控流程由 open/onOpenChange 管理。",
-      "标题与关闭按钮垂直居中；主体内边距 20px，footer 上间隔 16px，footer 内上下留白各 12px。多行标题与窄屏按钮换行均受支持。",
+      "标题与关闭按钮垂直居中；面板顶部内边距 12px、左右 20px，footer 上间隔 16px，footer 内上下留白各 8px。多行标题与窄屏按钮换行均受支持。",
     ],
   },
   {
