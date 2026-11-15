@@ -186,6 +186,13 @@ function Start() {
         />
         <p>样式只需导入一次。简单组件无需 Provider，使用默认中文与紧凑密度。</p>
       </section>
+      <section id="ai-coding">
+        <h2>与 AI 一起编程</h2>
+        <p><a href="./llms.txt">打开 llms.txt</a>，将内容提供给支持文件或网页上下文的 AI 编程工具。它包含安装方式、组件入口、重要 API、示例与文档链接。</p>
+        <CodeBlock code={'先读取 node_modules/@bixlab/mtone/llms.txt 和 dist/index.d.ts。使用已安装版本的 mtone 组件实现一个设置页，导入 styles.css，复用组件，不猜测其他 UI 库的 API。最后执行类型检查并验证键盘交互。'} />
+        <p>从包含此文件的新版 npm 包安装后，可在 node_modules/@bixlab/mtone/llms.txt 读取。当前改动尚待下一次 npm 发布；已安装的旧版本可能没有该文件。</p>
+        <p>网站文件跟随仓库 master，可能领先 npm。优先使用已安装包中的文件和类型声明；llms.txt 不会被所有 AI 工具自动读取，也不能代替完整类型、测试或后端实现。</p>
+      </section>
       <section>
         <h2>你会获得什么</h2>
         <p>

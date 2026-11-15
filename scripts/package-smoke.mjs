@@ -23,6 +23,7 @@ try {
     "dist/styles.css",
     "README.md",
     "LICENSE",
+    "llms.txt",
   ]) {
     assert(
       pack.files.some((f) => f.path === path),
@@ -31,7 +32,7 @@ try {
   }
   assert(
     pack.files.every((f) =>
-      /^(dist\/|package.json$|README.md$|LICENSE)/.test(f.path),
+      /^(dist\/|package.json$|README.md$|llms.txt$|LICENSE)/.test(f.path),
     ),
     "Unexpected tarball contents",
   );
@@ -53,6 +54,7 @@ try {
     ],
     dir,
   );
+  assert.equal(readFileSync(join(dir, "node_modules/@bixlab/mtone/llms.txt"), "utf8"), readFileSync(join(root, "packages/mtone/llms.txt"), "utf8"));
   writeFileSync(
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';

@@ -1,0 +1,1483 @@
+# mtone
+
+> Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
+
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.2.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+
+## Setup
+
+- Package: @bixlab/mtone (ESM; React and ReactDOM ^19.2.0).
+- Install: npm install @bixlab/mtone
+- Named imports: import { Button, MtoneProvider } from "@bixlab/mtone";
+- Import precompiled CSS once: import "@bixlab/mtone/styles.css";
+- Consumers do not need to install/configure Tailwind or copy component source. Base UI and Lucide are package dependencies.
+- Optional provider: <MtoneProvider locale="zh" density="compact"><Button>保存</Button></MtoneProvider>. Locale: zh | en; density: compact | comfortable. Provider tokens are CSS custom properties.
+- Interactive components need a client boundary in React Server Component frameworks.
+
+## AI coding guidance
+
+- Read the installed dist/index.d.ts for the complete authoritative signatures. This reference lists curated public props, not every inherited HTML/Base UI prop.
+- Use documented mtone wrapper APIs, not guessed Ant Design, shadcn, Mantine or raw Base UI props. Do not import private src paths.
+- Pair controlled values/open state with the documented change callbacks; defaultValue/defaultOpen are for uncontrolled initial state.
+- Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact.
+- Prefer Dialog. Modal/ModalProps are deprecated aliases. Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.
+- Use Badge, not removed Tag. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.
+- Toast notifications need ToastProvider; useToast exposes add, success, error, info, update, promise and close (verify installed declarations before use).
+- Do not assume the live docs match an older npm package. Type-check generated code and run interaction tests.
+
+## Documentation
+
+- [Getting started](https://xingjianxu.github.io/mtone/#/start): installation and AI usage
+- [Component gallery](https://xingjianxu.github.io/mtone/#/gallery): independent component examples
+- [Application showcase](https://xingjianxu.github.io/mtone/showcase.html): interactive in-memory demo, not a backend
+- [Source repository](https://github.com/xingjianxu/mtone): current code and migration notes
+
+## Components
+
+### Layout
+
+- [Layout](https://xingjianxu.github.io/mtone/#/components/Layout): 可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。
+- Import: Layout from @bixlab/mtone
+- Layout.Sider.version: ReactNode. 底部左侧的应用版本文字/内容；默认不显示，收起时隐藏。折叠按钮固定在底部右侧。
+- Layout.hasSider: boolean. 是否采用横向布局。省略时自动识别直接子元素中的 Layout.Sider；包装组件内的 Sider 请显式指定。
+- Layout.fullHeight: boolean (default: false). 占满视口高度（100dvh）；嵌入页面时可改用 style.height 指定有限高度。
+- Layout.Sider.collapsible: boolean (default: false). 启用复用自 Sidebar 的收起/展开按钮和图标窄栏。
+- Layout.Sider.collapsed: boolean. 受控收起状态；搭配 onCollapsedChange 由父组件更新。
+- Layout.Sider.defaultCollapsed: boolean (default: false). 非受控模式的初始收起状态。
+- Layout.Sider.onCollapsedChange: (collapsed: boolean) => void. 点击收起按钮或响应式断点请求改变状态时调用；受控模式不会自行覆盖 collapsed。
+- Layout.Sider.logo / collapsedLogo: ReactNode. 顶部品牌插槽；collapsedLogo 用于窄栏中的简化标识。
+- Layout.Sider.width / collapsedWidth: number (default: 240 / 52). 展开/收起宽度，单位 px，最小 40px；本版不支持零宽隐藏。
+- Layout.Sider.breakpoint: number. 可选视口断点（px），例如 768。低于断点请求收起，恢复宽屏请求展开；未设置时不自动响应。
+- Layout.Sider.onBreakpoint: (broken: boolean) => void. 监听断点状态；true 表示视口低于设定断点。
+- Layout.Sider.collapseLabel / expandLabel: string (default: 收起侧边栏 / 展开侧边栏). 继承 Sidebar 的切换按钮可访问名称。
+- Layout.Header.breadcrumb: ReactNode. 顶部左侧插槽；建议传入已有 Breadcrumb 组件。
+- Layout.Header.extra: ReactNode. 顶部右对齐操作插槽，可组合 IconButton、DropdownMenu、Avatar 等。
+- Layout.Header.children: ReactNode. 顶部左侧补充内容；窄屏允许换行。
+- Layout.Content.as: "main" | "section" | "div" (default: main). 主体语义标签。一个页面通常只使用一个 main；嵌入其他主体时改为 section 或 div。
+- children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes. 各区域均可嵌套内容和覆盖样式；默认不生成主体 Footer，显式组合 Layout.Footer 时显示，默认高度 42px。
+- 主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <Layout.Footer>内容</Layout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。
+- 使用 Layout.Sider、Layout.Header、Layout.Content、Layout.Footer 组合，不需要单独安装子组件。API 采用 Ant Design 的组合习惯，但不是 Ant Design Layout 的全量兼容实现。
+- Layout.Sider 复用本库 Sidebar 的状态、NavItem 图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、IconButton 等已有组件。
+- 默认头部 48px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌、侧栏底部版本/折叠行与顶部操作保持可见。
+- 响应式收起为图标窄栏，不是弹出式抽屉。breakpoint 按浏览器视口判断，不按示例容器宽度判断；希望自定义手机抽屉时可组合已有 Drawer。
+- 受控状态必须在 onCollapsedChange 中更新，否则切换只发出请求。导航、路由、数据保存、账号菜单与持久化由应用实现。
+- 示例右上按钮仅更新本地提示；不发送搜索、通知请求，也不更改账号或安全设置。
+
+```tsx
+import { useState } from "react";
+import { Box, BookOpen, Home, Settings } from "lucide-react";
+import { Layout, Breadcrumb, NavItem, IconButton, Card } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <Layout hasSider style={{ height: 480 }}>
+      <Layout.Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapsedChange={setCollapsed}
+        width={240}
+        collapsedWidth={52}
+        version="v1.0.0"
+        breakpoint={768}
+        logo={<strong>mtone</strong>}
+        collapsedLogo={<Box size={22} aria-label="mtone" />}
+        aria-label="主导航"
+      >
+        <NavItem icon={<Home size={16} />}>首页</NavItem>
+        <NavItem icon={<BookOpen size={16} />} active>知识库</NavItem>
+      </Layout.Sider>
+      <Layout>
+        <Layout.Header
+          breadcrumb={<Breadcrumb items={[{ label: "知识库" }, { label: "设计规范" }]} />}
+          extra={<IconButton aria-label="设置"><Settings size={16} /></IconButton>}
+        />
+        <Layout.Content>
+          <h1>设计规范</h1>
+          <Card>这里是独立滚动的主体内容。</Card>
+        </Layout.Content>
+      </Layout>
+    </Layout>
+  );
+}
+```
+
+### Button
+
+- [Button](https://xingjianxu.github.io/mtone/#/components/Button): 带完整样式的基础操作按钮。
+- Import: Button from @bixlab/mtone
+- variant: "blue" | "solid" | "outline" | "soft" | "ghost" (default: outline). 按钮外观。
+- size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
+- danger: boolean. 危险操作样式。
+- loading: boolean. 显示加载图标并禁用点击。
+- icon: ReactNode. 前置图标。
+- disabled: boolean. 禁用按钮。
+- onClick: MouseEventHandler. 点击回调。
+- children: ReactNode. 组件内容。
+- 支持 ref 和 Base UI Button 的可组合属性。加载中不会重复触发操作。
+- blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。
+
+```tsx
+import { Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Button variant="blue">启用两步验证</Button>
+  );
+}
+```
+
+### IconButton
+
+- [IconButton](https://xingjianxu.github.io/mtone/#/components/IconButton): 有可访问名称的图标操作按钮。
+- Import: IconButton from @bixlab/mtone
+- aria-label: string. 必填；读屏器朗读的操作名称。
+- variant: "blue" | "solid" | "outline" | "soft" | "ghost" (default: outline). 按钮外观。
+- size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
+- danger: boolean. 危险操作样式。
+- loading: boolean. 显示加载图标并禁用点击。
+- icon: ReactNode. 前置图标。
+- disabled: boolean. 禁用按钮。
+- onClick: MouseEventHandler. 点击回调。
+- children: ReactNode. 组件内容。
+- children 中可直接放 lucide-react 图标；不要只用图标而省略名称。
+
+```tsx
+import { IconButton } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <IconButton aria-label="添加">＋</IconButton>
+  );
+}
+```
+
+### ButtonGroup
+
+- [ButtonGroup](https://xingjianxu.github.io/mtone/#/components/ButtonGroup): 将关联按钮组织为一个操作组。
+- Import: ButtonGroup, Button from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+
+```tsx
+import { ButtonGroup, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <ButtonGroup aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>
+  );
+}
+```
+
+### Input
+
+- [Input](https://xingjianxu.github.io/mtone/#/components/Input): 单行文本输入，保留标准 HTML 输入接口。
+- Import: Input from @bixlab/mtone
+- value / defaultValue: string. 受控值或非受控初始值。
+- onChange: ChangeEventHandler. 接收原生 React change 事件。
+- placeholder: string. 输入提示。
+- disabled / readOnly: boolean. 禁用或只读。
+- aria-label / id: string. 可访问名称或与 label 关联的标识。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 支持对应原生输入元素属性和 ref。占位提示不能替代标签。
+
+```tsx
+import { Input } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Input aria-label="标题" placeholder="输入标题" />
+  );
+}
+```
+
+### SearchInput
+
+- [SearchInput](https://xingjianxu.github.io/mtone/#/components/SearchInput): 带搜索图标的输入框，不注册全局快捷键。
+- Import: SearchInput from @bixlab/mtone
+- value / defaultValue: string. 受控值或非受控初始值。
+- onChange: ChangeEventHandler. 接收原生 React change 事件。
+- placeholder: string. 输入提示。
+- disabled / readOnly: boolean. 禁用或只读。
+- aria-label / id: string. 可访问名称或与 label 关联的标识。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 支持对应原生输入元素属性和 ref。占位提示不能替代标签。
+
+```tsx
+import { SearchInput } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <SearchInput aria-label="搜索文档" placeholder="搜索文档…" />
+  );
+}
+```
+
+### Textarea
+
+- [Textarea](https://xingjianxu.github.io/mtone/#/components/Textarea): 用于多行说明和长文本的输入框。
+- Import: Textarea from @bixlab/mtone
+- value / defaultValue: string. 受控值或非受控初始值。
+- onChange: ChangeEventHandler. 接收原生 React change 事件。
+- placeholder: string. 输入提示。
+- disabled / readOnly: boolean. 禁用或只读。
+- aria-label / id: string. 可访问名称或与 label 关联的标识。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 支持对应原生输入元素属性和 ref。占位提示不能替代标签。
+
+```tsx
+import { Textarea } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Textarea aria-label="说明" rows={4} placeholder="记录你的想法" />
+  );
+}
+```
+
+### Form
+
+- [Form](https://xingjianxu.github.io/mtone/#/components/Form): 使用原生表单提交语义组织字段。
+- Import: Form, FormField, Input, Button from @bixlab/mtone
+- onSubmit: FormEventHandler. 原生提交事件，应用负责保存和验证。
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 不内置表单状态管理、请求或自定义验证引擎。
+
+```tsx
+import { Form, FormField, Input, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Form onSubmit={(event) => event.preventDefault()}><FormField label="标题" required><Input name="title" /></FormField><Button type="submit">提交</Button></Form>
+  );
+}
+```
+
+### FormField
+
+- [FormField](https://xingjianxu.github.io/mtone/#/components/FormField): 关联标签、说明、错误信息与单个输入控件。
+- Import: FormField, Input from @bixlab/mtone
+- label: ReactNode. 必填；字段标签。
+- children: ReactElement. 必填；一个可接收 id 与 ARIA 属性的输入元素。
+- description: ReactNode. 帮助说明。
+- error: ReactNode. 错误提示，优先于说明显示。
+- required: boolean. 必填标识并传递 required。
+- 会克隆子元素添加 id、required、aria-invalid 和 aria-describedby。复合选择控件请使用其 label 属性。
+
+```tsx
+import { FormField, Input } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <FormField label="文档名称" description="请输入便于查找的名称" required><Input placeholder="例如：阅读笔记" /></FormField>
+  );
+}
+```
+
+### Checkbox
+
+- [Checkbox](https://xingjianxu.github.io/mtone/#/components/Checkbox): 勾选状态切换。
+- Import: Checkbox from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- checked: boolean. 受控勾选值。
+- defaultChecked: boolean. 非受控初始值。
+- onCheckedChange: (checked: boolean) => void. 勾选变化回调。
+- children: ReactNode. 组件内容。
+- indeterminate: boolean. 不确定状态，适合部分选中。
+- 提供 label 或可读 children，确保控件有名称。
+
+```tsx
+import { Checkbox } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Checkbox label="自动保存" defaultChecked />
+  );
+}
+```
+
+### Switch
+
+- [Switch](https://xingjianxu.github.io/mtone/#/components/Switch): 开关式布尔状态控制。
+- Import: Switch from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- checked: boolean. 受控勾选值。
+- defaultChecked: boolean. 非受控初始值。
+- onCheckedChange: (checked: boolean) => void. 勾选变化回调。
+- children: ReactNode. 组件内容。
+- 提供 label 或可读 children，确保控件有名称。
+
+```tsx
+import { Switch } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Switch label="自动保存" defaultChecked />
+  );
+}
+```
+
+### RadioGroup
+
+- [RadioGroup](https://xingjianxu.github.io/mtone/#/components/RadioGroup): 从一组选项中选择一个值。
+- Import: RadioGroup from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- options: Option[]. 必填；每项含 value、label，可设置 disabled。value 必须唯一。
+- value: string. 受控值；提供后需在回调中更新。
+- defaultValue: string. 非受控初始值。
+- onValueChange: (value: string) => void. 值变化回调。
+- orientation: "horizontal" | "vertical" (default: vertical). RadioGroup 的排列方向；Segmented 默认采用水平分段样式。
+- 每个选项的 label 为可见名称；可用 disabled 禁用单项。
+
+```tsx
+import { RadioGroup } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <RadioGroup label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />
+  );
+}
+```
+
+### Segmented
+
+- [Segmented](https://xingjianxu.github.io/mtone/#/components/Segmented): 用紧凑分段按钮切换视图或模式。
+- Import: Segmented from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- options: Option[]. 必填；每项含 value、label，可设置 disabled。value 必须唯一。
+- value: string. 受控值；提供后需在回调中更新。
+- defaultValue: string. 非受控初始值。
+- onValueChange: (value: string) => void. 值变化回调。
+- orientation: "horizontal" | "vertical" (default: horizontal). RadioGroup 的排列方向；Segmented 默认采用水平分段样式。
+- 每个选项的 label 为可见名称；可用 disabled 禁用单项。
+
+```tsx
+import { Segmented } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Segmented label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />
+  );
+}
+```
+
+### Select
+
+- [Select](https://xingjianxu.github.io/mtone/#/components/Select): 带浮层列表的单选控件。
+- Import: Select from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- options: Option[]. 必填；每项含 value、label，可设置 disabled。value 必须唯一。
+- placeholder: string. 未选择时的提示。
+- value: string | null. 受控值；提供后需在回调中更新。
+- defaultValue: string | null. 非受控初始值。
+- onValueChange: (value: string | null) => void. 值变化回调。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- 支持键盘选择、禁用选项和焦点恢复。
+- 选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。
+
+```tsx
+import { Select } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Select label="分类" defaultValue="design" options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />
+  );
+}
+```
+
+### MultiSelect
+
+- [MultiSelect](https://xingjianxu.github.io/mtone/#/components/MultiSelect): 支持搜索与移除标签的多选控件。
+- Import: MultiSelect from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- options: Option[]. 必填；每项含 value、label，可设置 disabled。value 必须唯一。
+- placeholder: string. 未选择时的提示。
+- value: string[]. 受控值；提供后需在回调中更新。
+- defaultValue: string[]. 非受控初始值。
+- onValueChange: (value: string[]) => void. 值变化回调。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。
+
+```tsx
+import { MultiSelect } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <MultiSelect label="分类" defaultValue={["design"]} options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />
+  );
+}
+```
+
+### Slider
+
+- [Slider](https://xingjianxu.github.io/mtone/#/components/Slider): 通过滑轨调整一个数值。
+- Import: Slider from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- value: number. 受控值；提供后需在回调中更新。
+- defaultValue: number. 非受控初始值。
+- onValueChange: (value: number) => void. 值变化回调。
+- min / max: number. 数值下限与上限。
+- step: number. 步进大小。
+- 仅单值，不支持区间滑块。
+
+```tsx
+import { Slider } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Slider label="数量" defaultValue={20} min={0} max={100} step={5} />
+  );
+}
+```
+
+### NumberInput
+
+- [NumberInput](https://xingjianxu.github.io/mtone/#/components/NumberInput): 带增减按钮的数字输入框。
+- Import: NumberInput from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- value: number | null. 受控值；提供后需在回调中更新。
+- defaultValue: number | null. 非受控初始值。
+- onValueChange: (value: number | null) => void. 值变化回调。
+- min / max: number. 数值下限与上限。
+- step: number. 步进大小。
+- 清空时 value 可为 null；defaultValue 应传 number。
+
+```tsx
+import { NumberInput } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <NumberInput label="数量" defaultValue={20} min={0} max={100} step={5} />
+  );
+}
+```
+
+### DatePicker
+
+- [DatePicker](https://xingjianxu.github.io/mtone/#/components/DatePicker): 使用浏览器原生日历的单日期选择。
+- Import: DatePicker from @bixlab/mtone
+- label: string. 提供可访问名称。
+- disabled: boolean. 禁用交互。
+- name: string. 表单字段名称。
+- className: string. 附加样式类。
+- value: string. 受控值；提供后需在回调中更新。
+- defaultValue: string. 非受控初始值。
+- onValueChange: (value: string) => void. 值变化回调。
+- min / max: string. ISO YYYY-MM-DD 日期边界。
+- disabledDate: (date: string) => boolean. 返回 true 的日期在选择后被拒绝。
+- clearable: boolean (default: true). 显示清除按钮。
+- 值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。
+- 日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。
+- 仅对支持样式的原生日期指示器使用与 Select 一致的 16px 箭头，不叠加第二个图标；其他浏览器和强制颜色模式保留原生日期界面。
+- 不支持日期区间、时间或自定义日历面板。
+
+```tsx
+import { DatePicker } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <DatePicker label="完成日期" defaultValue="2026-11-15" min="2026-01-01" max="2026-12-31" />
+  );
+}
+```
+
+### Sidebar
+
+- [Sidebar](https://xingjianxu.github.io/mtone/#/components/Sidebar): 支持展开与图标窄栏切换的应用侧栏。
+- Import: Sidebar, NavItem from @bixlab/mtone
+- footer: ReactNode | ((collapsed: boolean) => ReactNode). 可选底部内容。
+- collapsePlacement: "header" | "footer" (default: header). 折叠按钮位置；Layout.Sider 使用 footer，独立 Sidebar 保持原默认。
+- header: ReactNode | ((collapsed: boolean) => ReactNode). 可选品牌头部，与已有折叠按钮同排；Layout.Sider 的 logo 通过该插槽复用。
+- collapsible: boolean (default: false). 启用内置收起/展开按钮；未启用时保持原有容器行为。
+- collapsed: boolean. 受控收起状态；搭配 onCollapsedChange 更新。
+- defaultCollapsed: boolean (default: false). 非受控模式的初始收起状态。
+- onCollapsedChange: (collapsed: boolean) => void. 点击切换按钮时触发。
+- collapseLabel / expandLabel: string (default: 收起侧边栏 / 展开侧边栏). 切换按钮的可访问名称和提示，可本地化。
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题并保留分组分隔。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。
+- 收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。
+- 受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。
+- 不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。
+
+```tsx
+import { Sidebar, NavItem } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>
+  );
+}
+```
+
+### NavItem
+
+- [NavItem](https://xingjianxu.github.io/mtone/#/components/NavItem): 支持当前状态和图标的导航按钮。
+- Import: NavItem from @bixlab/mtone
+- active: boolean. 设置当前项样式和 aria-current。
+- icon: ReactNode. 前置图标。
+- onClick: MouseEventHandler. 由应用执行导航。
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 底层为 button，不是链接；应用负责与路由集成。
+
+```tsx
+import { NavItem } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <NavItem active onClick={() => console.log("navigation")}>我的知识库</NavItem>
+  );
+}
+```
+
+### NavGroup
+
+- [NavGroup](https://xingjianxu.github.io/mtone/#/components/NavGroup): 以可选分组标题组织导航内容。
+- Import: NavGroup, NavItem from @bixlab/mtone
+- label: ReactNode. 可选分组标题。
+- children: ReactNode. 组件内容。
+
+```tsx
+import { NavGroup, NavItem } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <NavGroup label="私人空间"><NavItem active>工作笔记</NavItem><NavItem>阅读记录</NavItem></NavGroup>
+  );
+}
+```
+
+### Breadcrumb
+
+- [Breadcrumb](https://xingjianxu.github.io/mtone/#/components/Breadcrumb): 显示层级路径，最后一项为当前位置。
+- Import: Breadcrumb from @bixlab/mtone
+- items: { label: ReactNode; href?: string }[]. 必填；按层级排列。
+- aria-label: string (default: Breadcrumb). 导航区域名称。
+- 最后一项使用 aria-current="page"，不渲染链接。
+
+```tsx
+import { Breadcrumb } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Breadcrumb items={[{label:"首页",href:"#"},{label:"知识库",href:"#"},{label:"组件规范"}]} />
+  );
+}
+```
+
+### Tree
+
+- [Tree](https://xingjianxu.github.io/mtone/#/components/Tree): 支持展开、单选和键盘导航的目录树。
+- Import: Tree from @bixlab/mtone
+- items: TreeItem[]. 必填；节点含 id、label、children、disabled、icon。
+- value: string. 受控值；提供后需在回调中更新。
+- defaultValue: string. 非受控初始值。
+- onValueChange: (value: string) => void. 值变化回调。
+- expanded / defaultExpanded: string[]. 受控或初始展开节点 ID。
+- onExpandedChange: (ids: string[]) => void. 展开状态变化。
+- label: string. 目录树可访问名称。
+- className: string. 附加样式类。
+- 支持方向键、Home/End、Enter/Space。节点 id 应全树唯一。
+- 不含拖拽排序、懒加载协议或复选树。
+
+```tsx
+import { Tree } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Tree label="文档目录" defaultExpanded={["root"]} defaultValue="notes" items={[{id:"root",label:"知识库",children:[{id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}]}]} />
+  );
+}
+```
+
+### Tabs
+
+- [Tabs](https://xingjianxu.github.io/mtone/#/components/Tabs): 切换一组关联内容面板。
+- Import: Tabs from @bixlab/mtone
+- items: TabItem[]. 必填；value、label、content，可带 disabled。
+- value: string. 受控值；提供后需在回调中更新。
+- defaultValue: string. 非受控初始值。
+- onValueChange: (value: string) => void. 值变化回调。
+- className: string. 附加样式类。
+- 未指定 defaultValue 时使用第一项的 value。
+
+```tsx
+import { Tabs } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />
+  );
+}
+```
+
+### FilterBar
+
+- [FilterBar](https://xingjianxu.github.io/mtone/#/components/FilterBar): 筛选控件的弹性布局容器。
+- Import: FilterBar, FilterChip, Button from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 仅负责布局，不定义筛选查询或服务器协议。
+
+```tsx
+import { FilterBar, FilterChip, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <FilterBar><FilterChip onRemove={() => console.log("remove")}>分类：设计</FilterChip><Button>添加筛选</Button></FilterBar>
+  );
+}
+```
+
+### FilterChip
+
+- [FilterChip](https://xingjianxu.github.io/mtone/#/components/FilterChip): 展示已生效条件并提供移除操作。
+- Import: FilterChip from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- onRemove: () => void. 必填；移除请求，由应用更新条件。
+- 点击移除不会自行隐藏，应用负责更新状态。
+
+```tsx
+import { useState } from "react";
+import { FilterChip } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return <span>筛选已移除</span>;
+  return (
+    <FilterChip onRemove={() => setVisible(false)}>分类：设计</FilterChip>
+  );
+}
+```
+
+### Pagination
+
+- [Pagination](https://xingjianxu.github.io/mtone/#/components/Pagination): 完全受控的分页导航。
+- Import: Pagination from @bixlab/mtone
+- total: number. 必填；记录总数。
+- pageSize: number (default: 10). 每页记录数。
+- page: number. 必填；从 1 开始的当前页。
+- onPageChange: (page: number) => void. 必填；应用更新当前页。
+- className: string. 附加样式类。
+- 不自动加载数据。首尾翻页按钮会禁用；大量页码显示省略。
+
+```tsx
+import { useState } from "react";
+import { Pagination } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [page, setPage] = useState(1);
+  return (
+    <Pagination total={80} pageSize={10} page={page} onPageChange={setPage} />
+  );
+}
+```
+
+### DropdownMenu
+
+- [DropdownMenu](https://xingjianxu.github.io/mtone/#/components/DropdownMenu): 点击触发器打开的操作菜单。
+- Import: DropdownMenu, Button from @bixlab/mtone
+- trigger: ReactElement. 必填；触发元素。
+- items: MenuItem[]. 必填；key、label，可选 icon、shortcut、disabled、danger、onSelect。
+- onSelect: (key: string) => void. 选中菜单项时调用。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- 快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。
+
+```tsx
+import { DropdownMenu, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <DropdownMenu trigger={<Button>文档操作</Button>} items={[{key:"open",label:"打开"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />
+  );
+}
+```
+
+### ContextMenu
+
+- [ContextMenu](https://xingjianxu.github.io/mtone/#/components/ContextMenu): 在指定区域右键打开操作菜单。
+- Import: ContextMenu from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- items: MenuItem[]. 必填；key、label，可选 icon、shortcut、disabled、danger、onSelect。
+- onSelect: (key: string) => void. 选中菜单项时调用。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- children 为右键区域；不要向其传 DropdownMenu 的 trigger 属性。
+
+```tsx
+import { ContextMenu } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <ContextMenu items={[{key:"copy",label:"复制"}]} onSelect={(key) => console.log(key)}><div style={{padding:24}}>在此区域点击右键</div></ContextMenu>
+  );
+}
+```
+
+### Popover
+
+- [Popover](https://xingjianxu.github.io/mtone/#/components/Popover): 点击展开的轻量信息或操作浮层。
+- Import: Popover, Button from @bixlab/mtone
+- trigger: ReactElement. 必填；触发元素。
+- content: ReactNode. 必填；浮层内容。
+- title: ReactNode. 浮层标题。
+- side: "top" | "bottom" | "left" | "right" (default: bottom). 优先显示位置。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- 自定义触发器需转发 ref 与 DOM props。浮层自动继承 MtoneProvider 上下文。
+
+```tsx
+import { Popover, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Popover trigger={<Button>查看说明</Button>} title="提示" content="这里放置相关内容。" />
+  );
+}
+```
+
+### Tooltip
+
+- [Tooltip](https://xingjianxu.github.io/mtone/#/components/Tooltip): 悬停或聚焦时显示简短说明。
+- Import: Tooltip, Button from @bixlab/mtone
+- children: ReactElement. 必填；单个可聚焦触发元素。
+- content: ReactNode. 必填；提示内容。
+- side: "top" | "bottom" | "left" | "right" (default: top). 优先显示位置。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- 不要在提示中放必须操作的交互内容；图标触发器仍需 aria-label。
+
+```tsx
+import { Tooltip, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Tooltip content="复制当前链接"><Button>复制链接</Button></Tooltip>
+  );
+}
+```
+
+### Card
+
+- [Card](https://xingjianxu.github.io/mtone/#/components/Card): 带轻边框的内容卡片。
+- Import: Card from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+
+```tsx
+import { Card } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Card><strong>阅读笔记</strong><p>将知识组织为可复用的内容。</p></Card>
+  );
+}
+```
+
+### Text
+
+- [Text](https://xingjianxu.github.io/mtone/#/components/Text): 可使用次级颜色的行内文本。
+- Import: Text from @bixlab/mtone
+- muted: boolean. 使用次级文字颜色。
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+
+```tsx
+import { Text } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Text muted>更新于今天</Text>
+  );
+}
+```
+
+### Divider
+
+- [Divider](https://xingjianxu.github.io/mtone/#/components/Divider): 内容段落之间的水平分隔线。
+- Import: Divider from @bixlab/mtone
+- Divider 无额外公开属性。
+
+```tsx
+import { Divider } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <div><p>基本信息</p><Divider /><p>详细内容</p></div>
+  );
+}
+```
+
+### List
+
+- [List](https://xingjianxu.github.io/mtone/#/components/List): 语义化无序列表容器。
+- Import: List, ListItem from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+
+```tsx
+import { List, ListItem } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <List><ListItem>设计规范</ListItem><ListItem>研究笔记</ListItem></List>
+  );
+}
+```
+
+### ListItem
+
+- [ListItem](https://xingjianxu.github.io/mtone/#/components/ListItem): 包含图标、说明与尾部操作的列表项。
+- Import: ListItem, List, Button from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- icon: ReactNode. 前置图标。
+- description: ReactNode. 次级描述。
+- actions: ReactNode. 尾部操作区域。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 应放在 List 或 ul 中保持语义正确。
+
+```tsx
+import { ListItem, List, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <List><ListItem description="记录项目过程" actions={<Button size="sm">打开</Button>}>研究笔记</ListItem></List>
+  );
+}
+```
+
+### DocumentList
+
+- [DocumentList](https://xingjianxu.github.io/mtone/#/components/DocumentList): 面向知识库文档的标题与摘要列表。
+- Import: DocumentList from @bixlab/mtone
+- items: DocumentItem[]. 必填；文档数组。
+- DocumentItem: { id: string; title: string; description?: string; updatedAt?: string; icon?: ReactNode; onClick?: () => void }. 文档记录结构；时间是应用提供的显示字符串。
+- 不提供路由或日期格式化；点击由每项 onClick 处理。
+
+```tsx
+import { DocumentList } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <DocumentList items={[{id:"guide",title:"使用指南",description:"从一个想法开始",updatedAt:"今天",onClick:() => console.log("open guide")}]} />
+  );
+}
+```
+
+### DocumentCard
+
+- [DocumentCard](https://xingjianxu.github.io/mtone/#/components/DocumentCard): 以卡片展示一份文档。
+- Import: DocumentCard from @bixlab/mtone
+- id: string. 类型要求的文档标识。
+- title: string. 必填；文档名称。
+- description / updatedAt: string. 摘要与已格式化更新时间。
+- icon: ReactNode. 替代默认文件图标。
+- onClick: () => void. 点击标题回调。
+- 该组件不直接执行导航或读取文档内容。
+
+```tsx
+import { DocumentCard } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <DocumentCard id="guide" title="使用指南" description="从一个想法开始" updatedAt="今天" onClick={() => console.log("open guide")} />
+  );
+}
+```
+
+### Table
+
+- [Table](https://xingjianxu.github.io/mtone/#/components/Table): 支持排序、文本筛选、选择和分页的泛型数据表格。
+- Import: Table from @bixlab/mtone
+- data: T[]. 必填；当前数据行。
+- columns: TableColumn<T>[]. 必填；列定义 key、title、dataIndex、render、sortable、filterable。
+- rowKey: keyof T | ((row: T) => React.Key). 必填；稳定且唯一的字符串或数字键。
+- selectable: boolean. 显示行选择。
+- selectedKeys / onSelectionChange: React.Key[] / (keys: React.Key[]) => void. 受控选择与回调。
+- sort: {key: string; direction: "asc" | "desc"} | null. 受控单列排序，null 清除排序。
+- filters: Record<string, string>. 受控文本筛选。
+- pagination: false | {pageSize?, page?, total?, onPageChange?} (default: false). 分页配置。
+- manual: boolean (default: false). 远程模式，不在本地重复排序/筛选/分页。
+- onChange: (state: TableState) => void. 排序、筛选或分页变化。
+- loading: boolean (default: false). 加载状态。
+- empty: ReactNode. 自定义空态。
+- className: string. 附加样式类。
+- 筛选为不区分大小写的文本包含匹配。远程模式请传 pagination.total 和受控 page。
+- 选择可跨页保留；数据删除后应用负责清理失效行键。
+- 不含单元格编辑、冻结列、虚拟滚动或列宽调整。
+
+```tsx
+import { Table } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Table data={[{id:1,title:"设计规范",status:"进行中"},{id:2,title:"项目笔记",status:"已完成"}]} rowKey="id" selectable columns={[{key:"title",title:"名称",dataIndex:"title",sortable:true,filterable:true},{key:"status",title:"状态",dataIndex:"status"}]} pagination={{pageSize:10}} />
+  );
+}
+```
+
+### Badge
+
+- [Badge](https://xingjianxu.github.io/mtone/#/components/Badge): 紧凑的低饱和标签，支持语义颜色与可选移除操作。
+- Import: Badge from @bixlab/mtone
+- tone: "neutral" | "blue" | "green" | "orange" | "red" | "purple" (default: neutral). 低饱和语义颜色。
+- onRemove: () => void. 提供后显示移除按钮，应用负责移除内容。
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 可移除标签的存在状态由应用管理。Badge 不是数字角标或未读计数容器。
+
+```tsx
+import { Badge } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Badge tone="green">已完成</Badge>
+  );
+}
+```
+
+### Status
+
+- [Status](https://xingjianxu.github.io/mtone/#/components/Status): 使用状态点和文字表达进度。
+- Import: Status from @bixlab/mtone
+- tone: "neutral" | "blue" | "green" | "orange" | "red" | "purple" (default: neutral). 低饱和语义颜色。
+- children: ReactNode. 组件内容。
+- 状态必须同时有文字，不应仅依赖颜色。
+
+```tsx
+import { Status } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Status tone="green">已完成</Status>
+  );
+}
+```
+
+### Avatar
+
+- [Avatar](https://xingjianxu.github.io/mtone/#/components/Avatar): 展示头像，加载失败时回退到名字前两个字符。
+- Import: Avatar from @bixlab/mtone
+- name: string (default: 空字符串). 显示名称与图片替代文本。
+- src: string. 图片地址。
+- size: number (default: 24). 宽高像素值。
+- 未传图片或图片加载失败时显示文字。
+
+```tsx
+import { Avatar } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Avatar name="张三" size={32} />
+  );
+}
+```
+
+### AvatarGroup
+
+- [AvatarGroup](https://xingjianxu.github.io/mtone/#/components/AvatarGroup): 叠放一组头像并展示溢出数量。
+- Import: AvatarGroup from @bixlab/mtone
+- items: {name: string; src?: string}[]. 必填；头像数据。
+- max: number (default: 4). 最多可见头像数。
+- 各头像使用默认大小，多余人数以 +N 表示。
+
+```tsx
+import { AvatarGroup } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AvatarGroup items={[{name:"张三"},{name:"李四"},{name:"王五"}]} max={2} />
+  );
+}
+```
+
+### Progress
+
+- [Progress](https://xingjianxu.github.io/mtone/#/components/Progress): 显示 0 到 100 的任务进度。
+- Import: Progress from @bixlab/mtone
+- value: number. 必填；进度百分比，超出范围会被限制。
+- label: string (default: Progress). 进度条可访问名称。
+- 非有限值按 0 处理。组件不自行显示百分比文字。
+
+```tsx
+import { Progress } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Progress value={68} label="上传进度" />
+  );
+}
+```
+
+### PropertyList
+
+- [PropertyList](https://xingjianxu.github.io/mtone/#/components/PropertyList): 文档属性的定义列表容器。
+- Import: PropertyList, PropertyItem from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- 使用 dl 语义，与 PropertyItem 搭配。
+
+```tsx
+import { PropertyList, PropertyItem } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <PropertyList><PropertyItem label="类型">文档</PropertyItem><PropertyItem label="状态">进行中</PropertyItem></PropertyList>
+  );
+}
+```
+
+### PropertyItem
+
+- [PropertyItem](https://xingjianxu.github.io/mtone/#/components/PropertyItem): 展示一行属性名和值。
+- Import: PropertyItem, PropertyList from @bixlab/mtone
+- label: ReactNode. 必填；属性名。
+- children: ReactNode. 组件内容。
+- 放在 PropertyList 中；编辑能力通过在 children 中组合控件实现。
+
+```tsx
+import { PropertyItem, PropertyList } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <PropertyList><PropertyItem label="负责人">张三</PropertyItem></PropertyList>
+  );
+}
+```
+
+### Dialog
+
+- [Dialog](https://xingjianxu.github.io/mtone/#/components/Dialog): 聚焦当前任务的模态对话框。
+- Import: Dialog, Button from @bixlab/mtone
+- modal: boolean (default: true). 默认 true，点击外部不关闭；false 点击外部关闭。仅控制外部关闭，不影响焦点陷阱、遮罩、滚动锁定、Escape 或关闭按钮。
+- title: ReactNode. 对话框标题；传 null 隐藏可见标题，仍保留默认无障碍名称。
+- description: ReactNode. 说明文本。
+- children: ReactNode. 组件内容。
+- trigger: ReactElement. 可选触发器；也可用 open 受控打开。
+- footer: ReactNode. 可选页脚操作区，分隔线上下独立布局；按钮上下内边距均为 8px。
+- className: string. 附加面板样式类。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- 支持 Esc 关闭、焦点管理与关闭后焦点恢复。
+- Modal/ModalProps 暂保留为已弃用兼容别名，建议迁移至 Dialog/DialogProps。
+- 复杂受控流程由 open/onOpenChange 管理。
+- 标题与关闭按钮垂直居中；面板顶部内边距 12px、左右 20px，footer 上间隔 16px，footer 内上下留白各 8px。多行标题与窄屏按钮换行均受支持。
+
+```tsx
+import { Dialog, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Dialog modal={true} title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开 Dialog</Button>}><p>这里是内容区域。</p></Dialog>
+  );
+}
+```
+
+### Drawer
+
+- [Drawer](https://xingjianxu.github.io/mtone/#/components/Drawer): 从右侧打开的属性抽屉。
+- Import: Drawer, Button from @bixlab/mtone
+- title: ReactNode. 必填；对话框标题。
+- description: ReactNode. 说明文本。
+- children: ReactNode. 组件内容。
+- trigger: ReactElement. 可选触发器；也可用 open 受控打开。
+- footer: ReactNode. 页脚操作区。
+- className: string. 附加面板样式类。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- 支持 Esc 关闭、焦点管理与关闭后焦点恢复。
+- Drawer 当前固定从右侧打开。
+
+```tsx
+import { Drawer, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Drawer title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开Drawer</Button>}><p>这里是内容区域。</p></Drawer>
+  );
+}
+```
+
+### ConfirmDialog
+
+- [ConfirmDialog](https://xingjianxu.github.io/mtone/#/components/ConfirmDialog): 可等待异步结果的危险操作确认。
+- Import: ConfirmDialog, Button from @bixlab/mtone
+- title: ReactNode. 必填；对话框标题。
+- description: ReactNode. 说明文本。
+- children: ReactNode. 组件内容。
+- trigger: ReactElement. 可选触发器；也可用 open 受控打开。
+- open: boolean. 受控开关。
+- defaultOpen: boolean. 非受控初始开关。
+- onOpenChange: (open: boolean) => void. 开关变化回调。
+- onConfirm: () => void | Promise<void>. 确认操作；成功后关闭，抛错时保持打开并提示重试。
+- confirmText / cancelText: string. 确认和取消按钮文案。
+- danger: boolean. 危险确认按钮样式。
+- 异步执行时禁用按钮。当前实现不使用 footer、className；请勿依赖这些继承类型属性定制确认框。
+
+```tsx
+import { ConfirmDialog, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <ConfirmDialog title="移除文档？" description="这是演示，不会删除任何文件。" danger trigger={<Button danger>移除文档</Button>} onConfirm={async () => { console.log("confirmed"); }} />
+  );
+}
+```
+
+### Alert
+
+- [Alert](https://xingjianxu.github.io/mtone/#/components/Alert): 显示信息、成功、警告或错误反馈。
+- Import: Alert from @bixlab/mtone
+- tone: "info" | "success" | "warning" | "error" (default: info). 提示类型。
+- title: ReactNode. 标题。
+- children: ReactNode. 组件内容。
+- onClose: () => void. 提供后显示关闭按钮，应用负责隐藏。
+- 错误使用 alert 语义，其余类型使用 status。
+
+```tsx
+import { Alert } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Alert tone="success" title="已保存">你的更改已保存。</Alert>
+  );
+}
+```
+
+### Empty
+
+- [Empty](https://xingjianxu.github.io/mtone/#/components/Empty): 为空数据提供说明与下一步入口。
+- Import: Empty, Button from @bixlab/mtone
+- title: ReactNode. 标题，默认按语言显示暂无内容。
+- description: ReactNode. 补充说明。
+- action: ReactNode. 可选操作入口。
+
+```tsx
+import { Empty, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Empty title="暂无文档" description="创建第一份文档开始记录。" action={<Button>新建文档</Button>} />
+  );
+}
+```
+
+### Skeleton
+
+- [Skeleton](https://xingjianxu.github.io/mtone/#/components/Skeleton): 加载期间用于占位的轻量骨架。
+- Import: Skeleton from @bixlab/mtone
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 默认 aria-hidden，真实加载状态应由可访问文字或 Spinner 说明。
+
+```tsx
+import { Skeleton } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Skeleton style={{width:240,height:16}} />
+  );
+}
+```
+
+### Spinner
+
+- [Spinner](https://xingjianxu.github.io/mtone/#/components/Spinner): 带状态语义的小型加载图标。
+- Import: Spinner from @bixlab/mtone
+- label: string (default: Loading). 可访问加载描述。
+- 不会阻塞父区域交互；需要禁用操作时由应用设置。
+
+```tsx
+import { Spinner } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Spinner label="正在加载文档" />
+  );
+}
+```
+
+### Upload
+
+- [Upload](https://xingjianxu.github.io/mtone/#/components/Upload): 支持选择、拖拽、进度、取消与重试的上传组件。
+- Import: Upload from @bixlab/mtone
+- upload: (file: File, context: UploadContext) => Promise<unknown>. 必填；context 包含 signal 和 onProgress(percent)。
+- accept: string. 扩展名或 MIME 类型筛选，例如 .pdf,image/*。
+- maxSize: number. 最大文件字节数。
+- multiple: boolean (default: true). 允许多文件选择。
+- disabled: boolean. 禁用选择和拖拽。
+- onChange: (files: UploadFile[]) => void. 文件状态列表变化。
+- children: ReactNode. 组件内容。
+- className: string. 附加样式类。
+- 实际上传需应用提供服务器接口，示例明确为模拟上传。
+- 适配器应使用 signal 取消请求；进度通过 onProgress(0–100) 更新。
+- 文件类型/大小检查只是客户端便利检查，服务端仍需校验。
+
+```tsx
+import { Upload } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Upload accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {
+      // 仅演示：不会发送文件到服务器
+      if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+      onProgress(100);
+    }}>模拟上传：文件不会发送到服务器。</Upload>
+  );
+}
+```
+
+### Dropzone
+
+- [Dropzone](https://xingjianxu.github.io/mtone/#/components/Dropzone): Upload 的别名，支持相同上传适配器。
+- Import: Dropzone from @bixlab/mtone
+- upload: (file: File, context: UploadContext) => Promise<unknown>. 必填；context 包含 signal 和 onProgress(percent)。
+- accept: string. 扩展名或 MIME 类型筛选，例如 .pdf,image/*。
+- maxSize: number. 最大文件字节数。
+- multiple: boolean (default: true). 允许多文件选择。
+- disabled: boolean. 禁用选择和拖拽。
+- onChange: (files: UploadFile[]) => void. 文件状态列表变化。
+- children: ReactNode. 组件内容。
+- className: string. 附加样式类。
+- 实际上传需应用提供服务器接口，示例明确为模拟上传。
+- 适配器应使用 signal 取消请求；进度通过 onProgress(0–100) 更新。
+- 文件类型/大小检查只是客户端便利检查，服务端仍需校验。
+- Dropzone 是 Upload 的同一实现。
+
+```tsx
+import { Dropzone } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <Dropzone accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {
+      // 仅演示：不会发送文件到服务器
+      if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+      onProgress(100);
+    }}>模拟上传：文件不会发送到服务器。</Dropzone>
+  );
+}
+```
+
+### Toast
+
+- [Toast](https://xingjianxu.github.io/mtone/#/components/Toast): ToastProvider 的别名，提供成功、失败、普通通知，不是单条消息组件。
+- Import: Toast, Button, useToast from @bixlab/mtone
+- children: ReactNode. Provider 包裹的应用内容；不是单条通知正文。
+- position: ToastPosition (default: bottom-right). Provider 默认位置，单条通知可覆盖。
+- timeout: number (default: 5000). 默认自动关闭毫秒数；0 表示持续显示直到关闭。
+- limit: number (default: 3). 所有位置共用的可见通知上限；新通知优先，超出上限的旧通知隐藏。
+- useToast().add(options): (options: ToastOptions) => string. 添加通知并返回 id；已有相同 id 时更新。
+- options.type: "success" | "error" | "info" | string (default: info). 成功、失败和普通通知预设，各有图标和风格；未知类型按普通通知显示。
+- options.title / body: ReactNode. 标题和正文，无需提供自定义 children。
+- options.description: ReactNode. 保留旧正文字段；body 提供时优先于 description。
+- options.position: "top-right" | "bottom-right" | "top-left" | "bottom-left" | "top-center" | "bottom-center" | "center" | "center-top". 覆盖此条通知的位置；center-top 位于视口上方约 25% 处。
+- options.children: ReactNode. 可选自定义正文，用于更复杂的通知内容。
+- options.timeout / priority: number / "low" | "high". 单条超时和播报优先级。默认礼貌播报；仅紧急通知使用 high。
+- options.actionProps: ButtonHTMLAttributes. 可选操作按钮属性，含 children、onClick 等。
+- useToast().success / error / info: (options: ToastOptions) => string. 预设类型快捷方法，接受同样的 title、body、position 等选项。
+- useToast().update(id, options): (id, options | (previous) => options) => void. 更新已有通知的正文、类型和位置；保留未修改的选项。
+- useToast().close(id?): (id?: string) => void. 关闭指定通知；省略 id 关闭全部。
+- useToast().promise(promise, options): Promise<Value>. 保留异步通知 API，以 loading、success、error 配置各阶段；支持标题正文与预设选项。
+- 必须在 Provider 后代调用 useToast。Toast 与 ToastProvider 是同一组件，建议放在 MtoneProvider 内。
+- 单一队列管理所有位置，改变位置不会创建第二条通知；多位置会占用同一 limit。数量较多时请关闭旧通知或适当调整上限。
+- center / center-top 是非模态提示，不是 Dialog，不锁定焦点或阻止背景操作。
+- 默认使用 Base UI 的礼貌播报、自动关闭、悬停/焦点暂停与关闭行为。保留优先级、actionProps、data、update、close 和 promise API。
+- 持续通知（timeout: 0）必须留有关闭方式；不要仅用颜色传达状态，预设图标与文字共同表达含义。
+
+```tsx
+import { Toast, Button, useToast } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+function Action() {
+  const toast = useToast();
+  return <Button onClick={() => toast.success({
+    title: "更改已保存",
+    body: "文档已同步，可以继续编辑。",
+    position: "top-right",
+  })}>显示成功通知</Button>;
+}
+
+export default function Demo() {
+  return <Toast position="bottom-right" timeout={5000} limit={3}>
+    <Action />
+  </Toast>;
+}
+```
+
+### ToastProvider
+
+- [ToastProvider](https://xingjianxu.github.io/mtone/#/components/ToastProvider): 支持预设状态、标题正文与多位置的通知上下文。
+- Import: ToastProvider, Button, useToast from @bixlab/mtone
+- children: ReactNode. Provider 包裹的应用内容；不是单条通知正文。
+- position: ToastPosition (default: bottom-right). Provider 默认位置，单条通知可覆盖。
+- timeout: number (default: 5000). 默认自动关闭毫秒数；0 表示持续显示直到关闭。
+- limit: number (default: 3). 所有位置共用的可见通知上限；新通知优先，超出上限的旧通知隐藏。
+- useToast().add(options): (options: ToastOptions) => string. 添加通知并返回 id；已有相同 id 时更新。
+- options.type: "success" | "error" | "info" | string (default: info). 成功、失败和普通通知预设，各有图标和风格；未知类型按普通通知显示。
+- options.title / body: ReactNode. 标题和正文，无需提供自定义 children。
+- options.description: ReactNode. 保留旧正文字段；body 提供时优先于 description。
+- options.position: "top-right" | "bottom-right" | "top-left" | "bottom-left" | "top-center" | "bottom-center" | "center" | "center-top". 覆盖此条通知的位置；center-top 位于视口上方约 25% 处。
+- options.children: ReactNode. 可选自定义正文，用于更复杂的通知内容。
+- options.timeout / priority: number / "low" | "high". 单条超时和播报优先级。默认礼貌播报；仅紧急通知使用 high。
+- options.actionProps: ButtonHTMLAttributes. 可选操作按钮属性，含 children、onClick 等。
+- useToast().success / error / info: (options: ToastOptions) => string. 预设类型快捷方法，接受同样的 title、body、position 等选项。
+- useToast().update(id, options): (id, options | (previous) => options) => void. 更新已有通知的正文、类型和位置；保留未修改的选项。
+- useToast().close(id?): (id?: string) => void. 关闭指定通知；省略 id 关闭全部。
+- useToast().promise(promise, options): Promise<Value>. 保留异步通知 API，以 loading、success、error 配置各阶段；支持标题正文与预设选项。
+- 必须在 Provider 后代调用 useToast。Toast 与 ToastProvider 是同一组件，建议放在 MtoneProvider 内。
+- 单一队列管理所有位置，改变位置不会创建第二条通知；多位置会占用同一 limit。数量较多时请关闭旧通知或适当调整上限。
+- center / center-top 是非模态提示，不是 Dialog，不锁定焦点或阻止背景操作。
+- 默认使用 Base UI 的礼貌播报、自动关闭、悬停/焦点暂停与关闭行为。保留优先级、actionProps、data、update、close 和 promise API。
+- 持续通知（timeout: 0）必须留有关闭方式；不要仅用颜色传达状态，预设图标与文字共同表达含义。
+
+```tsx
+import { ToastProvider, Button, useToast } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+function Action() {
+  const toast = useToast();
+  return <Button onClick={() => toast.success({
+    title: "更改已保存",
+    body: "文档已同步，可以继续编辑。",
+    position: "top-right",
+  })}>显示成功通知</Button>;
+}
+
+export default function Demo() {
+  return <ToastProvider position="bottom-right" timeout={5000} limit={3}>
+    <Action />
+  </ToastProvider>;
+}
+```
+
+### MtoneProvider
+
+- [MtoneProvider](https://xingjianxu.github.io/mtone/#/components/MtoneProvider): 为组件及其浮层配置语言、密度和主题变量。
+- Import: MtoneProvider, Button from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- locale: "zh" | "en" (default: zh). 内置控件文案语言。
+- density: "compact" | "comfortable" (default: compact). 控件密度。
+- tokens: Tokens. CSS 自定义属性与 CSSProperties，常用 --mt-fg、--mt-bg、--mt-primary。
+- 简单组件不使用 Provider 时也可用默认值。
+- 库分发预编译 CSS，不要求宿主安装 Tailwind。浮层继承 Provider 上下文。
+- 主题通过 CSS 变量传播，不是 Shadow DOM 隔离；自定义层级请检查 z-index 1200–1300。
+
+```tsx
+import { MtoneProvider, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <MtoneProvider locale="zh" density="comfortable" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>
+  );
+}
+```
+
+### MtoneScope
+
+- [MtoneScope](https://xingjianxu.github.io/mtone/#/components/MtoneScope): 把当前 Provider 的主题变量和密度应用到一个 div。
+- Import: MtoneScope, MtoneProvider, Button from @bixlab/mtone
+- children: ReactNode. 组件内容。
+- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 通常无需手动使用；库内部用它让 Portal 浮层继承主题。它读取已有上下文，不创建新的 Provider。
+
+```tsx
+import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>
+  );
+}
+```

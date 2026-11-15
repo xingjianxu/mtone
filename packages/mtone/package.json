@@ -4,7 +4,8 @@
   "type": "module",
   "description": "Compact, ready-styled React components powered by Base UI",
   "files": [
-    "dist"
+    "dist",
+    "llms.txt"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,13 +14,14 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./llms.txt": "./llms.txt"
   },
   "sideEffects": [
     "**/*.css"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --external react --external react-dom --external @base-ui/react --external lucide-react && tailwindcss -i src/styles.css -o dist/styles.css --minify"
+    "build": "node ../../scripts/generate-llms.mjs && tsup src/index.ts --format esm --dts --external react --external react-dom --external @base-ui/react --external lucide-react && tailwindcss -i src/styles.css -o dist/styles.css --minify"
   },
   "peerDependencies": {
     "react": "^19.2.0",

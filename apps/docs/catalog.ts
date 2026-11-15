@@ -1,4 +1,4 @@
-/** Public component reference, verified against mtone 0.1.0 source. */
+/** Public component reference, maintained alongside the source and generated llms.txt. */
 export type PropDoc = {
   name: string;
   type: string;
