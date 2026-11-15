@@ -51,6 +51,8 @@ try {
     assert.equal(await page.locator("body").evaluate(el => getComputedStyle(el).overflow), "hidden", "Scroll lock retained in every mode");
     for (let step = 0; step < 8; step++) {
       await page.keyboard.press("Tab");
+      // Base UI focus guards enqueue restoration in requestAnimationFrame.
+      await page.waitForFunction(() => document.querySelector('[role="dialog"]')?.contains(document.activeElement), undefined, { timeout: 2000 });
       assert(await dialog.evaluate(el => el.contains(document.activeElement)), "Focus stays trapped throughout a full tab cycle in every mode");
     }
     await page.mouse.click(4, 4);
