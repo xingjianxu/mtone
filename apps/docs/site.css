@@ -161,12 +161,12 @@ a:hover {
   margin-top: 3px;
 }
 .docs-sidebar nav a:hover {
-  background: #f0f0ed;
-  color: #37352f;
+  background: #efefef;
+  color: #262626;
 }
 .docs-sidebar nav a[aria-current="page"] {
-  background: #e9ede7;
-  color: #35543e;
+  background: #e5e5e5;
+  color: #262626;
   font-weight: 600;
 }
 .nav-heading {

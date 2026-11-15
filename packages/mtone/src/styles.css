@@ -412,9 +412,12 @@
   cursor: pointer;
   min-height: var(--mt-height, 28px);
 }
-.mt-nav-item:hover,
+.mt-nav-item:hover {
+  background: #efefef;
+}
 .mt-nav-item.mt-active {
-  background: #eaeae7;
+  background: #e5e5e5;
+  color: #262626;
 }
 .mt-nav-item:focus-visible {
   outline: 2px solid var(--mt-focus, #5378aa);
