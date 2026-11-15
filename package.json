@@ -6,13 +6,14 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w mtone && vite build apps/docs --outDir ../../dist/docs",
+    "build": "npm run build -w @bixlab/mtone && vite build apps/docs --outDir ../../dist/docs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "dev": "vite apps/docs --host 127.0.0.1",
     "format": "prettier --write packages/mtone/src apps/docs tests docs *.json *.ts",
-    "pretest": "npm run build -w mtone",
-    "build:docs": "npm run build -w mtone && vite build apps/docs --base=/mtone/ --outDir ../../dist/docs"
+    "pretest": "npm run build -w @bixlab/mtone",
+    "build:docs": "npm run build -w @bixlab/mtone && vite build apps/docs --base=/mtone/ --outDir ../../dist/docs",
+    "test:package": "node scripts/package-smoke.mjs"
   },
   "devDependencies": {
     "@base-ui/react": "latest",

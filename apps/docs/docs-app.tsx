@@ -167,7 +167,7 @@ function Start() {
         </p>
         <CodeBlock
           code={
-            "git clone https://github.com/xingjianxu/mtone.git\ncd mtone\nnpm ci\nnpm run build -w mtone\nnpm pack -w mtone\n\n# 在你的 React 项目中安装生成的包\nnpm install /path/to/mtone/mtone-0.1.0.tgz"
+            "git clone https://github.com/xingjianxu/mtone.git\ncd mtone\nnpm ci\nnpm run build -w @bixlab/mtone\nnpm pack -w @bixlab/mtone\n\n# 在你的 React 项目中安装生成的包\nnpm install /path/to/mtone/bixlab-mtone-0.1.0.tgz"
           }
         />
         <p>
@@ -179,7 +179,7 @@ function Start() {
         <h2>导入样式与组件</h2>
         <CodeBlock
           code={
-            'import { Button, MtoneProvider } from "mtone";\nimport "mtone/styles.css";\n\nexport default function App() {\n  return (\n    <MtoneProvider locale="zh" density="compact">\n      <Button onClick={() => console.log("create")}>新建文档</Button>\n    </MtoneProvider>\n  );\n}'
+            'import { Button, MtoneProvider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function App() {\n  return (\n    <MtoneProvider locale="zh" density="compact">\n      <Button onClick={() => console.log("create")}>新建文档</Button>\n    </MtoneProvider>\n  );\n}'
           }
         />
         <p>样式只需导入一次。简单组件无需 Provider，使用默认中文与紧凑密度。</p>

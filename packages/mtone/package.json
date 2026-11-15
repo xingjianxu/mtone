@@ -1,5 +1,5 @@
 {
-  "name": "mtone",
+  "name": "@bixlab/mtone",
   "version": "0.1.0",
   "type": "module",
   "description": "Compact, ready-styled React components powered by Base UI",
@@ -29,5 +29,18 @@
     "@base-ui/react": "^1.9.0",
     "lucide-react": "1.73.0"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xingjianxu/mtone.git",
+    "directory": "packages/mtone"
+  },
+  "homepage": "https://xingjianxu.github.io/mtone/",
+  "bugs": {
+    "url": "https://github.com/xingjianxu/mtone/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
 }

@@ -1,6 +1,6 @@
 # mtone API guide
 
-Import all components by name from `mtone` and import `mtone/styles.css` once. Package includes TypeScript declarations. Below are the public contracts; detailed exact types are in the distributed `index.d.ts`.
+Import all components by name from `@bixlab/mtone` and import `@bixlab/mtone/styles.css` once. Package includes TypeScript declarations. Below are the public contracts; detailed exact types are in the distributed `index.d.ts`.
 
 ## Provider and styling
 

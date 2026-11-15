@@ -2,15 +2,15 @@
 
 Compact, ready-styled React components for knowledge and content applications. Base UI supplies interaction primitives; mtone supplies a cohesive warm-neutral visual system and high-level APIs. Tailwind builds the distributed CSS. Lucide supplies icons.
 
-## Install the delivered package
+## Install @bixlab/mtone
 
 ```bash
-npm install ./mtone-0.1.0.tgz
+npm install ./bixlab-mtone-0.1.0.tgz
 ```
 
 ```tsx
-import { MtoneProvider, Button, Select } from 'mtone';
-import 'mtone/styles.css';
+import { MtoneProvider, Button, Select } from '@bixlab/mtone';
+import '@bixlab/mtone/styles.css';
 
 export function App() {
   return <MtoneProvider locale="zh" density="compact">
@@ -20,7 +20,7 @@ export function App() {
 }
 ```
 
-One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM are peer dependencies. ESM only. Public npm publication is not included; the name's registry availability has not been verified.
+One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM are peer dependencies. ESM only. The npm package name is `@bixlab/mtone`. Initial npm publication is pending owner setup and license selection; use the local tarball until the first release is available. After publication: `npm install @bixlab/mtone`.
 
 ## Develop
 
@@ -32,7 +32,7 @@ npm test
 npm run typecheck
 ```
 
-Node 20.19+ recommended. The documentation app lives in `apps/docs`; its static build is `dist/docs`. It consumes the precompiled library stylesheet, so run build after editing library CSS. Components are in `packages/mtone/src`.
+Node 24 recommended. The documentation app lives in `apps/docs`; its static build is `dist/docs`. It consumes the precompiled library stylesheet, so run build after editing library CSS. Components are in `packages/mtone/src`.
 
 ## Scope
 
@@ -49,3 +49,7 @@ npm run build:docs
 ```
 
 Production assets use the GitHub Pages `/mtone/` base. Component URLs use hash routes, e.g. `#/components/Button`, so refreshing a deep link does not require a server rewrite. See [deployment instructions](docs/DEPLOYMENT.md) for initial Pages setup and [the documentation workflow](.github/workflows/docs.yml). The ChatGPT Site is no longer updated.
+
+## npm releases
+
+GitHub Actions uses trusted publishing (OIDC), without a stored npm token. See [release setup and workflow](docs/RELEASING.md). Manual workflow runs validate only; stable GitHub Releases publish after checks and the configured environment approval.

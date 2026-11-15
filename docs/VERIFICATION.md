@@ -20,4 +20,4 @@
 
 `npm ci && npm test && npm run typecheck && npm run build`
 
-Install `mtone-0.1.0.tgz` into an ordinary React19.2 app and import `mtone/styles.css` once. The source package includes test files; local temporary consumer smoke harness was run against the packed artifact.
+Install `bixlab-mtone-0.1.0.tgz` into an ordinary React19.2 app and import `@bixlab/mtone/styles.css` once. The source package includes test files; local temporary consumer smoke harness was run against the packed artifact.

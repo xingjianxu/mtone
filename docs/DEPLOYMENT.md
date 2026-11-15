@@ -6,7 +6,7 @@ The documentation lives in `apps/docs`, importing real mtone components. It uses
 
 ```sh
 npm ci
-npm run build -w mtone
+npm run build -w @bixlab/mtone
 npm run dev
 ```
 
