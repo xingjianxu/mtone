@@ -1,3 +1,4 @@
+import { LayoutExample } from "./layout-example";
 import React, { useState } from "react";
 import * as M from "../../packages/mtone/src";
 import { BookOpen, FileText, Folder, Plus, Search, Star } from "lucide-react";
@@ -57,12 +58,12 @@ const simulateUpload: M.UploadAdapter = (_file, { signal, onProgress }) =>
     else signal.addEventListener("abort", abort, { once: true });
   });
 
-export function ComponentExample({ name }: { name: string }) {
+export function ComponentExample({ name, compact = false }: { name: string; compact?: boolean }) {
   // A keyed inner component resets each demonstration when its document changes.
-  return <ExampleBody key={name} name={name} />;
+  return <ExampleBody key={name} name={name} compact={compact} />;
 }
 
-function ExampleBody({ name }: { name: string }) {
+function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
   const [text, setText] = useState("设计规范");
   const [search, setSearch] = useState("");
   const [checked, setChecked] = useState(true);
@@ -123,6 +124,8 @@ function ExampleBody({ name }: { name: string }) {
   );
 
   switch (name) {
+    case "Layout":
+      return <LayoutExample compact={compact} />;
     case "Button":
       return (
         <div style={stackStyle}>

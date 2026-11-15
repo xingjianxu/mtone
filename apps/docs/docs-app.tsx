@@ -471,7 +471,7 @@ export function DocsApp() {
                           {entries.map((d) => (
                             <article className="gallery-card" key={d.name}>
                               <div className="gallery-preview">
-                                <ComponentExample name={d.name} />
+                                <ComponentExample name={d.name} compact />
                               </div>
                               <a
                                 className="gallery-card-title"

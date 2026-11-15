@@ -16,6 +16,117 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
   {
+    name: "Layout",
+    category: "页面布局",
+    description:
+      "可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。",
+    importNames: ["Layout"],
+    code: 'import { useState } from "react";\nimport { Box, BookOpen, Home, Settings } from "lucide-react";\nimport { Layout, Breadcrumb, NavItem, IconButton, Card } from "mtone";\nimport "mtone/styles.css";\n\nexport default function Demo() {\n  const [collapsed, setCollapsed] = useState(false);\n  return (\n    <Layout hasSider style={{ height: 480 }}>\n      <Layout.Sider\n        collapsible\n        collapsed={collapsed}\n        onCollapsedChange={setCollapsed}\n        width={240}\n        collapsedWidth={52}\n        breakpoint={768}\n        logo={<strong>mtone</strong>}\n        collapsedLogo={<Box size={22} aria-label="mtone" />}\n        aria-label="主导航"\n      >\n        <NavItem icon={<Home size={16} />}>首页</NavItem>\n        <NavItem icon={<BookOpen size={16} />} active>知识库</NavItem>\n      </Layout.Sider>\n      <Layout>\n        <Layout.Header\n          breadcrumb={<Breadcrumb items={[{ label: "知识库" }, { label: "设计规范" }]} />}\n          extra={<IconButton aria-label="设置"><Settings size={16} /></IconButton>}\n        />\n        <Layout.Content>\n          <h1>设计规范</h1>\n          <Card>这里是独立滚动的主体内容。</Card>\n        </Layout.Content>\n        <Layout.Footer>mtone · 内容优先</Layout.Footer>\n      </Layout>\n    </Layout>\n  );\n}',
+    props: [
+      {
+        name: "Layout.hasSider",
+        type: "boolean",
+        description:
+          "是否采用横向布局。省略时自动识别直接子元素中的 Layout.Sider；包装组件内的 Sider 请显式指定。",
+      },
+      {
+        name: "Layout.fullHeight",
+        type: "boolean",
+        default: "false",
+        description:
+          "占满视口高度（100dvh）；嵌入页面时可改用 style.height 指定有限高度。",
+      },
+      {
+        name: "Layout.Sider.collapsible",
+        type: "boolean",
+        default: "false",
+        description: "启用复用自 Sidebar 的收起/展开按钮和图标窄栏。",
+      },
+      {
+        name: "Layout.Sider.collapsed",
+        type: "boolean",
+        description: "受控收起状态；搭配 onCollapsedChange 由父组件更新。",
+      },
+      {
+        name: "Layout.Sider.defaultCollapsed",
+        type: "boolean",
+        default: "false",
+        description: "非受控模式的初始收起状态。",
+      },
+      {
+        name: "Layout.Sider.onCollapsedChange",
+        type: "(collapsed: boolean) => void",
+        description:
+          "点击收起按钮或响应式断点请求改变状态时调用；受控模式不会自行覆盖 collapsed。",
+      },
+      {
+        name: "Layout.Sider.logo / collapsedLogo",
+        type: "ReactNode",
+        description: "顶部品牌插槽；collapsedLogo 用于窄栏中的简化标识。",
+      },
+      {
+        name: "Layout.Sider.width / collapsedWidth",
+        type: "number",
+        default: "240 / 52",
+        description: "展开/收起宽度，单位 px，最小 40px；本版不支持零宽隐藏。",
+      },
+      {
+        name: "Layout.Sider.breakpoint",
+        type: "number",
+        description:
+          "可选视口断点（px），例如 768。低于断点请求收起，恢复宽屏请求展开；未设置时不自动响应。",
+      },
+      {
+        name: "Layout.Sider.onBreakpoint",
+        type: "(broken: boolean) => void",
+        description: "监听断点状态；true 表示视口低于设定断点。",
+      },
+      {
+        name: "Layout.Sider.collapseLabel / expandLabel",
+        type: "string",
+        default: "收起侧边栏 / 展开侧边栏",
+        description: "继承 Sidebar 的切换按钮可访问名称。",
+      },
+      {
+        name: "Layout.Header.breadcrumb",
+        type: "ReactNode",
+        description: "顶部左侧插槽；建议传入已有 Breadcrumb 组件。",
+      },
+      {
+        name: "Layout.Header.extra",
+        type: "ReactNode",
+        description:
+          "顶部右对齐操作插槽，可组合 IconButton、DropdownMenu、Avatar 等。",
+      },
+      {
+        name: "Layout.Header.children",
+        type: "ReactNode",
+        description: "顶部左侧补充内容；窄屏允许换行。",
+      },
+      {
+        name: "Layout.Content.as",
+        type: '"main" | "section" | "div"',
+        default: "main",
+        description:
+          "主体语义标签。一个页面通常只使用一个 main；嵌入其他主体时改为 section 或 div。",
+      },
+      {
+        name: "children / className / style / 原生属性",
+        type: "ReactNode / string / CSSProperties / HTMLAttributes",
+        description:
+          "各区域均可嵌套内容和覆盖样式；Footer 用于底部说明，Layout 可嵌套组合。",
+      },
+    ],
+    notes: [
+      "使用 Layout.Sider、Layout.Header、Layout.Content、Layout.Footer 组合，不需要单独安装子组件。API 采用 Ant Design 的组合习惯，但不是 Ant Design Layout 的全量兼容实现。",
+      "Layout.Sider 复用本库 Sidebar 的状态、NavItem 图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、IconButton 等已有组件。",
+      "默认头部 64px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌与顶部操作保持可见。",
+      "响应式收起为图标窄栏，不是弹出式抽屉。breakpoint 按浏览器视口判断，不按示例容器宽度判断；希望自定义手机抽屉时可组合已有 Drawer。",
+      "受控状态必须在 onCollapsedChange 中更新，否则切换只发出请求。导航、路由、数据保存、账号菜单与持久化由应用实现。",
+      "示例右上按钮仅更新本地提示；不发送搜索、通知请求，也不更改账号或安全设置。",
+    ],
+  },
+  {
     name: "Button",
     category: "按钮与操作",
     description: "带完整样式的基础操作按钮。",
@@ -877,6 +988,7 @@ export const componentDocs: ComponentDoc[] = [
     importNames: ["Sidebar", "NavItem"],
     code: 'import { Sidebar, NavItem } from "mtone";\nimport "mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
     props: [
+      { name: "header", type: "ReactNode | ((collapsed: boolean) => ReactNode)", description: "可选品牌头部，与已有折叠按钮同排；Layout.Sider 的 logo 通过该插槽复用。" },
       { name: "collapsible", type: "boolean", default: "false", description: "启用内置收起/展开按钮；未启用时保持原有容器行为。" },
       { name: "collapsed", type: "boolean", description: "受控收起状态；搭配 onCollapsedChange 更新。" },
       { name: "defaultCollapsed", type: "boolean", default: "false", description: "非受控模式的初始收起状态。" },
