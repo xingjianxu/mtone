@@ -11,6 +11,8 @@ import { Tooltip } from "./interactive";
 const SidebarContext = React.createContext(false);
 export type SidebarProps = React.HTMLAttributes<HTMLElement> & {
   header?: React.ReactNode | ((collapsed: boolean) => React.ReactNode);
+  footer?: React.ReactNode | ((collapsed: boolean) => React.ReactNode);
+  collapsePlacement?: "header" | "footer";
   collapsible?: boolean;
   collapsed?: boolean;
   defaultCollapsed?: boolean;
@@ -22,6 +24,8 @@ export function Sidebar({
   className,
   children,
   header,
+  footer,
+  collapsePlacement = "header",
   collapsible = false,
   collapsed,
   defaultCollapsed = false,
@@ -65,10 +69,10 @@ export function Sidebar({
             <div className="mt-sidebar-brand">
               {typeof header === "function" ? header(isCollapsed) : header}
             </div>
-            {toggle}
+            {collapsePlacement === "header" && toggle}
           </div>
         ) : (
-          toggle
+          collapsePlacement === "header" && toggle
         )}
         {collapsible || header !== undefined ? (
           <div id={contentId} className="mt-sidebar-content">
@@ -76,6 +80,17 @@ export function Sidebar({
           </div>
         ) : (
           children
+        )}
+        {(footer !== undefined ||
+          (collapsePlacement === "footer" && collapsible)) && (
+          <div className="mt-sidebar-footer">
+            {footer !== undefined && (
+              <div className="mt-sidebar-footer-content">
+                {typeof footer === "function" ? footer(isCollapsed) : footer}
+              </div>
+            )}
+            {collapsePlacement === "footer" && toggle}
+          </div>
         )}
       </aside>
     </SidebarContext.Provider>

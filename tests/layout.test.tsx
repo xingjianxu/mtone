@@ -174,3 +174,34 @@ it("re-evaluates collapse when the configured breakpoint changes", () => {
   );
   vi.unstubAllGlobals();
 });
+it("places version and collapse control in a persistent bottom row", () => {
+  render(
+    <Layout.Sider collapsible version="v2.4.0" logo="brand">
+      <NavItem>Home</NavItem>
+    </Layout.Sider>,
+  );
+  const sider = screen.getByRole("complementary");
+  const footer = sider.querySelector(".mt-sidebar-footer");
+  const toggle = screen.getByRole("button", { name: "收起侧边栏" });
+  expect(footer).toContainElement(toggle);
+  expect(footer).toHaveTextContent("v2.4.0");
+  expect(sider.querySelector(".mt-sidebar-heading")).not.toContainElement(
+    toggle,
+  );
+  expect(sider.lastElementChild).toBe(footer);
+  fireEvent.click(toggle);
+  expect(screen.queryByText("v2.4.0")).not.toBeInTheDocument();
+  expect(footer).toContainElement(
+    screen.getByRole("button", { name: "展开侧边栏" }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "展开侧边栏" }));
+  expect(screen.getByText("v2.4.0")).toBeInTheDocument();
+});
+it("does not hardcode a host application version", () => {
+  render(<Layout.Sider collapsible>Menu</Layout.Sider>);
+  expect(
+    screen
+      .getByRole("complementary")
+      .querySelector(".mt-sidebar-footer-content"),
+  ).toBeNull();
+});

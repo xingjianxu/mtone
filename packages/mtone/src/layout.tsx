@@ -6,8 +6,12 @@ export type LayoutProps = React.HTMLAttributes<HTMLDivElement> & {
   hasSider?: boolean;
   fullHeight?: boolean;
 };
-export type LayoutSiderProps = Omit<SidebarProps, "header"> & {
+export type LayoutSiderProps = Omit<
+  SidebarProps,
+  "header" | "footer" | "collapsePlacement"
+> & {
   logo?: React.ReactNode;
+  version?: React.ReactNode;
   collapsedLogo?: React.ReactNode;
   width?: number;
   collapsedWidth?: number;
@@ -16,6 +20,7 @@ export type LayoutSiderProps = Omit<SidebarProps, "header"> & {
 };
 function LayoutSider({
   logo,
+  version,
   collapsedLogo,
   width = 240,
   collapsedWidth = 52,
@@ -72,6 +77,8 @@ function LayoutSider({
       collapsible={collapsible}
       collapsed={collapsed ?? internal}
       onCollapsedChange={update}
+      collapsePlacement="footer"
+      footer={version != null ? (small) => (small ? null : version) : undefined}
       header={(small) => (small ? (collapsedLogo ?? logo) : logo)}
       className={cn("mt-layout-sider", className)}
       style={

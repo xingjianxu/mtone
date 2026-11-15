@@ -79,6 +79,7 @@ export function LayoutExample({ compact = false }: { compact?: boolean }) {
         width={200}
         collapsedWidth={52}
         breakpoint={compact ? undefined : 768}
+        version="v0.1.0 · 演示应用"
         logo={logo}
         collapsedLogo={<Box size={22} aria-label="mtone" />}
       >
