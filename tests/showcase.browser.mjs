@@ -7,11 +7,30 @@ let browser;
 try {
   browser = await chromium.launch({ ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}), headless: true });
   const page = await browser.newPage();
+  // The docs entry must open an independent document without replacing its tab.
+  await page.goto("http://127.0.0.1:5189/#/gallery");
+  const entry = page.getByRole("link", { name: "应用示例", exact: true });
+  assert.equal(await entry.getAttribute("target"), "_blank");
+  assert.match(await entry.getAttribute("rel"), /noopener/);
+  const [appTab] = await Promise.all([page.waitForEvent("popup"), entry.click()]);
+  await appTab.getByRole("heading", { name: "团队知识库", exact: true }).waitFor();
+  assert.match(page.url(), /#\/gallery$/);
+  assert.equal(await appTab.evaluate(() => window.opener === null), true);
+  assert.equal(await appTab.locator(".content-layout, .sidebar, .topbar").count(), 0, "No documentation frame in app");
+  await appTab.reload();
+  await appTab.getByRole("heading", { name: "团队知识库", exact: true }).waitFor();
+  await appTab.getByRole("link", { name: "返回组件文档" }).click();
+  await appTab.getByRole("heading", { name: "为内容留出空间。", exact: true }).waitFor();
+  await appTab.goBack();
+  await appTab.getByRole("heading", { name: "团队知识库", exact: true }).waitFor();
+  await appTab.goForward();
+  await appTab.getByRole("heading", { name: "为内容留出空间。", exact: true }).waitFor();
+  await appTab.close();
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   for (const width of [1440, 768, 360]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("http://127.0.0.1:5189/#/showcase");
+    await page.goto("http://127.0.0.1:5189/showcase.html");
     await page.getByRole("heading", { name: "团队知识库", exact: true }).waitFor();
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Page overflow at ${width}`);
     if (width < 760) {
@@ -50,8 +69,11 @@ try {
   await page.getByRole("heading", { name: "Button", exact: true }).waitFor();
   await page.goto("http://127.0.0.1:5189/#/gallery");
   await page.getByRole("heading", { name: "为内容留出空间。", exact: true }).waitFor();
-  await page.goto("http://127.0.0.1:5189/#/showcase");
+  await page.goto("http://127.0.0.1:5189/showcase.html");
   await page.getByRole("heading", { name: "团队知识库", exact: true }).waitFor();
   assert.equal(await page.getByRole("button", { name: "编辑文档：仅本页临时数据" }).count(), 0, "Leaving the example resets local demo state");
+  await page.goto("http://127.0.0.1:5189/#/showcase");
+  await page.getByRole("heading", { name: "团队知识库", exact: true }).waitFor();
+  assert.equal(await page.locator(".content-layout, .sidebar, .topbar").count(), 0, "Legacy hash links render independent frame too");
   assert.deepEqual(errors, []);
 } finally { await browser?.close(); await server.close(); }

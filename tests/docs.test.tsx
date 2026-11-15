@@ -71,3 +71,15 @@ describe("documentation navigation", () => {
     window.location.hash = "";
   });
 });
+
+
+it("opens the app showcase safely in a new tab", async () => {
+  window.location.hash = "#/gallery";
+  const { DocsApp } = await import("../apps/docs/docs-app");
+  render(<DocsApp />);
+  for (const link of screen.getAllByRole("link", { name: /应用示例/ })) {
+    expect(link).toHaveAttribute("href", "./showcase.html");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  }
+});

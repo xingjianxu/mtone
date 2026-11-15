@@ -14,7 +14,7 @@ import {
 import * as M from "../../packages/mtone/src";
 import { componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
-import { AppShowcase } from "./app-showcase";
+import { ShowcasePage } from "./showcase-page";
 export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
   | { kind: "component"; name: string };
@@ -299,6 +299,7 @@ export function DocsApp() {
   useEffect(() => {
     document.title = `${route.kind === "component" ? route.name : route.kind === "gallery" ? "组件总览" : route.kind === "showcase" ? "应用示例" : route.kind === "start" ? "快速开始" : route.kind === "theme" ? "主题与样式" : "页面未找到"} · mtone`;
   }, [route]);
+  if (route.kind === "showcase") return <ShowcasePage />;
   const doc =
     route.kind === "component"
       ? componentDocs.find((d) => d.name === route.name)
@@ -389,7 +390,7 @@ export function DocsApp() {
               <Layers size={15} />
               Component gallery
             </a>
-            <a href="#/showcase" aria-current={route.kind === "showcase" ? "page" : undefined}>
+            <a href="./showcase.html" target="_blank" rel="noopener noreferrer" >
               <Layers size={15} />应用示例
             </a>
             <a
@@ -442,7 +443,7 @@ export function DocsApp() {
                   <a className="primary-link" href="#/start">
                     开始使用 <ArrowRight size={15} />
                   </a>
-                  <a href="#/showcase">探索应用示例 <ArrowRight size={15} /></a>
+                  <a href="./showcase.html" target="_blank" rel="noopener noreferrer">探索应用示例 <ArrowRight size={15} /></a>
                   <span>
                     {componentDocs.length} 个文档条目 · 含别名与 Provider
                   </span>
@@ -495,8 +496,7 @@ export function DocsApp() {
                   );
                 })}
               </>
-            ) : route.kind === "showcase" ? (
-              <AppShowcase />
+
             ) : doc ? (
               <ComponentPage key={doc.name} doc={doc} />
             ) : route.kind === "start" ? (

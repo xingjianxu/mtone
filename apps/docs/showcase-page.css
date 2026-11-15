@@ -1,0 +1,15 @@
+.showcase-page { min-height: 100dvh; background: #fafafa; color: #292929; font: 14px/1.6 Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif; }
+.showcase-page *, .showcase-page *::before, .showcase-page *::after { box-sizing: border-box; }
+.showcase-page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; min-height: 52px; padding: 12px 24px; border-bottom: 1px solid #e5e5e5; background: #fff; font-size: 12px; }
+.showcase-page-header > span, .showcase-page-header a { display: inline-flex; align-items: center; gap: 8px; }
+.showcase-page-header a { color: #555; text-decoration: none; }
+.showcase-page-header a:hover { color: #111; text-decoration: underline; }
+.showcase-page-header a:focus-visible { outline: 2px solid #5378aa; outline-offset: 4px; }
+.showcase-page .showcase-page-main { max-width: 1500px; margin: 0 auto; padding: 20px 24px 24px; }
+.showcase-page .showcase-intro { display: none; }
+.showcase-page .showcase-note { margin-bottom: 14px; }
+.showcase-page .showcase-shell { min-height: calc(100dvh - 165px); }
+@media (max-width: 600px) {
+  .showcase-page-header { padding-inline: 14px; }
+  .showcase-page .showcase-page-main { padding: 12px 10px; }
+}

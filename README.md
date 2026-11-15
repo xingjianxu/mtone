@@ -25,7 +25,7 @@ One package, no component-copy CLI, no Tailwind setup in the consuming applicati
 ## Explore
 
 - [Component Gallery](https://xingjianxu.github.io/mtone/#/gallery): individual component previews and API documentation.
-- [App Showcase](https://xingjianxu.github.io/mtone/#/showcase): an interactive knowledge workspace built from mtone components. Search, filter, switch views, edit documents, favorite and delete items. Changes are held only in page memory and reset when leaving or refreshing; no backend or block editor is included.
+- [App Showcase](https://xingjianxu.github.io/mtone/showcase.html): a standalone interactive knowledge workspace built from mtone components. Search, filter, switch views, edit documents, favorite and delete items. Changes are held only in page memory and reset when leaving or refreshing; no backend or block editor is included.
 
 ## Develop
 
