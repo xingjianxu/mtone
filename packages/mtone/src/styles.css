@@ -9,7 +9,7 @@
 .mt-btn,
 .mt-input,
 .mt-card,
-.mt-tag,
+.mt-badge,
 .mt-list,
 .mt-table-wrap {
   font-family:
@@ -186,7 +186,7 @@
 .mt-scope small {
   color: var(--mt-muted, #787774);
 }
-.mt-tag {
+.mt-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -196,7 +196,7 @@
   font-size: 12px;
   white-space: nowrap;
 }
-.mt-tag button {
+.mt-badge button {
   display: inline-flex;
   padding: 0;
   background: none;
@@ -520,7 +520,7 @@
 /* All interactive focus indicators use the Input focus token, never primary. */
 :is(.mt-slider-thumb, .mt-chip, .mt-chip-remove, .mt-combobox-trigger, .mt-dialog-close,
   .mt-tab-panel, .mt-table-sort):not(:disabled):not([data-disabled]):not([aria-disabled="true"]):focus-visible,
-:is(.mt-tag, .mt-filter-chip) > button:focus-visible,
+:is(.mt-badge, .mt-filter-chip) > button:focus-visible,
 .mt-breadcrumb a:focus-visible,
 .mt-table input:focus-visible,
 .mt-dropzone input:focus-visible {

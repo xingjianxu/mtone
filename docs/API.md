@@ -64,7 +64,7 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 
 - Card, Text(muted), Divider, List, ListItem(icon,description,actions): styled semantic wrappers.
 - DocumentList: items `{id,title,description?,updatedAt?,icon?,onClick?}`. DocumentCard accepts one item.
-- Tag/Badge: tone neutral/blue/green/orange/red/purple, onRemove optional.
+- Badge: tone neutral/blue/green/orange/red/purple, onRemove optional.
 - Status: tone, children. Avatar: name, src, size; falls back to initials on image error. AvatarGroup: items, max.
 - Progress: value clamped0–100, label. PropertyList and PropertyItem(label): definition-list display.
 - Alert: tone info/success/warning/error, title, children, onClose.
@@ -89,7 +89,7 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
       key: "status",
       title: "状态",
       dataIndex: "status",
-      render: (value) => <Tag>{String(value)}</Tag>,
+      render: (value) => <Badge>{String(value)}</Badge>,
     },
   ]}
   pagination={{ pageSize: 10 }}

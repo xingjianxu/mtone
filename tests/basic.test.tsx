@@ -4,7 +4,7 @@ import {
   Button,
   Input,
   FormField,
-  Tag,
+  Badge,
   MtoneProvider,
 } from "../packages/mtone/src/basic";
 describe("foundation", () => {
@@ -32,9 +32,9 @@ describe("foundation", () => {
       "Required",
     );
   });
-  it("removes tag", () => {
+  it("removes badge", () => {
     const fn = vi.fn();
-    render(<Tag onRemove={fn}>Work</Tag>);
+    render(<Badge onRemove={fn}>Work</Badge>);
     fireEvent.click(screen.getByRole("button"));
     expect(fn).toHaveBeenCalledOnce();
   });
@@ -63,4 +63,17 @@ it('renders blue buttons and preserves disabled/loading behavior', () => {
   expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
   fireEvent.click(screen.getByRole('button'));
   expect(fn).toHaveBeenCalledOnce();
+});
+
+
+it("exports Badge without the removed Tag alias", async () => {
+  const api = await import("../packages/mtone/src");
+  expect(api).toHaveProperty("Badge");
+  expect(api).not.toHaveProperty("Tag");
+});
+it.each(["neutral", "blue", "green", "orange", "red", "purple"] as const)("preserves Badge %s tone and native attributes", (tone) => {
+  render(<Badge tone={tone} title="label" className="custom" data-testid="badge">Work</Badge>);
+  expect(screen.getByTestId("badge")).toHaveClass("mt-badge", `mt-tone-${tone}`, "custom");
+  expect(screen.getByTestId("badge")).toHaveAttribute("title", "label");
+  expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });

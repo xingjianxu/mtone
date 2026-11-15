@@ -12,7 +12,7 @@ Reference groups 01–09, 11–12 are implemented. Group10 block editor was expl
 | Menus           | DropdownMenu, ContextMenu, Popover, Tooltip                                        |
 | Documents       | List, ListItem, DocumentList, DocumentCard, Card, Text, Divider                    |
 | Table           | Table                                                                              |
-| Status          | Tag, Badge, Status, Avatar, AvatarGroup, Progress, PropertyList, PropertyItem      |
+| Status          | Badge, Status, Avatar, AvatarGroup, Progress, PropertyList, PropertyItem      |
 | Dialogs         | Modal, ConfirmDialog, Drawer                                                       |
 | Feedback        | Alert, ToastProvider/Toast, useToast, Empty, Skeleton, Spinner, Upload/Dropzone    |
 

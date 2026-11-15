@@ -106,7 +106,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     <M.PropertyList>
       <M.PropertyItem label="类型">文档</M.PropertyItem>
       <M.PropertyItem label="标签">
-        <M.Tag tone="green">研究</M.Tag>
+        <M.Badge tone="green">研究</M.Badge>
       </M.PropertyItem>
       <M.PropertyItem label="负责人">
         <M.Avatar name="林" />
@@ -570,7 +570,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.ListItem
             icon={<FileText size={16} />}
             description="今天更新"
-            actions={<M.Tag>设计</M.Tag>}
+            actions={<M.Badge>设计</M.Badge>}
           >
             组件规范
           </M.ListItem>
@@ -616,7 +616,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
                 key: "category",
                 title: "分类",
                 dataIndex: "category",
-                render: (v) => <M.Tag>{String(v)}</M.Tag>,
+                render: (v) => <M.Badge>{String(v)}</M.Badge>,
               },
             ]}
             selectable
@@ -627,20 +627,18 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>已选择 {selected.length} 行</M.Text>
         </div>
       );
-    case "Tag":
     case "Badge": {
-      const Tag = name === "Badge" ? M.Badge : M.Tag;
       return (
         <div style={rowStyle}>
           {(
             ["neutral", "blue", "green", "orange", "red", "purple"] as const
           ).map((tone) => (
-            <Tag key={tone} tone={tone}>
+            <M.Badge key={tone} tone={tone}>
               {tone}
-            </Tag>
+            </M.Badge>
           ))}
           {visible ? (
-            <Tag onRemove={() => setVisible(false)}>可移除</Tag>
+            <M.Badge onRemove={() => setVisible(false)}>可移除</M.Badge>
           ) : (
             <M.Button onClick={() => setVisible(true)}>恢复标签</M.Button>
           )}

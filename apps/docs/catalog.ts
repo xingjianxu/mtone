@@ -1727,41 +1727,9 @@ export const componentDocs: ComponentDoc[] = [
     ],
   },
   {
-    name: "Tag",
-    category: "属性与状态",
-    description: "紧凑的低饱和标签。",
-    importNames: ["Tag"],
-    code: 'import { Tag } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tag tone="green">已完成</Tag>\n  );\n}',
-    props: [
-      {
-        name: "tone",
-        type: '"neutral" | "blue" | "green" | "orange" | "red" | "purple"',
-        description: "低饱和语义颜色。",
-        default: "neutral",
-      },
-      {
-        name: "onRemove",
-        type: "() => void",
-        description: "提供后显示移除按钮，应用负责移除内容。",
-      },
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "组件内容。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
-    ],
-    notes: ["可移除标签的存在状态由应用管理。"],
-  },
-  {
     name: "Badge",
     category: "属性与状态",
-    description: "Tag 的别名，接口和视觉行为相同。",
+    description: "紧凑的低饱和标签，支持语义颜色与可选移除操作。",
     importNames: ["Badge"],
     code: 'import { Badge } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Badge tone="green">已完成</Badge>\n  );\n}',
     props: [
@@ -1788,7 +1756,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["Badge 是 Tag 别名，不是数字角标或未读计数容器。"],
+    notes: ["可移除标签的存在状态由应用管理。Badge 不是数字角标或未读计数容器。"],
   },
   {
     name: "Status",

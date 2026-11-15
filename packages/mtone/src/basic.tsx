@@ -187,7 +187,7 @@ export const Form = ({
   <form {...p} className={cn("mt-form", className)} />
 );
 export type Tone = "neutral" | "blue" | "green" | "orange" | "red" | "purple";
-export function Tag({
+export function Badge({
   children,
   tone = "neutral",
   onRemove,
@@ -199,7 +199,7 @@ export function Tag({
 }) {
   const { locale } = useMtone();
   return (
-    <span {...p} className={cn("mt-tag", `mt-tone-${tone}`, className)}>
+    <span {...p} className={cn("mt-badge", `mt-tone-${tone}`, className)}>
       {children}
       {onRemove && (
         <button
@@ -213,7 +213,6 @@ export function Tag({
     </span>
   );
 }
-export const Badge = Tag;
 export const Status = ({
   children,
   tone = "neutral",
