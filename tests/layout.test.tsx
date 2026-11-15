@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { it, expect, vi } from "vitest";
@@ -204,4 +205,29 @@ it("does not hardcode a host application version", () => {
       .getByRole("complementary")
       .querySelector(".mt-sidebar-footer-content"),
   ).toBeNull();
+});
+it("does not create a main footer unless explicitly composed", () => {
+  const { rerender } = render(
+    <Layout>
+      <Layout.Header>Header</Layout.Header>
+      <Layout.Content>Body</Layout.Content>
+    </Layout>,
+  );
+  expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+  rerender(
+    <Layout>
+      <Layout.Content>Body</Layout.Content>
+      <Layout.Footer style={{ height: 64 }}>Footer</Layout.Footer>
+    </Layout>,
+  );
+  expect(screen.getByRole("contentinfo")).toHaveStyle({ height: "64px" });
+});
+it('keeps the example main footer hidden until opted in',async()=>{
+ const {LayoutExample}=await import('../apps/docs/layout-example');
+ render(<LayoutExample/>);
+ expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
+ await userEvent.click(screen.getByRole('button',{name:/主体 Footer/}));
+ expect(screen.getByRole('contentinfo')).toBeInTheDocument();
+ await userEvent.click(screen.getByRole('button',{name:/主体 Footer/}));
+ expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
 });

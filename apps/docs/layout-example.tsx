@@ -20,6 +20,7 @@ import {
   Layout,
   NavItem,
   Text,
+  Button,
 } from "../../packages/mtone/src";
 
 const pages = [
@@ -43,6 +44,7 @@ export function LayoutExample({ compact = false }: { compact?: boolean }) {
   const [collapsed, setCollapsed] = useState(compact);
   const [page, setPage] = useState("知识库");
   const [notice, setNotice] = useState("");
+  const [showFooter, setShowFooter] = useState(false);
   const title = page === "知识库" ? "设计规范" : page;
   const logo = (
     <span
@@ -206,8 +208,13 @@ export function LayoutExample({ compact = false }: { compact?: boolean }) {
                 "点击导航、收起按钮或右上角操作。所有变化仅发生在此示例中。"}
             </p>
           )}
+          {!compact && (
+            <Button aria-pressed={showFooter} onClick={() => setShowFooter(value => !value)}>
+              {showFooter ? "隐藏主体 Footer" : "显示主体 Footer（48px）"}
+            </Button>
+          )}
         </Layout.Content>
-        {!compact && (
+        {!compact && showFooter && (
           <Layout.Footer>mtone · 内容优先的 React 组件库</Layout.Footer>
         )}
       </Layout>
