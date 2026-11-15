@@ -14,13 +14,15 @@ import {
 import * as M from "../../packages/mtone/src";
 import { componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
+import { AppShowcase } from "./app-showcase";
 export type Route =
-  | { kind: "gallery" | "start" | "theme" | "not-found" }
+  | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
   | { kind: "component"; name: string };
 export function parseRoute(hash: string): Route {
   if (hash === "#/components/Modal") return { kind: "component", name: "Dialog" };
   if (!hash || hash === "#" || hash === "#/" || hash === "#/gallery")
     return { kind: "gallery" };
+  if (hash === "#/showcase" || hash === "#/apps") return { kind: "showcase" };
   if (hash === "#/start") return { kind: "start" };
   if (hash === "#/theme") return { kind: "theme" };
   const m = hash.match(/^#\/components\/([A-Za-z]+)$/);
@@ -295,7 +297,7 @@ export function DocsApp() {
     return () => window.removeEventListener("hashchange", change);
   }, []);
   useEffect(() => {
-    document.title = `${route.kind === "component" ? route.name : route.kind === "gallery" ? "组件总览" : route.kind === "start" ? "快速开始" : route.kind === "theme" ? "主题与样式" : "页面未找到"} · mtone`;
+    document.title = `${route.kind === "component" ? route.name : route.kind === "gallery" ? "组件总览" : route.kind === "showcase" ? "应用示例" : route.kind === "start" ? "快速开始" : route.kind === "theme" ? "主题与样式" : "页面未找到"} · mtone`;
   }, [route]);
   const doc =
     route.kind === "component"
@@ -387,6 +389,9 @@ export function DocsApp() {
               <Layers size={15} />
               Component gallery
             </a>
+            <a href="#/showcase" aria-current={route.kind === "showcase" ? "page" : undefined}>
+              <Layers size={15} />应用示例
+            </a>
             <a
               href="#/theme"
               aria-current={route.kind === "theme" ? "page" : undefined}
@@ -437,6 +442,7 @@ export function DocsApp() {
                   <a className="primary-link" href="#/start">
                     开始使用 <ArrowRight size={15} />
                   </a>
+                  <a href="#/showcase">探索应用示例 <ArrowRight size={15} /></a>
                   <span>
                     {componentDocs.length} 个文档条目 · 含别名与 Provider
                   </span>
@@ -489,6 +495,8 @@ export function DocsApp() {
                   );
                 })}
               </>
+            ) : route.kind === "showcase" ? (
+              <AppShowcase />
             ) : doc ? (
               <ComponentPage key={doc.name} doc={doc} />
             ) : route.kind === "start" ? (

@@ -25,6 +25,8 @@ describe("documentation", () => {
       name: "Button",
     });
     expect(parseRoute("#/components/Modal")).toEqual({ kind: "component", name: "Dialog" });
+    expect(parseRoute("#/showcase")).toEqual({ kind: "showcase" });
+    expect(parseRoute("#/apps")).toEqual({ kind: "showcase" });
     expect(parseRoute("#/garbage").kind).toBe("not-found");
     expect(parseRoute("").kind).toBe("gallery");
   });

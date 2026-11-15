@@ -22,6 +22,11 @@ export function App() {
 
 One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM ^19.2.0 are peer dependencies. ESM only. The install command above uses published npm releases. To try an unreleased checkout, build and pack it locally with `npm ci`, `npm run build -w @bixlab/mtone`, and `npm pack -w @bixlab/mtone`, then install the generated `.tgz` in your application.
 
+## Explore
+
+- [Component Gallery](https://xingjianxu.github.io/mtone/#/gallery): individual component previews and API documentation.
+- [App Showcase](https://xingjianxu.github.io/mtone/#/showcase): an interactive knowledge workspace built from mtone components. Search, filter, switch views, edit documents, favorite and delete items. Changes are held only in page memory and reset when leaving or refreshing; no backend or block editor is included.
+
 ## Develop
 
 ```bash
