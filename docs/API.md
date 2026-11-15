@@ -54,7 +54,7 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 - ContextMenu: same items and open contract, children are the right-click area.
 - Popover: trigger, content, optional title and side.
 - Tooltip: child trigger element, content, side. Supply accessible names on icon-only children.
-- Modal/Drawer: title, description, children, footer, optional trigger; open/defaultOpen/onOpenChange. Escape and close button restore focus. Drawer has right-edge interaction.
+- Dialog/Drawer: title, description, children, footer, optional trigger; open/defaultOpen/onOpenChange. Escape and close button restore focus. Drawer has right-edge interaction.
 - ConfirmDialog: same basic dialog properties, onConfirm (sync/async), confirmText/cancelText/danger. Async failures remain open with error; pending action disables buttons.
 - ToastProvider (alias Toast): wraps application, timeout and limit. `useToast().add({title,description})` creates a dismissible toast. Place inside MtoneProvider.
 
@@ -121,3 +121,11 @@ No spreadsheet editing, frozen columns, virtualization or column resizing in thi
 ```
 
 Required adapter `upload(file,{signal,onProgress}) => Promise<unknown>`. Progress0–100. Props accept/maxSize(bytes)/multiple/disabled/onChange(files). Dropzone is an alias. Retry, cancel and removal abort active work; stale results cannot overwrite newer attempts. Validation is client convenience only; server must enforce file rules too. The component does not persist files, provide credentials or choose an endpoint. Documentation demo is explicitly simulated.
+
+### Dialog dismissal
+
+`Dialog` is the primary name (`Modal` / `ModalProps` remain deprecated aliases).
+`closeOnOutsideClick?: boolean` defaults to `true`. Setting it to `false` prevents
+outside presses from closing the dialog; Escape, the close button, and controlled
+`open` updates are unaffected. This option is specific to Dialog, not Drawer or
+ConfirmDialog.

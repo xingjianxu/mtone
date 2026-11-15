@@ -1884,12 +1884,13 @@ export const componentDocs: ComponentDoc[] = [
     notes: ["放在 PropertyList 中；编辑能力通过在 children 中组合控件实现。"],
   },
   {
-    name: "Modal",
+    name: "Dialog",
     category: "弹窗与抽屉",
     description: "聚焦当前任务的模态对话框。",
-    importNames: ["Modal", "Button"],
-    code: 'import { Modal, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Modal title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开Modal</Button>}><p>这里是内容区域。</p></Modal>\n  );\n}',
+    importNames: ["Dialog", "Button"],
+    code: 'import { Dialog, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dialog closeOnOutsideClick={false} title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开 Dialog</Button>}><p>这里是内容区域。</p></Dialog>\n  );\n}',
     props: [
+      { name: "closeOnOutsideClick", type: "boolean", default: "true", description: "点击对话框外部是否关闭；false 不影响 Escape 或关闭按钮。" },
       {
         name: "title",
         type: "ReactNode",
@@ -1938,6 +1939,7 @@ export const componentDocs: ComponentDoc[] = [
     ],
     notes: [
       "支持 Esc 关闭、焦点管理与关闭后焦点恢复。",
+      "Modal/ModalProps 暂保留为已弃用兼容别名，建议迁移至 Dialog/DialogProps。",
       "复杂受控流程由 open/onOpenChange 管理。",
       "标题与关闭按钮垂直居中；面板顶部内边距 12px、左右 20px，footer 上间隔 16px，footer 内上下留白各 8px。多行标题与窄屏按钮换行均受支持。",
     ],

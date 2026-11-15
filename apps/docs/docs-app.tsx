@@ -18,6 +18,7 @@ export type Route =
   | { kind: "gallery" | "start" | "theme" | "not-found" }
   | { kind: "component"; name: string };
 export function parseRoute(hash: string): Route {
+  if (hash === "#/components/Modal") return { kind: "component", name: "Dialog" };
   if (!hash || hash === "#" || hash === "#/" || hash === "#/gallery")
     return { kind: "gallery" };
   if (hash === "#/start") return { kind: "start" };

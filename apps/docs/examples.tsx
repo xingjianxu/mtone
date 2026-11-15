@@ -689,9 +689,12 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "PropertyList":
     case "PropertyItem":
       return properties;
-    case "Modal":
+    case "Dialog":
       return (
-        <M.Modal
+        <div style={{ display: "grid", gap: 12 }}>
+        {!compact && <M.Checkbox checked={checked} onCheckedChange={setChecked} label="点击对话框外部关闭" />}
+        <M.Dialog
+          closeOnOutsideClick={checked}
           title="新建知识库"
           description="此示例只更新当前页面状态。"
           open={open}
@@ -707,7 +710,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           }
         >
           {field}
-        </M.Modal>
+        </M.Dialog>
+        </div>
       );
     case "Drawer":
       return (

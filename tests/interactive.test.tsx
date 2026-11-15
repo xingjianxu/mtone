@@ -129,9 +129,9 @@ describe("styled interactive controls", () => {
   it("modal is labeled and dismissible", async () => {
     const change = vi.fn();
     render(
-      <UI.Modal open title="Edit entry" onOpenChange={change}>
+      <UI.Dialog open title="Edit entry" onOpenChange={change}>
         Fields
-      </UI.Modal>,
+      </UI.Dialog>,
     );
     expect(screen.getByRole("dialog", { name: "Edit entry" })).toBeVisible();
     await userEvent.click(screen.getByRole("button", { name: /Close|关闭/ }));
@@ -178,9 +178,9 @@ describe("styled interactive controls", () => {
   });
   it("modal Escape closes and restores focus to its trigger", async () => {
     render(
-      <UI.Modal title="Keyboard modal" trigger={<button>Open editor</button>}>
+      <UI.Dialog title="Keyboard modal" trigger={<button>Open editor</button>}>
         Body
-      </UI.Modal>,
+      </UI.Dialog>,
     );
     await userEvent.click(screen.getByRole("button", { name: "Open editor" }));
     expect(screen.getByRole("dialog")).toBeVisible();
@@ -194,9 +194,9 @@ describe("styled interactive controls", () => {
         density="comfortable"
         tokens={{ "--mt-primary": "purple" }}
       >
-        <UI.Modal open title="Theme">
+        <UI.Dialog open title="Theme">
           Body
-        </UI.Modal>
+        </UI.Dialog>
       </MtoneProvider>,
     );
     const scope = screen.getByRole("dialog").closest(".mt-scope");
@@ -303,16 +303,27 @@ it("select marks only the selected option with a thin decorative vector check", 
   expect(screen.getByRole("option", {name:/Charlie/}).querySelector(".mt-select-item-indicator")).toBeNull();
 });
 
-it("scopes Modal layout and provides a name when its visible title is empty", () => {
-  render(<UI.Modal open title={null}><p>Body only</p></UI.Modal>);
+it("scopes Dialog layout and provides a name when its visible title is empty", () => {
+  render(<UI.Dialog open title={null}><p>Body only</p></UI.Dialog>);
   const modal = screen.getByRole("dialog", { name: "对话框" });
   expect(modal).toHaveClass("mt-modal-dialog");
   expect(modal.querySelector(".mt-modal-header .mt-dialog-close")).not.toBeNull();
   expect(modal.querySelector(".mt-dialog-footer")).toBeNull();
 });
 
-it("preserves zero as a visible Modal title", () => {
-  render(<UI.Modal open title={0}>Content</UI.Modal>);
+it("preserves zero as a visible Dialog title", () => {
+  render(<UI.Dialog open title={0}>Content</UI.Dialog>);
   const modal = screen.getByRole("dialog", { name: "0" });
   expect(modal.querySelector(".mt-dialog-title")).not.toHaveClass("mt-modal-title-hidden");
+});
+
+it("keeps deprecated Modal as an exact Dialog alias", () => {
+  expect(UI.Modal).toBe(UI.Dialog);
+});
+it("keeps Escape dismissal when outside dismissal is disabled", async () => {
+  const user = userEvent.setup();
+  render(<UI.Dialog title="Protected" closeOnOutsideClick={false} trigger={<button>Open protected</button>}>Content</UI.Dialog>);
+  await user.click(screen.getByRole("button", { name: "Open protected" }));
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog")).toBeNull();
 });

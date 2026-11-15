@@ -13,7 +13,7 @@ Reference groups 01–09, 11–12 are implemented. Group10 block editor was expl
 | Documents       | List, ListItem, DocumentList, DocumentCard, Card, Text, Divider                    |
 | Table           | Table                                                                              |
 | Status          | Badge, Status, Avatar, AvatarGroup, Progress, PropertyList, PropertyItem      |
-| Dialogs         | Modal, ConfirmDialog, Drawer                                                       |
+| Dialogs         | Dialog, ConfirmDialog, Drawer                                                       |
 | Feedback        | Alert, ToastProvider/Toast, useToast, Empty, Skeleton, Spinner, Upload/Dropzone    |
 
 This inventory is not an assertion of Ant Design API parity. The simple implementation boundaries in API.md are intentional. DatePicker is native, not a custom themed calendar. Upload requires a host adapter. Reference menu shortcuts are display-only, not global registrations. No full form-state engine, dark theme or editor.

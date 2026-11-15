@@ -13,7 +13,7 @@ import { Menu } from "@base-ui/react/menu";
 import { ContextMenu as BContextMenu } from "@base-ui/react/context-menu";
 import { Popover as BPopover } from "@base-ui/react/popover";
 import { Tooltip as BTooltip } from "@base-ui/react/tooltip";
-import { Dialog } from "@base-ui/react/dialog";
+import { Dialog as BDialog } from "@base-ui/react/dialog";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
 import { MtoneScope, useMtone, cn } from "./basic";
@@ -517,7 +517,7 @@ export function Tooltip({
     </BTooltip.Provider>
   );
 }
-export interface ModalProps extends OpenProps {
+interface DialogFrameProps extends OpenProps {
   title: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
@@ -525,7 +525,12 @@ export interface ModalProps extends OpenProps {
   trigger?: React.ReactElement;
   className?: string;
 }
-export function Modal({
+export interface DialogProps extends DialogFrameProps {
+  /** Whether clicking outside dismisses the dialog. Escape and the close button are unaffected. @default true */
+  closeOnOutsideClick?: boolean;
+}
+export function Dialog({
+  closeOnOutsideClick = true,
   title,
   description,
   children,
@@ -533,41 +538,46 @@ export function Modal({
   trigger,
   className,
   ...props
-}: ModalProps) {
+}: DialogProps) {
   const { locale } = useMtone();
   const hasTitle = title !== null && title !== undefined && title !== false && title !== "";
   return (
-    <Dialog.Root {...props}>
-      {trigger && <Dialog.Trigger render={trigger} />}
-      <Dialog.Portal>
+    <BDialog.Root {...props} disablePointerDismissal={!closeOnOutsideClick}>
+      {trigger && <BDialog.Trigger render={trigger} />}
+      <BDialog.Portal>
         <MtoneScope>
-          <Dialog.Backdrop className="mt-backdrop" />
-          <Dialog.Popup className={cn("mt-modal", "mt-modal-dialog", className)}>
+          <BDialog.Backdrop className="mt-backdrop" />
+          <BDialog.Popup className={cn("mt-modal", "mt-modal-dialog", className)}>
             <div className="mt-modal-header">
-              <Dialog.Title className={cn("mt-dialog-title", !hasTitle && "mt-modal-title-hidden")}>
+              <BDialog.Title className={cn("mt-dialog-title", !hasTitle && "mt-modal-title-hidden")}>
                 {hasTitle ? title : (locale === "zh" ? "对话框" : "Dialog")}
-              </Dialog.Title>
-              <Dialog.Close
+              </BDialog.Title>
+              <BDialog.Close
                 className="mt-dialog-close"
                 aria-label={locale === "zh" ? "关闭" : "Close"}
               >
                 <X size={18} aria-hidden="true" />
-              </Dialog.Close>
+              </BDialog.Close>
             </div>
             {description && (
-              <Dialog.Description className="mt-dialog-description">
+              <BDialog.Description className="mt-dialog-description">
                 {description}
-              </Dialog.Description>
+              </BDialog.Description>
             )}
             <div className="mt-dialog-body">{children}</div>
             {footer && <div className="mt-dialog-footer">{footer}</div>}
-          </Dialog.Popup>
+          </BDialog.Popup>
         </MtoneScope>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </BDialog.Portal>
+    </BDialog.Root>
   );
 }
-export interface ConfirmDialogProps extends ModalProps {
+/** @deprecated Use DialogProps instead. */
+export type ModalProps = DialogProps;
+/** @deprecated Use Dialog instead. */
+export const Modal = Dialog;
+
+export interface ConfirmDialogProps extends DialogFrameProps {
   onConfirm?: () => void | Promise<void>;
   confirmText?: string;
   cancelText?: string;
@@ -661,7 +671,7 @@ export function Drawer({
   trigger,
   className,
   ...props
-}: ModalProps) {
+}: DialogFrameProps) {
   const { locale } = useMtone();
   return (
     <BDrawer.Root swipeDirection="right" {...props}>

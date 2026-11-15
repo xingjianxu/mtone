@@ -8,7 +8,7 @@ import { parseRoute, searchDocs } from "../apps/docs/docs-app";
 describe("documentation", () => {
   it("covers every component export without counting hooks as components", () => {
     const names = Object.keys(M).filter(
-      (k) => !["cn", "useMtone", "useToast"].includes(k),
+      (k) => !["cn", "useMtone", "useToast", "Modal"].includes(k),
     );
     expect(componentDocs.map((d) => d.name).sort()).toEqual(names.sort());
     expect(new Set(componentDocs.map((d) => d.name)).size).toBe(
@@ -24,6 +24,7 @@ describe("documentation", () => {
       kind: "component",
       name: "Button",
     });
+    expect(parseRoute("#/components/Modal")).toEqual({ kind: "component", name: "Dialog" });
     expect(parseRoute("#/garbage").kind).toBe("not-found");
     expect(parseRoute("").kind).toBe("gallery");
   });
@@ -33,7 +34,7 @@ describe("documentation", () => {
     expect(searchDocs("")).toHaveLength(componentDocs.length);
   });
   it.each(
-    Object.keys(M).filter((k) => !["cn", "useMtone", "useToast"].includes(k)),
+    Object.keys(M).filter((k) => !["cn", "useMtone", "useToast", "Modal"].includes(k)),
   )("renders %s example", (name) => {
     render(
       <M.MtoneProvider>

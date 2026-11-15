@@ -43,6 +43,21 @@ try {
     await page.getByRole("button", { name: "关闭", exact: true }).click();
     await dialog.waitFor({ state: "hidden" });
   }
+  for (const outside of ["default", "true", "false"]) {
+    await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?outside=${outside}`);
+    const dialog = page.getByRole("dialog");
+    await dialog.waitFor();
+    await page.mouse.click(4, 4);
+    if (outside !== "false") await dialog.waitFor({ state: "hidden" });
+    else {
+      assert(await dialog.isVisible(), "Outside press must not dismiss when disabled");
+      await page.keyboard.press("Escape");
+      await dialog.waitFor({ state: "hidden" });
+      await page.reload();
+      await page.getByRole("button", { name: "关闭", exact: true }).click();
+      await dialog.waitFor({ state: "hidden" });
+    }
+  }
   for (const mode of ["confirm", "drawer"]) {
     await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?mode=${mode}`);
     await page.locator(".mt-dialog-footer").waitFor();
