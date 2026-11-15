@@ -270,3 +270,17 @@ test("tree never focuses disabled parent via ArrowLeft", () => {
   fireEvent.keyDown(child, { key: "ArrowLeft" });
   expect(document.activeElement).toBe(child);
 });
+
+test("date picker adds a decorative Select-style arrow without replacing its native input", () => {
+  en(<DatePicker label="Native date" defaultValue="2026-02-01" disabled min="2026-01-01" max="2026-12-31" name="due" />);
+  const input = screen.getByLabelText("Native date");
+  expect(input).toHaveAttribute("type", "date");
+  expect(input).toBeDisabled();
+  expect(input).toHaveAttribute("name", "due");
+  expect(input).toHaveAttribute("min", "2026-01-01");
+  const icon = input.parentElement?.querySelector(".mt-date-icon");
+  expect(icon).toHaveAttribute("aria-hidden", "true");
+  expect(icon?.querySelector("svg")).toHaveClass("lucide-chevron-down");
+  expect(icon?.querySelector("svg")).toHaveAttribute("width", "16");
+  expect(icon?.querySelector("svg")).toHaveAttribute("stroke-width", "2");
+});

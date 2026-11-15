@@ -551,6 +551,7 @@ export function DatePicker({
   };
   return (
     <div className={cn("mt-date-picker", className)}>
+      <span className="mt-date-field">
       <input
         className="mt-input"
         type="date"
@@ -564,6 +565,8 @@ export function DatePicker({
         aria-describedby={error ? id : undefined}
         onChange={(e) => change(e.target.value)}
       />
+      <span className="mt-date-icon" aria-hidden="true"><ChevronDown size={16} aria-hidden="true" /></span>
+      </span>
       {clearable && current && (
         <Button
           variant="ghost"

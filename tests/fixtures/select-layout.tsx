@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Select, MultiSelect, Checkbox } from "../../packages/mtone/src/interactive";
+import { DatePicker } from "../../packages/mtone/src/data";
 import { MtoneProvider } from "../../packages/mtone/src/basic";
 import "../../packages/mtone/dist/styles.css";
 const text =
@@ -61,6 +62,8 @@ createRoot(document.getElementById("root")!).render(
           <Checkbox label={`${density}-mixed`} indeterminate />
         </div>
         <div className="case"><MultiSelect label={`${density}-multi-disabled`} options={[]} disabled /></div>
+        <div className={`case date-${density}`} style={{ width: 250 }}><DatePicker label={`${density}-date`} min="2026-01-01" max="2026-12-31" defaultValue="2026-02-01" /></div>
+        <div className={`case date-disabled-${density}`} style={{ width: 180 }}><DatePicker label={`${density}-date-disabled`} disabled /></div>
       </MtoneProvider>
     ))}
   </>,

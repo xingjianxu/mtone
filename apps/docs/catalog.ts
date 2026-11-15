@@ -985,6 +985,7 @@ export const componentDocs: ComponentDoc[] = [
     notes: [
       "值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。",
       "日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。",
+      "支持原生指示器样式的浏览器显示与 Select 一致的 16px 箭头，仍使用原生日历点击区域；其他浏览器保留原生图标。",
       "不支持日期区间、时间或自定义日历面板。",
     ],
   },

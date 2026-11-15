@@ -177,6 +177,26 @@ try {
     }
     assert(await page.getByRole("combobox",{name:`${density}-multi-disabled`}).isDisabled());
   }
+  for (const density of ["compact", "comfortable"]) {
+    const field = page.locator(`.date-${density}`);
+    const input = field.getByLabel(`${density}-date`, {exact:true});
+    await input.scrollIntoViewIfNeeded();
+    const arrow = await field.locator(".mt-date-icon").evaluate(el => {
+      const input=el.previousElementSibling, b=input.getBoundingClientRect(), r=el.getBoundingClientRect(), svg=el.querySelector("svg");
+      return {w:r.width,h:r.height,delta:Math.abs((r.top+r.bottom-b.top-b.bottom)/2),inside:r.right<=b.right,hidden:el.getAttribute("aria-hidden"),events:getComputedStyle(el).pointerEvents,stroke:svg.getAttribute("stroke-width")};
+    });
+    assert.deepEqual(arrow,{w:16,h:16,delta:0,inside:true,hidden:"true",events:"none",stroke:"2"});
+    const arrowBox = await field.locator(".mt-date-icon").boundingBox();
+    await page.mouse.click(arrowBox.x + arrowBox.width / 2, arrowBox.y + arrowBox.height / 2);
+    await page.keyboard.press("Escape");
+    await input.fill("2026-07-01");
+    assert.equal(await input.inputValue(),"2026-07-01");
+    await field.getByRole("button",{name:"清除日期",exact:true}).click();
+    assert.equal(await input.inputValue(),"");
+    assert.equal(await input.getAttribute("type"),"date");
+    assert.equal(await input.getAttribute("min"),"2026-01-01");
+    assert(await page.getByLabel(`${density}-date-disabled`,{exact:true}).isDisabled());
+  }
   console.log("Select geometry, open, selection and disabled checks passed");
 } finally {
   await browser?.close();
