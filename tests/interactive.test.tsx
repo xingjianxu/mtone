@@ -302,3 +302,17 @@ it("select marks only the selected option with a thin decorative vector check", 
   expect(indicator).not.toHaveTextContent("✓");
   expect(screen.getByRole("option", {name:/Charlie/}).querySelector(".mt-select-item-indicator")).toBeNull();
 });
+
+it("scopes Modal layout and provides a name when its visible title is empty", () => {
+  render(<UI.Modal open title={null}><p>Body only</p></UI.Modal>);
+  const modal = screen.getByRole("dialog", { name: "对话框" });
+  expect(modal).toHaveClass("mt-modal-dialog");
+  expect(modal.querySelector(".mt-modal-header .mt-dialog-close")).not.toBeNull();
+  expect(modal.querySelector(".mt-dialog-footer")).toBeNull();
+});
+
+it("preserves zero as a visible Modal title", () => {
+  render(<UI.Modal open title={0}>Content</UI.Modal>);
+  const modal = screen.getByRole("dialog", { name: "0" });
+  expect(modal.querySelector(".mt-dialog-title")).not.toHaveClass("mt-modal-title-hidden");
+});

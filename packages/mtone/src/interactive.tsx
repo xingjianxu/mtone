@@ -1,5 +1,5 @@
 import React, { useId, useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BSwitch } from "@base-ui/react/switch";
 import { Radio as BRadio } from "@base-ui/react/radio";
@@ -535,25 +535,30 @@ export function Modal({
   ...props
 }: ModalProps) {
   const { locale } = useMtone();
+  const hasTitle = title !== null && title !== undefined && title !== false && title !== "";
   return (
     <Dialog.Root {...props}>
       {trigger && <Dialog.Trigger render={trigger} />}
       <Dialog.Portal>
         <MtoneScope>
           <Dialog.Backdrop className="mt-backdrop" />
-          <Dialog.Popup className={cn("mt-modal", className)}>
-            <Dialog.Title className="mt-dialog-title">{title}</Dialog.Title>
+          <Dialog.Popup className={cn("mt-modal", "mt-modal-dialog", className)}>
+            <div className="mt-modal-header">
+              <Dialog.Title className={cn("mt-dialog-title", !hasTitle && "mt-modal-title-hidden")}>
+                {hasTitle ? title : (locale === "zh" ? "对话框" : "Dialog")}
+              </Dialog.Title>
+              <Dialog.Close
+                className="mt-dialog-close"
+                aria-label={locale === "zh" ? "关闭" : "Close"}
+              >
+                <X size={18} aria-hidden="true" />
+              </Dialog.Close>
+            </div>
             {description && (
               <Dialog.Description className="mt-dialog-description">
                 {description}
               </Dialog.Description>
             )}
-            <Dialog.Close
-              className="mt-dialog-close"
-              aria-label={locale === "zh" ? "关闭" : "Close"}
-            >
-              ×
-            </Dialog.Close>
             <div className="mt-dialog-body">{children}</div>
             {footer && <div className="mt-dialog-footer">{footer}</div>}
           </Dialog.Popup>

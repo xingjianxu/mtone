@@ -450,3 +450,51 @@
   width: 16px;
   height: 16px;
 }
+
+/* Modal-only layout: ConfirmDialog and Drawer retain their existing spacing. */
+.mt-modal-dialog {
+  padding: 20px 20px 0;
+}
+.mt-modal-dialog > .mt-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  min-height: 24px;
+}
+.mt-modal-dialog .mt-modal-header > .mt-dialog-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.mt-modal-dialog .mt-modal-header > .mt-dialog-close {
+  position: static;
+  flex: 0 0 24px;
+  margin-left: auto;
+  padding: 0;
+}
+.mt-modal-dialog > .mt-dialog-description {
+  margin: 0 0 16px;
+  overflow-wrap: anywhere;
+}
+.mt-modal-dialog > .mt-dialog-body:last-child {
+  padding-bottom: 20px;
+}
+.mt-modal-dialog > .mt-dialog-footer {
+  margin: 16px -20px 0;
+  border-top: 1px solid var(--mt-border, #e9e9e7);
+  padding: 12px 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mt-modal-dialog .mt-modal-header > .mt-modal-title-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1893,7 +1893,7 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "title",
         type: "ReactNode",
-        description: "必填；对话框标题。",
+        description: "对话框标题；传 null 隐藏可见标题，仍保留默认无障碍名称。",
       },
       {
         name: "description",
@@ -1913,7 +1913,7 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "footer",
         type: "ReactNode",
-        description: "页脚操作区。",
+        description: "可选页脚操作区，分隔线上下独立布局；按钮上下内边距均为 12px。",
       },
       {
         name: "className",
@@ -1939,6 +1939,7 @@ export const componentDocs: ComponentDoc[] = [
     notes: [
       "支持 Esc 关闭、焦点管理与关闭后焦点恢复。",
       "复杂受控流程由 open/onOpenChange 管理。",
+      "标题与关闭按钮垂直居中；主体内边距 20px，footer 上间隔 16px，footer 内上下留白各 12px。多行标题与窄屏按钮换行均受支持。",
     ],
   },
   {

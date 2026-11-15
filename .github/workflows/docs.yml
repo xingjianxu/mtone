@@ -23,6 +23,7 @@ jobs:
       - run: npm run build:docs
       - run: npx playwright install --with-deps chromium
       - run: node tests/select-layout.browser.mjs
+      - run: node tests/modal-layout.browser.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/docs
