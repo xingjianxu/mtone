@@ -60,11 +60,12 @@ it('keeps toast icons centered on the first text row with compact spacing', () =
   expect(title).toContain('margin: 0');
   expect(title).toContain('font-size: inherit');
 });
-it('defaults layout topbar and optional main footer to 48px without changing sider footer',()=>{
+it('keeps the topbar at 48px and both layout footers at 42px',()=>{
  const css=readFileSync('packages/mtone/src/layout.css','utf8');
  expect(css).toContain('var(--mt-layout-header-height, 48px)');
  expect(css).not.toContain('var(--mt-layout-header-height, 64px)');
- expect(css).toContain('height: var(--mt-layout-footer-height, 48px)');
+ expect(css).toContain('height: var(--mt-layout-footer-height, 42px)');
  const sider=css.slice(css.indexOf('.mt-layout-sider .mt-sidebar-footer {')).split('}')[0];
- expect(sider).toContain('min-height: 52px');
+ expect(sider).toContain('height: var(--mt-layout-footer-height, 42px)');
+ expect(sider).toContain('padding: 6px 12px');
 });

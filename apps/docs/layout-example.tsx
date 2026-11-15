@@ -210,7 +210,7 @@ export function LayoutExample({ compact = false }: { compact?: boolean }) {
           )}
           {!compact && (
             <Button aria-pressed={showFooter} onClick={() => setShowFooter(value => !value)}>
-              {showFooter ? "隐藏主体 Footer" : "显示主体 Footer（48px）"}
+              {showFooter ? "隐藏主体 Footer" : "显示主体 Footer（42px）"}
             </Button>
           )}
         </Layout.Content>
