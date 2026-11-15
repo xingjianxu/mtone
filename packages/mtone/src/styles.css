@@ -67,6 +67,15 @@
 .mt-btn-solid:hover:not(:disabled) {
   background: #53514c;
 }
+.mt-btn-blue {
+  background: #2783de;
+  color: #f3f9fd;
+  border-color: transparent;
+  transition: background-color 100ms ease-in-out;
+}
+.mt-btn-blue:hover:not(:disabled) {
+  background: #2276c9;
+}
 .mt-btn-soft {
   background: var(--mt-subtle, #f7f7f5);
   border-color: transparent;
@@ -78,9 +87,13 @@
 .mt-danger {
   color: #b6403b;
 }
-.mt-btn-solid.mt-danger {
+.mt-btn-solid.mt-danger,
+.mt-btn-blue.mt-danger {
   background: #b6403b;
   color: white;
+}
+.mt-btn-blue.mt-danger:hover:not(:disabled) {
+  background: #9e3632;
 }
 .mt-btn:disabled {
   opacity: 0.45;

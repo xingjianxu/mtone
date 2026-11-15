@@ -49,3 +49,18 @@ describe("foundation", () => {
     ).toHaveAttribute("data-density", "comfortable");
   });
 });
+
+it('renders blue buttons and preserves disabled/loading behavior', () => {
+  const fn = vi.fn();
+  const { rerender } = render(<Button variant="blue" onClick={fn}>启用两步验证</Button>);
+  expect(screen.getByRole('button')).toHaveClass('mt-btn-blue');
+  fireEvent.click(screen.getByRole('button'));
+  expect(fn).toHaveBeenCalledOnce();
+  rerender(<Button variant="blue" disabled onClick={fn}>启用两步验证</Button>);
+  expect(screen.getByRole('button')).toBeDisabled();
+  fireEvent.click(screen.getByRole('button'));
+  rerender(<Button variant="blue" loading onClick={fn}>启用两步验证</Button>);
+  expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
+  fireEvent.click(screen.getByRole('button'));
+  expect(fn).toHaveBeenCalledOnce();
+});

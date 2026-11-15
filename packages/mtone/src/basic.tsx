@@ -62,7 +62,7 @@ export type ButtonProps = Omit<
   "className"
 > & {
   className?: string;
-  variant?: "solid" | "outline" | "soft" | "ghost";
+  variant?: "blue" | "solid" | "outline" | "soft" | "ghost";
   size?: "sm" | "md" | "lg";
   danger?: boolean;
   loading?: boolean;

@@ -20,11 +20,11 @@ export const componentDocs: ComponentDoc[] = [
     category: "按钮与操作",
     description: "带完整样式的基础操作按钮。",
     importNames: ["Button"],
-    code: 'import { Button } from "mtone";\nimport "mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Button variant="solid">保存更改</Button>\n  );\n}',
+    code: 'import { Button } from "mtone";\nimport "mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Button variant="blue">启用两步验证</Button>\n  );\n}',
     props: [
       {
         name: "variant",
-        type: '"solid" | "outline" | "soft" | "ghost"',
+        type: '"blue" | "solid" | "outline" | "soft" | "ghost"',
         description: "按钮外观。",
         default: "outline",
       },
@@ -67,6 +67,7 @@ export const componentDocs: ComponentDoc[] = [
     ],
     notes: [
       "支持 ref 和 Base UI Button 的可组合属性。加载中不会重复触发操作。",
+      "blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。",
     ],
   },
   {
@@ -83,7 +84,7 @@ export const componentDocs: ComponentDoc[] = [
       },
       {
         name: "variant",
-        type: '"solid" | "outline" | "soft" | "ghost"',
+        type: '"blue" | "solid" | "outline" | "soft" | "ghost"',
         description: "按钮外观。",
         default: "outline",
       },

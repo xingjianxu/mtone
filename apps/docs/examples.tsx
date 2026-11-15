@@ -127,7 +127,7 @@ function ExampleBody({ name }: { name: string }) {
       return (
         <div style={stackStyle}>
           <div style={rowStyle}>
-            {(["solid", "outline", "soft", "ghost"] as const).map((variant) => (
+            {(["blue", "solid", "outline", "soft", "ghost"] as const).map((variant) => (
               <M.Button
                 key={variant}
                 variant={variant}
@@ -142,7 +142,9 @@ function ExampleBody({ name }: { name: string }) {
             >
               删除
             </M.Button>
-            <M.Button loading>保存中</M.Button>
+            <M.Button variant="blue" onClick={() => setNotice("两步验证按钮样式演示，不会更改安全设置")}>启用两步验证</M.Button>
+            <M.Button variant="blue" loading>保存中</M.Button>
+            <M.Button variant="blue" disabled>不可用</M.Button>
             <M.Button disabled>不可用</M.Button>
           </div>
           {output}
