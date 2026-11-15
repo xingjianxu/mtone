@@ -43,20 +43,28 @@ try {
     await page.getByRole("button", { name: "关闭", exact: true }).click();
     await dialog.waitFor({ state: "hidden" });
   }
-  for (const outside of ["default", "true", "false"]) {
-    await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?outside=${outside}`);
+  for (const modal of ["default", "true", "false"]) {
+    await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?modal=${modal}`);
     const dialog = page.getByRole("dialog");
     await dialog.waitFor();
-    await page.mouse.click(4, 4);
-    if (outside !== "false") await dialog.waitFor({ state: "hidden" });
-    else {
-      assert(await dialog.isVisible(), "Outside press must not dismiss when disabled");
-      await page.keyboard.press("Escape");
-      await dialog.waitFor({ state: "hidden" });
-      await page.reload();
-      await page.getByRole("button", { name: "关闭", exact: true }).click();
-      await dialog.waitFor({ state: "hidden" });
+    assert.equal(await page.locator(".mt-backdrop").count(), 1, "Backdrop retained in every mode");
+    assert.equal(await page.locator("body").evaluate(el => getComputedStyle(el).overflow), "hidden", "Scroll lock retained in every mode");
+    for (let step = 0; step < 8; step++) {
+      await page.keyboard.press("Tab");
+      assert(await dialog.evaluate(el => el.contains(document.activeElement)), "Focus stays trapped throughout a full tab cycle in every mode");
     }
+    await page.mouse.click(4, 4);
+    if (modal === "false") await dialog.waitFor({ state: "hidden" });
+    else {
+      assert(await dialog.isVisible(), "modal=true/default must prevent outside dismissal");
+    }
+    await page.reload();
+    await dialog.waitFor();
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
+    await page.reload();
+    await page.getByRole("button", { name: "关闭", exact: true }).click();
+    await dialog.waitFor({ state: "hidden" });
   }
   for (const mode of ["confirm", "drawer"]) {
     await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?mode=${mode}`);

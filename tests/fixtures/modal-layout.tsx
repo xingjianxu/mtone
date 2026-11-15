@@ -9,8 +9,9 @@ const title = mode === "empty" ? null : mode === "long" ? "这是一段跨越多
 const footer = mode === "empty" ? null : <><Button>{mode === "wrap" ? "取消并保留当前所有未保存的编辑" : "取消"}</Button><Button variant="solid">{mode === "wrap" ? "确认创建并继续编辑当前知识库" : "创建"}</Button></>;
 createRoot(document.getElementById("root")!).render(
   <MtoneProvider density={params.get("density") === "comfortable" ? "comfortable" : "compact"}>
+    <button id="outside-target">Outside focus target</button>
     {mode === "confirm" ? <ConfirmDialog defaultOpen title="确认操作" description="保持已有样式" /> : mode === "drawer" ? <Drawer defaultOpen title="抽屉" footer={footer}>内容</Drawer> :
-    <Dialog closeOnOutsideClick={params.get("outside") === "default" ? undefined : params.get("outside") !== "false"} defaultOpen title={title} description={mode === "empty" ? undefined : "为你的内容创建一个新的空间。"} footer={footer}>
+    <Dialog modal={params.get("modal") === "false" ? false : params.get("modal") === "true" ? true : undefined} defaultOpen title={title} description={mode === "empty" ? undefined : "为你的内容创建一个新的空间。"} footer={footer}>
       <FormField label="名称"><Input placeholder="输入知识库名称" /></FormField>
     </Dialog>}
   </MtoneProvider>,

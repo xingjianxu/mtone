@@ -692,9 +692,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "Dialog":
       return (
         <div style={{ display: "grid", gap: 12 }}>
-        {!compact && <M.Checkbox checked={checked} onCheckedChange={setChecked} label="点击对话框外部关闭" />}
+        {!compact && <M.Checkbox checked={checked} onCheckedChange={setChecked} label="阻止点击对话框外部关闭（modal）" />}
         <M.Dialog
-          closeOnOutsideClick={checked}
+          modal={checked}
           title="新建知识库"
           description="此示例只更新当前页面状态。"
           open={open}

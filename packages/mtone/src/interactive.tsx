@@ -526,11 +526,11 @@ interface DialogFrameProps extends OpenProps {
   className?: string;
 }
 export interface DialogProps extends DialogFrameProps {
-  /** Whether clicking outside dismisses the dialog. Escape and the close button are unaffected. @default true */
-  closeOnOutsideClick?: boolean;
+  /** Whether outside clicks are blocked from dismissing the dialog. Does not change focus trapping, scroll locking, Escape, or the close button. @default true */
+  modal?: boolean;
 }
 export function Dialog({
-  closeOnOutsideClick = true,
+  modal = true,
   title,
   description,
   children,
@@ -542,7 +542,7 @@ export function Dialog({
   const { locale } = useMtone();
   const hasTitle = title !== null && title !== undefined && title !== false && title !== "";
   return (
-    <BDialog.Root {...props} disablePointerDismissal={!closeOnOutsideClick}>
+    <BDialog.Root {...props} modal={true} disablePointerDismissal={modal}>
       {trigger && <BDialog.Trigger render={trigger} />}
       <BDialog.Portal>
         <MtoneScope>

@@ -18,7 +18,11 @@ The documentation gallery now lists only Badge.
 Use `Dialog` and `DialogProps` in new code. `Modal` and `ModalProps` remain
 deprecated aliases for compatibility. The old documentation URL also resolves to Dialog.
 
-`closeOnOutsideClick` defaults to `true`, preserving existing behavior. Set it
-to `false` to ignore outside presses without disabling Escape or the close button.
-The styling classes and existing layout remain unchanged. Drawer and ConfirmDialog
-do not receive this new option.
+The short-lived `closeOnOutsideClick` option has been replaced by `modal` with
+inverted semantics: use `modal={!oldCloseOnOutsideClick}` for an explicit old value.
+The new default is `true`, so outside clicks **do not close** the dialog by default.
+Set `modal={false}` to retain the earlier outside-dismissal behavior.
+
+This option only controls outside dismissal. Focus trapping, the backdrop,
+scroll locking, Escape, and the close button remain unchanged. Existing styling
+classes remain unchanged. Drawer and ConfirmDialog do not receive this option.

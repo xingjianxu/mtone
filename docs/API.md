@@ -125,7 +125,8 @@ Required adapter `upload(file,{signal,onProgress}) => Promise<unknown>`. Progres
 ### Dialog dismissal
 
 `Dialog` is the primary name (`Modal` / `ModalProps` remain deprecated aliases).
-`closeOnOutsideClick?: boolean` defaults to `true`. Setting it to `false` prevents
-outside presses from closing the dialog; Escape, the close button, and controlled
-`open` updates are unaffected. This option is specific to Dialog, not Drawer or
-ConfirmDialog.
+`modal?: boolean` defaults to `true`: outside clicks do not close the dialog.
+Set `modal={false}` to allow outside clicks to close it. This option only controls
+outside dismissal. Focus trapping, the backdrop, scroll locking, Escape, the close
+button, and controlled `open` updates remain unchanged in both modes. It is not
+forwarded as Base UI's `modal` option. Drawer and ConfirmDialog are unaffected.

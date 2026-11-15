@@ -322,7 +322,7 @@ it("keeps deprecated Modal as an exact Dialog alias", () => {
 });
 it("keeps Escape dismissal when outside dismissal is disabled", async () => {
   const user = userEvent.setup();
-  render(<UI.Dialog title="Protected" closeOnOutsideClick={false} trigger={<button>Open protected</button>}>Content</UI.Dialog>);
+  render(<UI.Dialog title="Protected" modal={true} trigger={<button>Open protected</button>}>Content</UI.Dialog>);
   await user.click(screen.getByRole("button", { name: "Open protected" }));
   await user.keyboard("{Escape}");
   expect(screen.queryByRole("dialog")).toBeNull();

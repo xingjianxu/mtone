@@ -1888,9 +1888,9 @@ export const componentDocs: ComponentDoc[] = [
     category: "弹窗与抽屉",
     description: "聚焦当前任务的模态对话框。",
     importNames: ["Dialog", "Button"],
-    code: 'import { Dialog, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dialog closeOnOutsideClick={false} title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开 Dialog</Button>}><p>这里是内容区域。</p></Dialog>\n  );\n}',
+    code: 'import { Dialog, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dialog modal={true} title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开 Dialog</Button>}><p>这里是内容区域。</p></Dialog>\n  );\n}',
     props: [
-      { name: "closeOnOutsideClick", type: "boolean", default: "true", description: "点击对话框外部是否关闭；false 不影响 Escape 或关闭按钮。" },
+      { name: "modal", type: "boolean", default: "true", description: "默认 true，点击外部不关闭；false 点击外部关闭。仅控制外部关闭，不影响焦点陷阱、遮罩、滚动锁定、Escape 或关闭按钮。" },
       {
         name: "title",
         type: "ReactNode",
