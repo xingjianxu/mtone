@@ -181,13 +181,9 @@ try {
     const field = page.locator(`.date-${density}`);
     const input = field.getByLabel(`${density}-date`, {exact:true});
     await input.scrollIntoViewIfNeeded();
-    const arrow = await field.locator(".mt-date-icon").evaluate(el => {
-      const input=el.previousElementSibling, b=input.getBoundingClientRect(), r=el.getBoundingClientRect(), svg=el.querySelector("svg");
-      return {w:r.width,h:r.height,delta:Math.abs((r.top+r.bottom-b.top-b.bottom)/2),inside:r.right<=b.right,hidden:el.getAttribute("aria-hidden"),events:getComputedStyle(el).pointerEvents,stroke:svg.getAttribute("stroke-width")};
-    });
-    assert.deepEqual(arrow,{w:16,h:16,delta:0,inside:true,hidden:"true",events:"none",stroke:"2"});
-    const arrowBox = await field.locator(".mt-date-icon").boundingBox();
-    await page.mouse.click(arrowBox.x + arrowBox.width / 2, arrowBox.y + arrowBox.height / 2);
+    assert.equal(await field.locator(".mt-date-icon, .mt-date-field svg").count(), 0);
+    const box = await input.boundingBox();
+    await page.mouse.click(box.x + box.width - 16, box.y + box.height / 2);
     await page.keyboard.press("Escape");
     await input.fill("2026-07-01");
     assert.equal(await input.inputValue(),"2026-07-01");

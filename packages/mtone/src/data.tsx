@@ -565,7 +565,6 @@ export function DatePicker({
         aria-describedby={error ? id : undefined}
         onChange={(e) => change(e.target.value)}
       />
-      <span className="mt-date-icon" aria-hidden="true"><ChevronDown size={16} aria-hidden="true" /></span>
       </span>
       {clearable && current && (
         <Button
