@@ -20,7 +20,7 @@ export function App() {
 }
 ```
 
-One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM are peer dependencies. ESM only. The npm package name is `@bixlab/mtone`. Initial npm publication is pending owner setup and license selection; use the local tarball until the first release is available. After publication: `npm install @bixlab/mtone`.
+One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM are peer dependencies. ESM only. The npm package name is `@bixlab/mtone`. Initial npm publication is pending npm account and trusted-publisher setup; use the local tarball until the first release is available. After publication: `npm install @bixlab/mtone`.
 
 ## Develop
 
@@ -39,3 +39,7 @@ Node 24 recommended. The documentation app lives in `apps/docs`; its static buil
 Buttons, forms, selection controls, navigation, directory tree, tabs, menus, lists, table, status and property displays, dialogs/drawers, feedback and upload. No block editor or backend. See [API](https://github.com/xingjianxu/mtone/blob/master/docs/API.md), [coverage](https://github.com/xingjianxu/mtone/blob/master/docs/COVERAGE.md) and [verification](https://github.com/xingjianxu/mtone/blob/master/docs/VERIFICATION.md).
 
 Default style: text #37352F, muted #787774, border #E9E9E7, subtle surface #F7F7F5, white canvas, 14px text, 28px controls, 4px radius. CSS is precompiled, prefixed and contains no Tailwind Preflight. Dark theme is not included.
+
+## License
+
+MIT © 2026 Xingjian Xu. See [LICENSE](LICENSE).

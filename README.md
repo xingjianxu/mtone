@@ -20,7 +20,7 @@ export function App() {
 }
 ```
 
-One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM are peer dependencies. ESM only. The npm package name is `@bixlab/mtone`. Initial npm publication is pending owner setup and license selection; use the local tarball until the first release is available. After publication: `npm install @bixlab/mtone`.
+One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM are peer dependencies. ESM only. The npm package name is `@bixlab/mtone`. Initial npm publication is pending npm account and trusted-publisher setup; use the local tarball until the first release is available. After publication: `npm install @bixlab/mtone`.
 
 ## Develop
 
@@ -53,3 +53,7 @@ Production assets use the GitHub Pages `/mtone/` base. Component URLs use hash r
 ## npm releases
 
 GitHub Actions uses trusted publishing (OIDC), without a stored npm token. See [release setup and workflow](docs/RELEASING.md). Manual workflow runs validate only; stable GitHub Releases publish after checks and the configured environment approval.
+
+## License
+
+MIT © 2026 Xingjian Xu. See [LICENSE](LICENSE).

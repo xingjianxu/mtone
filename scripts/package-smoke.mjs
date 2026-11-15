@@ -22,6 +22,7 @@ try {
     "dist/index.d.ts",
     "dist/styles.css",
     "README.md",
+    "LICENSE",
   ]) {
     assert(
       pack.files.some((f) => f.path === path),

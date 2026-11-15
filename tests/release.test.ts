@@ -18,13 +18,13 @@ describe("npm release safety", () => {
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("Release tag must match package version");
   });
-  it("blocks publishing while license remains undecided", () => {
-    if (pkg.license !== "UNLICENSED") return;
+  it("accepts the approved MIT license for the matching stable version", () => {
+    expect(pkg.license).toBe("MIT");
     const result = spawnSync(process.execPath, ["scripts/check-release.mjs"], {
       env: { ...process.env, RELEASE_TAG: `v${pkg.version}` },
       encoding: "utf8",
     });
-    expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("Owner must choose a license");
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("Ready to publish @bixlab/mtone");
   });
 });
