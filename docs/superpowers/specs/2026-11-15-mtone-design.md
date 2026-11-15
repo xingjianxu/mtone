@@ -1,0 +1,5 @@
+# mtone design
+
+Approved: React UI library, Base UI headless logic wrapped as ready-styled components, TypeScript, Tailwind, Lucide. Install one package and import mtone/styles.css. No BlockNote/editor, no backend or publication. Reference: warm text #37352F, muted #787774, border #E9E9E7, sidebar #F7F7F5, white canvas, 14px text, 28px controls, 4px radius.
+Scope: buttons; forms; checkbox/radio/switch; select/multiselect; number/slider/date; navigation/tree/breadcrumb; tabs/segmented/filter/pagination; menus/popover/tooltip; lists/cards/table; tags/status/avatar/progress/properties; modal/confirm/drawer; alert/toast/empty/skeleton/spinner/upload.
+Deliver source, installable package, docs and interactive overview. Defaults Chinese with English locale, compact plus comfortable density, CSS tokens. Precompiled isolated CSS without global reset. Test interactions, types, package consumer. Table supports sort/filter/select/page, no spreadsheet/virtualization. Upload uses application adapter; demo clearly simulated. Theme travels into portals. No public npm publishing.
