@@ -514,3 +514,31 @@
   border-top: 1px solid var(--mt-border, #e9e9e7);
   padding-top: 8px;
 }
+
+/* All interactive focus indicators use the Input focus token, never primary. */
+:is(.mt-slider-thumb, .mt-chip, .mt-chip-remove, .mt-combobox-trigger, .mt-dialog-close,
+  .mt-tab-panel, .mt-table-sort):not(:disabled):not([data-disabled]):not([aria-disabled="true"]):focus-visible,
+:is(.mt-tag, .mt-filter-chip) > button:focus-visible,
+.mt-breadcrumb a:focus-visible,
+.mt-table input:focus-visible,
+.mt-dropzone input:focus-visible {
+  outline: 2px solid var(--mt-focus, #5378aa);
+  outline-offset: 2px;
+}
+/* Compound inputs show one outer ring even when their text input is clicked. */
+.mt-number-group:not(:has(input:disabled)):focus-within,
+.mt-multiselect:not(:has(input:disabled)):focus-within {
+  outline: 2px solid var(--mt-focus, #5378aa);
+  outline-offset: 2px;
+}
+.mt-number-group .mt-number-input:focus-visible,
+.mt-multiselect .mt-combobox-input:focus-visible {
+  outline: none;
+}
+/* Inset rings remain visible inside clipped stepper and popup containers. */
+.mt-number-step:not(:disabled):not([data-disabled]):focus-visible,
+.mt-option[data-highlighted]:not([data-disabled]),
+.mt-menu-item[data-highlighted]:not([data-disabled]) {
+  outline: 2px solid var(--mt-focus, #5378aa);
+  outline-offset: -2px;
+}

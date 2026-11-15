@@ -238,7 +238,7 @@ function Theme() {
                 ["--mt-hover", "悬停背景"],
                 ["--mt-height", "控件高度"],
                 ["--mt-radius", "圆角"],
-                ["--mt-focus", "键盘焦点"],
+                ["--mt-focus", "统一焦点色（默认 #5378AA），独立于 --mt-primary"],
               ].map(([k, v]) => (
                 <tr key={k}>
                   <td>

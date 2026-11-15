@@ -255,3 +255,15 @@ describe("styled interactive controls", () => {
     expect(await screen.findByText("Saved")).toBeVisible();
   });
 });
+
+it('keeps disabled compound inputs unfocusable', async () => {
+  render(<><UI.NumberInput label="Disabled count" disabled /><UI.MultiSelect label="Disabled tags" options={options} disabled /></>);
+  const number = screen.getByLabelText('Disabled count');
+  const combo = screen.getByRole('combobox', {name: 'Disabled tags'});
+  expect(number).toBeDisabled();
+  expect(combo).toBeDisabled();
+  number.focus();
+  expect(number).not.toHaveFocus();
+  combo.focus();
+  expect(combo).not.toHaveFocus();
+});

@@ -23,3 +23,31 @@ it('ships the requested blue button palette and transition', () => {
   expect(css).toContain('background: #2276c9');
   expect(css).toContain('.mt-btn:focus-visible');
 });
+
+it('uses the Input focus token for all focus indicators and compound fields', () => {
+  const files = ['styles.css', 'interactive.css', 'data.css'];
+  for (const file of files) {
+    const css = readFileSync(`packages/mtone/src/${file}`, 'utf8');
+    for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (rule[1].includes(':focus') && /outline:.*solid/.test(rule[2])) {
+        expect(rule[2]).toContain('var(--mt-focus, #5378aa)');
+        expect(rule[2]).not.toContain('--mt-primary');
+      }
+    }
+  }
+  const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
+  expect(css).toContain('.mt-chip,');
+  expect(css).toContain('.mt-number-group:not(:has(input:disabled)):focus-within');
+  expect(css).toContain('.mt-multiselect:not(:has(input:disabled)):focus-within');
+  expect(css).toContain('.mt-number-group .mt-number-input:focus-visible');
+  expect(css).toContain('.mt-multiselect .mt-combobox-input:focus-visible');
+  const docs = readFileSync('apps/docs/site.css', 'utf8');
+  expect(docs).not.toContain('outline: 2px solid #779482');
+  expect(docs).toContain('outline: 2px solid var(--mt-focus, #5378aa)');
+});
+it('keeps semantic error borders separate from the blue focus ring', () => {
+  const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
+  const errorRule = css.slice(css.indexOf('.mt-input[aria-invalid="true"]')).split('}')[0];
+  expect(errorRule).toContain('border-color: #c66660');
+  expect(css).toContain('--mt-focus: #5378aa');
+});

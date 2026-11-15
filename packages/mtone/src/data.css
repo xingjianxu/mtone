@@ -89,7 +89,7 @@
   cursor: not-allowed;
 }
 .mt-tree-item:focus-visible {
-  outline: 2px solid var(--mt-focus, #6c9ad2);
+  outline: 2px solid var(--mt-focus, #5378aa);
   outline-offset: -2px;
 }
 .mt-tree-toggle {
@@ -123,7 +123,7 @@
 }
 .mt-dropzone[data-dragging] {
   background: var(--mt-selected, #edf3fa);
-  border-color: var(--mt-focus, #6c9ad2);
+  border-color: var(--mt-focus, #5378aa);
 }
 .mt-dropzone input {
   max-width: 100%;

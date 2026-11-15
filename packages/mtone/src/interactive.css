@@ -427,7 +427,7 @@
 .mt-segment:focus-visible,
 .mt-action:focus-visible,
 .mt-tab:focus-visible {
-  outline: 2px solid var(--mt-primary, #37352f);
+  outline: 2px solid var(--mt-focus, #5378aa);
   outline-offset: 2px;
 }
 .mt-check-label:has([data-disabled]) {
