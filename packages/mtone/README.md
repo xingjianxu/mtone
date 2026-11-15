@@ -5,7 +5,7 @@ Compact, ready-styled React components for knowledge and content applications. B
 ## Install @bixlab/mtone
 
 ```bash
-npm install ./bixlab-mtone-0.1.0.tgz
+npm install @bixlab/mtone
 ```
 
 ```tsx
@@ -20,7 +20,7 @@ export function App() {
 }
 ```
 
-One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM are peer dependencies. ESM only. The npm package name is `@bixlab/mtone`. Initial npm publication is pending npm account and trusted-publisher setup; use the local tarball until the first release is available. After publication: `npm install @bixlab/mtone`.
+One package, no component-copy CLI, no Tailwind setup in the consuming application. React/ReactDOM ^19.2.0 are peer dependencies. ESM only. The install command above uses published npm releases. To try an unreleased checkout, build and pack it locally with `npm ci`, `npm run build -w @bixlab/mtone`, and `npm pack -w @bixlab/mtone`, then install the generated `.tgz` in your application.
 
 ## Develop
 
