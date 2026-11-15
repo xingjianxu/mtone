@@ -73,13 +73,17 @@ try {
     .click();
   await page.getByRole("listbox").waitFor();
   const checkSelection = async () => {
-    const selected = page.getByRole("option", { selected: true });
+    // Base UI may retain an aria-hidden exiting popup during its lifecycle.
+    // Selection uniqueness applies to the active accessible listbox, not all DOM portals.
+    const activeListbox = page.getByRole("listbox");
+    assert.equal(await activeListbox.count(), 1, "Exactly one active listbox");
+    const selected = activeListbox.getByRole("option", { selected: true });
     assert.equal(
       await selected.count(),
       1,
       "Exactly one option must be selected",
     );
-    assert.equal(await page.locator(".mt-select-item-indicator").count(), 1);
+    assert.equal(await activeListbox.locator(".mt-select-item-indicator").count(), 1);
     const result = await selected.evaluate((option) => {
       const marker = option.querySelector(".mt-select-item-indicator");
       const svg = marker.querySelector("svg");
@@ -128,10 +132,12 @@ try {
   await page.getByRole("listbox").waitFor();
   await checkSelection();
   await page.keyboard.press("Escape");
+  await page.getByRole("listbox").waitFor({state:"hidden"});
   await page.getByRole("combobox", {name:"comfortable-160", exact:true}).click();
   await page.getByRole("listbox").waitFor();
   await checkSelection();
   await page.keyboard.press("Escape");
+  await page.getByRole("listbox").waitFor({state:"hidden"});
   assert.equal(
     await page
       .getByRole("combobox", { name: "compact-disabled", exact: true })
