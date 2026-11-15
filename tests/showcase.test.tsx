@@ -6,6 +6,13 @@ import { AppShowcase } from "../apps/docs/app-showcase";
 import { MtoneProvider } from "../packages/mtone/src/basic";
 function setup() { render(<MtoneProvider><AppShowcase /></MtoneProvider>); return userEvent.setup(); }
 describe("application showcase", () => {
+  it("keeps documentation and local-data context inside the workspace", () => {
+    setup();
+    const workspace = screen.getByLabelText("知识库应用示例");
+    expect(within(workspace).getByRole("link", { name: "返回组件文档" })).toHaveAttribute("href", "./index.html#/gallery");
+    expect(within(workspace).getByText(/刷新或离页重置/)).toBeVisible();
+    expect(document.querySelector(".showcase-intro, .showcase-note")).toBeNull();
+  });
   it("filters real documents and recovers from empty search", async () => {
     const user = setup();
     await user.type(screen.getByRole("textbox", { name: "搜索知识库" }), "no-match-123");

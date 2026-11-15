@@ -37,6 +37,9 @@ try {
       assert.equal(await page.locator(".showcase-sidebar").getAttribute("data-collapsed"), "true");
       assert.equal(await page.locator(".showcase-sidebar .mt-sidebar-toggle").isVisible(), false);
     }
+    const workspace = await page.locator(".showcase-shell").boundingBox();
+    assert.deepEqual(workspace, { x: 0, y: 0, width, height: 900 }, "Workspace must fill viewport without an external intro or gutter");
+    assert.equal(await page.locator(".showcase-intro, .showcase-note, .showcase-page-header").count(), 0);
     const cardsFit = await page.locator(".showcase-document").evaluateAll(nodes => nodes.every(node => node.scrollWidth <= node.clientWidth));
     assert(cardsFit, `Document cards must not clip controls at ${width}px`);
     await page.getByRole("textbox", { name: "搜索知识库" }).fill("no-match-123");

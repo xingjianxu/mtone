@@ -207,20 +207,6 @@ function KnowledgeWorkspace() {
         : "全部文档";
   return (
     <div className="showcase">
-      <div className="showcase-intro">
-        <div>
-          <span className="showcase-eyebrow">APP SHOWCASE</span>
-          <h1>应用示例</h1>
-          <p>组件不止单独存在。探索一个由 mtone 组成的知识工作台。</p>
-        </div>
-        <Badge>交互演示</Badge>
-      </div>
-      <div className="showcase-note">
-        <Info size={15} aria-hidden="true" />
-        <span>
-          这是本地交互演示：可以创建、编辑、收藏和删除文档。修改仅保留在本页内存，刷新或离开此页后重置，不会发送到服务器。
-        </span>
-      </div>
       <Layout hasSider className="showcase-shell" aria-label="知识库应用示例">
         <Layout.Sider
           className="showcase-sidebar"
@@ -284,9 +270,9 @@ function KnowledgeWorkspace() {
               />
             }
             extra={
-              <div className="showcase-member">
-                <span>演示空间</span>
-                <Avatar name="林" size={23} />
+              <div className="showcase-topbar-actions">
+                <a href="./index.html#/gallery" className="showcase-docs-link">返回组件文档</a>
+                <div className="showcase-member"><Avatar name="林" size={23} /></div>
               </div>
             }
           />
@@ -457,7 +443,7 @@ function KnowledgeWorkspace() {
             <div className="showcase-bottom">
               <span>
                 <FileText size={13} aria-hidden="true" />
-                好内容，值得被找到。
+                本页演示 · 刷新或离页重置 · 不会发送到服务器
               </span>
               <span>由 mtone 组件构建</span>
             </div>
