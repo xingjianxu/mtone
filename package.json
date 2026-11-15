@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "dev": "vite apps/docs --host 127.0.0.1",
     "format": "prettier --write packages/mtone/src apps/docs tests docs *.json *.ts",
-    "pretest": "npm run build -w mtone"
+    "pretest": "npm run build -w mtone",
+    "build:docs": "npm run build -w mtone && vite build apps/docs --base=/mtone/ --outDir ../../dist/docs"
   },
   "devDependencies": {
     "@base-ui/react": "latest",
