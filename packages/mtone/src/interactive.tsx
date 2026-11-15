@@ -1,4 +1,5 @@
 import React, { useId, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BSwitch } from "@base-ui/react/switch";
 import { Radio as BRadio } from "@base-ui/react/radio";
@@ -129,9 +130,12 @@ export function Select({
         className={cn("mt-select", className)}
       >
         <BSelect.Value
+          className="mt-select-value"
           placeholder={placeholder ?? (locale === "zh" ? "请选择" : "Select…")}
         />
-        <BSelect.Icon className="mt-select-icon">⌄</BSelect.Icon>
+        <BSelect.Icon className="mt-select-icon">
+          <ChevronDown size={16} aria-hidden="true" />
+        </BSelect.Icon>
       </BSelect.Trigger>
       <BSelect.Portal>
         <MtoneScope>

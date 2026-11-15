@@ -89,8 +89,28 @@
   min-width: 160px;
   justify-content: space-between;
 }
+.mt-select-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: start;
+}
 .mt-select-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
   color: var(--mt-muted, #787774);
+}
+.mt-select-icon > svg {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
 }
 .mt-positioner {
   z-index: 1250;

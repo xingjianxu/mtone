@@ -1,6 +1,6 @@
 # 发布 @bixlab/mtone
 
-包名已配置为 `@bixlab/mtone`，版本 `0.1.0`。本次配置不发布 npm，也不创建 GitHub Release。仓库所有者已选择 MIT 许可证，根目录和组件包均包含 LICENSE。仍须完成下述 npm 账号权限与 Trusted Publisher 设置，才能首次发布。
+包名为 `@bixlab/mtone`，采用 MIT 许可证。`0.1.0` 已通过 npm staged publishing 和维护者审核正式发布。后续版本使用下述 GitHub Actions 可信发布流程，安装命令为 `npm install @bixlab/mtone`。
 
 ## 一次性设置
 

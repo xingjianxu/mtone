@@ -162,12 +162,11 @@ function Start() {
       <section>
         <h2>安装</h2>
         <p>
-          当前版本尚未发布到 npm。先获取仓库源码并构建本地安装包，不要安装 npm
-          上的同名未知包。
+          正式版本通过 npm 发布。安装一个包即可使用全部组件，不需要逐个添加组件源码。
         </p>
         <CodeBlock
           code={
-            "git clone https://github.com/xingjianxu/mtone.git\ncd mtone\nnpm ci\nnpm run build -w @bixlab/mtone\nnpm pack -w @bixlab/mtone\n\n# 在你的 React 项目中安装生成的包\nnpm install /path/to/mtone/bixlab-mtone-0.1.0.tgz"
+            "npm install @bixlab/mtone"
           }
         />
         <p>

@@ -21,6 +21,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build:docs
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/select-layout.browser.mjs
       - run: npm run test:package
       - run: npm pack -w @bixlab/mtone --dry-run
   publish:

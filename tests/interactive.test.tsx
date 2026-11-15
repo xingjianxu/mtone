@@ -267,3 +267,22 @@ it('keeps disabled compound inputs unfocusable', async () => {
   combo.focus();
   expect(combo).not.toHaveFocus();
 });
+
+it("select uses a decorative fixed-size vector arrow instead of a font glyph", () => {
+  render(<UI.Select label="Fixed arrow" options={options} defaultValue="a" />);
+  const trigger = screen.getByRole("combobox", { name: "Fixed arrow" });
+  const icon = trigger.querySelector(".mt-select-icon");
+  expect(icon).toHaveAttribute("aria-hidden", "true");
+  expect(icon?.querySelector("svg")).toHaveAttribute("width", "16");
+  expect(icon?.querySelector("svg")).toHaveAttribute("height", "16");
+  expect(icon).not.toHaveTextContent("⌄");
+  expect(trigger.querySelector(".mt-select-value")).toHaveTextContent("Alpha");
+});
+
+it("select preserves long values and disabled semantics with its decorative arrow", async () => {
+  const long = "A long option that must truncate without changing its value";
+  render(<UI.Select label="Long disabled" disabled options={[{value:"long",label:long}]} defaultValue="long" />);
+  const trigger = screen.getByRole("combobox", { name:"Long disabled" });
+  expect(trigger).toBeDisabled();
+  expect(trigger.querySelector(".mt-select-value")).toHaveTextContent(long);
+});
