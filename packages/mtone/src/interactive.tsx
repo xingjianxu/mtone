@@ -15,7 +15,6 @@ import { Tooltip as BTooltip } from "@base-ui/react/tooltip";
 import { Dialog } from "@base-ui/react/dialog";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
-import { Toast as BToast } from "@base-ui/react/toast";
 import { MtoneScope, useMtone, cn } from "./basic";
 
 export interface Option {
@@ -683,48 +682,5 @@ export function Drawer({
     </BDrawer.Root>
   );
 }
-export const useToast = BToast.useToastManager;
-function ToastViewport() {
-  const { toasts } = useToast();
-  const { locale } = useMtone();
-  return (
-    <BToast.Portal>
-      <MtoneScope>
-        <BToast.Viewport className="mt-toast-viewport">
-          {toasts.map((t) => (
-            <BToast.Root key={t.id} toast={t} className="mt-toast">
-              <BToast.Content>
-                <BToast.Title className="mt-toast-title" />
-                <BToast.Description className="mt-toast-description" />
-                {t.actionProps && <BToast.Action className="mt-action" />}
-                <BToast.Close
-                  className="mt-dialog-close"
-                  aria-label={locale === "zh" ? "关闭" : "Close"}
-                >
-                  ×
-                </BToast.Close>
-              </BToast.Content>
-            </BToast.Root>
-          ))}
-        </BToast.Viewport>
-      </MtoneScope>
-    </BToast.Portal>
-  );
-}
-export function ToastProvider({
-  children,
-  timeout = 5000,
-  limit = 3,
-}: {
-  children: React.ReactNode;
-  timeout?: number;
-  limit?: number;
-}) {
-  return (
-    <BToast.Provider timeout={timeout} limit={limit}>
-      {children}
-      <ToastViewport />
-    </BToast.Provider>
-  );
-}
-export const Toast = ToastProvider;
+export { Toast, ToastProvider, useToast } from "./toast";
+export type { ToastOptions, ToastUpdateOptions, ToastPromiseOptions, ToastPosition, ToastType, ToastProviderProps } from "./toast";

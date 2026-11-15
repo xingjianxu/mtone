@@ -204,7 +204,7 @@ describe("styled interactive controls", () => {
     expect(scope).toHaveStyle({ "--mt-primary": "purple" });
   });
   it("portal layers appear above modals and below toast notifications", () => {
-    const compact = interactiveStyles.replace(/\s/g, "");
+    const compact = (interactiveStyles + readFileSync("packages/mtone/src/toast.css", "utf8")).replace(/\s/g, "");
     const layer = (selector: string) =>
       Number(
         compact

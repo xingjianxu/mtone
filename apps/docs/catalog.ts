@@ -988,12 +988,40 @@ export const componentDocs: ComponentDoc[] = [
     importNames: ["Sidebar", "NavItem"],
     code: 'import { Sidebar, NavItem } from "mtone";\nimport "mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
     props: [
-      { name: "header", type: "ReactNode | ((collapsed: boolean) => ReactNode)", description: "可选品牌头部，与已有折叠按钮同排；Layout.Sider 的 logo 通过该插槽复用。" },
-      { name: "collapsible", type: "boolean", default: "false", description: "启用内置收起/展开按钮；未启用时保持原有容器行为。" },
-      { name: "collapsed", type: "boolean", description: "受控收起状态；搭配 onCollapsedChange 更新。" },
-      { name: "defaultCollapsed", type: "boolean", default: "false", description: "非受控模式的初始收起状态。" },
-      { name: "onCollapsedChange", type: "(collapsed: boolean) => void", description: "点击切换按钮时触发。" },
-      { name: "collapseLabel / expandLabel", type: "string", default: "收起侧边栏 / 展开侧边栏", description: "切换按钮的可访问名称和提示，可本地化。" },
+      {
+        name: "header",
+        type: "ReactNode | ((collapsed: boolean) => ReactNode)",
+        description:
+          "可选品牌头部，与已有折叠按钮同排；Layout.Sider 的 logo 通过该插槽复用。",
+      },
+      {
+        name: "collapsible",
+        type: "boolean",
+        default: "false",
+        description: "启用内置收起/展开按钮；未启用时保持原有容器行为。",
+      },
+      {
+        name: "collapsed",
+        type: "boolean",
+        description: "受控收起状态；搭配 onCollapsedChange 更新。",
+      },
+      {
+        name: "defaultCollapsed",
+        type: "boolean",
+        default: "false",
+        description: "非受控模式的初始收起状态。",
+      },
+      {
+        name: "onCollapsedChange",
+        type: "(collapsed: boolean) => void",
+        description: "点击切换按钮时触发。",
+      },
+      {
+        name: "collapseLabel / expandLabel",
+        type: "string",
+        default: "收起侧边栏 / 展开侧边栏",
+        description: "切换按钮的可访问名称和提示，可本地化。",
+      },
       {
         name: "children",
         type: "ReactNode",
@@ -2248,61 +2276,212 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "Toast",
     category: "反馈与上传",
-    description: "ToastProvider 的别名，用于提供消息上下文，不是单条消息。",
+    description:
+      "ToastProvider 的别名，提供成功、失败、普通通知，不是单条消息组件。",
     importNames: ["Toast", "Button", "useToast"],
-    code: 'import { Toast, Button, useToast } from "mtone";\nimport "mtone/styles.css";\n\nfunction Action() {\n  const toast = useToast();\n  return <Button onClick={() => toast.add({title:"已保存", description:"示例操作成功"})}>显示消息</Button>;\n}\n\nexport default function Demo() {\n  return <Toast timeout={5000} limit={3}><Action /></Toast>;\n}',
+    code: 'import { Toast, Button, useToast } from "mtone";\nimport "mtone/styles.css";\n\nfunction Action() {\n  const toast = useToast();\n  return <Button onClick={() => toast.success({\n    title: "更改已保存",\n    body: "文档已同步，可以继续编辑。",\n    position: "top-right",\n  })}>显示成功通知</Button>;\n}\n\nexport default function Demo() {\n  return <Toast position="bottom-right" timeout={5000} limit={3}>\n    <Action />\n  </Toast>;\n}',
     props: [
       {
         name: "children",
         type: "ReactNode",
-        description: "组件内容。",
+        description: "Provider 包裹的应用内容；不是单条通知正文。",
+      },
+      {
+        name: "position",
+        type: "ToastPosition",
+        default: "bottom-right",
+        description: "Provider 默认位置，单条通知可覆盖。",
       },
       {
         name: "timeout",
         type: "number",
-        description: "自动关闭毫秒数。",
         default: "5000",
+        description: "默认自动关闭毫秒数；0 表示持续显示直到关闭。",
       },
       {
         name: "limit",
         type: "number",
-        description: "同时可见消息数上限。",
         default: "3",
+        description:
+          "所有位置共用的可见通知上限；新通知优先，超出上限的旧通知隐藏。",
+      },
+      {
+        name: "useToast().add(options)",
+        type: "(options: ToastOptions) => string",
+        description: "添加通知并返回 id；已有相同 id 时更新。",
+      },
+      {
+        name: "options.type",
+        type: '"success" | "error" | "info" | string',
+        default: "info",
+        description:
+          "成功、失败和普通通知预设，各有图标和风格；未知类型按普通通知显示。",
+      },
+      {
+        name: "options.title / body",
+        type: "ReactNode",
+        description: "标题和正文，无需提供自定义 children。",
+      },
+      {
+        name: "options.description",
+        type: "ReactNode",
+        description: "保留旧正文字段；body 提供时优先于 description。",
+      },
+      {
+        name: "options.position",
+        type: '"top-right" | "bottom-right" | "top-left" | "bottom-left" | "top-center" | "bottom-center" | "center" | "center-top"',
+        description: "覆盖此条通知的位置；center-top 位于视口上方约 25% 处。",
+      },
+      {
+        name: "options.children",
+        type: "ReactNode",
+        description: "可选自定义正文，用于更复杂的通知内容。",
+      },
+      {
+        name: "options.timeout / priority",
+        type: 'number / "low" | "high"',
+        description:
+          "单条超时和播报优先级。默认礼貌播报；仅紧急通知使用 high。",
+      },
+      {
+        name: "options.actionProps",
+        type: "ButtonHTMLAttributes",
+        description: "可选操作按钮属性，含 children、onClick 等。",
+      },
+      {
+        name: "useToast().success / error / info",
+        type: "(options: ToastOptions) => string",
+        description:
+          "预设类型快捷方法，接受同样的 title、body、position 等选项。",
+      },
+      {
+        name: "useToast().update(id, options)",
+        type: "(id, options | (previous) => options) => void",
+        description: "更新已有通知的正文、类型和位置；保留未修改的选项。",
+      },
+      {
+        name: "useToast().close(id?)",
+        type: "(id?: string) => void",
+        description: "关闭指定通知；省略 id 关闭全部。",
+      },
+      {
+        name: "useToast().promise(promise, options)",
+        type: "Promise<Value>",
+        description:
+          "保留异步通知 API，以 loading、success、error 配置各阶段；支持标题正文与预设选项。",
       },
     ],
     notes: [
-      "必须在 Provider 后代调用 useToast().add({title, description})。建议放在 MtoneProvider 内。",
-      "Toast 与 ToastProvider 是同一组件。",
+      "必须在 Provider 后代调用 useToast。Toast 与 ToastProvider 是同一组件，建议放在 MtoneProvider 内。",
+      "单一队列管理所有位置，改变位置不会创建第二条通知；多位置会占用同一 limit。数量较多时请关闭旧通知或适当调整上限。",
+      "center / center-top 是非模态提示，不是 Dialog，不锁定焦点或阻止背景操作。",
+      "默认使用 Base UI 的礼貌播报、自动关闭、悬停/焦点暂停与关闭行为。保留优先级、actionProps、data、update、close 和 promise API。",
+      "持续通知（timeout: 0）必须留有关闭方式；不要仅用颜色传达状态，预设图标与文字共同表达含义。",
     ],
   },
   {
     name: "ToastProvider",
     category: "配置与主题",
-    description: "提供消息队列上下文与已设样式的消息视口。",
+    description: "支持预设状态、标题正文与多位置的通知上下文。",
     importNames: ["ToastProvider", "Button", "useToast"],
-    code: 'import { ToastProvider, Button, useToast } from "mtone";\nimport "mtone/styles.css";\n\nfunction Action() {\n  const toast = useToast();\n  return <Button onClick={() => toast.add({title:"已保存", description:"示例操作成功"})}>显示消息</Button>;\n}\n\nexport default function Demo() {\n  return <ToastProvider timeout={5000} limit={3}><Action /></ToastProvider>;\n}',
+    code: 'import { ToastProvider, Button, useToast } from "mtone";\nimport "mtone/styles.css";\n\nfunction Action() {\n  const toast = useToast();\n  return <Button onClick={() => toast.success({\n    title: "更改已保存",\n    body: "文档已同步，可以继续编辑。",\n    position: "top-right",\n  })}>显示成功通知</Button>;\n}\n\nexport default function Demo() {\n  return <ToastProvider position="bottom-right" timeout={5000} limit={3}>\n    <Action />\n  </ToastProvider>;\n}',
     props: [
       {
         name: "children",
         type: "ReactNode",
-        description: "组件内容。",
+        description: "Provider 包裹的应用内容；不是单条通知正文。",
+      },
+      {
+        name: "position",
+        type: "ToastPosition",
+        default: "bottom-right",
+        description: "Provider 默认位置，单条通知可覆盖。",
       },
       {
         name: "timeout",
         type: "number",
-        description: "自动关闭毫秒数。",
         default: "5000",
+        description: "默认自动关闭毫秒数；0 表示持续显示直到关闭。",
       },
       {
         name: "limit",
         type: "number",
-        description: "同时可见消息数上限。",
         default: "3",
+        description:
+          "所有位置共用的可见通知上限；新通知优先，超出上限的旧通知隐藏。",
+      },
+      {
+        name: "useToast().add(options)",
+        type: "(options: ToastOptions) => string",
+        description: "添加通知并返回 id；已有相同 id 时更新。",
+      },
+      {
+        name: "options.type",
+        type: '"success" | "error" | "info" | string',
+        default: "info",
+        description:
+          "成功、失败和普通通知预设，各有图标和风格；未知类型按普通通知显示。",
+      },
+      {
+        name: "options.title / body",
+        type: "ReactNode",
+        description: "标题和正文，无需提供自定义 children。",
+      },
+      {
+        name: "options.description",
+        type: "ReactNode",
+        description: "保留旧正文字段；body 提供时优先于 description。",
+      },
+      {
+        name: "options.position",
+        type: '"top-right" | "bottom-right" | "top-left" | "bottom-left" | "top-center" | "bottom-center" | "center" | "center-top"',
+        description: "覆盖此条通知的位置；center-top 位于视口上方约 25% 处。",
+      },
+      {
+        name: "options.children",
+        type: "ReactNode",
+        description: "可选自定义正文，用于更复杂的通知内容。",
+      },
+      {
+        name: "options.timeout / priority",
+        type: 'number / "low" | "high"',
+        description:
+          "单条超时和播报优先级。默认礼貌播报；仅紧急通知使用 high。",
+      },
+      {
+        name: "options.actionProps",
+        type: "ButtonHTMLAttributes",
+        description: "可选操作按钮属性，含 children、onClick 等。",
+      },
+      {
+        name: "useToast().success / error / info",
+        type: "(options: ToastOptions) => string",
+        description:
+          "预设类型快捷方法，接受同样的 title、body、position 等选项。",
+      },
+      {
+        name: "useToast().update(id, options)",
+        type: "(id, options | (previous) => options) => void",
+        description: "更新已有通知的正文、类型和位置；保留未修改的选项。",
+      },
+      {
+        name: "useToast().close(id?)",
+        type: "(id?: string) => void",
+        description: "关闭指定通知；省略 id 关闭全部。",
+      },
+      {
+        name: "useToast().promise(promise, options)",
+        type: "Promise<Value>",
+        description:
+          "保留异步通知 API，以 loading、success、error 配置各阶段；支持标题正文与预设选项。",
       },
     ],
     notes: [
-      "必须在 Provider 后代调用 useToast().add({title, description})。建议放在 MtoneProvider 内。",
-      "Toast 与 ToastProvider 是同一组件。",
+      "必须在 Provider 后代调用 useToast。Toast 与 ToastProvider 是同一组件，建议放在 MtoneProvider 内。",
+      "单一队列管理所有位置，改变位置不会创建第二条通知；多位置会占用同一 limit。数量较多时请关闭旧通知或适当调整上限。",
+      "center / center-top 是非模态提示，不是 Dialog，不锁定焦点或阻止背景操作。",
+      "默认使用 Base UI 的礼貌播报、自动关闭、悬停/焦点暂停与关闭行为。保留优先级、actionProps、data、update、close 和 promise API。",
+      "持续通知（timeout: 0）必须留有关闭方式；不要仅用颜色传达状态，预设图标与文字共同表达含义。",
     ],
   },
   {

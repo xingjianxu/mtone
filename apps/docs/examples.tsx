@@ -1,3 +1,4 @@
+import { ToastAction } from "./toast-example";
 import { LayoutExample } from "./layout-example";
 import React, { useState } from "react";
 import * as M from "../../packages/mtone/src";
@@ -21,22 +22,6 @@ const stackStyle: React.CSSProperties = {
   maxWidth: 460,
 };
 
-function ToastAction() {
-  const toast = M.useToast();
-  return (
-    <M.Button
-      onClick={() =>
-        toast.add({
-          title: "已保存",
-          description: "这是本地演示消息，没有发送网络请求。",
-        })
-      }
-    >
-      显示消息
-    </M.Button>
-  );
-}
-
 /** A local-only upload adapter: no file bytes are sent to any server. */
 const simulateUpload: M.UploadAdapter = (_file, { signal, onProgress }) =>
   new Promise<void>((resolve, reject) => {
@@ -58,7 +43,13 @@ const simulateUpload: M.UploadAdapter = (_file, { signal, onProgress }) =>
     else signal.addEventListener("abort", abort, { once: true });
   });
 
-export function ComponentExample({ name, compact = false }: { name: string; compact?: boolean }) {
+export function ComponentExample({
+  name,
+  compact = false,
+}: {
+  name: string;
+  compact?: boolean;
+}) {
   // A keyed inner component resets each demonstration when its document changes.
   return <ExampleBody key={name} name={name} compact={compact} />;
 }
@@ -130,24 +121,37 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return (
         <div style={stackStyle}>
           <div style={rowStyle}>
-            {(["blue", "solid", "outline", "soft", "ghost"] as const).map((variant) => (
-              <M.Button
-                key={variant}
-                variant={variant}
-                onClick={() => setNotice(`点击了 ${variant}`)}
-              >
-                {variant}
-              </M.Button>
-            ))}
+            {(["blue", "solid", "outline", "soft", "ghost"] as const).map(
+              (variant) => (
+                <M.Button
+                  key={variant}
+                  variant={variant}
+                  onClick={() => setNotice(`点击了 ${variant}`)}
+                >
+                  {variant}
+                </M.Button>
+              ),
+            )}
             <M.Button
               danger
               onClick={() => setNotice("危险操作样式演示，未删除任何内容")}
             >
               删除
             </M.Button>
-            <M.Button variant="blue" onClick={() => setNotice("两步验证按钮样式演示，不会更改安全设置")}>启用两步验证</M.Button>
-            <M.Button variant="blue" loading>保存中</M.Button>
-            <M.Button variant="blue" disabled>不可用</M.Button>
+            <M.Button
+              variant="blue"
+              onClick={() =>
+                setNotice("两步验证按钮样式演示，不会更改安全设置")
+              }
+            >
+              启用两步验证
+            </M.Button>
+            <M.Button variant="blue" loading>
+              保存中
+            </M.Button>
+            <M.Button variant="blue" disabled>
+              不可用
+            </M.Button>
             <M.Button disabled>不可用</M.Button>
           </div>
           {output}
@@ -341,7 +345,11 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Sidebar":
       return (
-        <M.Sidebar collapsible aria-label="工作空间导航" style={{ maxWidth: 240 }}>
+        <M.Sidebar
+          collapsible
+          aria-label="工作空间导航"
+          style={{ maxWidth: 240 }}
+        >
           <M.NavGroup label="工作空间">
             <M.NavItem
               active={value === "design"}
@@ -748,13 +756,13 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "Toast":
       return (
         <M.Toast timeout={3500}>
-          <ToastAction />
+          <ToastAction compact={compact} />
         </M.Toast>
       );
     case "ToastProvider":
       return (
         <M.ToastProvider timeout={3500} limit={3}>
-          <ToastAction />
+          <ToastAction compact={compact} />
         </M.ToastProvider>
       );
     case "Empty":
