@@ -191,6 +191,21 @@ try {
         .getByRole("button", { name: "Expand row", exact: true })
         .click();
       await expect(tree.getByText("Child one", { exact: true })).toBeVisible();
+      const treeVertical = await tree.locator("tbody .mt-table-row").first().evaluate(row => {
+        const center = el => { const r = el.getBoundingClientRect(); return r.y + r.height / 2; };
+        const arrow = row.querySelector(".mt-table-expand");
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        const textCell = [...row.querySelectorAll("td")].find(td => td.textContent === "Parent");
+        const range = document.createRange();
+        range.selectNodeContents(textCell);
+        const rect = range.getBoundingClientRect();
+        return { arrow: center(arrow), checkbox: center(checkbox), text: rect.y + rect.height / 2 };
+      });
+      assert(Math.abs(treeVertical.arrow - treeVertical.checkbox) <= 1,
+        `${name}: tree arrow and checkbox centers must align: ${JSON.stringify(treeVertical)}`);
+      assert(Math.abs(treeVertical.arrow - treeVertical.text) <= 2,
+        `${name}: tree arrow and row text centers must align: ${JSON.stringify(treeVertical)}`);
+
       await tree
         .getByRole("checkbox", { name: "Select row 0", exact: true })
         .check();
