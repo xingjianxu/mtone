@@ -5,9 +5,20 @@ export type PropDoc = {
   default?: string;
   description: string;
 };
+/** Classify by primary responsibility, never by incidental presentation (e.g. a menu is an action even when rendered in a popup).
+ * Layout owns spatial structure; actions invoke commands; navigation changes location/view;
+ * input collects values and filters; display presents records; overlays host contextual content;
+ * feedback reports task/data state; configuration provides cross-component settings.
+ * Keep related components and aliases together. Order is intentional, not catalog insertion order.
+ */
+export const componentCategories = [
+  "布局容器", "操作命令", "导航切换", "数据录入",
+  "数据展示", "浮层对话", "状态反馈", "全局配置",
+] as const;
+export type ComponentCategory = (typeof componentCategories)[number];
 export type ComponentDoc = {
   name: string;
-  category: string;
+  category: ComponentCategory;
   description: string;
   importNames: string[];
   code: string;
@@ -17,7 +28,7 @@ export type ComponentDoc = {
 export const componentDocs: ComponentDoc[] = [
 {
   "name": "Splitter",
-  "category": "布局与导航",
+  "category": "布局容器",
   "description": "可拖动的紧凑分栏布局，支持横向、纵向、受控大小和可折叠面板。",
   "importNames": [
     "Splitter"
@@ -138,7 +149,7 @@ export const componentDocs: ComponentDoc[] = [
 },
 {
   "name": "Spotlight",
-  "category": "反馈与浮层",
+  "category": "操作命令",
   "description": "可搜索的快捷操作面板，支持分组、键盘导航和动作回调。",
   "importNames": [
     "Spotlight"
@@ -259,7 +270,7 @@ export const componentDocs: ComponentDoc[] = [
 },
   {
     name: "Layout",
-    category: "页面布局",
+    category: "布局容器",
     description:
       "可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。",
     importNames: ["Layout"],
@@ -377,7 +388,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Button",
-    category: "按钮与操作",
+    category: "操作命令",
     description: "带完整样式的基础操作按钮。",
     importNames: ["Button"],
     code: 'import { Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Button variant="blue">启用两步验证</Button>\n  );\n}',
@@ -432,7 +443,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "IconButton",
-    category: "按钮与操作",
+    category: "操作命令",
     description: "有可访问名称的图标操作按钮。",
     importNames: ["IconButton"],
     code: 'import { IconButton } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <IconButton aria-label="添加">＋</IconButton>\n  );\n}',
@@ -489,7 +500,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "ButtonGroup",
-    category: "按钮与操作",
+    category: "操作命令",
     description: "将关联按钮组织为一个操作组。",
     importNames: ["ButtonGroup", "Button"],
     code: 'import { ButtonGroup, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ButtonGroup aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>\n  );\n}',
@@ -510,7 +521,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Input",
-    category: "输入与表单",
+    category: "数据录入",
     description: "单行文本输入，保留标准 HTML 输入接口。",
     importNames: ["Input"],
     code: 'import { Input } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Input aria-label="标题" placeholder="输入标题" />\n  );\n}',
@@ -551,7 +562,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "SearchInput",
-    category: "输入与表单",
+    category: "数据录入",
     description: "带搜索图标的输入框，不注册全局快捷键。",
     importNames: ["SearchInput"],
     code: 'import { SearchInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <SearchInput aria-label="搜索文档" placeholder="搜索文档…" />\n  );\n}',
@@ -592,7 +603,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Textarea",
-    category: "输入与表单",
+    category: "数据录入",
     description: "用于多行说明和长文本的输入框。",
     importNames: ["Textarea"],
     code: 'import { Textarea } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Textarea aria-label="说明" rows={4} placeholder="记录你的想法" />\n  );\n}',
@@ -633,7 +644,7 @@ export const componentDocs: ComponentDoc[] = [
   },
 {
   "name": "Form",
-  "category": "输入与表单",
+  "category": "数据录入",
   "description": "管理字段值与同步/异步校验，支持受验证的提交回调并保留原生表单用法。",
   "importNames": [
     "Form",
@@ -748,7 +759,7 @@ export const componentDocs: ComponentDoc[] = [
 },
 {
   "name": "FormField",
-  "category": "输入与表单",
+  "category": "数据录入",
   "description": "关联字段标签与帮助信息，配合 Form 的 name/rules 自动管理值和校验。",
   "importNames": [
     "Form",
@@ -871,7 +882,7 @@ export const componentDocs: ComponentDoc[] = [
 },
   {
     name: "Checkbox",
-    category: "选择控件",
+    category: "数据录入",
     description: "勾选状态切换。",
     importNames: ["Checkbox"],
     code: 'import { Checkbox } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Checkbox label="自动保存" defaultChecked />\n  );\n}',
@@ -926,7 +937,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Switch",
-    category: "选择控件",
+    category: "数据录入",
     description: "开关式布尔状态控制。",
     importNames: ["Switch"],
     code: 'import { Switch } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Switch label="自动保存" defaultChecked />\n  );\n}',
@@ -976,7 +987,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "RadioGroup",
-    category: "选择控件",
+    category: "数据录入",
     description: "从一组选项中选择一个值。",
     importNames: ["RadioGroup"],
     code: 'import { RadioGroup } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <RadioGroup label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />\n  );\n}',
@@ -1033,7 +1044,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Segmented",
-    category: "导航与筛选",
+    category: "导航切换",
     description: "用紧凑分段按钮切换视图或模式。",
     importNames: ["Segmented"],
     code: 'import { Segmented } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Segmented label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />\n  );\n}',
@@ -1090,7 +1101,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Select",
-    category: "选择控件",
+    category: "数据录入",
     description: "带浮层列表的单选控件。",
     importNames: ["Select"],
     code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Select label="分类" defaultValue="design" options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />\n  );\n}',
@@ -1161,7 +1172,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "MultiSelect",
-    category: "选择控件",
+    category: "数据录入",
     description: "支持搜索与移除标签的多选控件。",
     importNames: ["MultiSelect"],
     code: 'import { MultiSelect } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MultiSelect label="分类" defaultValue={["design"]} options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />\n  );\n}',
@@ -1232,7 +1243,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Slider",
-    category: "选择控件",
+    category: "数据录入",
     description: "通过滑轨调整一个数值。",
     importNames: ["Slider"],
     code: 'import { Slider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Slider label="数量" defaultValue={20} min={0} max={100} step={5} />\n  );\n}',
@@ -1287,7 +1298,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "NumberInput",
-    category: "选择控件",
+    category: "数据录入",
     description: "带增减按钮的数字输入框。",
     importNames: ["NumberInput"],
     code: 'import { NumberInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NumberInput label="数量" defaultValue={20} min={0} max={100} step={5} />\n  );\n}',
@@ -1342,7 +1353,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "DatePicker",
-    category: "选择控件",
+    category: "数据录入",
     description: "使用浏览器原生日历的单日期选择。",
     importNames: ["DatePicker"],
     code: 'import { DatePicker } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DatePicker label="完成日期" defaultValue="2026-11-15" min="2026-01-01" max="2026-12-31" />\n  );\n}',
@@ -1408,7 +1419,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Sidebar",
-    category: "导航与筛选",
+    category: "导航切换",
     description: "支持展开与图标窄栏切换的应用侧栏。",
     importNames: ["Sidebar", "NavItem"],
     code: 'import { Sidebar, NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
@@ -1480,7 +1491,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "NavItem",
-    category: "导航与筛选",
+    category: "导航切换",
     description: "支持当前状态和图标的导航按钮。",
     importNames: ["NavItem"],
     code: 'import { NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NavItem active onClick={() => console.log("navigation")}>我的知识库</NavItem>\n  );\n}',
@@ -1516,7 +1527,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "NavGroup",
-    category: "导航与筛选",
+    category: "导航切换",
     description: "以可选分组标题组织导航内容。",
     importNames: ["NavGroup", "NavItem"],
     code: 'import { NavGroup, NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NavGroup label="私人空间"><NavItem active>工作笔记</NavItem><NavItem>阅读记录</NavItem></NavGroup>\n  );\n}',
@@ -1536,7 +1547,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Breadcrumb",
-    category: "导航与筛选",
+    category: "导航切换",
     description: "显示层级路径，最后一项为当前位置。",
     importNames: ["Breadcrumb"],
     code: 'import { Breadcrumb } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Breadcrumb items={[{label:"首页",href:"#"},{label:"知识库",href:"#"},{label:"组件规范"}]} />\n  );\n}',
@@ -1557,7 +1568,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Tree",
-    category: "导航与筛选",
+    category: "数据展示",
     description: "支持展开、单选和键盘导航的目录树。",
     importNames: ["Tree"],
     code: 'import { Tree } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tree label="文档目录" defaultExpanded={["root"]} defaultValue="notes" items={[{id:"root",label:"知识库",children:[{id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}]}]} />\n  );\n}',
@@ -1610,7 +1621,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Tabs",
-    category: "导航与筛选",
+    category: "导航切换",
     description: "切换一组关联内容面板。",
     importNames: ["Tabs"],
     code: 'import { Tabs } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />\n  );\n}',
@@ -1645,7 +1656,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "FilterBar",
-    category: "导航与筛选",
+    category: "数据录入",
     description: "筛选控件的弹性布局容器。",
     importNames: ["FilterBar", "FilterChip", "Button"],
     code: 'import { FilterBar, FilterChip, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <FilterBar><FilterChip onRemove={() => console.log("remove")}>分类：设计</FilterChip><Button>添加筛选</Button></FilterBar>\n  );\n}',
@@ -1666,7 +1677,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "FilterChip",
-    category: "导航与筛选",
+    category: "数据录入",
     description: "展示已生效条件并提供移除操作。",
     importNames: ["FilterChip"],
     code: 'import { useState } from "react";\nimport { FilterChip } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [visible, setVisible] = useState(true);\n  if (!visible) return <span>筛选已移除</span>;\n  return (\n    <FilterChip onRemove={() => setVisible(false)}>分类：设计</FilterChip>\n  );\n}',
@@ -1686,7 +1697,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Pagination",
-    category: "导航与筛选",
+    category: "导航切换",
     description: "完全受控的分页导航。",
     importNames: ["Pagination"],
     code: 'import { useState } from "react";\nimport { Pagination } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [page, setPage] = useState(1);\n  return (\n    <Pagination total={80} pageSize={10} page={page} onPageChange={setPage} />\n  );\n}',
@@ -1722,7 +1733,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "DropdownMenu",
-    category: "菜单与浮层",
+    category: "操作命令",
     description: "点击触发器打开的操作菜单。",
     importNames: ["DropdownMenu", "Button"],
     code: 'import { DropdownMenu, Button } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DropdownMenu trigger={<Button>文档操作</Button>} items={[{key:"open",label:"打开",icon:<FileText />},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
@@ -1766,7 +1777,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "ContextMenu",
-    category: "菜单与浮层",
+    category: "操作命令",
     description: "在指定区域右键打开操作菜单。",
     importNames: ["ContextMenu"],
     code: 'import { ContextMenu } from "@bixlab/mtone";\nimport { Copy } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ContextMenu items={[{key:"copy",label:"复制",icon:<Copy />},{key:"paste",label:"粘贴",shortcut:"⌘V"}]} onSelect={(key) => console.log(key)}><div style={{padding:24}}>在此区域点击右键</div></ContextMenu>\n  );\n}',
@@ -1807,7 +1818,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Popover",
-    category: "菜单与浮层",
+    category: "浮层对话",
     description: "点击展开的轻量信息或操作浮层。",
     importNames: ["Popover", "Button"],
     code: 'import { Popover, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Popover trigger={<Button>查看说明</Button>} title="提示" content="这里放置相关内容。" />\n  );\n}',
@@ -1855,7 +1866,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Tooltip",
-    category: "菜单与浮层",
+    category: "浮层对话",
     description: "悬停或聚焦时显示简短说明。",
     importNames: ["Tooltip", "Button"],
     code: 'import { Tooltip, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tooltip content="复制当前链接"><Button>复制链接</Button></Tooltip>\n  );\n}',
@@ -1896,7 +1907,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     "name": "Card",
-    "category": "内容展示",
+    "category": "数据展示",
     "description": "紧凑的结构化内容卡片，支持封面、操作、加载、标签页、元信息与网格。",
     "importNames": [
       "Card",
@@ -2016,7 +2027,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Text",
-    category: "内容展示",
+    category: "数据展示",
     description: "可使用次级颜色的行内文本。",
     importNames: ["Text"],
     code: 'import { Text } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Text muted>更新于今天</Text>\n  );\n}',
@@ -2042,7 +2053,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Divider",
-    category: "内容展示",
+    category: "布局容器",
     description: "内容段落之间的水平分隔线。",
     importNames: ["Divider"],
     code: 'import { Divider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <div><p>基本信息</p><Divider /><p>详细内容</p></div>\n  );\n}',
@@ -2051,7 +2062,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "List",
-    category: "内容展示",
+    category: "数据展示",
     description: "语义化无序列表容器。",
     importNames: ["List", "ListItem"],
     code: 'import { List, ListItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <List><ListItem>设计规范</ListItem><ListItem>研究笔记</ListItem></List>\n  );\n}',
@@ -2072,7 +2083,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "ListItem",
-    category: "内容展示",
+    category: "数据展示",
     description: "包含图标、说明与尾部操作的列表项。",
     importNames: ["ListItem", "List", "Button"],
     code: 'import { ListItem, List, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <List><ListItem description="记录项目过程" actions={<Button size="sm">打开</Button>}>研究笔记</ListItem></List>\n  );\n}',
@@ -2108,7 +2119,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "DocumentList",
-    category: "内容展示",
+    category: "数据展示",
     description: "面向知识库文档的标题与摘要列表。",
     importNames: ["DocumentList"],
     code: 'import { DocumentList } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DocumentList items={[{id:"guide",title:"使用指南",description:"从一个想法开始",updatedAt:"今天",onClick:() => console.log("open guide")}]} />\n  );\n}',
@@ -2128,7 +2139,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "DocumentCard",
-    category: "内容展示",
+    category: "数据展示",
     description: "以卡片展示一份文档。",
     importNames: ["DocumentCard"],
     code: 'import { DocumentCard } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DocumentCard id="guide" title="使用指南" description="从一个想法开始" updatedAt="今天" onClick={() => console.log("open guide")} />\n  );\n}',
@@ -2163,7 +2174,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Table",
-    category: "内容展示",
+    category: "数据展示",
     description:
       "保留 mtone 紧凑风格的数据表格，支持高级排序筛选、选择、展开、固定布局与虚拟滚动。",
     importNames: ["Table"],
@@ -2346,7 +2357,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Badge",
-    category: "属性与状态",
+    category: "数据展示",
     description: "紧凑的低饱和标签，支持语义颜色与可选移除操作。",
     importNames: ["Badge"],
     code: 'import { Badge } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Badge tone="green">已完成</Badge>\n  );\n}',
@@ -2378,7 +2389,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Status",
-    category: "属性与状态",
+    category: "状态反馈",
     description: "使用状态点和文字表达进度。",
     importNames: ["Status"],
     code: 'import { Status } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Status tone="green">已完成</Status>\n  );\n}',
@@ -2399,7 +2410,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Avatar",
-    category: "属性与状态",
+    category: "数据展示",
     description: "展示头像，加载失败时回退到名字前两个字符。",
     importNames: ["Avatar"],
     code: 'import { Avatar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Avatar name="张三" size={32} />\n  );\n}',
@@ -2426,7 +2437,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "AvatarGroup",
-    category: "属性与状态",
+    category: "数据展示",
     description: "叠放一组头像并展示溢出数量。",
     importNames: ["AvatarGroup"],
     code: 'import { AvatarGroup } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AvatarGroup items={[{name:"张三"},{name:"李四"},{name:"王五"}]} max={2} />\n  );\n}',
@@ -2447,7 +2458,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Progress",
-    category: "属性与状态",
+    category: "状态反馈",
     description: "显示 0 到 100 的任务进度。",
     importNames: ["Progress"],
     code: 'import { Progress } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Progress value={68} label="上传进度" />\n  );\n}',
@@ -2468,7 +2479,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "PropertyList",
-    category: "属性与状态",
+    category: "数据展示",
     description: "文档属性的定义列表容器。",
     importNames: ["PropertyList", "PropertyItem"],
     code: 'import { PropertyList, PropertyItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <PropertyList><PropertyItem label="类型">文档</PropertyItem><PropertyItem label="状态">进行中</PropertyItem></PropertyList>\n  );\n}',
@@ -2483,7 +2494,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "PropertyItem",
-    category: "属性与状态",
+    category: "数据展示",
     description: "展示一行属性名和值。",
     importNames: ["PropertyItem", "PropertyList"],
     code: 'import { PropertyItem, PropertyList } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <PropertyList><PropertyItem label="负责人">张三</PropertyItem></PropertyList>\n  );\n}',
@@ -2503,7 +2514,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Dialog",
-    category: "弹窗与抽屉",
+    category: "浮层对话",
     description: "聚焦当前任务的模态对话框。",
     importNames: ["Dialog", "Button"],
     code: 'import { Dialog, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dialog modal={true} title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开 Dialog</Button>}><p>这里是内容区域。</p></Dialog>\n  );\n}',
@@ -2564,7 +2575,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Drawer",
-    category: "弹窗与抽屉",
+    category: "浮层对话",
     description: "从右侧打开的属性抽屉。",
     importNames: ["Drawer", "Button"],
     code: 'import { Drawer, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Drawer title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开Drawer</Button>}><p>这里是内容区域。</p></Drawer>\n  );\n}',
@@ -2622,7 +2633,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "ConfirmDialog",
-    category: "弹窗与抽屉",
+    category: "浮层对话",
     description: "可等待异步结果的危险操作确认。",
     importNames: ["ConfirmDialog", "Button"],
     code: 'import { ConfirmDialog, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ConfirmDialog title="移除文档？" description="这是演示，不会删除任何文件。" danger trigger={<Button danger>移除文档</Button>} onConfirm={async () => { console.log("confirmed"); }} />\n  );\n}',
@@ -2684,7 +2695,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Alert",
-    category: "反馈与上传",
+    category: "状态反馈",
     description: "显示信息、成功、警告或错误反馈。",
     importNames: ["Alert"],
     code: 'import { Alert } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Alert tone="success" title="已保存">你的更改已保存。</Alert>\n  );\n}',
@@ -2715,7 +2726,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Empty",
-    category: "反馈与上传",
+    category: "状态反馈",
     description: "为空数据提供说明与下一步入口。",
     importNames: ["Empty", "Button"],
     code: 'import { Empty, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Empty title="暂无文档" description="创建第一份文档开始记录。" action={<Button>新建文档</Button>} />\n  );\n}',
@@ -2740,7 +2751,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Skeleton",
-    category: "反馈与上传",
+    category: "状态反馈",
     description: "加载期间用于占位的轻量骨架。",
     importNames: ["Skeleton"],
     code: 'import { Skeleton } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Skeleton style={{width:240,height:16}} />\n  );\n}',
@@ -2756,7 +2767,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Spinner",
-    category: "反馈与上传",
+    category: "状态反馈",
     description: "带状态语义的小型加载图标。",
     importNames: ["Spinner"],
     code: 'import { Spinner } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Spinner label="正在加载文档" />\n  );\n}',
@@ -2772,7 +2783,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Upload",
-    category: "反馈与上传",
+    category: "数据录入",
     description: "支持选择、拖拽、进度、取消与重试的上传组件。",
     importNames: ["Upload"],
     code: 'import { Upload } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Upload accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {\n      // 仅演示：不会发送文件到服务器\n      if (signal.aborted) throw new DOMException("Aborted", "AbortError");\n      onProgress(100);\n    }}>模拟上传：文件不会发送到服务器。</Upload>\n  );\n}',
@@ -2827,7 +2838,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Dropzone",
-    category: "反馈与上传",
+    category: "数据录入",
     description: "Upload 的别名，支持相同上传适配器。",
     importNames: ["Dropzone"],
     code: 'import { Dropzone } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dropzone accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {\n      // 仅演示：不会发送文件到服务器\n      if (signal.aborted) throw new DOMException("Aborted", "AbortError");\n      onProgress(100);\n    }}>模拟上传：文件不会发送到服务器。</Dropzone>\n  );\n}',
@@ -2883,7 +2894,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "Toast",
-    category: "反馈与上传",
+    category: "状态反馈",
     description:
       "ToastProvider 的别名，提供成功、失败、普通通知，不是单条消息组件。",
     importNames: ["Toast", "Button", "useToast"],
@@ -2989,7 +3000,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "ToastProvider",
-    category: "配置与主题",
+    category: "状态反馈",
     description: "支持预设状态、标题正文与多位置的通知上下文。",
     importNames: ["ToastProvider", "Button", "useToast"],
     code: 'import { ToastProvider, Button, useToast } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nfunction Action() {\n  const toast = useToast();\n  return <Button onClick={() => toast.success({\n    title: "更改已保存",\n    body: "文档已同步，可以继续编辑。",\n    position: "top-right",\n  })}>显示成功通知</Button>;\n}\n\nexport default function Demo() {\n  return <ToastProvider position="bottom-right" timeout={5000} limit={3}>\n    <Action />\n  </ToastProvider>;\n}',
@@ -3094,7 +3105,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "MtoneProvider",
-    category: "配置与主题",
+    category: "全局配置",
     description: "为组件及其浮层配置语言、密度和主题变量。",
     importNames: ["MtoneProvider", "Button"],
     code: 'import { MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider locale="zh" density="comfortable" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>\n  );\n}',
@@ -3131,7 +3142,7 @@ export const componentDocs: ComponentDoc[] = [
   },
   {
     name: "MtoneScope",
-    category: "配置与主题",
+    category: "全局配置",
     description: "把当前 Provider 的主题变量和密度应用到一个 div。",
     importNames: ["MtoneScope", "MtoneProvider", "Button"],
     code: 'import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>\n  );\n}',

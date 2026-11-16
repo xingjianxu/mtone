@@ -12,7 +12,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import * as M from "../../packages/mtone/src";
-import { componentDocs, type ComponentDoc } from "./catalog";
+import { componentCategories, componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
 import { ShowcasePage } from "./showcase-page";
 export type Route =
@@ -36,7 +36,7 @@ export function searchDocs(query: string) {
     `${d.name} ${d.category} ${d.description}`.toLowerCase().includes(q),
   );
 }
-const groups = Array.from(new Set(componentDocs.map((d) => d.category)));
+const groups = componentCategories;
 function CodeBlock({ code }: { code: string }) {
   const [status, setStatus] = useState("");
   return (
