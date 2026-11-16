@@ -9,3 +9,5 @@ export * from "./layout";
 export * from "./spotlight";
 
 export * from "./splitter";
+
+export * from "./table";

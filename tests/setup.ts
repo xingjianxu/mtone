@@ -8,3 +8,9 @@ globalThis.ResizeObserver = class {
   disconnect() {}
 };
 HTMLElement.prototype.scrollIntoView = () => {};
+
+HTMLElement.prototype.scrollTo = () => {};
+
+// jsdom has no pseudo-element layout; rc-table only uses this to measure scrollbars.
+const nativeGetComputedStyle = window.getComputedStyle;
+window.getComputedStyle = (element) => nativeGetComputedStyle(element);

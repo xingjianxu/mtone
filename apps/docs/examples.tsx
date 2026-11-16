@@ -1,3 +1,4 @@
+import { TableExample } from "./table-example";
 import { SplitterExample } from "./splitter-example";
 import { CardExample } from "./card-example";
 import { FormExample, FormFieldExample } from "./form-example";
@@ -572,39 +573,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     case "Table":
-      return (
-        <div style={{ width: "100%", minWidth: 0 }}>
-          <M.Table
-            data={[
-              { id: 1, title: "组件规范", category: "设计" },
-              { id: 2, title: "研究笔记", category: "研究" },
-              { id: 3, title: "阅读清单", category: "阅读" },
-              { id: 4, title: "会议记录", category: "工作" },
-            ]}
-            rowKey="id"
-            columns={[
-              {
-                key: "title",
-                title: "标题",
-                dataIndex: "title",
-                sortable: true,
-                filterable: true,
-              },
-              {
-                key: "category",
-                title: "分类",
-                dataIndex: "category",
-                render: (v) => <M.Badge>{String(v)}</M.Badge>,
-              },
-            ]}
-            selectable
-            selectedKeys={selected}
-            onSelectionChange={setSelected}
-            pagination={{ pageSize: 3 }}
-          />
-          <M.Text muted>已选择 {selected.length} 行</M.Text>
-        </div>
-      );
+      return <TableExample compact={compact} />;
     case "Badge": {
       return (
         <div style={rowStyle}>

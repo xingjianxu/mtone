@@ -2164,84 +2164,172 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "Table",
     category: "内容展示",
-    description: "支持排序、文本筛选、选择和分页的泛型数据表格。",
+    description:
+      "保留 mtone 紧凑风格的数据表格，支持高级排序筛选、选择、展开、固定布局与虚拟滚动。",
     importNames: ["Table"],
-    code: 'import { Table } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Table data={[{id:1,title:"设计规范",status:"进行中"},{id:2,title:"项目笔记",status:"已完成"}]} rowKey="id" selectable columns={[{key:"title",title:"名称",dataIndex:"title",sortable:true,filterable:true},{key:"status",title:"状态",dataIndex:"status"}]} pagination={{pageSize:10}} />\n  );\n}',
+    code: 'import { Table } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Table dataSource={[{key:1,title:"设计规范",score:90},{key:2,title:"研究笔记",score:75}]} columns={[{key:"title",title:"标题",dataIndex:"title"},{key:"score",title:"完成度",dataIndex:"score",sorter:(a,b)=>a.score-b.score}]} rowSelection={{}} pagination={{defaultPageSize:10}} />;\n}',
     props: [
       {
-        name: "data",
+        name: "data / dataSource",
         type: "T[]",
-        description: "必填；当前数据行。",
+        description: "数据源，dataSource 优先；保留旧 data 用法。",
+        default: "[]",
       },
       {
-        name: "columns",
-        type: "TableColumn<T>[]",
+        name: "columns / children",
+        type: "TableColumn<T>[] / ReactNode",
         description:
-          "必填；列定义 key、title、dataIndex、render、sortable、filterable。",
+          "列定义或 Table.Column / Table.ColumnGroup JSX。列支持嵌套 dataIndex、children 分组、render、width/minWidth、align、hidden、responsive、ellipsis、fixed 和 onCell/onHeaderCell。",
       },
       {
         name: "rowKey",
-        type: "keyof T | ((row: T) => React.Key)",
-        description: "必填；稳定且唯一的字符串或数字键。",
+        type: "string | ((record: T) => React.Key)",
+        description: "稳定且唯一的行键，保留数字键类型。",
+        default: "key",
       },
       {
-        name: "selectable",
-        type: "boolean",
-        description: "显示行选择。",
+        name: "column",
+        type: "Partial<TableColumn<T>>",
+        description: "所有列的共享默认配置，单列配置优先。",
       },
       {
-        name: "selectedKeys / onSelectionChange",
-        type: "React.Key[] / (keys: React.Key[]) => void",
-        description: "受控选择与回调。",
+        name: "columns[].sorter / sortOrder",
+        type: "boolean | compare | {compare?, multiple?} / ascend | descend | null",
+        description:
+          "本地比较、多列优先级或远程排序；defaultSortOrder、sortDirections、sortIcon 可配置。sorter=true 仅报告排序意图；使用 manual 管理服务端数据。",
       },
       {
-        name: "sort",
-        type: '{key: string; direction: "asc" | "desc"} | null',
-        description: "受控单列排序，null 清除排序。",
+        name: "columns[].filters / onFilter",
+        type: "TableFilterItem[] / (value, record) => boolean",
+        description:
+          "菜单或树形筛选项及本地匹配逻辑。支持 filterSearch、filterMultiple、filteredValue、defaultFilteredValue、filterResetToDefaultFilteredValue、filterOnClose。",
       },
       {
-        name: "filters",
-        type: "Record<string, string>",
-        description: "受控文本筛选。",
+        name: "columns[].filterDropdown",
+        type: "ReactNode | (props: TableFilterDropdownProps) => ReactNode",
+        description:
+          "自定义筛选面板，使用 selectedKeys、setSelectedKeys、confirm、clearFilters、close 管理草稿；filterDropdownProps 支持 open/onOpenChange/className/style。",
+      },
+      {
+        name: "rowSelection",
+        type: "TableRowSelection<T>",
+        description:
+          "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。",
+      },
+      {
+        name: "expandable",
+        type: "TableExpandableConfig<T>",
+        description:
+          "树字段、默认/受控展开键、expandedRowRender、展开图标、行点击展开、showExpandAll、forceRender、展开回调。详情中可嵌套 Table。",
       },
       {
         name: "pagination",
-        type: "false | {pageSize?, page?, total?, onPageChange?}",
-        description: "分页配置。",
+        type: "false | TablePagination",
+        description:
+          "支持 page/current、默认页、页容量、total、showSizeChanger、showQuickJumper、hideOnSinglePage、simple、disabled、showTotal、itemRender、placement/position 和变化回调。",
         default: "false",
+      },
+      {
+        name: "scroll / sticky",
+        type: "{x?, y?, scrollToFirstRowOnChange?} / boolean | object",
+        description:
+          "横纵滚动、固定表头和粘性布局；列 fixed 使用底层类型所支持的方向值。",
+      },
+      {
+        name: "virtual / virtualItemHeight",
+        type: "boolean / number",
+        description:
+          "虚拟滚动。建议明确提供数字 scroll.x 与 scroll.y；缺省虚拟视口为 1000×400，virtualItemHeight 为行高估计。",
+        default: "false / 38",
+      },
+      {
+        name: "title / footer / summary",
+        type: "(currentData: T[]) => ReactNode",
+        description:
+          "顶部、底部和汇总内容。Table.Summary、Row、Cell 可组成汇总表格。",
+      },
+      {
+        name: "components / onRow / onHeaderRow",
+        type: "TableComponents / function / function",
+        description:
+          "替换表格结构或配置行属性。编辑、拖拽、额外工具提示属于应用组合，不是自动持久化功能。",
+      },
+      {
+        name: "size / bordered / showHeader / tableLayout",
+        type: "small | middle | medium | large / boolean / boolean / auto | fixed",
+        description: "紧凑尺寸、边框、表头显示和布局。",
+        default: "middle / false / true",
+      },
+      {
+        name: "loading",
+        type: "boolean | {spinning?, tip?, delay?, indicator?}",
+        description: "加载状态、延迟与自定义指示内容。",
+        default: "false",
+      },
+      {
+        name: "empty / locale",
+        type: "ReactNode / TableLocale",
+        description:
+          "自定义空态与筛选、排序、展开文字；默认跟随 MtoneProvider 语言。",
+      },
+      {
+        name: "classNames / styles",
+        type: "TableClassNames | function / TableStyles | function",
+        description:
+          "语义结构样式及 root/pagination 扩展；className/style 配置外层。",
+      },
+      {
+        name: "getPopupContainer",
+        type: "(trigger: HTMLElement) => HTMLElement",
+        description: "筛选弹层挂载容器。",
+      },
+      {
+        name: "ref",
+        type: "TableRef",
+        description:
+          "nativeElement 与 scrollTo({key?, index?, top?, offset?, align?})。虚拟模式不支持 center 对齐。",
+      },
+      {
+        name: "onTableChange",
+        type: "(pagination, filters, sorter, extra) => void",
+        description:
+          "新详细回调。extra 包含 action 和 currentDataSource；多列排序返回 sorter 数组。",
       },
       {
         name: "manual",
         type: "boolean",
-        description: "远程模式，不在本地重复排序/筛选/分页。",
+        description:
+          "禁用本地排序、筛选和分页。远程请求由应用处理，并传受控分页和 total。",
         default: "false",
       },
       {
         name: "onChange",
         type: "(state: TableState) => void",
-        description: "排序、筛选或分页变化。",
+        description:
+          "保留旧回调，不替换成 Ant Design 四参数签名。state 包含 sort、文本 filters、page、pageSize；高级筛选请用 onTableChange。",
       },
       {
-        name: "loading",
-        type: "boolean",
-        description: "加载状态。",
-        default: "false",
+        name: "sort / filters",
+        type: "{key, direction: asc | desc} | null / Record<string,string>",
+        description:
+          "旧受控单排序与文本筛选；sort=null 显式清空。旧列 sortable/filterable 继续有效。",
       },
       {
-        name: "empty",
-        type: "ReactNode",
-        description: "自定义空态。",
-      },
-      {
-        name: "className",
-        type: "string",
-        description: "附加样式类。",
+        name: "selectable / selectedKeys / onSelectionChange",
+        type: "boolean / React.Key[] / (keys) => void",
+        description: "旧选择接口继续可用；复杂选择推荐 rowSelection。",
       },
     ],
-    notes: ["列筛选输入默认外框高度为 28px（含边框），comfortable 密度保留 36px；不改变表头、数据行或分页按钮的尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
-      "筛选为不区分大小写的文本包含匹配。远程模式请传 pagination.total 和受控 page。",
-      "选择可跨页保留；数据删除后应用负责清理失效行键。",
-      "不含单元格编辑、冻结列、虚拟滚动或列宽调整。",
+    notes: [
+      "能力参照 Ant Design Table，但不是可直接替换的 Ant Design API。旧 onChange(state)、pagination=false 默认值和文本筛选继续保留；高级事件使用 onTableChange。",
+      "Table.EXPAND_COLUMN / Table.SELECTION_COLUMN 控制特殊列顺序；Table.SELECTION_ALL / SELECTION_INVERT / SELECTION_NONE 可用于选择菜单。",
+      "列 onCell 返回 rowSpan/colSpan 可合并单元格，0 隐藏被合并的单元格；固定列需要合理宽度和足够的横向滚动空间。",
+      "菜单筛选需提供 onFilter 才执行本地匹配；旧 filterable 为不区分大小写的文本包含匹配。多列 sorter.multiple 值较大者优先。",
+      "编辑单元格、整行编辑、行列拖拽和自定义提示通过 render/onCell/onRow/onHeaderCell/components 组合；示例使用本地状态，不包含网络请求、自动保存、校验框架或拖拽库。列宽调整不是内置能力。",
+      "虚拟滚动应提供数字视口尺寸。自定义 body 需要遵守底层 ref 契约；树、展开、合并、固定列与虚拟化的复杂组合应按业务数据验证，不能将单项支持等同于所有组合都已验收。",
+      "filterDropdownProps 是公开类型列出的精简配置，不透传 Ant Design Dropdown 的全部属性。loading 与 sorter tooltip 也不是完整 Spin/Tooltip 属性集合。",
+      "行键必须稳定唯一；服务端数据使用 manual，并由应用管理请求、分页 total、受控状态和失效选择键。",
+      "组件结构使用无样式 @rc-component/table 引擎，交互、状态与视觉由 mtone 提供。文档站可能领先 npm，使用前核对已安装版本。",
     ],
   },
   {
