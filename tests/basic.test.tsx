@@ -80,7 +80,7 @@ it.each(["neutral", "blue", "green", "orange", "red", "purple"] as const)("prese
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
 
-test("Input has an isolated focus style without changing SearchInput or Textarea", () => {
+test("Input retains its specific class marker while SearchInput and Textarea use shared input styling", () => {
   const { container } = render(<><Input aria-label="plain" /><SearchInput aria-label="search" /><Textarea aria-label="multiline" /></>);
   expect(container.querySelector('[aria-label="plain"]')).toHaveClass("mt-input-control");
   expect(container.querySelector('[aria-label="search"]')).not.toHaveClass("mt-input-control");

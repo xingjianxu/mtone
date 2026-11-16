@@ -426,7 +426,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea 等其他组件保持原焦点样式。"],
+    notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea、Select、MultiSelect、NumberInput、DatePicker 及 Table 筛选输入采用相同边框聚焦效果。"],
   },
   {
     name: "SearchInput",
@@ -467,7 +467,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
+    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
   },
   {
     name: "Textarea",
@@ -508,7 +508,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
+    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
   },
 {
   "name": "Form",
@@ -1036,7 +1036,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "开关变化回调。",
       },
     ],
-    notes: ["支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
+    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
   {
     name: "MultiSelect",
@@ -1107,7 +1107,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "开关变化回调。",
       },
     ],
-    notes: ["MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
+    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
   },
   {
     name: "Slider",
@@ -1217,7 +1217,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "步进大小。",
       },
     ],
-    notes: ["清空时 value 可为 null；defaultValue 应传 number。"],
+    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "清空时 value 可为 null；defaultValue 应传 number。"],
   },
   {
     name: "DatePicker",
@@ -1278,7 +1278,7 @@ export const componentDocs: ComponentDoc[] = [
         default: "true",
       },
     ],
-    notes: [
+    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
       "值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。",
       "日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。",
       "仅对支持样式的原生日期指示器使用与 Select 一致的 16px 箭头，不叠加第二个图标；其他浏览器和强制颜色模式保留原生日期界面。",
@@ -2017,7 +2017,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "附加样式类。",
       },
     ],
-    notes: [
+    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
       "筛选为不区分大小写的文本包含匹配。远程模式请传 pagination.total 和受控 page。",
       "选择可跨页保留；数据删除后应用负责清理失效行键。",
       "不含单元格编辑、冻结列、虚拟滚动或列宽调整。",

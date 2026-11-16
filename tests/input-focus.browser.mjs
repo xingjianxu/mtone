@@ -23,8 +23,8 @@ try {
  assert.equal(await page.getByLabel("Invalid",{exact:true}).evaluate(el=>getComputedStyle(el).borderTopColor),"rgb(198, 102, 96)");
  for(const name of ["Search","Textarea","Date"]) {
   const el=page.getByLabel(name,{exact:true});await el.focus();
-  assert.equal(await el.evaluate(el=>getComputedStyle(el).outlineStyle),"solid");
-  assert.equal(await el.evaluate(el=>getComputedStyle(el).outlineWidth),"2px");
+  assert.equal(await el.evaluate(el=>getComputedStyle(el).outlineStyle),"none");
+  assert.equal(await el.evaluate(el=>getComputedStyle(el).borderTopColor),"rgb(147, 180, 220)");
  }
  await page.getByLabel("Disabled",{exact:true}).focus();
  assert(!(await page.getByLabel("Disabled",{exact:true}).evaluate(el=>el===document.activeElement)));

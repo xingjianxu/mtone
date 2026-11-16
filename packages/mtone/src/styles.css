@@ -146,19 +146,6 @@
 .mt-input[aria-invalid="true"] {
   border-color: #c66660;
 }
-/* Input only: reuse the existing 1px border, without an external focus ring. */
-.mt-input.mt-input-control:focus {
-  border-color: #93b4dc;
-  outline: none;
-}
-.mt-input.mt-input-control[aria-invalid="true"]:focus { border-color: #c66660; }
-@media (forced-colors: active) {
-  .mt-input.mt-input-control:focus {
-    border-color: Highlight;
-    outline: 1px solid Highlight;
-    outline-offset: 1px;
-  }
-}
 .mt-textarea {
   min-height: 72px;
   resize: vertical;
@@ -531,19 +518,13 @@
   padding-top: 8px;
 }
 
-/* All interactive focus indicators use the Input focus token, never primary. */
+/* Non-field controls retain a distinct keyboard focus indicator. */
 :is(.mt-slider-thumb, .mt-chip, .mt-chip-remove, .mt-combobox-trigger, .mt-dialog-close,
   .mt-tab-panel, .mt-table-sort):not(:disabled):not([data-disabled]):not([aria-disabled="true"]):focus-visible,
 :is(.mt-badge, .mt-filter-chip) > button:focus-visible,
 .mt-breadcrumb a:focus-visible,
 .mt-table input:focus-visible,
 .mt-dropzone input:focus-visible {
-  outline: 2px solid var(--mt-focus, #5378aa);
-  outline-offset: 2px;
-}
-/* Compound inputs show one outer ring even when their text input is clicked. */
-.mt-number-group:not(:has(input:disabled)):focus-within,
-.mt-multiselect:not(:has(input:disabled)):focus-within {
   outline: 2px solid var(--mt-focus, #5378aa);
   outline-offset: 2px;
 }
@@ -560,3 +541,21 @@
 }
 
 .mt-select[aria-invalid="true"], .mt-multiselect[aria-invalid="true"] { border-color: #c66660; }
+
+/* Bordered input surfaces: change color only, without an extra outer ring. */
+:is(.mt-input, .mt-select):not(:disabled):not([data-disabled]):is(:focus, [aria-expanded="true"]),
+:is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):focus-within {
+  outline: none;
+}
+:is(.mt-input, .mt-select):not(:disabled):not([data-disabled]):not([aria-invalid="true"]):not([data-invalid]):is(:focus, [aria-expanded="true"]),
+:is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):not([aria-invalid="true"]):not([data-invalid]):not(:has([aria-invalid="true"], [data-invalid])):focus-within {
+  border-color: #93b4dc;
+}
+.mt-number-group:has([aria-invalid="true"], [data-invalid]) { border-color: #c66660; }
+@media (forced-colors: active) {
+  :is(.mt-input, .mt-select):not(:disabled):not([data-disabled]):is(:focus, [aria-expanded="true"]),
+  :is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):focus-within {
+    outline: 1px solid Highlight;
+    outline-offset: 1px;
+  }
+}

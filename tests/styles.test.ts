@@ -30,7 +30,7 @@ it('keeps shared focus tokens and allows the Input forced-colors fallback', () =
     const css = readFileSync(`packages/mtone/src/${file}`, 'utf8');
     for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
       if (rule[1].includes(':focus') && /outline:.*solid/.test(rule[2])) {
-        if (rule[1].trim() === '.mt-input.mt-input-control:focus' && rule[2].includes('Highlight')) {
+        if (rule[2].includes('Highlight')) {
           expect(rule[2]).toContain('outline: 1px solid Highlight');
         } else {
           expect(rule[2]).toContain('var(--mt-focus, #5378aa)');
@@ -41,8 +41,7 @@ it('keeps shared focus tokens and allows the Input forced-colors fallback', () =
   }
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   expect(css).toContain('.mt-chip,');
-  expect(css).toContain('.mt-number-group:not(:has(input:disabled)):focus-within');
-  expect(css).toContain('.mt-multiselect:not(:has(input:disabled)):focus-within');
+  expect(css).toContain(':is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):focus-within');
   expect(css).toContain('.mt-number-group .mt-number-input:focus-visible');
   expect(css).toContain('.mt-multiselect .mt-combobox-input:focus-visible');
   const docs = readFileSync('apps/docs/site.css', 'utf8');
@@ -74,10 +73,11 @@ it('keeps the topbar at 48px and both layout footers at 42px',()=>{
  expect(sider).toContain('padding: 6px 12px');
 });
 
-it('uses only the existing border for normal Input focus', () => {
+it('uses border color only for all bordered input focus surfaces', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
-  const rule = css.slice(css.indexOf('.mt-input.mt-input-control:focus {')).split('}')[0];
-  expect(rule).toContain('border-color: #93b4dc');
-  expect(rule).toContain('outline: none');
-  expect(rule).not.toMatch(/border-width|padding|height|box-shadow/);
+  const rules = css.slice(css.indexOf('/* Bordered input surfaces:'));
+  expect(rules).toContain('border-color: #93b4dc');
+  expect(rules).toContain('outline: none');
+  expect(rules).not.toMatch(/border-width|padding|height|box-shadow/);
+  expect(rules).toContain(':not([aria-invalid="true"])');
 });
