@@ -2243,7 +2243,7 @@ export const componentDocs: ComponentDoc[] = [
         name: "expandable",
         type: "TableExpandableConfig<T>",
         description:
-          "树字段、默认/受控展开键、expandedRowRender、展开图标、行点击展开、showExpandAll、forceRender、展开回调。详情中可嵌套 Table。树形展开箭头默认置于首个可见数据列，选择列保持表头与各行复选框对齐；子节点按层级缩进，expandIconColumnIndex 可覆盖箭头位置。",
+          "树字段、默认/受控展开键、expandedRowRender、展开图标、行点击展开、showExpandAll、forceRender、展开回调。详情中可嵌套 Table。树形展开箭头默认置于首个可见数据列，选择列保持表头与各行复选框对齐；子节点默认每层缩进 15px，可用 indentSize 调整；expandIconColumnIndex 可覆盖箭头位置。",
       },
       {
         name: "pagination",

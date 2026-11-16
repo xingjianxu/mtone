@@ -510,6 +510,7 @@ function TableInner<T>(
   const resolvedExpandable = !expandable?.expandedRowRender
     ? {
         ...expandable,
+        indentSize: expandable?.indentSize ?? 15,
         expandIconColumnIndex:
           expandable?.expandIconColumnIndex ?? treeExpandColumnIndex,
       }

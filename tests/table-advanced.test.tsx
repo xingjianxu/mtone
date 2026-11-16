@@ -401,7 +401,7 @@ test("tree expand controls default to the first data column, not the selection c
   const row = container.querySelector('tbody tr[data-row-key="1"]')!;
   expect(row.querySelector('.mt-table-selection-column .mt-table-expand')).toBeNull();
   expect(within(row as HTMLElement).getByRole('button', { name: 'Collapse row' }).closest('td')?.textContent).toBe('Parent');
-  expect(screen.getByText('Child').closest('td')?.querySelector('.indent-level-1')).toBeTruthy();
+  expect(screen.getByText('Child').closest('td')?.querySelector('.indent-level-1')).toHaveStyle({ paddingLeft: '15px' });
 });
 
 test("tree expand position honors explicit overrides and tables without selection", () => {
