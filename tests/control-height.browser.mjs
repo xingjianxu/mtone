@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const server=await createServer({root:process.cwd(),server:{host:'127.0.0.1',port:5196,strictPort:true},logLevel:'error'});await server.listen();
 try {for(const [name,engine,dpi] of [['chromium',chromium,1],['chromium-hidpi',chromium,2],['firefox',firefox,1],['webkit',webkit,1]]){
  const browser=await engine.launch({headless:true});try {const page=await browser.newPage({viewport:{width:360,height:1200},deviceScaleFactor:dpi});page.setDefaultTimeout(10000);await page.goto('http://127.0.0.1:5196/tests/fixtures/control-height.html');
- const selectors=['main > .mt-input','main > .mt-search .mt-input','main > .mt-select','main > .mt-multiselect','main > .mt-number .mt-number-group','main > .mt-date-field input','main > .mt-filter-chip','.mt-table-filter'];
+ const selectors=['main > .mt-input','main > .mt-search .mt-input','main > .mt-select','main > .mt-multiselect','main > .mt-number .mt-number-group','main .mt-date-field input','main > .mt-filter-chip','.mt-table-filter'];
  const measure=el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};};
  for(const selector of selectors){const el=page.locator(selector).first();assert.equal((await el.evaluate(measure)).height,28,name+' '+selector);}
  // Keyboard and pointer focus must not change geometry; popup behavior is covered separately.
