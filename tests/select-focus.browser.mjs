@@ -13,6 +13,7 @@ try {
       const errors=[]; page.on('pageerror', e=>errors.push(e.message));
       for (const dark of [false,true]) for (const control of ['Select','MultiSelect']) {
         await page.goto('http://127.0.0.1:5198/tests/fixtures/select-focus.html');
+        await page.getByLabel('Reference input').waitFor();
         await page.evaluate(dark=>document.body.classList.toggle('dark',dark),dark);
         await page.getByLabel('Reference input').focus();
         const reference = await page.getByLabel('Reference input').evaluate(el=>({color:getComputedStyle(el).borderTopColor,width:getComputedStyle(el).borderTopWidth}));
