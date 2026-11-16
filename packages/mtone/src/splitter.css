@@ -49,7 +49,7 @@
   outline-offset: -2px;
   z-index: 2;
 }
-.mt-splitter-controls > .mt-splitter-collapse {
+.mt-splitter > .mt-splitter-controls > .mt-splitter-collapse {
   position: absolute;
   z-index: 3;
   width: 20px;
@@ -88,7 +88,7 @@
   height: 68px;
   transform: translateX(-50%);
 }
-.mt-splitter-controls > .mt-splitter-collapse {
+.mt-splitter > .mt-splitter-controls > .mt-splitter-collapse {
   top: 4px;
   opacity: 0;
   pointer-events: none;
@@ -105,7 +105,7 @@
   pointer-events: auto;
 }
 @media (any-pointer: coarse) {
-  .mt-splitter-controls > .mt-splitter-collapse {
+  .mt-splitter > .mt-splitter-controls > .mt-splitter-collapse {
     opacity: var(--mt-splitter-control-opacity, 1);
     pointer-events: auto;
   }
