@@ -28,6 +28,7 @@ jobs:
       - run: node tests/select-layout.browser.mjs
       - run: node tests/spotlight.browser.mjs
       - run: node tests/input-focus.browser.mjs
+      - run: node tests/form.browser.mjs
       - run: node tests/modal-layout.browser.mjs
       - run: node tests/showcase.browser.mjs
       - uses: actions/upload-pages-artifact@v3

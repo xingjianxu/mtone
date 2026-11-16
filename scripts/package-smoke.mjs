@@ -59,19 +59,20 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Button, Layout, Toast, NumberInput, MultiSelect, Spotlight } from '@bixlab/mtone';
+import { Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
-assert(Layout.Sider && Toast && NumberInput && MultiSelect && Spotlight);
+assert(Layout.Sider && Toast && NumberInput && MultiSelect && Spotlight && Form.useForm && Form.Item);
 assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.css'));
 `,
   );
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { Button, Layout, Toast, useToast } from '@bixlab/mtone';
+    `import { Button, Layout, Toast, useToast, Form, Input } from '@bixlab/mtone';
 import '@bixlab/mtone/styles.css';
 export const demo = <Layout><Layout.Sider version="v1" collapsible /><Layout><Layout.Header /><Layout.Content><Toast><Button variant="blue">OK</Button></Toast></Layout.Content></Layout></Layout>;
+export function FormDemo() { const [form] = Form.useForm(); return <Form form={form} onFinish={values => console.log(values)}><Form.Item name='email' label='Email' rules={[{type:'email',required:true}]}><Input /></Form.Item></Form>; }
 export const action = () => useToast().success({title:'Saved', body:'Ready', position:'top-right'});
 `,
   );

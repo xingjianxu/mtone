@@ -110,8 +110,16 @@ export function RadioGroup({
     </BRadioGroup>
   );
 }
+interface FieldControlProps {
+  id?: string;
+  "aria-invalid"?: React.AriaAttributes["aria-invalid"];
+  "aria-describedby"?: string;
+  "aria-labelledby"?: string;
+  "aria-busy"?: boolean;
+  onBlur?: React.FocusEventHandler<HTMLElement>;
+}
 export interface SelectProps
-  extends Common, ValueProps<string | null>, OpenProps {
+  extends Common, ValueProps<string | null>, OpenProps, FieldControlProps {
   options: Option[];
   placeholder?: string;
 }
@@ -119,13 +127,14 @@ export function Select({
   options,
   label,
   placeholder,
-  className,
+  className, id, onBlur, "aria-invalid": invalid, "aria-describedby": describedBy, "aria-labelledby": labelledBy, "aria-busy": busy,
   ...props
 }: SelectProps) {
   const { locale } = useMtone();
   return (
     <BSelect.Root items={options} {...props}>
       <BSelect.Trigger
+        id={id} onBlur={onBlur} aria-invalid={invalid} aria-describedby={describedBy} aria-labelledby={labelledBy} aria-busy={busy}
         aria-label={label}
         className={cn("mt-select", className)}
       >
@@ -170,8 +179,10 @@ export function Select({
     </BSelect.Root>
   );
 }
+Select.formValueType = "nullable" as const;
+
 export interface MultiSelectProps
-  extends Common, ValueProps<string[]>, OpenProps {
+  extends Common, ValueProps<string[]>, OpenProps, FieldControlProps {
   options: Option[];
   placeholder?: string;
 }
@@ -179,7 +190,7 @@ export function MultiSelect({
   options,
   label,
   placeholder,
-  className,
+  className, id, onBlur, "aria-invalid": invalid, "aria-describedby": describedBy, "aria-labelledby": labelledBy, "aria-busy": busy,
   ...props
 }: MultiSelectProps) {
   const { locale } = useMtone();
@@ -193,7 +204,7 @@ export function MultiSelect({
       itemToStringLabel={labelFor}
       {...props}
     >
-      <Combobox.Chips className={cn("mt-multiselect", className)}>
+      <Combobox.Chips aria-invalid={invalid} className={cn("mt-multiselect", className)}>
         <Combobox.Value>
           {(selected: string[]) => (
             <>
@@ -212,6 +223,7 @@ export function MultiSelect({
           )}
         </Combobox.Value>
         <Combobox.Input
+        id={id} onBlur={onBlur} aria-invalid={invalid} aria-describedby={describedBy} aria-labelledby={labelledBy} aria-busy={busy}
           aria-label={label}
           placeholder={placeholder ?? (locale === "zh" ? "搜索…" : "Search…")}
           className="mt-combobox-input"
@@ -250,6 +262,8 @@ export function MultiSelect({
     </Combobox.Root>
   );
 }
+MultiSelect.formValueType = "array" as const;
+
 export interface SliderProps extends Common, ValueProps<number> {
   min?: number;
   max?: number;

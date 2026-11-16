@@ -1,3 +1,4 @@
+import { FormExample, FormFieldExample } from "./form-example";
 import { SpotlightExample } from "./spotlight-example";
 import { ToastAction } from "./toast-example";
 import { LayoutExample } from "./layout-example";
@@ -222,34 +223,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     case "Form":
-      return (
-        <M.Form
-          style={stackStyle}
-          onSubmit={(e) => {
-            e.preventDefault();
-            setNotice(`本地表单已提交：${text}`);
-          }}
-        >
-          {field}
-          <M.Button type="submit" variant="solid">
-            保存
-          </M.Button>
-          {output}
-        </M.Form>
-      );
+      return <FormExample />;
     case "FormField":
-      return (
-        <div style={stackStyle}>
-          <M.FormField
-            label="名称"
-            required
-            error={!text.trim() ? "请输入名称" : undefined}
-            description="清空输入可查看错误状态。"
-          >
-            <M.Input value={text} onChange={(e) => setText(e.target.value)} />
-          </M.FormField>
-        </div>
-      );
+      return <FormFieldExample />;
     case "Checkbox":
       return (
         <div style={stackStyle}>

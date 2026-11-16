@@ -510,69 +510,244 @@ export const componentDocs: ComponentDoc[] = [
     ],
     notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
   },
-  {
-    name: "Form",
-    category: "输入与表单",
-    description: "使用原生表单提交语义组织字段。",
-    importNames: ["Form", "FormField", "Input", "Button"],
-    code: 'import { Form, FormField, Input, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Form onSubmit={(event) => event.preventDefault()}><FormField label="标题" required><Input name="title" /></FormField><Button type="submit">提交</Button></Form>\n  );\n}',
-    props: [
-      {
-        name: "onSubmit",
-        type: "FormEventHandler",
-        description: "原生提交事件，应用负责保存和验证。",
-      },
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "组件内容。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
-    ],
-    notes: ["不内置表单状态管理、请求或自定义验证引擎。"],
-  },
-  {
-    name: "FormField",
-    category: "输入与表单",
-    description: "关联标签、说明、错误信息与单个输入控件。",
-    importNames: ["FormField", "Input"],
-    code: 'import { FormField, Input } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <FormField label="文档名称" description="请输入便于查找的名称" required><Input placeholder="例如：阅读笔记" /></FormField>\n  );\n}',
-    props: [
-      {
-        name: "label",
-        type: "ReactNode",
-        description: "必填；字段标签。",
-      },
-      {
-        name: "children",
-        type: "ReactElement",
-        description: "必填；一个可接收 id 与 ARIA 属性的输入元素。",
-      },
-      {
-        name: "description",
-        type: "ReactNode",
-        description: "帮助说明。",
-      },
-      {
-        name: "error",
-        type: "ReactNode",
-        description: "错误提示，优先于说明显示。",
-      },
-      {
-        name: "required",
-        type: "boolean",
-        description: "必填标识并传递 required。",
-      },
-    ],
-    notes: [
-      "会克隆子元素添加 id、required、aria-invalid 和 aria-describedby。复合选择控件请使用其 label 属性。",
-    ],
-  },
+{
+  "name": "Form",
+  "category": "输入与表单",
+  "description": "管理字段值与同步/异步校验，支持受验证的提交回调并保留原生表单用法。",
+  "importNames": [
+    "Form",
+    "FormField",
+    "Input",
+    "Button"
+  ],
+  "code": "import { useState } from \"react\";\nimport { Form, FormField, Input, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [form] = Form.useForm();\n  const [message, setMessage] = useState(\"\");\n  return (\n    <Form form={form} initialValues={{ email: \"\" }}\n      onFinish={values => setMessage(`本地提交成功：${values.email}`)}\n      onFinishFailed={() => setMessage(\"请检查字段错误\")}\n    >\n      <FormField name=\"email\" label=\"邮箱\" rules={[\n        { required: true, message: \"请输入邮箱\" },\n        { type: \"email\", message: \"请输入有效邮箱\" },\n      ]}>\n        <Input type=\"email\" />\n      </FormField>\n      <Button type=\"submit\" variant=\"blue\">提交</Button>\n      <Button type=\"reset\">重置</Button>\n      <p role=\"status\">{message}</p>\n    </Form>\n  );\n}",
+  "props": [
+    {
+      "name": "form",
+      "type": "FormInstance",
+      "description": "传入 Form.useForm() 获得的实例；省略时创建内部实例。"
+    },
+    {
+      "name": "initialValues",
+      "type": "Record<string, unknown>",
+      "description": "初始值及 resetFields 的恢复值；一次初始化，优先于字段 initialValue。"
+    },
+    {
+      "name": "validateTrigger",
+      "type": "\"onChange\" | \"onBlur\" | (\"onChange\" | \"onBlur\")[] | false",
+      "description": "字段自动校验时机；false 仅关闭自动校验，提交和手动校验仍执行。",
+      "default": "\"onChange\""
+    },
+    {
+      "name": "onFinish",
+      "type": "(values: FormValues) => void",
+      "description": "所有托管字段校验通过后的提交回调。"
+    },
+    {
+      "name": "onFinishFailed",
+      "type": "(error: FormValidationError) => void",
+      "description": "非过期的提交校验失败回调，包含 values、errorFields、outOfDate。"
+    },
+    {
+      "name": "onValuesChange",
+      "type": "(changed: FormValues, values: FormValues) => void",
+      "description": "控件交互更新值时触发，提供改变的字段和值快照。"
+    },
+    {
+      "name": "onSubmit / onReset",
+      "type": "FormEventHandler",
+      "description": "原生事件回调最先执行；preventDefault 可取消对应内建处理。"
+    },
+    {
+      "name": "noValidate",
+      "type": "boolean",
+      "description": "托管时默认由规则引擎校验，避免浏览器原生校验拦截提交；可显式覆盖。",
+      "default": "托管表单默认 true"
+    },
+    {
+      "name": "children / className / style / 原生属性",
+      "type": "ReactNode / string / CSSProperties / FormHTMLAttributes",
+      "description": "支持原生 form 属性。"
+    },
+    {
+      "name": "Form.useForm()",
+      "type": "() => [FormInstance]",
+      "description": "创建生命周期稳定的表单实例，遵守 React Hook 使用规则。"
+    },
+    {
+      "name": "Form.Item",
+      "type": "typeof FormField",
+      "description": "FormField 的组合式别名，支持相同字段属性。"
+    },
+    {
+      "name": "form.getFieldValue / getFieldsValue",
+      "type": "(name: string) => unknown / () => FormValues",
+      "description": "读取单个字段或全部当前值。"
+    },
+    {
+      "name": "form.setFieldValue / setFieldsValue",
+      "type": "(name: string, value: unknown) => void / (values: FormValues) => void",
+      "description": "设置单个或合并多个字段值，不触发 onValuesChange 或自动校验。"
+    },
+    {
+      "name": "form.getFieldError / getFieldsError",
+      "type": "(name: string) => string[] / (names?: string[]) => {name: string; errors: string[]}[]",
+      "description": "读取单个或多个字段的规则错误。"
+    },
+    {
+      "name": "form.isFieldValidating",
+      "type": "(name: string) => boolean",
+      "description": "读取字段是否正在校验。"
+    },
+    {
+      "name": "form.validateFields",
+      "type": "(names?: string[]) => Promise<FormValues>",
+      "description": "校验全部注册字段或指定字段；失败或过期时拒绝，必须处理 Promise。"
+    },
+    {
+      "name": "form.resetFields",
+      "type": "(names?: string[]) => void",
+      "description": "恢复全部或指定字段的初始值，清除错误与校验中状态。"
+    }
+  ],
+  "notes": [
+    "这是 mtone 的轻量表单 API，不是 Ant Design Form 的完整兼容实现；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。",
+    "字段 name 是扁平字符串 key；例如 \"user.email\" 只是一个完整 key，不会生成嵌套对象。控件以 Form 接管的值为准，不要同时传 value/defaultValue。",
+    "initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，MultiSelect 的初始值建议在 initialValues 中设为 []。",
+    "无 name 的 FormField 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。",
+    "规则按顺序执行，每个字段遇到首个错误停止。可选空值跳过内建类型/长度/范围/正则检查，但仍执行自定义 validator；若要求填写请设置 required。required 只判断空值，不等于 Checkbox 必须选中；此类业务约束用自定义 validator。",
+    "异步校验不发送内置网络请求；自定义 validator 可返回错误字符串、抛出错误或返回 Promise。值变化、重置或新校验可能使旧校验失效，validateFields 会拒绝并返回 outOfDate: true；手动调用须 catch，忽略过期结果。",
+    "显式 error 优先于自动错误显示，但仅是展示，不会使 validateFields 失败或阻止 onFinish；阻止提交必须使用 rules。",
+    "组件注入 id、required、aria-invalid、aria-describedby 和校验中的 aria-busy；子控件需将这些属性传递到实际输入元素。内置 Input/Select/MultiSelect 已适配。",
+    "控件交互触发 onValuesChange；setFieldValue/setFieldsValue/resetFields 不触发该回调，也不会自动重跑校验。set 操作清除对应字段旧错误，若需校验请手动调用 validateFields。",
+    "托管提交会阻止浏览器默认提交并校验；通过后调用 onFinish，失败调用 onFinishFailed。用户 onSubmit 最先执行，若调用 preventDefault 则取消本次内建提交和校验。",
+    "Form 内 type=\"reset\" 按钮恢复初始值与校验状态；onReset 若 preventDefault 则取消内建重置。业务保存/请求、成功状态与提交中的 loading 由应用管理。",
+    "字段卸载后不再参与校验，但值保留在表单数据中。实例读取返回浅拷贝，不要原地修改其中的数组或对象。"
+  ]
+},
+{
+  "name": "FormField",
+  "category": "输入与表单",
+  "description": "关联字段标签与帮助信息，配合 Form 的 name/rules 自动管理值和校验。",
+  "importNames": [
+    "Form",
+    "FormField",
+    "Input",
+    "Button"
+  ],
+  "code": "import { Form, FormField, Input, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <Form onFinish={values => console.log(\"已校验\", values)}>\n      <FormField name=\"title\" label=\"文档名称\" validateTrigger=\"onBlur\"\n        rules={[\n          { required: true, whitespace: true, message: \"请输入文档名称\" },\n          { min: 3, message: \"至少输入 3 个字符\" },\n        ]}\n      >\n        <Input placeholder=\"例如：阅读笔记\" />\n      </FormField>\n      <Button type=\"submit\">校验并提交</Button>\n    </Form>\n  );\n}",
+  "props": [
+    {
+      "name": "label",
+      "type": "ReactNode",
+      "description": "必填；字段可访问标签。"
+    },
+    {
+      "name": "children",
+      "type": "ReactElement",
+      "description": "必填；单个可接收注入值、事件、id 与 ARIA 属性的控件。"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "description": "Form 中的扁平字段 key。省略时保持手动模式。"
+    },
+    {
+      "name": "rules",
+      "type": "FormRule[]",
+      "description": "同步/异步规则，按顺序遇到首错停止。"
+    },
+    {
+      "name": "initialValue",
+      "type": "unknown",
+      "description": "字段初始值，优先级低于 Form.initialValues；只用于初始化/重置。"
+    },
+    {
+      "name": "validateTrigger",
+      "type": "\"onChange\" | \"onBlur\" | (\"onChange\" | \"onBlur\")[] | false",
+      "description": "覆盖此字段的自动校验时机。",
+      "default": "继承 Form"
+    },
+    {
+      "name": "valuePropName",
+      "type": "string",
+      "description": "绑定到子控件的值属性，例如 checked。",
+      "default": "\"value\""
+    },
+    {
+      "name": "trigger",
+      "type": "string",
+      "description": "取值事件名；同名子控件事件仍会调用。",
+      "default": "Input: onChange；Select/MultiSelect: onValueChange"
+    },
+    {
+      "name": "getValueFromEvent",
+      "type": "(...args: any[]) => unknown",
+      "description": "自定义从控件事件参数中提取字段值。"
+    },
+    {
+      "name": "description",
+      "type": "ReactNode",
+      "description": "没有错误时显示的辅助说明。"
+    },
+    {
+      "name": "error",
+      "type": "ReactNode",
+      "description": "显式错误展示，优先于规则错误；不参与提交校验。"
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "description": "必填标记和传给控件的 required；规则引擎是否必填应使用 rules.required。",
+      "default": "从 rules.required 推断"
+    },
+    {
+      "name": "rule.required / whitespace",
+      "type": "boolean",
+      "description": "必填检查 / 拒绝纯空白字符串。"
+    },
+    {
+      "name": "rule.type",
+      "type": "\"string\" | \"number\" | \"boolean\" | \"array\" | \"email\" | \"url\" | \"integer\"",
+      "description": "值类型或基础格式规则，不隐式转换类型。"
+    },
+    {
+      "name": "rule.min / max / len",
+      "type": "number",
+      "description": "字符串/数组长度或数值下限、上限、相等值。"
+    },
+    {
+      "name": "rule.pattern",
+      "type": "RegExp",
+      "description": "字符串正则检查。"
+    },
+    {
+      "name": "rule.message",
+      "type": "string",
+      "description": "覆盖规则失败的错误文案。"
+    },
+    {
+      "name": "rule.validator",
+      "type": "(rule: FormRule, value: unknown, values: FormValues) => void | string | Promise<void | string>",
+      "description": "返回 void 表示通过，返回错误字符串或抛错表示失败；支持异步。"
+    }
+  ],
+  "notes": [
+    "这是 mtone 的轻量表单 API，不是 Ant Design Form 的完整兼容实现；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。",
+    "字段 name 是扁平字符串 key；例如 \"user.email\" 只是一个完整 key，不会生成嵌套对象。控件以 Form 接管的值为准，不要同时传 value/defaultValue。",
+    "initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，MultiSelect 的初始值建议在 initialValues 中设为 []。",
+    "无 name 的 FormField 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。",
+    "规则按顺序执行，每个字段遇到首个错误停止。可选空值跳过内建类型/长度/范围/正则检查，但仍执行自定义 validator；若要求填写请设置 required。required 只判断空值，不等于 Checkbox 必须选中；此类业务约束用自定义 validator。",
+    "异步校验不发送内置网络请求；自定义 validator 可返回错误字符串、抛出错误或返回 Promise。值变化、重置或新校验可能使旧校验失效，validateFields 会拒绝并返回 outOfDate: true；手动调用须 catch，忽略过期结果。",
+    "显式 error 优先于自动错误显示，但仅是展示，不会使 validateFields 失败或阻止 onFinish；阻止提交必须使用 rules。",
+    "组件注入 id、required、aria-invalid、aria-describedby 和校验中的 aria-busy；子控件需将这些属性传递到实际输入元素。内置 Input/Select/MultiSelect 已适配。",
+    "Input 默认监听 onChange 并提取 event.target.value；内置 Select/MultiSelect 自动改用 onValueChange，无需额外 trigger。自定义控件可配置 valuePropName、trigger、getValueFromEvent。",
+    "Checkbox 等非 value 控件可配置 valuePropName=\"checked\"、trigger=\"onCheckedChange\"。trigger 负责取值，validateTrigger 负责校验时机，是两个不同概念。",
+    "rules.type 不做类型转换，原生数字输入的字符串不会自动成为 number；可用 getValueFromEvent 显式转换。string/array 的 min/max/len 比较长度，number 的 min/max/len 比较数值。",
+    "URL 规则接受有效 http/https 地址；email 是基础格式检查，不验证邮箱存在。whitespace 拒绝纯空白字符串，不会自动 trim 值。pattern 为 RegExp。",
+    "规则 message 覆盖该规则的错误文案（包括 validator 的错误），建议提供中文文案；如果希望 validator 返回不同错误，省略此规则的 message。"
+  ]
+},
   {
     name: "Checkbox",
     category: "选择控件",

@@ -558,3 +558,5 @@
   outline: 2px solid var(--mt-focus, #5378aa);
   outline-offset: -2px;
 }
+
+.mt-select[aria-invalid="true"], .mt-multiselect[aria-invalid="true"] { border-color: #c66660; }

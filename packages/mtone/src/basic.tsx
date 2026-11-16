@@ -144,48 +144,8 @@ export const SearchInput = React.forwardRef<
     </span>
   );
 });
-export function FormField({
-  label,
-  error,
-  description,
-  required,
-  children,
-}: {
-  label: React.ReactNode;
-  error?: React.ReactNode;
-  description?: React.ReactNode;
-  required?: boolean;
-  children: React.ReactElement;
-}) {
-  const id = React.useId();
-  const child = children as React.ReactElement<Record<string, unknown>>;
-  const inputId = (child.props.id as string) || id;
-  return (
-    <div className="mt-field">
-      <label htmlFor={inputId}>
-        {label}
-        {required && <span aria-hidden="true"> *</span>}
-      </label>
-      {React.cloneElement(child, {
-        id: inputId,
-        required,
-        "aria-invalid": !!error,
-        "aria-describedby": error || description ? `${id}-help` : undefined,
-      })}
-      {(error || description) && (
-        <div id={`${id}-help`} className={cn("mt-help", !!error && "mt-error")}>
-          {error || description}
-        </div>
-      )}
-    </div>
-  );
-}
-export const Form = ({
-  className,
-  ...p
-}: React.FormHTMLAttributes<HTMLFormElement>) => (
-  <form {...p} className={cn("mt-form", className)} />
-);
+export { Form, FormField } from "./form";
+export type { FormProps, FormFieldProps, FormRule, FormInstance, FormValues, FormValidationError, FormValidateTrigger } from "./form";
 export type Tone = "neutral" | "blue" | "green" | "orange" | "red" | "purple";
 export function Badge({
   children,
