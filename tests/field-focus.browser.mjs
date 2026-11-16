@@ -7,8 +7,9 @@ await page.goto("http://127.0.0.1:5195/tests/fixtures/field-focus.html");
 const specs=[['Input','.mt-input',1],['SearchInput','.mt-input',1],['Textarea','.mt-input',1],['Select','.mt-select',1],['MultiSelect','.mt-multiselect',1],['NumberInput','.mt-number-group',1],['DatePicker','.mt-input',1],['Table','.mt-table-filter',1]];
 const measure=el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();return {size:[r.width,r.height],border:[s.borderTopWidth,s.borderRightWidth,s.borderBottomWidth,s.borderLeftWidth],padding:[s.paddingTop,s.paddingRight,s.paddingBottom,s.paddingLeft],color:s.borderTopColor,outline:s.outlineStyle};};
 for(const [name,selector] of specs){
+ await page.goto('http://127.0.0.1:5195/tests/fixtures/field-focus.html');
  const section=page.locator(`[data-test-field="${name}"]`),surface=section.locator(selector),before=section.getByRole('button',{name:`Before ${name}`,exact:true});
- const target=name==='Table'?section.getByRole('textbox'):name==='NumberInput'?section.getByRole('spinbutton'):section.getByLabel(name,{exact:true});
+ const target=name==='Table'?section.getByRole('textbox'):section.getByLabel(name,{exact:true});
  await before.scrollIntoViewIfNeeded();await before.click();const normal=await surface.evaluate(measure);
  // Keyboard entry covers the first child for compound fields (chip/stepper).
  await page.keyboard.press('Tab');const keyboard=await surface.evaluate(measure);
@@ -18,10 +19,11 @@ for(const [name,selector] of specs){
  assert.equal(mouse.color,'rgb(147, 180, 220)',name+' mouse');assert.equal(mouse.outline,'none');assert.deepEqual(mouse.size,normal.size);assert.deepEqual(mouse.border,normal.border);
  if(name==='Select'){await page.getByRole('option',{name:'One',exact:true}).click();await page.getByRole('listbox').waitFor({state:'hidden'});}
  console.log('FIELD_FOCUS_'+name+'='+(await section.screenshot()).toString('base64')); 
- if(name==='MultiSelect'){await before.click();await section.getByRole('button',{name:'Show options'}).focus();assert.equal((await surface.evaluate(measure)).color,'rgb(147, 180, 220)');await before.click();}
+ if(name==='MultiSelect'){if(await target.getAttribute('aria-expanded')==='true'){await target.press('Escape');await page.getByRole('listbox').waitFor({state:'hidden'});}await before.click();await section.getByRole('button',{name:'Show options'}).focus();assert.equal((await surface.evaluate(measure)).color,'rgb(147, 180, 220)');await before.click();}
  if(name==='NumberInput'){await section.getByRole('button',{name:'Increase'}).focus();assert.equal((await surface.evaluate(measure)).color,'rgb(147, 180, 220)');}
  await page.emulateMedia({forcedColors:'active'});await target.focus();assert.equal((await surface.evaluate(measure)).outline,'solid',name+' forced colors');await before.focus();await page.emulateMedia({forcedColors:'none'});
 }
+await page.goto('http://127.0.0.1:5195/tests/fixtures/field-focus.html');
 for(const name of ['Input','Select','MultiSelect']){const control=page.getByLabel(name+' error',{exact:true});await control.focus();const surface=name==='MultiSelect'?page.locator('[data-test-field="errors"] .mt-multiselect'):control;assert.equal((await surface.evaluate(measure)).color,'rgb(198, 102, 96)');}
 for(const name of ['Input','Select','MultiSelect','NumberInput']){const control=page.getByLabel(name+' disabled',{exact:true});assert(await control.isDisabled());await control.focus();assert(!(await control.evaluate(el=>el===document.activeElement)));}
 for(const name of ['Checkbox','Regular button']){const control=name==='Checkbox'?page.getByRole('checkbox',{name}):page.getByRole('button',{name});await control.focus();await page.keyboard.press('Tab');await page.keyboard.press('Shift+Tab');assert.equal(await control.evaluate(el=>getComputedStyle(el).outlineStyle),'solid');}
