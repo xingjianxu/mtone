@@ -146,6 +146,19 @@
 .mt-input[aria-invalid="true"] {
   border-color: #c66660;
 }
+/* Input only: reuse the existing 1px border, without an external focus ring. */
+.mt-input.mt-input-control:focus {
+  border-color: #93b4dc;
+  outline: none;
+}
+.mt-input.mt-input-control[aria-invalid="true"]:focus { border-color: #c66660; }
+@media (forced-colors: active) {
+  .mt-input.mt-input-control:focus {
+    border-color: Highlight;
+    outline: 1px solid Highlight;
+    outline-offset: 1px;
+  }
+}
 .mt-textarea {
   min-height: 72px;
   resize: vertical;

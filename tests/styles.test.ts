@@ -24,13 +24,17 @@ it('ships the requested blue button palette and transition', () => {
   expect(css).toContain('.mt-btn:focus-visible');
 });
 
-it('uses the Input focus token for all focus indicators and compound fields', () => {
+it('keeps shared focus tokens and allows the Input forced-colors fallback', () => {
   const files = ['styles.css', 'interactive.css', 'data.css'];
   for (const file of files) {
     const css = readFileSync(`packages/mtone/src/${file}`, 'utf8');
     for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
       if (rule[1].includes(':focus') && /outline:.*solid/.test(rule[2])) {
-        expect(rule[2]).toContain('var(--mt-focus, #5378aa)');
+        if (rule[1].trim() === '.mt-input.mt-input-control:focus' && rule[2].includes('Highlight')) {
+          expect(rule[2]).toContain('outline: 1px solid Highlight');
+        } else {
+          expect(rule[2]).toContain('var(--mt-focus, #5378aa)');
+        }
         expect(rule[2]).not.toContain('--mt-primary');
       }
     }
@@ -68,4 +72,12 @@ it('keeps the topbar at 48px and both layout footers at 42px',()=>{
  const sider=css.slice(css.indexOf('.mt-layout-sider .mt-sidebar-footer {')).split('}')[0];
  expect(sider).toContain('height: var(--mt-layout-footer-height, 42px)');
  expect(sider).toContain('padding: 6px 12px');
+});
+
+it('uses only the existing border for normal Input focus', () => {
+  const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
+  const rule = css.slice(css.indexOf('.mt-input.mt-input-control:focus {')).split('}')[0];
+  expect(rule).toContain('border-color: #93b4dc');
+  expect(rule).toContain('outline: none');
+  expect(rule).not.toMatch(/border-width|padding|height|box-shadow/);
 });

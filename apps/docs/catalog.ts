@@ -426,7 +426,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
+    notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea 等其他组件保持原焦点样式。"],
   },
   {
     name: "SearchInput",

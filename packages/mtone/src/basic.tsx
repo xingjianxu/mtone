@@ -119,7 +119,7 @@ export const Input = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
 >(function Input({ className, ...p }, r) {
-  return <BaseInput {...p} ref={r} className={cn("mt-input", className)} />;
+  return <BaseInput {...p} ref={r} className={cn("mt-input mt-input-control", className)} />;
 });
 export const Textarea = React.forwardRef<
   HTMLTextAreaElement,
@@ -136,11 +136,11 @@ export const Textarea = React.forwardRef<
 export const SearchInput = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
->(function SearchInput(p, r) {
+>(function SearchInput({ className, ...p }, r) {
   return (
     <span className="mt-search">
       <Search size={15} />
-      <Input {...p} ref={r} />
+      <BaseInput {...p} ref={r} className={cn("mt-input", className)} />
     </span>
   );
 });

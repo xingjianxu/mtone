@@ -1,8 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, test, expect, vi } from "vitest";
 import {
   Button,
   Input,
+  SearchInput,
+  Textarea,
   FormField,
   Badge,
   MtoneProvider,
@@ -76,4 +78,11 @@ it.each(["neutral", "blue", "green", "orange", "red", "purple"] as const)("prese
   expect(screen.getByTestId("badge")).toHaveClass("mt-badge", `mt-tone-${tone}`, "custom");
   expect(screen.getByTestId("badge")).toHaveAttribute("title", "label");
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
+});
+
+test("Input has an isolated focus style without changing SearchInput or Textarea", () => {
+  const { container } = render(<><Input aria-label="plain" /><SearchInput aria-label="search" /><Textarea aria-label="multiline" /></>);
+  expect(container.querySelector('[aria-label="plain"]')).toHaveClass("mt-input-control");
+  expect(container.querySelector('[aria-label="search"]')).not.toHaveClass("mt-input-control");
+  expect(container.querySelector('[aria-label="multiline"]')).not.toHaveClass("mt-input-control");
 });
