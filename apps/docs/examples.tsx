@@ -1,3 +1,4 @@
+import { CardExample } from "./card-example";
 import { FormExample, FormFieldExample } from "./form-example";
 import { SpotlightExample } from "./spotlight-example";
 import { ToastAction } from "./toast-example";
@@ -521,12 +522,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </M.Tooltip>
       );
     case "Card":
-      return (
-        <M.Card style={{ maxWidth: 320 }}>
-          <h3 style={{ marginTop: 0 }}>内容优先</h3>
-          <M.Text muted>为知识、想法与工作留出空间。</M.Text>
-        </M.Card>
-      );
+      return <CardExample />;
     case "Text":
       return (
         <div style={stackStyle}>

@@ -1,0 +1,213 @@
+/* Size library-owned structure consistently even without MtoneProvider.
+   Do not reset arbitrary children or the legacy bare-card subtree. */
+:is(
+  .mt-card-header,
+  .mt-card-title,
+  .mt-card-extra,
+  .mt-card-cover,
+  .mt-card-body,
+  .mt-card-actions,
+  .mt-card-loading,
+  .mt-card-tabs-layout,
+  .mt-card-tab-extra,
+  .mt-card-grid,
+  .mt-card-meta,
+  .mt-card-meta-avatar,
+  .mt-card-meta-section,
+  .mt-card-meta-title,
+  .mt-card-meta-description
+),
+.mt-card-actions > li,
+.mt-card-tabs > :is(.mt-tab-list, .mt-tab-panel) {
+  box-sizing: border-box;
+}
+/* Structured card additions preserve the bare Card's 16px content spacing. */
+.mt-card.mt-card-structured {
+  padding: 0;
+  border-radius: var(--mt-card-border-radius, 6px);
+}
+.mt-card-body {
+  padding: var(--mt-card-body-padding, 16px);
+  min-width: 0;
+}
+.mt-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--mt-card-header-height, 42px);
+  padding: 8px var(--mt-card-header-padding, 16px);
+  border-bottom: 1px solid var(--mt-border, #e9e9e7);
+  background: var(--mt-card-header-bg, transparent);
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+.mt-card-title {
+  min-width: 0;
+  flex: 1;
+  font-weight: 600;
+  font-size: var(--mt-card-header-font-size, 14px);
+  overflow-wrap: anywhere;
+}
+.mt-card-title > :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+  font-size: inherit;
+}
+.mt-card-extra {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+.mt-card-cover {
+  overflow: hidden;
+}
+.mt-card-cover:first-child {
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+.mt-card-cover > :is(img, video) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mt-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--mt-border, #e9e9e7);
+  background: var(--mt-card-actions-bg, transparent);
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+}
+.mt-card-actions > li {
+  overflow-wrap: anywhere;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1 64px;
+  min-width: 0;
+  padding: var(--mt-card-actions-padding, 8px);
+}
+.mt-card-actions > li + li {
+  border-inline-start: 1px solid var(--mt-border, #e9e9e7);
+}
+.mt-card.mt-card-borderless {
+  border-color: transparent;
+}
+.mt-card-hoverable,
+.mt-card-grid-hoverable {
+  transition: box-shadow 120ms ease;
+}
+.mt-card-hoverable:hover {
+  box-shadow: 0 3px 12px #00000012;
+}
+.mt-card-inner > .mt-card-header {
+  background: var(--mt-card-header-bg, var(--mt-subtle, #f7f7f5));
+}
+.mt-card-small > .mt-card-body:not(:has(> .mt-card-grid)),
+.mt-card-small
+  > .mt-card-tabs-layout
+  > .mt-card-tabs
+  > .mt-tab-panel
+  > .mt-card-body:not(:has(> .mt-card-grid)) {
+  padding: var(--mt-card-body-padding-sm, 12px);
+}
+.mt-card-small > .mt-card-header {
+  min-height: var(--mt-card-header-height-sm, 36px);
+  padding: 6px var(--mt-card-header-padding-sm, 12px);
+}
+.mt-card-small > .mt-card-header > .mt-card-title {
+  font-size: var(--mt-card-header-font-size-sm, 13px);
+}
+.mt-card-loading {
+  display: grid;
+  gap: 10px;
+}
+.mt-card-tabs-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+}
+.mt-card-tabs {
+  display: contents;
+}
+.mt-card-tabs > .mt-tab-list {
+  grid-column: 1;
+  grid-row: 1;
+  padding-inline: var(--mt-card-header-padding, 16px);
+  overflow-x: auto;
+  min-width: 0;
+}
+.mt-card-tabs > .mt-tab-panel {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  padding: 0;
+  min-width: 0;
+}
+.mt-card-tab-extra {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  padding-inline-end: var(--mt-card-header-padding, 16px);
+  border-bottom: 1px solid var(--mt-border, #e9e9e7);
+}
+.mt-card-meta {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+.mt-card-meta-avatar {
+  flex-shrink: 0;
+}
+.mt-card-meta-section {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.mt-card-meta-title {
+  font-weight: 600;
+}
+.mt-card-meta-description {
+  color: var(--mt-muted, #787774);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.mt-card:not(.mt-card-structured):has(> .mt-card-grid),
+.mt-card-body:has(> .mt-card-grid) {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--mt-card-grid-min-width, 180px)), 1fr)
+  );
+  padding: 0;
+}
+.mt-card-grid {
+  min-width: 0;
+  padding: var(--mt-card-body-padding, 16px);
+  box-shadow: inset -1px -1px 0 var(--mt-border, #e9e9e7);
+  overflow-wrap: anywhere;
+}
+.mt-card-grid-hoverable:hover {
+  box-shadow:
+    inset -1px -1px 0 var(--mt-border, #e9e9e7),
+    0 2px 8px #00000014;
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-card-hoverable,
+  .mt-card-grid-hoverable {
+    transition: none;
+  }
+}
+
+.mt-card-small > .mt-card-body > .mt-card-grid,
+.mt-card-small
+  > .mt-card-tabs-layout
+  > .mt-card-tabs
+  > .mt-tab-panel
+  > .mt-card-body
+  > .mt-card-grid {
+  padding: var(--mt-card-body-padding-sm, 12px);
+}

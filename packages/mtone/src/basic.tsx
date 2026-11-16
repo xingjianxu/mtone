@@ -1,3 +1,4 @@
+import { Card } from "./card";
 import * as React from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Input as BaseInput } from "@base-ui/react/input";
@@ -249,12 +250,8 @@ export const Text = ({
   <span {...p} className={cn("mt-text", muted && "mt-muted", className)} />
 );
 export const Divider = () => <hr className="mt-divider" />;
-export const Card = ({
-  className,
-  ...p
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div {...p} className={cn("mt-card", className)} />
-);
+export { Card } from "./card";
+export type { CardProps, CardTokens, CardSemantic, CardTabItem, CardMetaProps, CardMetaSemantic, CardGridProps } from "./card";
 export const List = ({
   className,
   ...p

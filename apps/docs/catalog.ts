@@ -1774,25 +1774,124 @@ export const componentDocs: ComponentDoc[] = [
     notes: ["不要在提示中放必须操作的交互内容；图标触发器仍需 aria-label。"],
   },
   {
-    name: "Card",
-    category: "内容展示",
-    description: "带轻边框的内容卡片。",
-    importNames: ["Card"],
-    code: 'import { Card } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Card><strong>阅读笔记</strong><p>将知识组织为可复用的内容。</p></Card>\n  );\n}',
-    props: [
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "组件内容。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
+    "name": "Card",
+    "category": "内容展示",
+    "description": "紧凑的结构化内容卡片，支持封面、操作、加载、标签页、元信息与网格。",
+    "importNames": [
+      "Card",
+      "Button",
+      "Avatar"
     ],
-    notes: [],
+    "code": "import { useState } from \"react\";\nimport { Card, Button, Avatar } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [tab, setTab] = useState(\"overview\");\n  const [loading, setLoading] = useState(false);\n  return (\n    <Card\n      title=\"知识库\"\n      htmlTitle=\"原生悬浮提示使用 htmlTitle\"\n      extra={<Button size=\"sm\" onClick={() => setLoading(!loading)}>切换加载</Button>}\n      loading={loading}\n      tabList={[{key:\"overview\",label:\"概览\"},{key:\"notes\",label:\"笔记\"}]}\n      activeTabKey={tab}\n      onTabChange={setTab}\n      actions={[<Button key=\"save\" variant=\"ghost\" onClick={() => alert(\"本地示例\")}>收藏</Button>]}\n    >\n      {tab === \"overview\" ? <Card.Meta avatar={<Avatar name=\"林\" />} title=\"设计知识\" description=\"记录可复用的经验。\" /> : <p>这是笔记内容。</p>}\n    </Card>\n  );\n}",
+    "props": [
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "description": "卡片主体；tabList 项未指定 content 时也用作该标签页主体。"
+      },
+      {
+        "name": "title / extra",
+        "type": "ReactNode",
+        "description": "可见标题与标题栏尾部区域；无内容时不生成空标题栏。"
+      },
+      {
+        "name": "htmlTitle",
+        "type": "string",
+        "description": "原生 HTML title 悬浮提示。旧 Card title 原生提示用法需迁移到此属性。"
+      },
+      {
+        "name": "cover",
+        "type": "ReactNode",
+        "description": "独立封面区域，可放图片或其他内容；图片请提供合适的 alt。"
+      },
+      {
+        "name": "actions",
+        "type": "ReactNode[]",
+        "description": "底部操作区域；请使用 Button、IconButton 或链接等有语义的交互元素。"
+      },
+      {
+        "name": "loading / loadingLabel",
+        "type": "boolean / string",
+        "description": "loading 默认 false，使用 Skeleton 显示加载态；loadingLabel 提供可访问的加载提示。"
+      },
+      {
+        "name": "size",
+        "type": "\"medium\" | \"small\"",
+        "description": "默认 medium；紧凑风格提供较小 padding 的 small 变体。"
+      },
+      {
+        "name": "variant",
+        "type": "\"outlined\" | \"borderless\"",
+        "description": "默认 outlined；borderless 隐藏可见边框并保留外框几何。"
+      },
+      {
+        "name": "hoverable",
+        "type": "boolean",
+        "description": "默认 false，仅增加悬浮视觉反馈，不添加按钮语义、键盘操作或点击处理。"
+      },
+      {
+        "name": "type",
+        "type": "\"inner\"",
+        "description": "可选嵌套卡片样式；不设置时为普通卡片。"
+      },
+      {
+        "name": "tabList",
+        "type": "{ key: string; label: ReactNode; disabled?: boolean; content?: ReactNode }[]",
+        "description": "复用 mtone Tabs。每项 key 应唯一；有 content 时显示该项内容，否则显示 children。"
+      },
+      {
+        "name": "activeTabKey / defaultActiveTabKey",
+        "type": "string",
+        "description": "分别为受控值与非受控初始值；默认选中第一个可用标签。"
+      },
+      {
+        "name": "onTabChange",
+        "type": "(key: string) => void",
+        "description": "标签切换回调；受控模式下需由父组件更新 activeTabKey。"
+      },
+      {
+        "name": "tabBarExtraContent",
+        "type": "ReactNode",
+        "description": "标签页区域的附加内容，和顶部 extra 独立。"
+      },
+      {
+        "name": "tabProps",
+        "type": "{ className?: string }",
+        "description": "传给复用的 mtone Tabs 的样式类；不是 Ant Design TabsProps，值与回调通过 Card 的标签属性控制。"
+      },
+      {
+        "name": "classNames / styles",
+        "type": "object | ({ props: CardProps }) => object",
+        "description": "分区 className / CSSProperties；键为 root、header、title、extra、cover、body、actions、tabs。"
+      },
+      {
+        "name": "tokens",
+        "type": "CardTokens",
+        "description": "单张卡片主题 token：bodyPadding、bodyPaddingSM、headerPadding、headerPaddingSM、headerHeight、headerHeightSM、headerFontSize、headerFontSizeSM、headerBg、actionsBg、actionsPadding、borderRadius、gridMinWidth。尺寸数字按 px 处理，也支持 CSS 长度字符串。"
+      },
+      {
+        "name": "Card.Meta",
+        "type": "avatar?: ReactNode; title?: ReactNode; description?: ReactNode; htmlTitle?: string",
+        "description": "元信息布局；支持原生 div 属性，以及 root、section、avatar、title、description 分区 classNames/styles（对象或 ({props}) => 对象）。"
+      },
+      {
+        "name": "Card.Grid",
+        "type": "hoverable?: boolean + HTMLAttributes<HTMLDivElement>",
+        "description": "卡片网格项，hoverable 默认 true；作为 Card 的直接子元素使用以启用响应式网格布局。"
+      },
+      {
+        "name": "原生属性",
+        "type": "Omit<HTMLAttributes<HTMLDivElement>, \"title\">",
+        "description": "支持根节点 className、style、aria-* 与适用 DOM 事件。title 已改为可见标题；原生提示使用 htmlTitle。"
+      }
+    ],
+    "notes": [
+      "不声明与 Ant Design 完全兼容：未提供旧 bordered/bodyStyle/headStyle；使用 variant 与分区 styles。size 使用 medium/small，tabProps 只支持现有 mtone Tabs 的 className。",
+      "迁移提醒：旧 <Card title=\"提示\"> 会改为显示标题栏；原生悬浮提示请改为 <Card htmlTitle=\"提示\">。只有 children、没有新增结构属性的 Card 维持原来的默认视觉。",
+      "Card.Meta 与 Card.Grid 是 Card 的静态子组件，不是单独安装或单独命名导出的组件。",
+      "不要用 hoverable 或 onClick 把普通 div 当作按钮；可交互入口优先用内部 Button 或链接，图标按钮必须有可访问名称。",
+      "title 字符串不自动生成 heading 语义；可传 h2/h3。非受控标签失效时回退首个可用项；无效受控 key 无活动面板。当前演示只使用本地状态，不执行网络保存。主题 token 与兼容范围详见仓库 docs/CARD.md。"
+    ]
   },
   {
     name: "Text",
