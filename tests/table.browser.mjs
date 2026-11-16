@@ -48,6 +48,8 @@ try {
           };
         });
       const initial = await geometry();
+      const overflow = await body.evaluate((el) => ({ width: el.clientWidth, content: el.scrollWidth }));
+      assert(overflow.content > overflow.width + 100, `${name}: fixture must provide horizontal overflow: ${JSON.stringify(overflow)}`);
       assert(
         initial.widths.every((n) => n < 2),
         `${name}: header/body widths must match`,

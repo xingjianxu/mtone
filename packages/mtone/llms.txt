@@ -1204,10 +1204,12 @@ export default function Demo() {
 - [Table](https://xingjianxu.github.io/mtone/#/components/Table): 保留 mtone 紧凑风格的数据表格，支持高级排序筛选、选择、展开、固定布局与虚拟滚动。
 - Import: Table from @bixlab/mtone
 - data / dataSource: T[] (default: []). 数据源，dataSource 优先；保留旧 data 用法。
-- columns / children: TableColumn<T>[] / ReactNode. 列定义或 Table.Column / Table.ColumnGroup JSX。列支持嵌套 dataIndex、children 分组、render、width/minWidth、align、hidden、responsive、ellipsis、fixed 和 onCell/onHeaderCell。
+- columns / children: TableColumn<T>[] / ReactNode. 列定义或 Table.Column / Table.ColumnGroup JSX。列支持嵌套 dataIndex、children 分组、render、width/minWidth、align、hidden、responsive、ellipsis、fixed、rowScope、shouldCellUpdate 和 onCell/onHeaderCell。
 - rowKey: string | ((record: T) => React.Key) (default: key). 稳定且唯一的行键，保留数字键类型。
 - column: Partial<TableColumn<T>>. 所有列的共享默认配置，单列配置优先。
 - columns[].sorter / sortOrder: boolean | compare | {compare?, multiple?} / ascend | descend | null. 本地比较、多列优先级或远程排序；defaultSortOrder、sortDirections、sortIcon 可配置。sorter=true 仅报告排序意图；使用 manual 管理服务端数据。
+- sortDirections / showSorterTooltip: ('ascend' | 'descend')[] / boolean | {title?: ReactNode, target?: 'full-header' | 'sorter-icon'} (default: ['ascend','descend'] / true). 排序方向循环与下一步提示；单列配置优先。title 支持富文本，target 控制整块排序按钮或仅图标触发提示。
+- rowClassName / rowHoverable / onScroll: string | ((record, index, indent) => string) / boolean / UIEventHandler (default: — / true / —). 行样式、悬停反馈与滚动事件；虚拟模式 onScroll 仅报告垂直滚动。direction 支持 ltr/rtl。
 - columns[].filters / onFilter: TableFilterItem[] / (value, record) => boolean. 菜单或树形筛选项及本地匹配逻辑。支持 filterSearch、filterMultiple、filteredValue、defaultFilteredValue、filterResetToDefaultFilteredValue、filterOnClose。
 - columns[].filterDropdown: ReactNode | (props: TableFilterDropdownProps) => ReactNode. 自定义筛选面板，使用 selectedKeys、setSelectedKeys、confirm、clearFilters、close 管理草稿；filterDropdownProps 支持 open/onOpenChange/className/style。
 - rowSelection: TableRowSelection<T>. checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。
@@ -1219,8 +1221,8 @@ export default function Demo() {
 - components / onRow / onHeaderRow: TableComponents / function / function. 替换表格结构或配置行属性。编辑、拖拽、额外工具提示属于应用组合，不是自动持久化功能。
 - size / bordered / showHeader / tableLayout: small | middle | medium | large / boolean / boolean / auto | fixed (default: middle / false / true). 紧凑尺寸、边框、表头显示和布局。
 - loading: boolean | {spinning?, tip?, delay?, indicator?} (default: false). 加载状态、延迟与自定义指示内容。
-- empty / locale: ReactNode / TableLocale. 自定义空态与筛选、排序、展开文字；默认跟随 MtoneProvider 语言。
-- classNames / styles: TableClassNames | function / TableStyles | function. 语义结构样式及 root/pagination 扩展；className/style 配置外层。
+- empty / locale: ReactNode / TableLocale. 自定义空态与筛选、排序、展开和选择文字（含 selectRow、selectionAll、selectionActions）；默认跟随 MtoneProvider 语言。
+- classNames / styles: TableClassNames | function / TableStyles | function. 支持 root、section、title、footer、content、pagination，以及 body/header 下的 wrapper、row、cell；className/style 配置外层。
 - getPopupContainer: (trigger: HTMLElement) => HTMLElement. 筛选弹层挂载容器。
 - ref: TableRef. nativeElement 与 scrollTo({key?, index?, top?, offset?, align?})。虚拟模式不支持 center 对齐。
 - onTableChange: (pagination, filters, sorter, extra) => void. 新详细回调。extra 包含 action 和 currentDataSource；多列排序返回 sorter 数组。

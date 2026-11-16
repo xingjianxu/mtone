@@ -35,6 +35,7 @@ function Demo() {
           minWidth: 0,
           margin: "auto",
           display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr)",
           gap: 24,
         }}
       >

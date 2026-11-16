@@ -389,3 +389,4 @@ test("sorter tooltip targets only the icon and accepts rich content", () => {
     "aria-describedby",
   );
 });
+test('legacy expandable expandIcon remains usable alongside expand-all default icon',()=>{render(<Table dataSource={rows} columns={[{title:'Name',dataIndex:'name'}]} expandable={{showExpandAll:true,expandedRowRender:r=>r.name+' detail',expandIcon:({record,onExpand})=><button onClick={e=>onExpand(record,e)}>Custom expand {record.name}</button>}}/>);fireEvent.click(screen.getByRole('button',{name:'Custom expand Bob'}));expect(screen.getByText('Bob detail')).toBeTruthy();expect(screen.getByRole('button',{name:'Expand all rows'})).toBeTruthy()});

@@ -535,7 +535,7 @@ function TableInner<T>(
     ExpandIcon:
       components?.ExpandIcon ??
       ((p: any) =>
-        p.expandable ? (
+        p.type==='row' && expandable?.expandIcon ? expandable.expandIcon({prefixCls:'mt-table',expanded:p.expanded,expandable:p.expandable,record:p.record,onExpand:(_record,event)=>p.onClick(event)}) : p.expandable ? (
           <button
             type="button"
             className="mt-table-expand"

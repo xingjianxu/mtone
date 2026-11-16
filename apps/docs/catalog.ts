@@ -2179,7 +2179,7 @@ export const componentDocs: ComponentDoc[] = [
         name: "columns / children",
         type: "TableColumn<T>[] / ReactNode",
         description:
-          "列定义或 Table.Column / Table.ColumnGroup JSX。列支持嵌套 dataIndex、children 分组、render、width/minWidth、align、hidden、responsive、ellipsis、fixed 和 onCell/onHeaderCell。",
+          "列定义或 Table.Column / Table.ColumnGroup JSX。列支持嵌套 dataIndex、children 分组、render、width/minWidth、align、hidden、responsive、ellipsis、fixed、rowScope、shouldCellUpdate 和 onCell/onHeaderCell。",
       },
       {
         name: "rowKey",
@@ -2197,6 +2197,18 @@ export const componentDocs: ComponentDoc[] = [
         type: "boolean | compare | {compare?, multiple?} / ascend | descend | null",
         description:
           "本地比较、多列优先级或远程排序；defaultSortOrder、sortDirections、sortIcon 可配置。sorter=true 仅报告排序意图；使用 manual 管理服务端数据。",
+      },
+      {
+        name: "sortDirections / showSorterTooltip",
+        type: "('ascend' | 'descend')[] / boolean | {title?: ReactNode, target?: 'full-header' | 'sorter-icon'}",
+        description: "排序方向循环与下一步提示；单列配置优先。title 支持富文本，target 控制整块排序按钮或仅图标触发提示。",
+        default: "['ascend','descend'] / true",
+      },
+      {
+        name: "rowClassName / rowHoverable / onScroll",
+        type: "string | ((record, index, indent) => string) / boolean / UIEventHandler",
+        description: "行样式、悬停反馈与滚动事件；虚拟模式 onScroll 仅报告垂直滚动。direction 支持 ltr/rtl。",
+        default: "— / true / —",
       },
       {
         name: "columns[].filters / onFilter",
@@ -2270,13 +2282,13 @@ export const componentDocs: ComponentDoc[] = [
         name: "empty / locale",
         type: "ReactNode / TableLocale",
         description:
-          "自定义空态与筛选、排序、展开文字；默认跟随 MtoneProvider 语言。",
+          "自定义空态与筛选、排序、展开和选择文字（含 selectRow、selectionAll、selectionActions）；默认跟随 MtoneProvider 语言。",
       },
       {
         name: "classNames / styles",
         type: "TableClassNames | function / TableStyles | function",
         description:
-          "语义结构样式及 root/pagination 扩展；className/style 配置外层。",
+          "支持 root、section、title、footer、content、pagination，以及 body/header 下的 wrapper、row、cell；className/style 配置外层。",
       },
       {
         name: "getPopupContainer",
