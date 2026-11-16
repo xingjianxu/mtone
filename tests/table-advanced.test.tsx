@@ -5,6 +5,7 @@ import {
   screen,
   within,
 } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
 import { Table, MtoneProvider } from "../packages/mtone/src";
 const render = (node: React.ReactNode) =>
@@ -57,7 +58,7 @@ test("modern sorting calls distinct callback while preserving legacy state callb
   });
   expect(modern.mock.calls[0][3].currentDataSource[0].age).toBe(10);
 });
-test("pagination defaults, size changer and remote data preserve table state", () => {
+test("pagination defaults, size changer and remote data preserve table state", async () => {
   const change = vi.fn();
   render(
     <Table
@@ -74,9 +75,14 @@ test("pagination defaults, size changer and remote data preserve table state", (
   expect(screen.queryByText("Ann")).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Next page" }));
   expect(screen.getByText("Ann")).toBeTruthy();
-  fireEvent.change(screen.getByRole("combobox", { name: "Page size" }), {
-    target: { value: "2" },
-  });
+  const size = screen.getByRole("combobox", { name: "Page size" });
+  expect(size).toHaveClass("mt-select");
+  await userEvent.click(size);
+  await userEvent.click(
+    await screen.findByRole("option", { name: "2 / page" }),
+  );
+  expect(size).toHaveTextContent("2 / page");
+  expect(screen.getByText("Bob")).toBeTruthy();
   expect(change.mock.calls.at(-1)![0].pageSize).toBe(2);
 });
 test("expandable rows with expand-all, summary, title and footer", () => {
@@ -412,4 +418,80 @@ test("tree expand position honors explicit overrides and tables without selectio
   rerender(<MtoneProvider locale="en"><Table dataSource={data} columns={columns} rowSelection={{}}
     expandable={{ expandIconColumnIndex: 2 }} /></MtoneProvider>);
   expect(screen.getByRole('button', { name: 'Expand row' }).closest('td')?.textContent).toBe('20');
+});
+
+test("page size Select preserves controlled values and numeric callbacks", async () => {
+  const onChange = vi.fn(),
+    onShowSizeChange = vi.fn(),
+    onTableChange = vi.fn();
+  const { rerender } = render(
+    <Table
+      dataSource={rows}
+      columns={[{ dataIndex: "name" }]}
+      pagination={{
+        current: 2,
+        pageSize: 1,
+        showSizeChanger: true,
+        pageSizeOptions: ["2", 2, 0],
+        onChange,
+        onShowSizeChange,
+      }}
+      onTableChange={onTableChange}
+    />,
+  );
+  const trigger = screen.getByRole("combobox", { name: "Page size" });
+  await userEvent.click(trigger);
+  expect(screen.getAllByRole("option")).toHaveLength(2);
+  await userEvent.click(screen.getByRole("option", { name: "2 / page" }));
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(1, 2);
+  expect(onShowSizeChange).toHaveBeenCalledExactlyOnceWith(1, 2);
+  expect(onTableChange.mock.calls[0][0]).toMatchObject({
+    current: 1,
+    pageSize: 2,
+  });
+  expect(trigger).toHaveTextContent("1 / page");
+  expect(screen.queryByText("Bob")).toBeNull();
+  rerender(
+    <MtoneProvider locale="en">
+      <Table
+        dataSource={rows}
+        columns={[{ dataIndex: "name" }]}
+        pagination={{ current: 1, pageSize: 2, showSizeChanger: true }}
+      />
+    </MtoneProvider>,
+  );
+  expect(trigger).toHaveTextContent("2 / page");
+  expect(screen.getByText("Bob")).toBeTruthy();
+});
+
+test("page size Select localizes, disables and hides with pagination settings", async () => {
+  const onChange = vi.fn();
+  const { rerender } = rtlRender(
+    <MtoneProvider locale="zh">
+      <Table
+        dataSource={rows}
+        columns={[{ dataIndex: "name" }]}
+        pagination={{
+          pageSize: 1,
+          disabled: true,
+          showSizeChanger: true,
+          onChange,
+        }}
+      />
+    </MtoneProvider>,
+  );
+  const trigger = screen.getByRole("combobox", { name: "每页条数" });
+  expect(trigger).toHaveTextContent("1 条/页");
+  expect(trigger).toBeDisabled();
+  await userEvent.click(trigger);
+  expect(screen.queryByRole("listbox")).toBeNull();
+  expect(onChange).not.toHaveBeenCalled();
+  rerender(
+    <Table
+      dataSource={rows}
+      columns={[]}
+      pagination={{ showSizeChanger: false }}
+    />,
+  );
+  expect(screen.queryByRole("combobox")).toBeNull();
 });

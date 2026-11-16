@@ -508,7 +508,7 @@
 .mt-pagination-start > .mt-pagination-total {
   margin-inline-end: 0;
 }
-.mt-table-page-size {
+.mt-select.mt-table-page-size {
   width: auto;
   min-width: 82px;
   max-width: 140px;

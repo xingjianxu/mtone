@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Button, cn } from "./basic";
+import { Select } from "./interactive";
 import type { TablePagination } from "./table-types";
 export function TablePaginationBar({
   config,
@@ -114,14 +115,15 @@ export function TablePaginationBar({
         {render(current + 1, "next", <span>›</span>)}
       </Button>
       {config.showSizeChanger && (
-        <select
-          className="mt-input mt-table-page-size"
-          aria-label={zh ? "每页条数" : "Page size"}
+        <Select
+          className="mt-table-page-size"
+          label={zh ? "每页条数" : "Page size"}
           disabled={config.disabled}
-          value={pageSize}
-          onChange={(e) => change(1, Number(e.target.value))}
-        >
-          {[
+          value={String(pageSize)}
+          onValueChange={(value) => {
+            if (value !== null) change(1, Number(value));
+          }}
+          options={[
             ...new Set([
               ...(config.pageSizeOptions ?? [10, 20, 50, 100]).map(Number),
               pageSize,
@@ -129,13 +131,11 @@ export function TablePaginationBar({
           ]
             .filter((s) => s > 0)
             .sort((a, b) => a - b)
-            .map((s) => (
-              <option key={s} value={s}>
-                {s}
-                {zh ? " 条/页" : " / page"}
-              </option>
-            ))}
-        </select>
+            .map((s) => ({
+              value: String(s),
+              label: `${s}${zh ? " 条/页" : " / page"}`,
+            }))}
+        />
       )}
       {config.showQuickJumper && (
         <form

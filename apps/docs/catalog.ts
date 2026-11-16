@@ -2249,7 +2249,7 @@ export const componentDocs: ComponentDoc[] = [
         name: "pagination",
         type: "false | TablePagination",
         description:
-          "支持 page/current、默认页、页容量、total、showSizeChanger、showQuickJumper、hideOnSinglePage、simple、disabled、showTotal、itemRender、placement/position 和变化回调。",
+          "支持 page/current、默认页、页容量、total、showSizeChanger、showQuickJumper、hideOnSinglePage、simple、disabled、showTotal、itemRender、placement/position 和变化回调。每页条数选择器使用本库 Select，支持键盘选择、Escape 取消与禁用状态，切换条数后回到第一页。",
         default: "false",
       },
       {

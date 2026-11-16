@@ -174,9 +174,23 @@ try {
       await expect(
         controls.getByLabel("Selected keys", { exact: true }),
       ).toHaveText("1");
-      await controls
-        .getByRole("combobox", { name: "Page size" })
-        .selectOption("8");
+      const pageSizeSelect = controls.getByRole("combobox", { name: "Page size" });
+      await expect(pageSizeSelect).toHaveClass(/mt-select/);
+      await pageSizeSelect.click();
+      await page.getByRole("option", { name: "8 / page", exact: true }).click();
+      await expect(pageSizeSelect).toBeFocused();
+      await pageSizeSelect.press("ArrowDown");
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("listbox")).toHaveCount(0);
+      await expect(pageSizeSelect).toHaveText(/8 \/ page/);
+      await pageSizeSelect.press("ArrowDown");
+      await page.keyboard.press("Home");
+      await page.keyboard.press("Enter");
+      await expect(pageSizeSelect).toHaveText(/4 \/ page/);
+      await expect(controls.getByText("Person 7", { exact: true })).toHaveCount(0);
+      await pageSizeSelect.click();
+      await page.getByRole("option", { name: "8 / page", exact: true }).click();
       await expect(
         controls.getByText("Person 7", { exact: true }),
       ).toBeVisible();
