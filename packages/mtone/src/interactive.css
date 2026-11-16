@@ -166,7 +166,7 @@
 .mt-multiselect {
   max-width: 100%;
   flex-wrap: wrap;
-  min-width: 200px;
+  min-width: min(200px, 100%);
   gap: 4px;
   padding: 3px 6px;
 }
