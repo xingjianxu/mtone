@@ -10,7 +10,7 @@ try {for(const [name,engine] of Object.entries({chromium,firefox,webkit})) {
  const ratio=async(v=false)=>(await size('left',v))/((await size('left',v))+(await size('right',v)));
  const open=async()=>{await page.goto(url);await expect(page.getByRole('separator')).toHaveCount(1);await expect.poll(()=>ratio()).toBeCloseTo(.4,2)};
  const cycle=async(index=0,key=false)=>{const h=page.getByRole('separator').nth(index);if(key)await h.press('Enter');else await h.dblclick();await page.waitForTimeout(80)};
- const drag=async(delta=50)=>{const b=await page.getByRole('separator').first().boundingBox();await page.mouse.move(b.x+b.width/2,b.y+60);await page.mouse.down();await page.mouse.move(b.x+delta,b.y+60,{steps:6});await page.mouse.up();await page.waitForTimeout(80)};
+ const drag=async(delta=50)=>{const b=await page.getByRole('separator').first().boundingBox();await page.mouse.move(b.x+b.width/2,b.y+60);await page.mouse.down();await page.mouse.move(Math.max(9,Math.min(890,b.x+delta)),b.y+60,{steps:6});await page.mouse.up();await page.waitForTimeout(80)};
  await open();await expect(page.locator('.mt-splitter-collapse')).toHaveCount(0);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);await cycle();await expect.poll(()=>size('right')).toBeLessThan(1);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);assert.equal(JSON.parse(await page.getByTestId('events').textContent()).doubles,4);
  // Manual movement restarts at A, but the original 40/60 ratio is not overwritten.
  await open();await drag();assert((await ratio())>.44);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);

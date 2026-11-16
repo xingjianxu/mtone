@@ -144,6 +144,11 @@ function SplitterRoot(props: SplitterProps) {
   );
   const cyclePending = React.useRef(false);
   const cycleToken = React.useRef(0);
+  const queuedCycle = React.useRef<{
+    boundary: number;
+    topology: string;
+  } | null>(null);
+  const cycleHandler = React.useRef<(boundary: number) => void>(() => {});
   const touchTap = React.useRef<{
     boundary: number;
     x: number;
@@ -354,6 +359,7 @@ function SplitterRoot(props: SplitterProps) {
       mounted.current = false;
       session.current = null;
       cyclePending.current = false;
+      queuedCycle.current = null;
       cycleToken.current++;
       win.removeEventListener("pointerup", end);
       win.removeEventListener("pointercancel", cancel, true);
@@ -371,6 +377,7 @@ function SplitterRoot(props: SplitterProps) {
       initial.current = { key: topology, layout: { ...layout.current } };
       phases.current.clear();
       cyclePending.current = false;
+      queuedCycle.current = null;
       cycleToken.current++;
     }
   });
@@ -383,7 +390,6 @@ function SplitterRoot(props: SplitterProps) {
       b = current.panels[boundary + 1]?.props;
     if (
       disabled ||
-      cyclePending.current ||
       !a ||
       !b ||
       a.resizable === false ||
@@ -391,6 +397,13 @@ function SplitterRoot(props: SplitterProps) {
       (!a.collapsible && !b.collapsible)
     )
       return;
+    if (cyclePending.current) {
+      // Keep one trailing discrete activation while the accepted layout settles.
+      // Key repeats never reach this path. Resolve against the latest props and
+      // phase after the preceding operation, including controlled rejection.
+      queuedCycle.current = { boundary, topology: JSON.stringify(current.ids) };
+      return;
+    }
     const aid = current.ids[boundary],
       bid = current.ids[boundary + 1];
     const key = JSON.stringify([aid, bid]);
@@ -458,8 +471,14 @@ function SplitterRoot(props: SplitterProps) {
       cyclePending.current = false;
       reportCollapse();
       finish();
+      const queued = queuedCycle.current;
+      queuedCycle.current = null;
+      if (queued && queued.topology === JSON.stringify(latest.current.ids)) {
+        cycleHandler.current(queued.boundary);
+      }
     });
   };
+  cycleHandler.current = cycle;
   const horizontal = orientation === "horizontal";
   return (
     <Group
