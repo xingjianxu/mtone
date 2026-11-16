@@ -32,6 +32,7 @@ jobs:
       - run: node tests/control-height.browser.mjs
       - run: node tests/menu-icons.browser.mjs
       - run: node tests/card.browser.mjs
+      - run: node tests/splitter.browser.mjs
       - run: node tests/form.browser.mjs
       - run: node tests/modal-layout.browser.mjs
       - run: node tests/showcase.browser.mjs

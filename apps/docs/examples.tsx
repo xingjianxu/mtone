@@ -1,3 +1,4 @@
+import { SplitterExample } from "./splitter-example";
 import { CardExample } from "./card-example";
 import { FormExample, FormFieldExample } from "./form-example";
 import { SpotlightExample } from "./spotlight-example";
@@ -118,6 +119,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
   );
 
   switch (name) {
+    case "Splitter":
+      return <SplitterExample />;
     case "Spotlight":
       return <SpotlightExample />;
     case "Layout":

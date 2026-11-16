@@ -34,6 +34,57 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### Splitter
+
+- [Splitter](https://xingjianxu.github.io/mtone/#/components/Splitter): 可拖动的紧凑分栏布局，支持横向、纵向、受控大小和可折叠面板。
+- Import: Splitter from @bixlab/mtone
+- children: Splitter.Panel elements. 面板直接子元素，可使用 Fragment 和条件渲染；支持多个面板及在面板内嵌套另一个 Splitter。
+- orientation: 'horizontal' | 'vertical' (default: 'horizontal'). 横向并排或纵向堆叠。容器必须有可测量的宽高。
+- sizes: SplitterSize[]. 整个布局的受控大小，按面板顺序一一对应；数量必须与面板数一致。数值为 px，字符串仅支持明确的 % 或 px。
+- onResize: (sizes: number[]) => void. 用户拖动、键盘或折叠交互中的大小请求，数组值为像素。受控时父组件接受并更新 sizes；不在首次挂载、容器变化或受控值同步时触发。
+- onResizeStart / onResizeEnd: (sizes: number[]) => void. 交互开始/结束回调；结束在后续帧报告最终接受/约束后的像素大小，无变化的交互也会结束。
+- onCollapse: (collapsed: boolean[], sizes: number[]) => void. 实际折叠状态变化回调（包括程序更新受控值），初次挂载不触发；数组按面板顺序对应。
+- disabled: boolean (default: false). 禁用整个布局的交互调整。
+- lazy: boolean (default: false). 拖拽期间显示分隔条预览，释放时调整面板，避免每次移动都重排重内容。
+- onDraggerDoubleClick: (index: number) => void. 双击分隔条回调，index 为分隔条索引；不会自动重置，宿主可更新 sizes 实现。
+- Splitter.Panel.id: string. 稳定且唯一的面板标识。动态增删、重排时应显式提供，不要用会变化的位置作为标识。
+- Splitter.Panel.label: string. 面板的可访问名称，建议使用内容含义，如导航、编辑区、预览。
+- Splitter.Panel.defaultSize: SplitterSize. 非受控初始大小。后续更改不会替代受控 sizes；重置可更新受控数组或重新挂载。
+- Splitter.Panel.min / max: SplitterSize. 面板最小/最大大小约束。默认 min 为 0，可折叠面板默认为 10%；max 默认 100%。数字为 px，字符串仅支持明确的 % 或 px。
+- Splitter.Panel.resizable: boolean (default: true). 是否允许调整此面板。
+- Splitter.Panel.collapsible: boolean (default: false). 启用面板折叠/展开。配合 min 明确展开后的最小尺寸。
+- Splitter.Panel.collapsedSize: SplitterSize (default: 0). 折叠后的大小，可以保留窄栏而不是完全隐藏。
+- Splitter.Panel.groupResizeBehavior: 'preserve-relative-size' | 'preserve-pixel-size' (default: 'preserve-relative-size'). 容器尺寸改变时优先保留相对比例，或尽量保留像素大小；仍受约束影响。至少一个面板必须保留相对大小，全部设为 preserve-pixel-size 会报错。
+- 原生属性 / className / style: HTMLAttributes<HTMLDivElement>. 根节点和 Panel 支持适用的原生属性及样式；Splitter 的 onResize 是布局回调而非 DOM UIEvent。不要覆盖内部必需的布局样式。
+- 所有大小数值均为 px；字符串必须带 % 或 px，如 240、'240px'、'30%'。不接受裸数字字符串、负数、NaN 或其他单位。回调返回像素，不是百分比。
+- sizes 为整个布局受控数组，不是 AntD 的 Panel.size。父组件需要在 onResize 中接受请求并更新；动态面板变化时同时更新数组长度与顺序。
+- 受控 sizes 先换算为像素，再按总和归一化填满可用面板空间（不含分隔条）。因此 [100,100] 表示等分，不保证各为 100px；总和应匹配实际空间才能精确表达像素请求。所有值为 0 无效。受控值会优先于容器变化的自动策略。
+- 显式提供稳定唯一 id 可在动态增删/重排中识别面板。只支持直接 Splitter.Panel（含 Fragment）；不要在 Panel 外另包 div 或自定义包装组件。
+- min/max、容器可用尺寸与总布局必须协调。无效单位和同单位 min 大于 max 会报错；空间不足或相互冲突时引擎会调整布局以填满可用区域，不保证所有不可能同时满足的约束。
+- 这是基于 react-resizable-panels 的 mtone 封装，不是完整 Ant Design API。没有 Panel.size、layout/vertical 别名、动画配置、destroyOnHidden 或 AntD 的完整 classNames/styles API。
+- Esc 或 pointercancel 撤销本次拖动并请求回到开始大小；窗口失焦提交最后有效大小。lazy 模式在释放时发出大小请求，取消时发回滚请求。0 大小面板保留挂载内容，但会 inert/aria-hidden，不参与交互。
+- 按需保存布局由宿主负责；示例只保留当前页面状态，不做服务器或浏览器持久化。库已包含所需依赖，使用者无需单独安装拖拽组件。
+
+```tsx
+import { useState } from "react";
+import { Splitter } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>(["30%", "70%"]);
+  return (
+    <Splitter style={{ height: 280 }} sizes={sizes} onResize={setSizes}>
+      <Splitter.Panel id="navigation" label="导航" min="15%" max="50%" collapsible>
+        <div style={{ padding: 12 }}>导航内容</div>
+      </Splitter.Panel>
+      <Splitter.Panel id="content" label="正文" min="30%">
+        <div style={{ padding: 12 }}>正文内容</div>
+      </Splitter.Panel>
+    </Splitter>
+  );
+}
+```
+
 ### Spotlight
 
 - [Spotlight](https://xingjianxu.github.io/mtone/#/components/Spotlight): 可搜索的快捷操作面板，支持分组、键盘导航和动作回调。
