@@ -26,6 +26,7 @@ jobs:
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: node tests/date-picker.browser.mjs
       - run: node tests/select-layout.browser.mjs
+      - run: node tests/select-focus.browser.mjs
       - run: node tests/spotlight.browser.mjs
       - run: node tests/input-focus.browser.mjs
       - run: node tests/field-focus.browser.mjs

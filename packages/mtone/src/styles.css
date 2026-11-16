@@ -543,10 +543,15 @@
 }
 /* Inset rings remain visible inside clipped stepper and popup containers. */
 .mt-number-step:not(:disabled):not([data-disabled]):focus-visible,
-.mt-option[data-highlighted]:not([data-disabled]),
 .mt-menu-item[data-highlighted]:not([data-disabled]) {
   outline: 2px solid var(--mt-focus, #5378aa);
   outline-offset: -2px;
+}
+
+/* Match Input's 1px focus color without changing option geometry. */
+.mt-option[data-highlighted]:not([data-disabled]) {
+  outline: 1px solid #93b4dc;
+  outline-offset: -1px;
 }
 
 .mt-select[aria-invalid="true"], .mt-multiselect[aria-invalid="true"] { border-color: #c66660; }
@@ -562,6 +567,10 @@
 }
 .mt-number-group:has([aria-invalid="true"], [data-invalid]) { border-color: #c66660; }
 @media (forced-colors: active) {
+  .mt-option[data-highlighted]:not([data-disabled]) {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
   :is(.mt-input, .mt-select):not(:disabled):not([data-disabled]):is(:focus, [aria-expanded="true"]),
   :is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):focus-within {
     outline: 1px solid Highlight;
