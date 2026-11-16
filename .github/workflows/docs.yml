@@ -32,8 +32,12 @@ jobs:
       - run: node tests/control-height.browser.mjs
       - run: node tests/menu-icons.browser.mjs
       - run: node tests/card.browser.mjs
-      - run: node tests/splitter-cycle.browser.mjs
-      - run: node tests/splitter.browser.mjs
+      - name: Splitter browser regressions
+        run: |
+          status=0
+          node tests/splitter-cycle.browser.mjs || status=1
+          node tests/splitter.browser.mjs || status=1
+          exit $status
       - run: node tests/form.browser.mjs
       - run: node tests/modal-layout.browser.mjs
       - run: node tests/showcase.browser.mjs

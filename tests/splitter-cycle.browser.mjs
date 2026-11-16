@@ -19,7 +19,7 @@ try {for(const [name,engine] of Object.entries({chromium,firefox,webkit})) {
  for(const mode of ['Vertical','RTL']){await open();await page.getByRole('button',{name:mode,exact:true}).click();await cycle(0,true);await expect.poll(()=>size('left',mode==='Vertical')).toBeLessThan(1);await cycle(0,true);await expect.poll(()=>ratio(mode==='Vertical')).toBeCloseTo(.4,2);await cycle(0,true);await expect.poll(()=>size('right',mode==='Vertical')).toBeLessThan(1);assert.equal(JSON.parse(await page.getByTestId('events').textContent()).doubles,0)}
  // Single eligible side toggles with initial; neither eligible and disabled do nothing.
  for(const mode of [1,2,3]){await open();for(let i=0;i<mode;i++)await page.getByRole('button',{name:/^Fold mode/}).click();await cycle();if(mode<3){await expect.poll(()=>size(mode===1?'left':'right')).toBeLessThan(1);await cycle();}await expect.poll(()=>ratio()).toBeCloseTo(.4,2)}
- await open();await page.getByRole('button',{name:'Disabled',exact:true}).click();await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ await open();await page.getByRole('button',{name:'Disabled',exact:true}).click();const disabledBox=await page.getByRole('separator').boundingBox();await page.mouse.dblclick(disabledBox.x+disabledBox.width/2,disabledBox.y+disabledBox.height/2);await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
  // Pair max prevents impossible collapse rather than resizing unrelated panels.
  await open();await page.getByRole('button',{name:'Limited',exact:true}).click();await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
  // Rejecting a controlled proposal does not advance cycle phase.
