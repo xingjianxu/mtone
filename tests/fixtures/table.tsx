@@ -224,6 +224,23 @@ function Demo() {
             />
           </MtoneProvider>
         </section>
+        {(["left", "center", "right"] as const).flatMap((align) =>
+          (["ltr", "rtl"] as const).map((direction) => (
+            <section
+              key={align + direction}
+              data-testid={"selection-" + align + "-" + direction}
+            >
+              <Table
+                dataSource={rows.slice(0, 3)}
+                columns={columns}
+                direction={direction}
+                size={align === "right" ? "large" : "small"}
+                rowSelection={{ selections: true, align, fixed: true }}
+                scroll={{ x: 1100, y: 160 }}
+              />
+            </section>
+          )),
+        )}
         <section data-testid="composition">
           <h2>Editing and drag demos</h2>
           <TableExample />

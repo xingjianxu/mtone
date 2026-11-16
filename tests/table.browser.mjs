@@ -82,6 +82,19 @@ try {
         path: `artifacts/table-browser/${name}-fixed.png`,
       });
       const controls = page.getByTestId("controls");
+      const selectionCenters = async (scope) => scope.locator(".mt-table-selection-column input").evaluateAll(inputs =>
+        inputs.map(input => { const r = input.getBoundingClientRect(); return r.x + r.width / 2; }));
+      for (const scope of [controls, ...await page.locator('[data-testid^="selection-"]').all()]) {
+        const centers = await selectionCenters(scope);
+        const contained = await scope.locator(".mt-table-selection-actions").evaluate(button => {
+          const a = button.getBoundingClientRect(), b = button.closest("th").getBoundingClientRect();
+          return a.left >= b.left && a.right <= b.right;
+        });
+        assert(contained, name + ": selection action must remain inside its column");
+        assert(centers.length >= 3, "selection fixture has header and body controls");
+        assert(centers.every(x => Math.abs(x - centers[0]) <= 1),
+          name + ": selection checkbox centers must align: " + JSON.stringify(centers));
+      }
       const actions = controls.getByRole("button", { name: "Selection actions" });
       await expect(actions).toHaveAttribute("aria-haspopup", "menu");
       await actions.click();

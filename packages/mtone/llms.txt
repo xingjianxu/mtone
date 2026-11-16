@@ -1212,7 +1212,7 @@ export default function Demo() {
 - rowClassName / rowHoverable / onScroll: string | ((record, index, indent) => string) / boolean / UIEventHandler (default: — / true / —). 行样式、悬停反馈与滚动事件；虚拟模式 onScroll 仅报告垂直滚动。direction 支持 ltr/rtl。
 - columns[].filters / onFilter: TableFilterItem[] / (value, record) => boolean. 菜单或树形筛选项及本地匹配逻辑。支持 filterSearch、filterMultiple、filteredValue、defaultFilteredValue、filterResetToDefaultFilteredValue、filterOnClose。
 - columns[].filterDropdown: ReactNode | (props: TableFilterDropdownProps) => ReactNode. 自定义筛选面板，使用 selectedKeys、setSelectedKeys、confirm、clearFilters、close 管理草稿；filterDropdownProps 支持 open/onOpenChange/className/style。
-- rowSelection: TableRowSelection<T>. checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用库内 DropdownMenu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。
+- rowSelection: TableRowSelection<T>. checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用库内 DropdownMenu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。有批量操作菜单时，默认选择列宽为 64px（否则 40px），表头和各行保留相同菜单空间以对齐复选框；columnWidth 可覆盖。
 - expandable: TableExpandableConfig<T>. 树字段、默认/受控展开键、expandedRowRender、展开图标、行点击展开、showExpandAll、forceRender、展开回调。详情中可嵌套 Table。
 - pagination: false | TablePagination (default: false). 支持 page/current、默认页、页容量、total、showSizeChanger、showQuickJumper、hideOnSinglePage、simple、disabled、showTotal、itemRender、placement/position 和变化回调。
 - scroll / sticky: {x?, y?, scrollToFirstRowOnChange?} / boolean | object. 横纵滚动、固定表头和粘性布局；列 fixed 使用底层类型所支持的方向值。

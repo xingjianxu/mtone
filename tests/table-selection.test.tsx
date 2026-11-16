@@ -315,3 +315,24 @@ test("selection command menu supports keyboard dismissal and repeated commands",
   );
   expect(screen.getByTestId("keys")).toHaveTextContent("[]");
 });
+
+test("selection rows reserve the same action slot as the header", () => {
+  const { rerender } = render(<Harness selection={{ selections: true }} />);
+  const header = screen.getByRole("checkbox", {
+    name: "Select all rows",
+  }).parentElement!;
+  const row = screen.getByRole("checkbox", {
+    name: "Select row 1",
+  }).parentElement!;
+  expect(header).toHaveClass("mt-table-selection-controls-with-actions");
+  expect(row).toHaveClass("mt-table-selection-controls-with-actions");
+  expect(row.querySelector("button")).toBeNull();
+  rerender(<Harness selection={{ hideSelectAll: true, selections: true }} />);
+  expect(
+    screen.getByRole("checkbox", { name: "Select row 1" }).parentElement,
+  ).not.toHaveClass("mt-table-selection-controls-with-actions");
+  rerender(<Harness selection={{ type: "radio", selections: true }} />);
+  expect(
+    screen.getByRole("radio", { name: "Select row 1" }).parentElement,
+  ).not.toHaveClass("mt-table-selection-controls-with-actions");
+});

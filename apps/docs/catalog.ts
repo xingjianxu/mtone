@@ -2237,7 +2237,7 @@ export const componentDocs: ComponentDoc[] = [
         name: "rowSelection",
         type: "TableRowSelection<T>",
         description:
-          "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用库内 DropdownMenu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。",
+          "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用库内 DropdownMenu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。有批量操作菜单时，默认选择列宽为 64px（否则 40px），表头和各行保留相同菜单空间以对齐复选框；columnWidth 可覆盖。",
       },
       {
         name: "expandable",

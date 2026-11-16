@@ -292,37 +292,39 @@ export function useTableSelection<T>({
       locale.selectInvert ?? (zh ? "反选当前页" : "Invert page selection"),
     none: locale.selectNone ?? (zh ? "清空选择" : "Select none"),
   };
+  const hasActions =
+    config.type !== "radio" && !config.hideSelectAll && commands.length > 0;
+  const controlsClass =
+    "mt-table-selection-controls" +
+    (hasActions ? " mt-table-selection-controls-with-actions" : "");
   const title = (
-    <span className="mt-table-selection-controls">
+    <span className={controlsClass}>
       {checkbox}
-      {config.type !== "radio" &&
-        !config.hideSelectAll &&
-        commands.length > 0 && (
-          <DropdownMenu
-            trigger={
-              <button
-                type="button"
-                className="mt-table-selection-actions"
-                aria-label={
-                  locale.selectionActions ??
-                  (zh ? "选择操作" : "Selection actions")
-                }
-                onClick={(event) => event.stopPropagation()}
-              >
-                <ChevronDown size={12} aria-hidden="true" />
-              </button>
-            }
-            items={commands.map((command, index) => ({
-              key: String(index),
-              label:
-                typeof command === "string" ? labels[command] : command.text,
-              onSelect: () => {
-                if (typeof command === "string") executeSelection(command);
-                else command.onSelect(availableKeys);
-              },
-            }))}
-          />
-        )}
+      {hasActions && (
+        <DropdownMenu
+          trigger={
+            <button
+              type="button"
+              className="mt-table-selection-actions"
+              aria-label={
+                locale.selectionActions ??
+                (zh ? "选择操作" : "Selection actions")
+              }
+              onClick={(event) => event.stopPropagation()}
+            >
+              <ChevronDown size={12} aria-hidden="true" />
+            </button>
+          }
+          items={commands.map((command, index) => ({
+            key: String(index),
+            label: typeof command === "string" ? labels[command] : command.text,
+            onSelect: () => {
+              if (typeof command === "string") executeSelection(command);
+              else command.onSelect(availableKeys);
+            },
+          }))}
+        />
+      )}
     </span>
   );
   return {
@@ -333,7 +335,7 @@ export function useTableSelection<T>({
         typeof config.columnTitle === "function"
           ? config.columnTitle(title)
           : (config.columnTitle ?? title),
-      width: config.columnWidth ?? 40,
+      width: config.columnWidth ?? (hasActions ? 64 : 40),
       fixed: config.fixed,
       align: config.align ?? "center",
       className: "mt-table-selection-column",
@@ -369,9 +371,13 @@ export function useTableSelection<T>({
             }}
           />
         );
-        return config.renderCell
-          ? config.renderCell(selected, row, index, control)
-          : control;
+        return (
+          <span className={controlsClass}>
+            {config.renderCell
+              ? config.renderCell(selected, row, index, control)
+              : control}
+          </span>
+        );
       },
     },
   };

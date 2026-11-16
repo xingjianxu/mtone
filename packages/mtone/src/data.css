@@ -344,6 +344,22 @@
   gap: 4px;
   max-width: 100%;
 }
+.mt-table .mt-table-selection-column {
+  padding-inline: 12px;
+}
+/* Reserve the command slot in both header and body, so checkbox centers align. */
+.mt-table-selection-controls-with-actions {
+  position: relative;
+  padding-inline-end: 26px;
+  min-width: 40px;
+  box-sizing: border-box;
+}
+.mt-table-selection-controls-with-actions .mt-table-selection-actions {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
 .mt-table-selection-column input,
 .mt-table-filter-label input {
   width: 14px;
