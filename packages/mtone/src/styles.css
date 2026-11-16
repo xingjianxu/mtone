@@ -474,6 +474,11 @@
   text-decoration: underline;
 }
 .mt-filter-chip {
+  box-sizing: border-box;
+  height: 28px;
+  max-width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -482,6 +487,8 @@
   border-radius: 4px;
   font-size: 12px;
 }
+.mt-filter-chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-filter-chip > button { flex-shrink: 0; }
 .mt-filter-bar {
   display: flex;
   align-items: center;

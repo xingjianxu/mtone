@@ -198,7 +198,7 @@ export function FilterChip({
   const { locale } = useMtone();
   return (
     <span className="mt-filter-chip">
-      {children}
+      <span className="mt-filter-chip-label">{children}</span>
       <IconButton
         size="sm"
         variant="ghost"

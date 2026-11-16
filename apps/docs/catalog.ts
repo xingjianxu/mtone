@@ -426,7 +426,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea、Select、MultiSelect、NumberInput、DatePicker 及 Table 筛选输入采用相同边框聚焦效果。"],
+    notes: ["默认单行外框高度为 28px（含边框）；comfortable 密度保留 36px。可使用 style 或 --mt-height 定制，不影响 Textarea 的多行高度。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea、Select、MultiSelect、NumberInput、DatePicker 及 Table 筛选输入采用相同边框聚焦效果。"],
   },
   {
     name: "SearchInput",
@@ -467,7 +467,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
+    notes: ["默认单行外框高度为 28px（含边框），搜索图标垂直居中；comfortable 密度保留 36px，可通过 --mt-height 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
   },
   {
     name: "Textarea",
@@ -1036,7 +1036,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "开关变化回调。",
       },
     ],
-    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
+    notes: ["默认单行外框高度为 28px（含边框）；长选中标签在行内省略，comfortable 密度保留 34px。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
   {
     name: "MultiSelect",
@@ -1107,7 +1107,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "开关变化回调。",
       },
     ],
-    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
+    notes: ["默认单行外框最小高度为 28px（含边框）；多个标签换行时自动增高，不强制裁剪为 28px。comfortable 密度下仍以 28px 为最小高度；可用 className 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
   },
   {
     name: "Slider",
@@ -1217,7 +1217,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "步进大小。",
       },
     ],
-    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "清空时 value 可为 null；defaultValue 应传 number。"],
+    notes: ["默认整体外框高度为 28px（含边框），增减按钮位于边框内；comfortable 密度保留 36px。可用 className 定制尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "清空时 value 可为 null；defaultValue 应传 number。"],
   },
   {
     name: "DatePicker",
@@ -1278,7 +1278,7 @@ export const componentDocs: ComponentDoc[] = [
         default: "true",
       },
     ],
-    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
+    notes: ["默认单行输入外框高度为 28px（含边框）；comfortable 密度保留 36px，可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
       "值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。",
       "日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。",
       "仅对支持样式的原生日期指示器使用与 Select 一致的 16px 箭头，不叠加第二个图标；其他浏览器和强制颜色模式保留原生日期界面。",
@@ -1561,7 +1561,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "必填；移除请求，由应用更新条件。",
       },
     ],
-    notes: ["点击移除不会自行隐藏，应用负责更新状态。"],
+    notes: ["默认单行外框高度为 28px，与输入及选择控件对齐；comfortable 密度下仍为 28px。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。", "点击移除不会自行隐藏，应用负责更新状态。"],
   },
   {
     name: "Pagination",
@@ -2017,7 +2017,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "附加样式类。",
       },
     ],
-    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
+    notes: ["列筛选输入默认外框高度为 28px（含边框），comfortable 密度保留 36px；不改变表头、数据行或分页按钮的尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
       "筛选为不区分大小写的文本包含匹配。远程模式请传 pagination.total 和受控 page。",
       "选择可跨页保留；数据删除后应用负责清理失效行键。",
       "不含单元格编辑、冻结列、虚拟滚动或列宽调整。",

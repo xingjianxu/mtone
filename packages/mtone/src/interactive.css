@@ -80,7 +80,9 @@
 .mt-number-group {
   font: inherit;
   font-size: 14px;
+  box-sizing: border-box;
   min-height: 28px;
+  line-height: 20px;
   border: 1px solid var(--mt-border, #e9e9e7);
   border-radius: 4px;
   background: var(--mt-bg, #fff);
@@ -91,6 +93,7 @@
   padding: 3px 9px;
 }
 .mt-select {
+  height: 28px;
   min-width: 160px;
   justify-content: space-between;
 }
@@ -168,16 +171,22 @@
   padding: 3px 6px;
 }
 .mt-chip {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 1px 5px;
+  padding: 0 5px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  line-height: 20px;
   border-radius: 3px;
   background: var(--mt-hover, #f1f1ef);
   font-size: 12px;
 }
 .mt-chip-remove,
 .mt-combobox-trigger {
+  flex-shrink: 0;
   background: none;
   border: 0;
   color: inherit;
@@ -185,7 +194,9 @@
   cursor: pointer;
 }
 .mt-combobox-input {
+  padding: 0;
   font: inherit;
+  line-height: 20px;
   border: 0;
   outline: none;
   background: none;
@@ -202,6 +213,7 @@
   display: none;
 }
 .mt-number-group {
+  height: 28px;
   padding: 0;
   gap: 0;
   overflow: hidden;
@@ -221,7 +233,7 @@
   color: inherit;
   cursor: pointer;
   width: 28px;
-  height: 28px;
+  height: 26px;
 }
 .mt-number-step:hover {
   background: var(--mt-hover, #f1f1ef);
@@ -437,6 +449,7 @@
 [data-density="comfortable"] .mt-number-step {
   min-height: 34px;
 }
+[data-density="comfortable"] .mt-number-group { height: 36px; }
 
 .mt-menu-label {
   display: inline-flex;
