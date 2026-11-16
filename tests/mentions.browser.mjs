@@ -62,7 +62,9 @@ try {
         shadow: "none",
         border: "0px",
       });
-      await page.getByRole("option", { name: "Locked", exact: true }).click();
+      // Deliberately attempt pointer input on an aria-disabled option; normal
+      // Playwright click correctly refuses disabled targets.
+      await page.getByRole("option", { name: "Locked", exact: true }).click({ force: true });
       await expect(basic).toHaveValue("@");
       await basic.press("Enter");
       await expect(basic).toHaveValue("@bob ");
