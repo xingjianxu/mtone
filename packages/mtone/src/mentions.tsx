@@ -291,7 +291,9 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
         const config = typeof autoSize === "object" ? autoSize : {};
         const min = Math.max(1, config.minRows ?? rows),
           max = Math.max(min, config.maxRows ?? Infinity);
-        input.style.height = "auto";
+        // Reset below the intrinsic rows height before measuring content, so
+        // minRows can shrink a textarea whose native rows default is larger.
+        input.style.height = "0px";
         const height = Math.min(
           line * max + extra,
           Math.max(

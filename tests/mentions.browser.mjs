@@ -189,7 +189,7 @@ try {
         name: "Scroll",
         exact: true,
       });
-      await scroll.scrollIntoViewIfNeeded();
+      await scroll.evaluate(el => el.scrollIntoView({block: "center"}));
       await scroll.fill("@");
       const oneLine = (await popup.boundingBox()).y;
       await scroll.fill("first\nsecond\n@");
@@ -204,11 +204,11 @@ try {
       await expect(popup).toBeVisible();
       let inputBox = await scroll.boundingBox(),
         popupBox = await popup.boundingBox();
-      assert(
-        popupBox.y >= inputBox.y &&
-          popupBox.y <= inputBox.y + inputBox.height + 30,
-        "scrolled caret popup follows visible text",
-      );
+      await expect.poll(async () => {
+        const field = await scroll.boundingBox(), menu = await popup.boundingBox();
+        return menu.y >= field.y && menu.y <= field.y + field.height + 30;
+      }, {message: "scrolled caret popup follows visible text"}).toBe(true);
+      popupBox = await popup.boundingBox();
       const before = popupBox.y;
       await page.evaluate(() => window.scrollBy(0, 25));
       await expect
@@ -220,7 +220,7 @@ try {
         name: "Horizontal",
         exact: true,
       });
-      await horizontal.scrollIntoViewIfNeeded();
+      await horizontal.evaluate(el => el.scrollIntoView({block: "center"}));
       await horizontal.fill("long text ".repeat(15) + "@");
       await horizontal.evaluate((el) => {
         el.scrollLeft = el.scrollWidth;
@@ -229,10 +229,10 @@ try {
       await expect(popup).toBeVisible();
       inputBox = await horizontal.boundingBox();
       popupBox = await popup.boundingBox();
-      assert(
-        popupBox.y < inputBox.y + 45,
-        "horizontal scrolling does not create phantom wrapped lines",
-      );
+      await expect.poll(async () => {
+        const field = await horizontal.boundingBox(), menu = await popup.boundingBox();
+        return menu.y >= field.y && menu.y < field.y + 45;
+      }, {message: "horizontal scrolling does not create phantom wrapped lines"}).toBe(true);
       await page.setViewportSize({ width: 320, height: 800 });
       const narrow = page.getByRole("combobox", {
         name: "Narrow",
