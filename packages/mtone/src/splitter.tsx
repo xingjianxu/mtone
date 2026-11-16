@@ -555,8 +555,8 @@ function SplitterRoot(props: SplitterProps) {
                 key={`${id}-separator`}
                 id={`${id}-separator`}
                 className="mt-splitter-separator"
-                onFocus={() => setFocusedBoundary(i)}
-                onBlur={() => setFocusedBoundary(null)}
+                onFocusCapture={() => setFocusedBoundary(i)}
+                onBlurCapture={() => setFocusedBoundary(null)}
                 onPointerEnter={() => showControls(i)}
                 onPointerLeave={hideControls}
                 disabled={
