@@ -138,7 +138,7 @@ try {
         exact: true,
       });
       await loading.fill("@");
-      await expect(page.getByRole("status")).toHaveText("Loading…");
+      await expect(popup.getByRole("status")).toHaveText("Loading…");
       await expect(loading).not.toHaveAttribute("aria-activedescendant");
       await page
         .getByRole("button", { name: "Load options", exact: true })
