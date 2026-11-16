@@ -70,7 +70,7 @@ export const componentDocs: ComponentDoc[] = [
     {
       "name": "onDraggerDoubleClick",
       "type": "(index: number) => void",
-      "description": "双击分隔条回调，index 为分隔条索引；不会自动重置，宿主可更新 sizes 实现。"
+      "description": "鼠标双击/触屏双击分隔条通知，index 为分隔条索引，同时执行内建折叠循环；Enter 执行循环但不触发此指针通知。不是取消默认行为的回调。旧版自行重置 sizes 的处理器需避免与内建循环竞争。"
     },
     {
       "name": "Splitter.Panel.id",
@@ -102,7 +102,7 @@ export const componentDocs: ComponentDoc[] = [
       "name": "Splitter.Panel.collapsible",
       "type": "boolean",
       "default": "false",
-      "description": "启用面板折叠/展开。每条分隔线分别提供两侧可折叠面板的控件；中间面板可在相邻的两条分隔线操作。配合 min 明确展开后的最小尺寸。"
+      "description": "允许分隔条循环折叠此面板，无额外按钮。相邻两侧均可折叠时依次收起前一个、恢复初始比例、收起后一个、再收起前一个；仅一侧可折叠则在收起/恢复之间切换。配合 min 明确展开后的最小尺寸。"
     },
     {
       "name": "Splitter.Panel.collapsedSize",
@@ -123,7 +123,8 @@ export const componentDocs: ComponentDoc[] = [
     }
   ],
   "notes": [
-    "精细指针下，默认隐藏折叠控件，悬停分隔线或分隔线/控件获得键盘焦点时显示；分隔线任意一侧已折叠时，该控件组保持可见，包含恢复按钮。粗指针触屏设备持续显示控件，无需依赖 hover。两侧是否可折叠分别由各自 Panel.collapsible 决定；任一相邻面板不可调整时，该边界整组控件禁用。",
+    "无独立折叠按钮。鼠标双击、触屏双击分隔条或聚焦后按 Enter 执行相邻面板循环；前/后按渲染顺序定义，纵向和 RTL 同样适用。两侧都不可折叠则不改变布局；disabled 或任一相邻面板不可调整时禁用此边界交互。",
+    "初始比例来自首次布局稳定后相邻两个面板的实际尺寸；恢复将此比例应用到当前两者总尺寸，其他面板不变。手动拖动/方向键调整会重启循环，但不改写初始比例；面板标识/顺序变化重新记录。受控父组件不接受请求时不推进循环。",
     "折叠和恢复仍受其他面板的 min/max 约束。若希望任意一侧完全收起，另一侧必须允许占满剩余空间；例如不要给另一侧设置 55% 的 max。",
     "所有大小数值均为 px；字符串必须带 % 或 px，如 240、'240px'、'30%'。不接受裸数字字符串、负数、NaN 或其他单位。回调返回像素，不是百分比。",
     "sizes 为整个布局受控数组，不是 AntD 的 Panel.size。父组件需要在 onResize 中接受请求并更新；动态面板变化时同时更新数组长度与顺序。",

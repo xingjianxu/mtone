@@ -50,3 +50,39 @@ export function splitterLayoutsEqual(
     Object.keys(a).every((key) => Math.abs(a[key] - (b[key] ?? -1000)) < 0.001)
   );
 }
+
+export interface SplitterPairConstraint {
+  min: number;
+  max: number;
+  collapsed: number;
+  collapsible: boolean;
+}
+/** Percentages of the group; preserves the pair total and never moves other panes. */
+export function splitterPairTarget(
+  total: number,
+  ratio: number,
+  phase: "first" | "initial" | "second",
+  a: SplitterPairConstraint,
+  b: SplitterPairConstraint,
+): [number, number] | null {
+  const valid = (value: number, c: SplitterPairConstraint) =>
+    (value >= c.min - 0.001 && value <= c.max + 0.001) ||
+    (c.collapsible && Math.abs(value - c.collapsed) < 0.001);
+  let first: number;
+  if (phase === "first") first = a.collapsed;
+  else if (phase === "second") first = total - b.collapsed;
+  else {
+    const desired = total * ratio;
+    if (valid(desired, a) && valid(total - desired, b)) first = desired;
+    else {
+      const lower = Math.max(a.min, total - b.max);
+      const upper = Math.min(a.max, total - b.min);
+      if (lower > upper) return null;
+      first = Math.max(lower, Math.min(upper, desired));
+    }
+  }
+  const second = total - first;
+  return Number.isFinite(first) && valid(first, a) && valid(second, b)
+    ? [first, second]
+    : null;
+}

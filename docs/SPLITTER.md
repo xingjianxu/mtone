@@ -144,40 +144,53 @@ package. Consumers need only install mtone and import its stylesheet.
 
 The divider exposes the separator role, orientation, related panel and current
 size information. Tab to a separator and use the axis direction keys to resize.
-Home/End move toward the available limits. Enter toggles the preceding panel
-when it is collapsible. F6/Shift+F6 move among separators in the same group.
+Home/End move toward the available limits. Enter performs the same collapse cycle
+as double-clicking the focused separator. F6/Shift+F6 move among separators in the same group.
 Pointer interactions support mouse and touch; keep the focus outline intact.
 Respect the surrounding text direction for RTL layouts.
 
-Double-click invokes `onDraggerDoubleClick(index)`; it does not reset by itself.
-Use that callback to change controlled sizes if double-click reset is desired.
-`disabled` locks the group. A non-resizable panel also disables its adjacent
-separator controls. Collapsing retains mounted panel content and application
-state; a zero-size panel is not a substitute for explicit application cleanup.
+## Separator collapse cycle
 
-## Per-boundary collapse controls
+There are no separate collapse buttons. Double-click a separator, double-tap it
+on a touch screen, or focus it and press Enter to cycle its adjacent panels. With both panels collapsible,
+the sequence is **first panel collapsed → initial proportions → second panel
+collapsed → first panel collapsed**, then repeats. “First” and “second” mean
+rendered panel order, not physical left/right; this also applies to vertical
+and RTL layouts. If only one neighbor is collapsible, the separator alternates
+between collapsing that panel and restoring the initial proportions. With
+neither neighbor collapsible, the activation does not change the layout.
 
-Each separator offers independent controls for its adjacent panels when those
-panels have `collapsible` enabled. Enable it on both panels to let the user
-choose which side to collapse. In a layout with three or more panels, a middle
-panel may have a control at each of its two boundaries; both operate on the same
-panel state, not separate copies of that panel.
+Initial proportions are the adjacent pair's ratio from its first settled actual
+layout, after constraints have been applied, not a copy of `defaultSize` values.
+Restoring applies that ratio to the pair's **current combined size**, leaving
+other panels unchanged. Container resizing therefore does not restore stale
+pixel lengths. Manual dragging or arrow-key resizing restarts the cycle from
+the first collapsible neighbor, but does not overwrite the initial ratio.
+Changing the panel identity/order recaptures the initial layout. A controlled
+parent must accept the requested `sizes`; rejected requests do not advance the
+cycle.
 
-On fine-pointer devices, the controls are hidden at rest and appear when the
-separator is hovered or the separator/control area has keyboard focus. They
-remain available while moving the pointer from the handle to a button. A
-boundary adjacent to a collapsed panel keeps its whole control group visible,
-including the restore control, so there is a clear way to reopen that panel. Coarse-pointer touch devices show the controls persistently and do
-not require hover. Existing disabled and non-resizable settings still apply: if
-either adjacent panel is non-resizable, that boundary's pair of controls is disabled.
+Each boundary has its own cycle. In a multi-panel layout the middle panel can
+participate at either boundary; this still changes one shared panel, not copies
+of its state. Existing constraints continue to apply and may clamp restoration
+or prevent a requested collapse. To fully collapse either side of a two-panel
+layout, the other side must be allowed to occupy the remaining space. For
+example, a `max="55%"` on navigation can prevent fully collapsing the document.
+The live example therefore makes both panels collapsible without that maximum.
+Its reset action remounts the example and starts a fresh cycle at 32% / 68%.
 
-Collapse and restore continue to obey the layout's constraints. To fully
-collapse either side of a two-panel layout, the other side must be allowed to
-occupy the remaining space. For example, a `max="55%"` on the navigation panel
-can prevent a complete collapse of the document panel because navigation cannot
-expand to fill the layout within that limit.
-The live example therefore enables `collapsible` on both panels and does not set
-that restrictive maximum. The reset button restores both starting proportions.
+`disabled` locks the group. Either adjacent panel being non-resizable disables
+that boundary's interaction. Collapsing keeps panel content mounted; a zero-size
+panel is not a substitute for explicit application cleanup.
+
+### Migration from button-based collapse
+
+Remove instructions telling users to find hover or touch collapse buttons.
+`onDraggerDoubleClick(index)` is now a notification accompanying the default
+mouse double-click or touch double-tap cycle, not a callback-only action. Enter
+uses the same cycle without invoking this pointer-specific notification. Existing handlers that implement their own
+reset by updating controlled sizes should be reviewed to avoid competing with
+the built-in cycle. The callback does not cancel the default action.
 
 ## Appearance
 
@@ -185,12 +198,12 @@ The default separator occupies 6px and uses a 2px quiet grip, with a visible
 keyboard focus state. Shared mtone `--mt-bg`, `--mt-fg`, `--mt-border`,
 `--mt-subtle` and `--mt-focus` variables keep it consistent with existing controls.
 Do not change separator thickness in CSS without checking pixel sizing and
-collapse-control placement. This version has no dedicated thickness token.
+separator hit testing. This version has no dedicated thickness token.
 
 
 ## Events, cancellation and collapsed content
 
-- `onResizeStart` marks a user pointer, keyboard or collapse-control interaction.
+- `onResizeStart` marks a user pointer, keyboard or separator-collapse interaction.
 - `onResize` reports size requests during those interactions. It is not fired
   just because the component mounted, its container changed, or the parent
   supplied new controlled sizes. In lazy mode, panel changes are deferred until

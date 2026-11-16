@@ -1,0 +1,35 @@
+import {createServer} from 'vite';
+import {chromium,firefox,webkit,expect} from '@playwright/test';
+import assert from 'node:assert/strict';
+const server=await createServer({root:process.cwd(),server:{host:'127.0.0.1',port:5200,strictPort:true},logLevel:'error'});await server.listen();
+const url='http://127.0.0.1:5200/tests/fixtures/splitter-cycle.html';
+try {for(const [name,engine] of Object.entries({chromium,firefox,webkit})) {
+ const browser=await engine.launch();try {
+ const page=await browser.newPage({viewport:{width:900,height:700}});page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const size=async(id,vertical=false)=>page.locator(`[data-panel][id="${id}"]`).evaluate((el,v)=>el.getBoundingClientRect()[v?'height':'width'],vertical);
+ const ratio=async(v=false)=>(await size('left',v))/((await size('left',v))+(await size('right',v)));
+ const open=async()=>{await page.goto(url);await expect(page.getByRole('separator')).toHaveCount(1);await expect.poll(()=>ratio()).toBeCloseTo(.4,2)};
+ const cycle=async(index=0,key=false)=>{const h=page.getByRole('separator').nth(index);if(key)await h.press('Enter');else await h.dblclick();await page.waitForTimeout(80)};
+ const drag=async(delta=50)=>{const b=await page.getByRole('separator').first().boundingBox();await page.mouse.move(b.x+b.width/2,b.y+60);await page.mouse.down();await page.mouse.move(b.x+delta,b.y+60,{steps:6});await page.mouse.up();await page.waitForTimeout(80)};
+ await open();await expect(page.locator('.mt-splitter-collapse')).toHaveCount(0);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);await cycle();await expect.poll(()=>size('right')).toBeLessThan(1);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);assert.equal(JSON.parse(await page.getByTestId('events').textContent()).doubles,4);
+ // Manual movement restarts at A, but the original 40/60 ratio is not overwritten.
+ await open();await drag();assert((await ratio())>.44);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ await open();await drag(-1000);await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ await open();await cycle();const cancelHandle=page.getByRole('separator');const cb=await cancelHandle.boundingBox();await page.mouse.move(cb.x+cb.width/2,cb.y+60);await page.mouse.down();await page.mouse.move(cb.x+150,cb.y+60,{steps:8});await page.keyboard.press('Escape');await page.mouse.up();await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ for(const mode of ['Vertical','RTL']){await open();await page.getByRole('button',{name:mode,exact:true}).click();await cycle(0,true);await expect.poll(()=>size('left',mode==='Vertical')).toBeLessThan(1);await cycle(0,true);await expect.poll(()=>ratio(mode==='Vertical')).toBeCloseTo(.4,2);await cycle(0,true);await expect.poll(()=>size('right',mode==='Vertical')).toBeLessThan(1);assert.equal(JSON.parse(await page.getByTestId('events').textContent()).doubles,0)}
+ // Single eligible side toggles with initial; neither eligible and disabled do nothing.
+ for(const mode of [1,2,3]){await open();for(let i=0;i<mode;i++)await page.getByRole('button',{name:/^Fold mode/}).click();await cycle();if(mode<3){await expect.poll(()=>size(mode===1?'left':'right')).toBeLessThan(1);await cycle();}await expect.poll(()=>ratio()).toBeCloseTo(.4,2)}
+ await open();await page.getByRole('button',{name:'Disabled',exact:true}).click();await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ // Pair max prevents impossible collapse rather than resizing unrelated panels.
+ await open();await page.getByRole('button',{name:'Limited',exact:true}).click();await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ // Rejecting a controlled proposal does not advance cycle phase.
+ await open();await page.getByRole('button',{name:'Controlled',exact:true}).click();await page.getByRole('button',{name:'Accept',exact:true}).click();await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);await page.getByRole('button',{name:'Accept',exact:true}).click();await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ await page.getByRole('button',{name:'Narrow',exact:true}).click();await cycle();await expect.poll(()=>size('right')).toBeLessThan(1);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);await cycle();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);
+ // Restore current adjacent total using the initial pair ratio; third stays fixed.
+ await open();await page.getByRole('button',{name:'Third',exact:true}).click();await expect(page.getByRole('separator')).toHaveCount(2);await expect.poll(()=>ratio()).toBeCloseTo(.5,2);const third=await size('third');await cycle(0);await expect.poll(()=>size('left')).toBeLessThan(1);await expect.poll(()=>size('third')).toBeCloseTo(third,0);await cycle(0);await expect.poll(()=>ratio()).toBeCloseTo(.5,2);await expect.poll(()=>size('third')).toBeCloseTo(third,0);await cycle(1);await expect.poll(()=>size('right')).toBeLessThan(1);await cycle(1);await expect.poll(()=>size('right')).toBeGreaterThan(50);await page.getByRole('button',{name:'Third',exact:true}).click();await expect.poll(()=>ratio()).toBeCloseTo(.4,2);await cycle();await expect.poll(()=>size('left')).toBeLessThan(1);
+ await open();await page.getByRole('separator').focus();await expect(page.getByRole('separator')).toHaveAttribute('aria-description',/Enter|回车/);if(name==='chromium')console.log('SPLITTER_CYCLE_DESKTOP='+(await page.screenshot()).toString('base64'));assert.deepEqual(errors,[],name+' page errors');await page.close();
+ // Touch double-tap on the handle, without any collapse icons.
+ const touch=await browser.newPage({viewport:{width:360,height:640},hasTouch:true,isMobile:name!=='firefox'});await touch.goto(url);const handle=touch.getByRole('separator');const tapCycle=async()=>{await handle.tap();await handle.tap();await touch.waitForTimeout(100)};await tapCycle();await expect.poll(()=>touch.locator('[data-panel][id="left"]').evaluate(el=>el.getBoundingClientRect().width)).toBeLessThan(1);await touch.waitForTimeout(400);await tapCycle();await expect.poll(()=>touch.locator('[data-panel][id="left"]').evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThan(70);assert(await touch.locator('body').evaluate(el=>el.scrollWidth<=innerWidth));await expect(touch.locator('.mt-splitter-collapse')).toHaveCount(0);if(name==='chromium')console.log('SPLITTER_CYCLE_TOUCH='+(await touch.screenshot()).toString('base64'));await touch.close();
+ console.log(name+' Splitter A/initial/B cycle, drag reset, keyboard, RTL, controlled rejection, constraints, dynamic and touch passed');
+ }finally{await browser.close()}
+}}finally{await server.close()}

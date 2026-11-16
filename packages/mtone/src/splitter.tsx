@@ -7,15 +7,11 @@ import {
   type PanelImperativeHandle,
   type Layout,
 } from "react-resizable-panels";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
-import { cn, IconButton, useMtone } from "./basic";
+import { cn, useMtone } from "./basic";
 import {
   splitterControlledLayout,
+  splitterPairTarget,
+  splitterSizeToPixels,
   splitterLayoutsEqual,
   validateSplitterSize,
   type SplitterSize,
@@ -98,6 +94,9 @@ function SplitterRoot(props: SplitterProps) {
     style,
     onPointerDownCapture,
     onKeyDownCapture,
+    onPointerMoveCapture,
+    onPointerUpCapture,
+    onPointerCancelCapture,
     ...native
   } = props;
   const { locale } = useMtone();
@@ -139,38 +138,36 @@ function SplitterRoot(props: SplitterProps) {
     [axis, setAxis] = React.useState(0),
     [collapsed, setCollapsed] = React.useState<Record<string, boolean>>({});
   const collapsedRef = React.useRef<Record<string, boolean>>({});
-  const [barGeometry, setBarGeometry] = React.useState<{
-    positions: number[];
-    total: number;
-  }>({ positions: [], total: 0 });
-  const [hoveredBoundary, setHoveredBoundary] = React.useState<number | null>(
-    null,
+  const initial = React.useRef<{ key: string; layout: Layout } | null>(null);
+  const phases = React.useRef(
+    new Map<string, "first" | "initial" | "second">(),
   );
-  const [focusedBoundary, setFocusedBoundary] = React.useState<number | null>(
-    null,
-  );
-  const hoverTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const showControls = (boundary: number) => {
-    if (hoverTimer.current) clearTimeout(hoverTimer.current);
-    setHoveredBoundary(boundary);
-  };
-  const hideControls = () => {
-    if (hoverTimer.current) clearTimeout(hoverTimer.current);
-    hoverTimer.current = setTimeout(() => setHoveredBoundary(null), 180);
-  };
-  React.useEffect(
-    () => () => {
-      if (hoverTimer.current) clearTimeout(hoverTimer.current);
-    },
-    [],
-  );
+  const cyclePending = React.useRef(false);
+  const cycleToken = React.useRef(0);
+  const touchTap = React.useRef<{
+    boundary: number;
+    x: number;
+    y: number;
+    time: number;
+  } | null>(null);
+  const touchDown = React.useRef<{
+    boundary: number;
+    x: number;
+    y: number;
+    time: number;
+    pointerId: number;
+    moved: boolean;
+  } | null>(null);
+  const lastTouchCycle = React.useRef(-Infinity);
   const suppress = React.useRef(false),
     mounted = React.useRef(true),
     lastApplied = React.useRef<{ key: string; layout: Layout } | null>(null),
     session = React.useRef<{
       before: Layout;
+      phasesBefore: Map<string, "first" | "initial" | "second">;
       pointerId?: number;
       pointerType?: string;
+      boundary?: number;
       cancelled?: boolean;
     } | null>(null);
   const latest = React.useRef({
@@ -228,9 +225,19 @@ function SplitterRoot(props: SplitterProps) {
       suppress.current = false;
     }
   };
-  const begin = (pointerId?: number, pointerType?: string) => {
+  const begin = (
+    pointerId?: number,
+    pointerType?: string,
+    boundary?: number,
+  ) => {
     if (session.current || disabled) return;
-    session.current = { before: { ...layout.current }, pointerId, pointerType };
+    session.current = {
+      before: { ...layout.current },
+      phasesBefore: new Map(phases.current),
+      pointerId,
+      pointerType,
+      boundary,
+    };
     latest.current.onResizeStart?.(pixels());
   };
   const finish = () => {
@@ -271,27 +278,6 @@ function SplitterRoot(props: SplitterProps) {
     return () => observer.disconnect();
   }, [orientation, ids.join("|")]);
   React.useLayoutEffect(() => {
-    const el = element.current;
-    if (!el) return;
-    const horizontal = orientation === "horizontal";
-    const positions = Array.from(el.children)
-      .filter((node) => node.hasAttribute("data-separator"))
-      .map((node) => {
-        const bar = node as HTMLElement;
-        return horizontal
-          ? bar.offsetLeft + bar.offsetWidth / 2
-          : bar.offsetTop + bar.offsetHeight / 2;
-      });
-    const total = horizontal ? el.clientWidth : el.clientHeight;
-    setBarGeometry((prev) =>
-      prev.total === total &&
-      prev.positions.length === positions.length &&
-      positions.every((value, i) => value === prev.positions[i])
-        ? prev
-        : { positions, total },
-    );
-  });
-  React.useLayoutEffect(() => {
     if (
       !sizes ||
       !group.current ||
@@ -322,8 +308,9 @@ function SplitterRoot(props: SplitterProps) {
         event.pointerId !== session.current?.pointerId
       )
         return;
+      const activeSession = session.current;
       requestAnimationFrame(() => {
-        if (mounted.current) {
+        if (mounted.current && session.current === activeSession) {
           reportCollapse();
           finish();
         }
@@ -331,11 +318,13 @@ function SplitterRoot(props: SplitterProps) {
     };
     const cancel = (event: PointerEvent) => {
       if (event.pointerId !== session.current?.pointerId) return;
-      const before = session.current?.before;
+      const activeSession = session.current;
+      const before = activeSession?.before;
       if (!before) return;
       session.current!.cancelled = true;
       queueMicrotask(() => {
-        if (mounted.current) {
+        if (mounted.current && session.current === activeSession) {
+          phases.current = new Map(activeSession!.phasesBefore);
           write(before);
           latest.current.onResize?.(pixels(before));
           reportCollapse();
@@ -364,64 +353,114 @@ function SplitterRoot(props: SplitterProps) {
     return () => {
       mounted.current = false;
       session.current = null;
+      cyclePending.current = false;
+      cycleToken.current++;
       win.removeEventListener("pointerup", end);
       win.removeEventListener("pointercancel", cancel, true);
       win.removeEventListener("keydown", escape, true);
       win.removeEventListener("blur", end);
     };
   }, [orientation]);
-  const toggle = (id: string) => {
-    if (disabled) return;
-    const api = panelRefs.current.get(id);
-    if (!api) return;
+  const topology = JSON.stringify(ids);
+  React.useLayoutEffect(() => {
+    if (
+      axis > 0 &&
+      ids.every((id) => layout.current[id] !== undefined) &&
+      initial.current?.key !== topology
+    ) {
+      initial.current = { key: topology, layout: { ...layout.current } };
+      phases.current.clear();
+      cyclePending.current = false;
+      cycleToken.current++;
+    }
+  });
+  React.useEffect(() => {
+    phases.current.clear();
+  }, [orientation]);
+  const cycle = (boundary: number) => {
+    const current = latest.current;
+    const a = current.panels[boundary]?.props,
+      b = current.panels[boundary + 1]?.props;
+    if (
+      disabled ||
+      cyclePending.current ||
+      !a ||
+      !b ||
+      a.resizable === false ||
+      b.resizable === false ||
+      (!a.collapsible && !b.collapsible)
+    )
+      return;
+    const aid = current.ids[boundary],
+      bid = current.ids[boundary + 1];
+    const key = JSON.stringify([aid, bid]);
+    const snapshot = initial.current;
+    if (!snapshot || snapshot.key !== JSON.stringify(current.ids)) return;
+    const previous = phases.current.get(key);
+    const phase =
+      a.collapsible && b.collapsible
+        ? previous === "first"
+          ? "initial"
+          : previous === "initial"
+            ? "second"
+            : "first"
+        : previous === (a.collapsible ? "first" : "second")
+          ? "initial"
+          : a.collapsible
+            ? "first"
+            : "second";
+    const available = measure();
+    if (available <= 0) return;
+    const percent = (value: SplitterSize) =>
+      (splitterSizeToPixels(value, available) / available) * 100;
+    const constraint = (p: SplitterPanelProps) => ({
+      min: percent(p.min ?? (p.collapsible ? "10%" : 0)),
+      max: percent(p.max ?? "100%"),
+      collapsed: percent(p.collapsedSize ?? 0),
+      collapsible: !!p.collapsible,
+    });
+    const initialTotal = snapshot.layout[aid] + snapshot.layout[bid];
+    const target = splitterPairTarget(
+      layout.current[aid] + layout.current[bid],
+      initialTotal > 0 ? snapshot.layout[aid] / initialTotal : 0.5,
+      phase,
+      constraint(a),
+      constraint(b),
+    );
+    if (!target) return;
+    const before = { ...layout.current };
+    const next = { ...before, [aid]: target[0], [bid]: target[1] };
+    if (splitterLayoutsEqual(before, next)) {
+      phases.current.set(key, phase);
+      return;
+    }
+    cyclePending.current = true;
+    const token = ++cycleToken.current;
+    // A dblclick can arrive before the preceding pointerup RAF. Give the cycle
+    // its own session so that a stale pointer completion cannot finish it.
+    finish();
     begin();
-    api.isCollapsed() ? api.expand() : api.collapse();
+    const applied = write(next);
+    if (!applied || !splitterLayoutsEqual(applied, next)) {
+      write(before);
+      cyclePending.current = false;
+      finish();
+      return;
+    }
+    current.onResize?.(pixels(applied));
     requestAnimationFrame(() => {
-      if (mounted.current) {
-        reportCollapse();
-        finish();
-      }
+      if (!mounted.current || cycleToken.current !== token) return;
+      if (
+        initial.current === snapshot &&
+        splitterLayoutsEqual(layout.current, applied)
+      )
+        phases.current.set(key, phase);
+      cyclePending.current = false;
+      reportCollapse();
+      finish();
     });
   };
   const horizontal = orientation === "horizontal";
-  const rtl =
-    native.dir === "rtl" ||
-    element.current?.ownerDocument.defaultView?.getComputedStyle(
-      element.current,
-    ).direction === "rtl";
-  // Nearby boundaries (for example around a collapsed middle pane) must not
-  // place one pair of buttons over another. Cluster their clamped axis spans,
-  // then stagger only those clusters across the handle's cross axis.
-  const controlPositions = barGeometry.positions
-    .map((position, boundary) => ({
-      boundary,
-      start: Math.max(
-        0,
-        Math.min(Math.max(0, barGeometry.total - 68), position - 34),
-      ),
-    }))
-    .filter(
-      ({ boundary }) =>
-        panels[boundary]?.props.collapsible ||
-        panels[boundary + 1]?.props.collapsible,
-    )
-    .sort((a, b) => a.start - b.start);
-  const controlOffsets = new Map<number, number>();
-  for (let first = 0; first < controlPositions.length;) {
-    let end = first + 1;
-    while (
-      end < controlPositions.length &&
-      controlPositions[end].start < controlPositions[end - 1].start + 68
-    )
-      end++;
-    for (let i = first; i < end; i++) {
-      controlOffsets.set(
-        controlPositions[i].boundary,
-        (i - first - (end - first - 1) / 2) * 36,
-      );
-    }
-    first = end;
-  }
   return (
     <Group
       {...native}
@@ -438,7 +477,6 @@ function SplitterRoot(props: SplitterProps) {
         if (
           e.button !== 0 ||
           disabled ||
-          (e.target as Element).closest(".mt-splitter-collapse") ||
           (e.target as Element).closest("[data-group]") !== element.current
         )
           return;
@@ -459,7 +497,76 @@ function SplitterRoot(props: SplitterProps) {
                 e.clientX >= r.left &&
                 e.clientX <= r.right;
         });
-        if (target) begin(e.pointerId, e.pointerType);
+        if (target) {
+          begin(
+            e.pointerId,
+            e.pointerType,
+            Number(target.getAttribute("data-boundary")),
+          );
+          if (
+            e.pointerType === "touch" &&
+            session.current?.pointerId === e.pointerId
+          )
+            touchDown.current = {
+              boundary: Number(target.getAttribute("data-boundary")),
+              x: e.clientX,
+              y: e.clientY,
+              time: performance.now(),
+              pointerId: e.pointerId,
+              moved: false,
+            };
+        }
+      }}
+      onPointerMoveCapture={(e) => {
+        onPointerMoveCapture?.(e);
+        const down = touchDown.current;
+        if (
+          down?.pointerId === e.pointerId &&
+          Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8
+        )
+          down.moved = true;
+      }}
+      onPointerCancelCapture={(e) => {
+        onPointerCancelCapture?.(e);
+        if (touchDown.current?.pointerId === e.pointerId) {
+          touchDown.current = null;
+          touchTap.current = null;
+        }
+      }}
+      onPointerUpCapture={(e) => {
+        onPointerUpCapture?.(e);
+        const down = touchDown.current;
+        if (!down || down.pointerId !== e.pointerId) return;
+        touchDown.current = null;
+        const now = performance.now();
+        if (
+          down.moved ||
+          now - down.time > 350 ||
+          Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8
+        ) {
+          touchTap.current = null;
+          return;
+        }
+        const prior = touchTap.current;
+        if (
+          prior &&
+          prior.boundary === down.boundary &&
+          now - prior.time < 350 &&
+          Math.hypot(e.clientX - prior.x, e.clientY - prior.y) < 24
+        ) {
+          touchTap.current = null;
+          lastTouchCycle.current = now;
+          // Finish the no-movement pointer session before the separate cycle.
+          finish();
+          onDraggerDoubleClick?.(down.boundary);
+          cycle(down.boundary);
+        } else
+          touchTap.current = {
+            boundary: down.boundary,
+            x: e.clientX,
+            y: e.clientY,
+            time: now,
+          };
       }}
       onKeyDownCapture={(e) => {
         onKeyDownCapture?.(e);
@@ -470,9 +577,25 @@ function SplitterRoot(props: SplitterProps) {
           (e.target as Element).parentElement === element.current &&
           (e.target as Element).getAttribute("aria-disabled") !== "true"
         ) {
-          begin();
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!e.repeat)
+              cycle(
+                Number((e.target as Element).getAttribute("data-boundary")),
+              );
+            return;
+          }
+          const boundary = Number(
+            (e.target as Element).getAttribute("data-boundary"),
+          );
+          phases.current.delete(
+            JSON.stringify([ids[boundary], ids[boundary + 1]]),
+          );
+          begin(undefined, undefined, boundary);
+          const activeSession = session.current;
           requestAnimationFrame(() => {
-            if (mounted.current) {
+            if (mounted.current && session.current === activeSession) {
               reportCollapse();
               finish();
             }
@@ -483,8 +606,22 @@ function SplitterRoot(props: SplitterProps) {
         if (!latest.current.ids.every((id) => next[id] !== undefined)) return;
         layout.current = next;
         setView(next);
-        if (!suppress.current && session.current && !session.current.cancelled)
+        if (
+          !suppress.current &&
+          session.current &&
+          !session.current.cancelled
+        ) {
+          if (!cyclePending.current && session.current.boundary !== undefined) {
+            const boundary = session.current.boundary;
+            phases.current.delete(
+              JSON.stringify([
+                latest.current.ids[boundary],
+                latest.current.ids[boundary + 1],
+              ]),
+            );
+          }
           latest.current.onResize?.(pixels(next));
+        }
       }}
       onLayoutChanged={(next, meta) => {
         if (!latest.current.ids.every((id) => next[id] !== undefined)) return;
@@ -494,8 +631,9 @@ function SplitterRoot(props: SplitterProps) {
             meta.isUserInteraction &&
             session.current?.pointerId === undefined
           ) {
+            const activeSession = session.current;
             requestAnimationFrame(() => {
-              if (mounted.current) {
+              if (mounted.current && session.current === activeSession) {
                 reportCollapse();
                 finish();
               }
@@ -555,10 +693,13 @@ function SplitterRoot(props: SplitterProps) {
                 key={`${id}-separator`}
                 id={`${id}-separator`}
                 className="mt-splitter-separator"
-                onFocusCapture={() => setFocusedBoundary(i)}
-                onBlurCapture={() => setFocusedBoundary(null)}
-                onPointerEnter={() => showControls(i)}
-                onPointerLeave={hideControls}
+                data-boundary={i}
+                disableDoubleClick
+                aria-description={
+                  locale === "zh"
+                    ? "双击、触屏双击或按 Enter 循环收起相邻面板与恢复初始比例"
+                    : "Double-click, double-tap, or press Enter to cycle adjacent panel collapse and initial proportions"
+                }
                 disabled={
                   disabled ||
                   !resizable ||
@@ -569,92 +710,15 @@ function SplitterRoot(props: SplitterProps) {
                     ? `调整分栏 ${i + 1}`
                     : `Resize panels ${i + 1}`
                 }
-                onDoubleClick={() => onDraggerDoubleClick?.(i)}
+                onDoubleClick={() => {
+                  if (performance.now() - lastTouchCycle.current < 700) return;
+                  onDraggerDoubleClick?.(i);
+                  cycle(i);
+                }}
               >
                 <span className="mt-splitter-grip" aria-hidden="true" />
               </Separator>,
             ];
-      })}
-      {panels.slice(0, -1).map((_, boundary) => {
-        const boundaryPosition = barGeometry.positions[boundary];
-        if (boundaryPosition === undefined) return null;
-        const adjacent = [boundary, boundary + 1];
-        if (!adjacent.some((i) => panels[i].props.collapsible)) return null;
-        // Keep the pair inside the root, including a fully collapsed edge pane.
-        const start = Math.max(
-          0,
-          Math.min(Math.max(0, barGeometry.total - 68), boundaryPosition - 34),
-        );
-        const boundaryDisabled =
-          disabled || adjacent.some((i) => panels[i].props.resizable === false);
-        return (
-          <div
-            key={`${ids[boundary]}-${ids[boundary + 1]}-controls`}
-            className="mt-splitter-controls"
-            data-boundary={boundary}
-            data-visible={
-              hoveredBoundary === boundary ||
-              focusedBoundary === boundary ||
-              undefined
-            }
-            data-collapsed={
-              adjacent.some((i) => collapsed[ids[i]]) || undefined
-            }
-            onPointerEnter={() => showControls(boundary)}
-            onPointerLeave={hideControls}
-            style={
-              horizontal
-                ? {
-                    left: start,
-                    top: `calc(50% + ${controlOffsets.get(boundary) ?? 0}px)`,
-                  }
-                : {
-                    top: start,
-                    left: `calc(50% + ${controlOffsets.get(boundary) ?? 0}px)`,
-                  }
-            }
-          >
-            {adjacent.map((i) => {
-              const child = panels[i];
-              if (!child.props.collapsible) return null;
-              const id = ids[i];
-              const isCollapsed = collapsed[id] ?? false;
-              const physicalSide =
-                (i === boundary ? -1 : 1) * (horizontal && rtl ? -1 : 1);
-              const direction = physicalSide * (isCollapsed ? -1 : 1);
-              const Icon = horizontal
-                ? direction < 0
-                  ? ChevronLeft
-                  : ChevronRight
-                : direction < 0
-                  ? ChevronUp
-                  : ChevronDown;
-              const label =
-                child.props.label ??
-                `${locale === "zh" ? "面板" : "panel"} ${i + 1}`;
-              return (
-                <IconButton
-                  key={`${id}-collapse`}
-                  size="sm"
-                  variant="ghost"
-                  className="mt-splitter-collapse"
-                  disabled={boundaryDisabled}
-                  aria-label={`${isCollapsed ? (locale === "zh" ? "展开" : "Expand") : locale === "zh" ? "收起" : "Collapse"} ${label}`}
-                  aria-controls={id}
-                  aria-expanded={!isCollapsed}
-                  style={
-                    horizontal
-                      ? { left: physicalSide < 0 ? 0 : 48 }
-                      : { top: physicalSide < 0 ? 0 : 48 }
-                  }
-                  onClick={() => toggle(id)}
-                >
-                  <Icon size={14} />
-                </IconButton>
-              );
-            })}
-          </div>
-        );
       })}
     </Group>
   );

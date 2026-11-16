@@ -33,7 +33,7 @@ jobs:
       - run: node tests/menu-icons.browser.mjs
       - run: node tests/card.browser.mjs
       - run: node tests/splitter.browser.mjs
-      - run: node tests/splitter-controls.browser.mjs
+      - run: node tests/splitter-cycle.browser.mjs
       - run: node tests/form.browser.mjs
       - run: node tests/modal-layout.browser.mjs
       - run: node tests/showcase.browser.mjs

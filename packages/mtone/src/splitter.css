@@ -49,19 +49,7 @@
   outline-offset: -2px;
   z-index: 2;
 }
-.mt-splitter > .mt-splitter-controls > .mt-splitter-collapse {
-  position: absolute;
-  z-index: 3;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  background: var(--mt-bg, #fff);
-  box-shadow: 0 0 0 1px var(--mt-border, #e9e9e7);
-}
-.mt-splitter-controls > .mt-splitter-collapse:disabled {
-  --mt-splitter-control-opacity: 0.5;
-}
-@media (forced-colors: active) {
+.mt-splitter > @media (forced-colors: active) {
   .mt-splitter-separator {
     border: 1px solid ButtonText;
   }
@@ -73,40 +61,4 @@
   min-width: 0;
   min-height: 0;
   height: 100%;
-}
-
-.mt-splitter > .mt-splitter-controls {
-  position: absolute;
-  z-index: 3;
-  width: 68px;
-  height: 28px;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-.mt-splitter[data-orientation="vertical"] > .mt-splitter-controls {
-  width: 28px;
-  height: 68px;
-  transform: translateX(-50%);
-}
-.mt-splitter > .mt-splitter-controls > .mt-splitter-collapse {
-  top: 4px;
-  opacity: 0;
-  pointer-events: none;
-}
-.mt-splitter[data-orientation="vertical"]
-  > .mt-splitter-controls
-  > .mt-splitter-collapse {
-  left: 4px;
-}
-.mt-splitter-controls[data-visible] > .mt-splitter-collapse,
-.mt-splitter-controls[data-collapsed] > .mt-splitter-collapse,
-.mt-splitter-controls:focus-within > .mt-splitter-collapse {
-  opacity: var(--mt-splitter-control-opacity, 1);
-  pointer-events: auto;
-}
-@media (any-pointer: coarse) {
-  .mt-splitter > .mt-splitter-controls > .mt-splitter-collapse {
-    opacity: var(--mt-splitter-control-opacity, 1);
-    pointer-events: auto;
-  }
 }

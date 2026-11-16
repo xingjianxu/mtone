@@ -9,7 +9,7 @@ export function SplitterExample() {
   const [generation, setGeneration] = useState(0);
   const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>(["32%", "68%"]);
   const [disabled, setDisabled] = useState(false);
-  const [notice, setNotice] = useState("拖动分隔条调整大小；悬停或聚焦分隔条，可分别折叠两侧面板。");
+  const [notice, setNotice] = useState("拖动调整大小；双击分隔条或聚焦后按 Enter，循环收起导航、恢复初始比例、收起正文。");
   const [vertical, setVertical] = useState(false);
   const [selection, setSelection] = useState("设计原则");
   return (
@@ -31,13 +31,13 @@ export function SplitterExample() {
           <div style={pane}>
             <FileText size={24} aria-hidden="true" />
             <strong>{selection}</strong>
-            <Text muted>悬停或聚焦分隔条，可独立收起知识库或正文；收起后用保留的按钮恢复。</Text>
+            <Text muted>双击分隔条或按 Enter：收起导航 → 恢复初始比例 → 收起正文 → 再次收起导航。</Text>
             <p style={{ margin: 0 }}>先保持内容结构清晰，再逐步增加有价值的信息。面板中的交互与布局调整彼此独立。</p>
           </div>
         </Splitter.Panel>
       </Splitter>
       <div role="status" style={{ fontSize: 12, color: "var(--mt-muted, #787774)" }}>{notice}</div>
-      <Text muted>两侧均可折叠，触屏设备持续显示操作按钮。布局与文档选择仅影响当前示例，刷新后重置。</Text>
+      <Text muted>没有额外折叠按钮，触屏可双击分隔条；拖动后下一次循环从收起导航开始，初始比例仍为 32% / 68%。布局与文档选择仅影响当前示例，刷新后重置。</Text>
     </div>
   );
 }
