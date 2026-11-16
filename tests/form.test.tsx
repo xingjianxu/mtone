@@ -77,3 +77,12 @@ test("custom blur collection trigger composes value update and validation", asyn
  render(<BlurForm />);fireEvent.blur(screen.getByRole("textbox",{name:"Blur"}),{target:{value:"ab"}});
  await screen.findByText("Too short");expect(instance.getFieldValue("blur")).toBe("ab");
 });
+
+test("collects actual Select and MultiSelect option clicks", async () => {
+ const user=(await import("@testing-library/user-event")).default.setup();const finish=vi.fn();render(<Demo finish={finish} />);
+ await user.type(screen.getByRole("textbox",{name:"Name"}),"Alice");
+ await user.click(screen.getByRole("combobox",{name:"Team"}));await user.click(await screen.findByRole("option",{name:"Design"}));
+ await user.type(screen.getByRole("combobox",{name:"Roles"}),"Read");await user.click(await screen.findByRole("option",{name:"Read"}));
+ expect(instance.getFieldsValue()).toEqual({name:"Alice",team:"design",roles:["read"]});
+ await user.click(screen.getByRole("button",{name:"Save"}));await waitFor(()=>expect(finish).toHaveBeenCalledOnce());
+});

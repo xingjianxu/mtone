@@ -13,7 +13,7 @@ for(const [role,name] of [["textbox","Email"],["combobox","Team"],["combobox","R
 console.log("FORM_ERROR_SNAPSHOT="+(await page.locator("#root").screenshot()).toString("base64"));
 await page.getByRole("textbox",{name:"Email",exact:true}).fill("person@example.com");
 await page.getByRole("combobox",{name:"Team",exact:true}).click();await page.getByRole("option",{name:"Design",exact:true}).click();
-await page.getByRole("combobox",{name:"Roles",exact:true}).fill("Read");await page.getByRole("option",{name:"Read",exact:true}).click();await page.keyboard.press("Escape");
+await page.getByRole("combobox",{name:"Roles",exact:true}).fill("Read");await page.getByRole("option",{name:"Read",exact:true}).click();
 await page.getByRole("button",{name:"Save",exact:true}).click();await page.waitForFunction(()=>document.querySelector("output")?.textContent==="Saved");
 await page.getByRole("button",{name:"Reset",exact:true}).click();assert.equal(await page.getByRole("textbox",{name:"Email",exact:true}).inputValue(),"");
 assert.equal(await page.getByRole("combobox",{name:"Roles",exact:true}).getAttribute("aria-invalid"),"false");
@@ -25,8 +25,8 @@ await page.getByText("此用户名已被占用，请换一个",{exact:true}).wai
 await page.getByRole("textbox",{name:"用户名",exact:true}).fill("xiaoming");
 await page.getByRole("textbox",{name:"邮箱",exact:true}).fill("person@example.com");
 await page.getByRole("combobox",{name:"角色",exact:true}).click();await page.getByRole("option",{name:"编辑者",exact:true}).click();
-await page.getByRole("combobox",{name:"关注主题",exact:true}).fill("设计");await page.getByRole("option",{name:"设计",exact:true}).click();await page.keyboard.press("Escape");
-await page.getByRole("button",{name:"提交示例表单",exact:true}).click();await page.getByText(/本地提交成功：/).waitFor();
+await page.getByRole("combobox",{name:"关注主题",exact:true}).fill("设计");await page.getByRole("option",{name:"设计",exact:true}).click();
+await page.getByRole("button",{name:"提交示例表单",exact:true}).click();await page.getByRole("status").filter({hasText:"本地提交成功："}).waitFor();
 await page.getByRole("button",{name:"重置示例表单",exact:true}).click();assert.equal(await page.getByRole("textbox",{name:"用户名",exact:true}).inputValue(),"");
 console.log("Form native/compound binding, accessible errors, submit, reset and manual validate passed");
 }finally{await browser?.close();await server.close();}
