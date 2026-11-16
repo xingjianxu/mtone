@@ -311,12 +311,11 @@ try {
         await expect(
           responsive.getByRole("columnheader", { name: "City", exact: true }),
         ).toHaveCount(0);
-        assert(
-          await page
-            .locator("main")
-            .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
-          `${name}: responsive page overflow at ${width}`,
-        );
+        // ResizeObserver updates fixed/virtual widths after React's breakpoint render.
+        await expect.poll(
+          () => page.locator("main").evaluate((el) => el.scrollWidth - el.clientWidth),
+          { message: `${name}: responsive page overflow at ${width}` },
+        ).toBeLessThanOrEqual(1);
       }
       await page.setViewportSize({ width: 1100, height: 1000 });
       await page.emulateMedia({ forcedColors: "active" });
