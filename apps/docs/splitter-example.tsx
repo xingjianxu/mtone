@@ -9,7 +9,7 @@ export function SplitterExample() {
   const [generation, setGeneration] = useState(0);
   const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>(["32%", "68%"]);
   const [disabled, setDisabled] = useState(false);
-  const [notice, setNotice] = useState("拖动分隔条，或聚焦后使用方向键调整。");
+  const [notice, setNotice] = useState("拖动分隔条调整大小；悬停或聚焦分隔条，可分别折叠两侧面板。");
   const [vertical, setVertical] = useState(false);
   const [selection, setSelection] = useState("设计原则");
   return (
@@ -21,23 +21,23 @@ export function SplitterExample() {
         <Badge>受控示例</Badge>
       </div>
       <Splitter key={generation + String(vertical)} orientation={vertical ? "vertical" : "horizontal"} sizes={sizes} onResize={setSizes} onResizeEnd={values => setNotice("调整完成：" + values.map(value => Math.round(value) + "px").join(" / "))} disabled={disabled} style={{ height: 320, border: "1px solid var(--mt-border, #e9e9e7)", borderRadius: 6, overflow: "hidden" }}>
-        <Splitter.Panel id="library" label="知识库导航" defaultSize="32%" min="20%" max="55%" collapsible>
+        <Splitter.Panel id="library" label="知识库导航" defaultSize="32%" min="20%" collapsible>
           <div style={pane}>
             <strong style={{ display: "flex", alignItems: "center", gap: 6 }}><BookOpen size={16} />知识库</strong>
             {["设计原则", "组件约定", "版本记录"].map(name => <Button key={name} variant={selection === name ? "soft" : "ghost"} style={{ justifyContent: "flex-start" }} onClick={() => setSelection(name)}>{name}</Button>)}
           </div>
         </Splitter.Panel>
-        <Splitter.Panel id="document" label="文档正文" min="30%">
+        <Splitter.Panel id="document" label="文档正文" min="30%" collapsible>
           <div style={pane}>
             <FileText size={24} aria-hidden="true" />
             <strong>{selection}</strong>
-            <Text muted>拖动分隔条调整阅读空间，或使用键盘操作分隔条。</Text>
+            <Text muted>悬停或聚焦分隔条，可独立收起知识库或正文；收起后用保留的按钮恢复。</Text>
             <p style={{ margin: 0 }}>先保持内容结构清晰，再逐步增加有价值的信息。面板中的交互与布局调整彼此独立。</p>
           </div>
         </Splitter.Panel>
       </Splitter>
       <div role="status" style={{ fontSize: 12, color: "var(--mt-muted, #787774)" }}>{notice}</div>
-      <Text muted>布局与文档选择仅影响当前示例，刷新后重置。纵向模式也需要明确容器高度。</Text>
+      <Text muted>两侧均可折叠，触屏设备持续显示操作按钮。布局与文档选择仅影响当前示例，刷新后重置。</Text>
     </div>
   );
 }

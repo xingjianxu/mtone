@@ -22,7 +22,7 @@ export const componentDocs: ComponentDoc[] = [
   "importNames": [
     "Splitter"
   ],
-  "code": "import { useState } from \"react\";\nimport { Splitter } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>([\"30%\", \"70%\"]);\n  return (\n    <Splitter style={{ height: 280 }} sizes={sizes} onResize={setSizes}>\n      <Splitter.Panel id=\"navigation\" label=\"导航\" min=\"15%\" max=\"50%\" collapsible>\n        <div style={{ padding: 12 }}>导航内容</div>\n      </Splitter.Panel>\n      <Splitter.Panel id=\"content\" label=\"正文\" min=\"30%\">\n        <div style={{ padding: 12 }}>正文内容</div>\n      </Splitter.Panel>\n    </Splitter>\n  );\n}",
+  "code": "import { useState } from \"react\";\nimport { Splitter } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>([\"30%\", \"70%\"]);\n  return (\n    <Splitter style={{ height: 280 }} sizes={sizes} onResize={setSizes}>\n      <Splitter.Panel id=\"navigation\" label=\"导航\" min=\"15%\" collapsible>\n        <div style={{ padding: 12 }}>导航内容</div>\n      </Splitter.Panel>\n      <Splitter.Panel id=\"content\" label=\"正文\" min=\"30%\" collapsible>\n        <div style={{ padding: 12 }}>正文内容</div>\n      </Splitter.Panel>\n    </Splitter>\n  );\n}",
   "props": [
     {
       "name": "children",
@@ -102,7 +102,7 @@ export const componentDocs: ComponentDoc[] = [
       "name": "Splitter.Panel.collapsible",
       "type": "boolean",
       "default": "false",
-      "description": "启用面板折叠/展开。配合 min 明确展开后的最小尺寸。"
+      "description": "启用面板折叠/展开。每条分隔线分别提供两侧可折叠面板的控件；中间面板可在相邻的两条分隔线操作。配合 min 明确展开后的最小尺寸。"
     },
     {
       "name": "Splitter.Panel.collapsedSize",
@@ -123,6 +123,8 @@ export const componentDocs: ComponentDoc[] = [
     }
   ],
   "notes": [
+    "精细指针下，默认隐藏折叠控件，悬停分隔线或分隔线/控件获得键盘焦点时显示；分隔线任意一侧已折叠时，该控件组保持可见，包含恢复按钮。粗指针触屏设备持续显示控件，无需依赖 hover。两侧是否可折叠分别由各自 Panel.collapsible 决定；任一相邻面板不可调整时，该边界整组控件禁用。",
+    "折叠和恢复仍受其他面板的 min/max 约束。若希望任意一侧完全收起，另一侧必须允许占满剩余空间；例如不要给另一侧设置 55% 的 max。",
     "所有大小数值均为 px；字符串必须带 % 或 px，如 240、'240px'、'30%'。不接受裸数字字符串、负数、NaN 或其他单位。回调返回像素，不是百分比。",
     "sizes 为整个布局受控数组，不是 AntD 的 Panel.size。父组件需要在 onResize 中接受请求并更新；动态面板变化时同时更新数组长度与顺序。",
     "受控 sizes 先换算为像素，再按总和归一化填满可用面板空间（不含分隔条）。因此 [100,100] 表示等分，不保证各为 100px；总和应匹配实际空间才能精确表达像素请求。所有值为 0 无效。受控值会优先于容器变化的自动策略。",

@@ -52,10 +52,12 @@ This file describes this package checkout, not necessarily the latest published 
 - Splitter.Panel.defaultSize: SplitterSize. 非受控初始大小。后续更改不会替代受控 sizes；重置可更新受控数组或重新挂载。
 - Splitter.Panel.min / max: SplitterSize. 面板最小/最大大小约束。默认 min 为 0，可折叠面板默认为 10%；max 默认 100%。数字为 px，字符串仅支持明确的 % 或 px。
 - Splitter.Panel.resizable: boolean (default: true). 是否允许调整此面板。
-- Splitter.Panel.collapsible: boolean (default: false). 启用面板折叠/展开。配合 min 明确展开后的最小尺寸。
+- Splitter.Panel.collapsible: boolean (default: false). 启用面板折叠/展开。每条分隔线分别提供两侧可折叠面板的控件；中间面板可在相邻的两条分隔线操作。配合 min 明确展开后的最小尺寸。
 - Splitter.Panel.collapsedSize: SplitterSize (default: 0). 折叠后的大小，可以保留窄栏而不是完全隐藏。
 - Splitter.Panel.groupResizeBehavior: 'preserve-relative-size' | 'preserve-pixel-size' (default: 'preserve-relative-size'). 容器尺寸改变时优先保留相对比例，或尽量保留像素大小；仍受约束影响。至少一个面板必须保留相对大小，全部设为 preserve-pixel-size 会报错。
 - 原生属性 / className / style: HTMLAttributes<HTMLDivElement>. 根节点和 Panel 支持适用的原生属性及样式；Splitter 的 onResize 是布局回调而非 DOM UIEvent。不要覆盖内部必需的布局样式。
+- 精细指针下，默认隐藏折叠控件，悬停分隔线或分隔线/控件获得键盘焦点时显示；分隔线任意一侧已折叠时，该控件组保持可见，包含恢复按钮。粗指针触屏设备持续显示控件，无需依赖 hover。两侧是否可折叠分别由各自 Panel.collapsible 决定；任一相邻面板不可调整时，该边界整组控件禁用。
+- 折叠和恢复仍受其他面板的 min/max 约束。若希望任意一侧完全收起，另一侧必须允许占满剩余空间；例如不要给另一侧设置 55% 的 max。
 - 所有大小数值均为 px；字符串必须带 % 或 px，如 240、'240px'、'30%'。不接受裸数字字符串、负数、NaN 或其他单位。回调返回像素，不是百分比。
 - sizes 为整个布局受控数组，不是 AntD 的 Panel.size。父组件需要在 onResize 中接受请求并更新；动态面板变化时同时更新数组长度与顺序。
 - 受控 sizes 先换算为像素，再按总和归一化填满可用面板空间（不含分隔条）。因此 [100,100] 表示等分，不保证各为 100px；总和应匹配实际空间才能精确表达像素请求。所有值为 0 无效。受控值会优先于容器变化的自动策略。
@@ -74,10 +76,10 @@ export default function Demo() {
   const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>(["30%", "70%"]);
   return (
     <Splitter style={{ height: 280 }} sizes={sizes} onResize={setSizes}>
-      <Splitter.Panel id="navigation" label="导航" min="15%" max="50%" collapsible>
+      <Splitter.Panel id="navigation" label="导航" min="15%" collapsible>
         <div style={{ padding: 12 }}>导航内容</div>
       </Splitter.Panel>
-      <Splitter.Panel id="content" label="正文" min="30%">
+      <Splitter.Panel id="content" label="正文" min="30%" collapsible>
         <div style={{ padding: 12 }}>正文内容</div>
       </Splitter.Panel>
     </Splitter>

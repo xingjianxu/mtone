@@ -143,6 +143,27 @@ function SplitterRoot(props: SplitterProps) {
     positions: number[];
     total: number;
   }>({ positions: [], total: 0 });
+  const [hoveredBoundary, setHoveredBoundary] = React.useState<number | null>(
+    null,
+  );
+  const [focusedBoundary, setFocusedBoundary] = React.useState<number | null>(
+    null,
+  );
+  const hoverTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showControls = (boundary: number) => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    setHoveredBoundary(boundary);
+  };
+  const hideControls = () => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    hoverTimer.current = setTimeout(() => setHoveredBoundary(null), 180);
+  };
+  React.useEffect(
+    () => () => {
+      if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    },
+    [],
+  );
   const suppress = React.useRef(false),
     mounted = React.useRef(true),
     lastApplied = React.useRef<{ key: string; layout: Layout } | null>(null),
@@ -368,6 +389,39 @@ function SplitterRoot(props: SplitterProps) {
     element.current?.ownerDocument.defaultView?.getComputedStyle(
       element.current,
     ).direction === "rtl";
+  // Nearby boundaries (for example around a collapsed middle pane) must not
+  // place one pair of buttons over another. Cluster their clamped axis spans,
+  // then stagger only those clusters across the handle's cross axis.
+  const controlPositions = barGeometry.positions
+    .map((position, boundary) => ({
+      boundary,
+      start: Math.max(
+        0,
+        Math.min(Math.max(0, barGeometry.total - 68), position - 34),
+      ),
+    }))
+    .filter(
+      ({ boundary }) =>
+        panels[boundary]?.props.collapsible ||
+        panels[boundary + 1]?.props.collapsible,
+    )
+    .sort((a, b) => a.start - b.start);
+  const controlOffsets = new Map<number, number>();
+  for (let first = 0; first < controlPositions.length;) {
+    let end = first + 1;
+    while (
+      end < controlPositions.length &&
+      controlPositions[end].start < controlPositions[end - 1].start + 68
+    )
+      end++;
+    for (let i = first; i < end; i++) {
+      controlOffsets.set(
+        controlPositions[i].boundary,
+        (i - first - (end - first - 1) / 2) * 36,
+      );
+    }
+    first = end;
+  }
   return (
     <Group
       {...native}
@@ -501,6 +555,10 @@ function SplitterRoot(props: SplitterProps) {
                 key={`${id}-separator`}
                 id={`${id}-separator`}
                 className="mt-splitter-separator"
+                onFocus={() => setFocusedBoundary(i)}
+                onBlur={() => setFocusedBoundary(null)}
+                onPointerEnter={() => showControls(i)}
+                onPointerLeave={hideControls}
                 disabled={
                   disabled ||
                   !resizable ||
@@ -517,47 +575,85 @@ function SplitterRoot(props: SplitterProps) {
               </Separator>,
             ];
       })}
-      {panels.map((child, i) => {
-        if (!child.props.collapsible) return null;
-        const id = ids[i],
-          isCollapsed = collapsed[id] ?? false;
-        const before = i < panels.length - 1;
-        const boundary = before ? i : i - 1;
-        if (boundary < 0) return null;
+      {panels.slice(0, -1).map((_, boundary) => {
         const boundaryPosition = barGeometry.positions[boundary];
         if (boundaryPosition === undefined) return null;
-        const side = (before ? -1 : 1) * (isCollapsed ? -1 : 1);
-        let position =
-          boundaryPosition + side * 26 * (horizontal && rtl ? -1 : 1);
-        position = Math.max(12, Math.min(barGeometry.total - 12, position));
-        const Icon = horizontal
-          ? (rtl ? -side : side) < 0
-            ? ChevronLeft
-            : ChevronRight
-          : side < 0
-            ? ChevronUp
-            : ChevronDown;
-        const label =
-          child.props.label ?? `${locale === "zh" ? "面板" : "panel"} ${i + 1}`;
+        const adjacent = [boundary, boundary + 1];
+        if (!adjacent.some((i) => panels[i].props.collapsible)) return null;
+        // Keep the pair inside the root, including a fully collapsed edge pane.
+        const start = Math.max(
+          0,
+          Math.min(Math.max(0, barGeometry.total - 68), boundaryPosition - 34),
+        );
+        const boundaryDisabled =
+          disabled || adjacent.some((i) => panels[i].props.resizable === false);
         return (
-          <IconButton
-            key={`${id}-collapse`}
-            size="sm"
-            variant="ghost"
-            className="mt-splitter-collapse"
-            disabled={disabled || child.props.resizable === false}
-            aria-label={`${isCollapsed ? (locale === "zh" ? "展开" : "Expand") : locale === "zh" ? "收起" : "Collapse"} ${label}`}
-            aria-controls={id}
-            aria-expanded={!isCollapsed}
+          <div
+            key={`${ids[boundary]}-${ids[boundary + 1]}-controls`}
+            className="mt-splitter-controls"
+            data-boundary={boundary}
+            data-visible={
+              hoveredBoundary === boundary ||
+              focusedBoundary === boundary ||
+              undefined
+            }
+            data-collapsed={
+              adjacent.some((i) => collapsed[ids[i]]) || undefined
+            }
+            onPointerEnter={() => showControls(boundary)}
+            onPointerLeave={hideControls}
             style={
               horizontal
-                ? { left: position - 10, top: 4 }
-                : { top: position - 10, left: 4 }
+                ? {
+                    left: start,
+                    top: `calc(50% + ${controlOffsets.get(boundary) ?? 0}px)`,
+                  }
+                : {
+                    top: start,
+                    left: `calc(50% + ${controlOffsets.get(boundary) ?? 0}px)`,
+                  }
             }
-            onClick={() => toggle(id)}
           >
-            <Icon size={14} />
-          </IconButton>
+            {adjacent.map((i) => {
+              const child = panels[i];
+              if (!child.props.collapsible) return null;
+              const id = ids[i];
+              const isCollapsed = collapsed[id] ?? false;
+              const physicalSide =
+                (i === boundary ? -1 : 1) * (horizontal && rtl ? -1 : 1);
+              const direction = physicalSide * (isCollapsed ? -1 : 1);
+              const Icon = horizontal
+                ? direction < 0
+                  ? ChevronLeft
+                  : ChevronRight
+                : direction < 0
+                  ? ChevronUp
+                  : ChevronDown;
+              const label =
+                child.props.label ??
+                `${locale === "zh" ? "面板" : "panel"} ${i + 1}`;
+              return (
+                <IconButton
+                  key={`${id}-collapse`}
+                  size="sm"
+                  variant="ghost"
+                  className="mt-splitter-collapse"
+                  disabled={boundaryDisabled}
+                  aria-label={`${isCollapsed ? (locale === "zh" ? "展开" : "Expand") : locale === "zh" ? "收起" : "Collapse"} ${label}`}
+                  aria-controls={id}
+                  aria-expanded={!isCollapsed}
+                  style={
+                    horizontal
+                      ? { left: physicalSide < 0 ? 0 : 48 }
+                      : { top: physicalSide < 0 ? 0 : 48 }
+                  }
+                  onClick={() => toggle(id)}
+                >
+                  <Icon size={14} />
+                </IconButton>
+              );
+            })}
+          </div>
         );
       })}
     </Group>

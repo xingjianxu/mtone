@@ -80,10 +80,10 @@ function Workspace() {
   ]);
   return (
     <Splitter style={{ height: 280 }} sizes={sizes} onResize={setSizes}>
-      <Splitter.Panel id="navigation" label="Navigation" min="15%" max="50%" collapsible>
+      <Splitter.Panel id="navigation" label="Navigation" min="15%" collapsible>
         <nav style={{ padding: 12 }}>Navigation</nav>
       </Splitter.Panel>
-      <Splitter.Panel id="content" label="Content" min="30%">
+      <Splitter.Panel id="content" label="Content" min="30%" collapsible>
         <article style={{ padding: 12 }}>Content</article>
       </Splitter.Panel>
     </Splitter>
@@ -154,6 +154,30 @@ Use that callback to change controlled sizes if double-click reset is desired.
 `disabled` locks the group. A non-resizable panel also disables its adjacent
 separator controls. Collapsing retains mounted panel content and application
 state; a zero-size panel is not a substitute for explicit application cleanup.
+
+## Per-boundary collapse controls
+
+Each separator offers independent controls for its adjacent panels when those
+panels have `collapsible` enabled. Enable it on both panels to let the user
+choose which side to collapse. In a layout with three or more panels, a middle
+panel may have a control at each of its two boundaries; both operate on the same
+panel state, not separate copies of that panel.
+
+On fine-pointer devices, the controls are hidden at rest and appear when the
+separator is hovered or the separator/control area has keyboard focus. They
+remain available while moving the pointer from the handle to a button. A
+boundary adjacent to a collapsed panel keeps its whole control group visible,
+including the restore control, so there is a clear way to reopen that panel. Coarse-pointer touch devices show the controls persistently and do
+not require hover. Existing disabled and non-resizable settings still apply: if
+either adjacent panel is non-resizable, that boundary's pair of controls is disabled.
+
+Collapse and restore continue to obey the layout's constraints. To fully
+collapse either side of a two-panel layout, the other side must be allowed to
+occupy the remaining space. For example, a `max="55%"` on the navigation panel
+can prevent a complete collapse of the document panel because navigation cannot
+expand to fill the layout within that limit.
+The live example therefore enables `collapsible` on both panels and does not set
+that restrictive maximum. The reset button restores both starting proportions.
 
 ## Appearance
 
