@@ -71,10 +71,9 @@ try {
       await expect(page.getByTestId("selected")).toHaveText("1");
       await expect(popup).toHaveCount(0);
       await basic.fill("Hi @al and bye");
-      await basic.evaluate((el) => {
-        el.setSelectionRange(6, 6);
-        el.dispatchEvent(new Event("select", { bubbles: true }));
-      });
+      await basic.press("Control+Home");
+      for (let i = 0; i < 6; i++) await basic.press("ArrowRight");
+      await expect.poll(() => basic.evaluate(el => el.selectionStart)).toBe(6);
       await basic.press("ArrowDown");
       await page.getByRole("option", { name: "Alice", exact: true }).click();
       await expect(basic).toHaveValue("Hi @alice and bye");
@@ -82,10 +81,9 @@ try {
         .poll(() => basic.evaluate((el) => el.selectionStart))
         .toBe(10);
       await basic.fill("prefix @al suffix\nsecond line");
-      await basic.evaluate((el) => {
-        el.setSelectionRange(10, 10);
-        el.dispatchEvent(new Event("select", { bubbles: true }));
-      });
+      await basic.press("Control+Home");
+      for (let i = 0; i < 10; i++) await basic.press("ArrowRight");
+      await expect.poll(() => basic.evaluate(el => el.selectionStart)).toBe(10);
       await basic.press("ArrowDown");
       await expect(popup).toBeVisible();
       const middleBox = await basic.boundingBox(),
