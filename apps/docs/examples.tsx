@@ -92,7 +92,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
   ];
   const menuItems: M.MenuItem[] = [
     { key: "open", label: "打开文档", icon: <FileText size={14} /> },
-    { key: "favorite", label: "加入收藏", icon: <Star size={14} /> },
+    { key: "favorite", label: "加入收藏", shortcut: "⌘D" },
     { key: "disabled", label: "不可用操作", disabled: true },
     { key: "delete", label: "移至回收站（演示）", danger: true },
   ];

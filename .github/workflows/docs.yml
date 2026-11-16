@@ -30,6 +30,7 @@ jobs:
       - run: node tests/input-focus.browser.mjs
       - run: node tests/field-focus.browser.mjs
       - run: node tests/control-height.browser.mjs
+      - run: node tests/menu-icons.browser.mjs
       - run: node tests/form.browser.mjs
       - run: node tests/modal-layout.browser.mjs
       - run: node tests/showcase.browser.mjs

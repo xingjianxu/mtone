@@ -1604,7 +1604,7 @@ export const componentDocs: ComponentDoc[] = [
     category: "菜单与浮层",
     description: "点击触发器打开的操作菜单。",
     importNames: ["DropdownMenu", "Button"],
-    code: 'import { DropdownMenu, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DropdownMenu trigger={<Button>文档操作</Button>} items={[{key:"open",label:"打开"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
+    code: 'import { DropdownMenu, Button } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DropdownMenu trigger={<Button>文档操作</Button>} items={[{key:"open",label:"打开",icon:<FileText />},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
     props: [
       {
         name: "trigger",
@@ -1639,6 +1639,7 @@ export const componentDocs: ComponentDoc[] = [
       },
     ],
     notes: [
+      "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。当前 items 为扁平数组，尚不支持分组、子菜单或勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",
       "快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。",
     ],
   },
@@ -1647,7 +1648,7 @@ export const componentDocs: ComponentDoc[] = [
     category: "菜单与浮层",
     description: "在指定区域右键打开操作菜单。",
     importNames: ["ContextMenu"],
-    code: 'import { ContextMenu } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ContextMenu items={[{key:"copy",label:"复制"}]} onSelect={(key) => console.log(key)}><div style={{padding:24}}>在此区域点击右键</div></ContextMenu>\n  );\n}',
+    code: 'import { ContextMenu } from "@bixlab/mtone";\nimport { Copy } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ContextMenu items={[{key:"copy",label:"复制",icon:<Copy />},{key:"paste",label:"粘贴",shortcut:"⌘V"}]} onSelect={(key) => console.log(key)}><div style={{padding:24}}>在此区域点击右键</div></ContextMenu>\n  );\n}',
     props: [
       {
         name: "children",
@@ -1681,7 +1682,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "开关变化回调。",
       },
     ],
-    notes: ["children 为右键区域；不要向其传 DropdownMenu 的 trigger 属性。"],
+    notes: ["同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。当前 items 为扁平数组，尚不支持分组、子菜单或勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。", "children 为右键区域；不要向其传 DropdownMenu 的 trigger 属性。"],
   },
   {
     name: "Popover",

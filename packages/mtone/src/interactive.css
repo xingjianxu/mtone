@@ -457,12 +457,17 @@
   gap: 8px;
 }
 .mt-menu-icon {
-  display: inline-flex;
+  display: none;
+  flex: 0 0 16px;
   align-items: center;
   justify-content: center;
   width: 16px;
   height: 16px;
   color: var(--mt-muted, #787774);
+}
+/* Only direct rows in this panel participate; never inspect nested popups. */
+.mt-popup:has(> .mt-menu-item > .mt-menu-label > .mt-menu-icon:not(:empty)) > .mt-menu-item > .mt-menu-label > .mt-menu-icon {
+  display: inline-flex;
 }
 .mt-menu-icon svg {
   width: 16px;

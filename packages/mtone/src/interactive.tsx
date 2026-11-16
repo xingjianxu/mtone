@@ -407,12 +407,8 @@ function MenuItems({
           }}
         >
           <span className="mt-menu-label">
-            {i.icon && (
-              <span aria-hidden="true" className="mt-menu-icon">
-                {i.icon}
-              </span>
-            )}
-            {i.label}
+            <span aria-hidden="true" className="mt-menu-icon">{i.icon}</span>
+            <span className="mt-menu-text">{i.label}</span>
           </span>
           {i.shortcut && <span className="mt-shortcut">{i.shortcut}</span>}
         </Menu.Item>
