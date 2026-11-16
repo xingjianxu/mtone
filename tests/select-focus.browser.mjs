@@ -37,7 +37,10 @@ try {
         await two.hover(); await check(two);
         const after=await two.boundingBox();
         assert.equal(after.width,size.width); assert.equal(after.height,size.height);
-        await disabled.hover(); await expect(disabled).not.toHaveAttribute('data-highlighted','');
+        // Base UI permits highlighting disabled options; they must not get an enabled focus border.
+        await disabled.hover();
+        await expect(disabled).toHaveAttribute('aria-disabled','true');
+        await expect(disabled).toHaveCSS('outline-style','none');
         await two.hover(); await check(two);
         await page.keyboard.press('ArrowUp'); await check(one);
         await page.keyboard.press('ArrowDown'); await check(two);
