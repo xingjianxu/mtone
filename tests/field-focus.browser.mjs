@@ -16,11 +16,11 @@ for(const [name,selector] of specs){
  assert.deepEqual(keyboard.size,normal.size,name+' size');assert.deepEqual(keyboard.border,normal.border,name+' widths');assert.deepEqual(keyboard.padding,normal.padding,name+' padding');
  await before.click();await target.click();const mouse=await surface.evaluate(measure);
  assert.equal(mouse.color,'rgb(147, 180, 220)',name+' mouse');assert.equal(mouse.outline,'none');assert.deepEqual(mouse.size,normal.size);assert.deepEqual(mouse.border,normal.border);
- if(name==='Select'){await page.keyboard.press('Escape');}
+ if(name==='Select'){await page.getByRole('option',{name:'One',exact:true}).click();await page.getByRole('listbox').waitFor({state:'hidden'});}
  console.log('FIELD_FOCUS_'+name+'='+(await section.screenshot()).toString('base64')); 
  if(name==='MultiSelect'){await before.click();await section.getByRole('button',{name:'Show options'}).focus();assert.equal((await surface.evaluate(measure)).color,'rgb(147, 180, 220)');await before.click();}
  if(name==='NumberInput'){await section.getByRole('button',{name:'Increase'}).focus();assert.equal((await surface.evaluate(measure)).color,'rgb(147, 180, 220)');}
- await page.emulateMedia({forcedColors:'active'});await target.focus();assert.equal((await surface.evaluate(measure)).outline,'solid',name+' forced colors');await before.click();await page.emulateMedia({forcedColors:'none'});
+ await page.emulateMedia({forcedColors:'active'});await target.focus();assert.equal((await surface.evaluate(measure)).outline,'solid',name+' forced colors');await before.focus();await page.emulateMedia({forcedColors:'none'});
 }
 for(const name of ['Input','Select','MultiSelect']){const control=page.getByLabel(name+' error',{exact:true});await control.focus();const surface=name==='MultiSelect'?page.locator('[data-test-field="errors"] .mt-multiselect'):control;assert.equal((await surface.evaluate(measure)).color,'rgb(198, 102, 96)');}
 for(const name of ['Input','Select','MultiSelect','NumberInput']){const control=page.getByLabel(name+' disabled',{exact:true});assert(await control.isDisabled());await control.focus();assert(!(await control.evaluate(el=>el===document.activeElement)));}
