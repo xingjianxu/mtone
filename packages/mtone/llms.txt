@@ -34,6 +34,62 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### Spotlight
+
+- [Spotlight](https://xingjianxu.github.io/mtone/#/components/Spotlight): 可搜索的快捷操作面板，支持分组、键盘导航和动作回调。
+- Import: Spotlight from @bixlab/mtone
+- actions: SpotlightAction[]. 动作列表；id 与 label 必填。支持 description、keywords(string|string[])、group、icon、rightSection、disabled 和 onSelect。
+- trigger: ReactElement. 触发元素，建议使用 Button；省略时可通过快捷键或受控 open 打开。
+- open / defaultOpen: boolean (default: false（defaultOpen）). 受控打开状态或非受控初始状态。
+- onOpenChange: (open: boolean) => void. 请求打开或关闭时调用。
+- query / defaultQuery: string (default: ""（defaultQuery）). 受控搜索内容或非受控初始查询。
+- onQueryChange: (query: string) => void. 查询变化或关闭时请求重置查询。
+- shortcut: string | false (default: "k"). 配合 Ctrl 或 Meta 的 KeyboardEvent.key 值；false 禁用。不是快捷键表达式解析器，不传 "mod+k"。
+- enableInInputs: boolean (default: false). 是否允许快捷键在外部输入和可编辑内容中触发；面板自己的搜索框始终允许切换。
+- title: string (default: 快捷操作 / Command palette). 面板标题，默认按 Provider locale 选择。
+- placeholder: string (default: 搜索操作或页面… / Search actions or pages…). 搜索输入提示，同时用于输入可访问名称。
+- nothingFound: ReactNode (default: 没有找到相关操作 / No actions found). 过滤后无结果时显示的内容。
+- limit: number (default: 20). 最多显示的匹配项数量；向下取整，负数按 0，非有限值回退 20。
+- filter: (query: string, action: SpotlightAction) => boolean. 替换默认匹配逻辑；不负责排序或异步请求。
+- onActionSelect: (action: SpotlightAction) => void. 执行可用动作时的统一回调，在动作自身 onSelect 之后调用。
+- closeOnSelect: boolean (default: true). 选择可用动作后请求关闭面板。
+- resetQueryOnClose: boolean (default: true). 组件请求关闭时将查询重置为空字符串。
+- className: string. 附加到面板的类名。
+- action.onSelect: () => void. 动作选择回调；与 id、label 一起定义在 actions 中。
+- 这是 mtone 自己的组件 API，不是 Mantine Spotlight API 的兼容实现；不提供全局 singleton、spotlight.open() 或命令注册中心。每个实例独立管理状态。
+- 默认 Ctrl/Cmd+K 切换面板；默认不拦截 input、textarea、select 和可编辑内容中的按键，忽略组合输入、重复按键及 Alt/Shift 组合。文档演示使用 shortcut={false}，避免 Gallery 多实例争抢快捷键。应用中建议只挂载一个启用相同全局快捷键的实例。
+- 默认搜索 label、description 和 keywords，不区分大小写，并去除查询首尾空白；group 不参与默认搜索。filter 接收未经裁剪的原始查询。
+- 动作按传入顺序保留，连续相同 group 合并为一组；相同分组若不连续，会出现多个同名组。每个 action.id 必须在实例中唯一。limit 在过滤之后应用，禁用项也计入数量。
+- 方向键上下循环选择可用项，Home/End 到首尾，Enter 执行，Esc 关闭。禁用项显示但不会执行。焦点保持在搜索框，关闭与焦点恢复由 Dialog 处理。
+- 默认选择后先关闭并请求清空查询，然后调用 action.onSelect 和 onActionSelect。回调不自动导航、等待异步任务、捕获业务错误或保存数据，业务逻辑由应用负责。
+- open/query 受控时，父组件必须响应对应回调更新状态。resetQueryOnClose 作用于组件发出的关闭请求；外部直接改变 open 不应被视为自动重置 query 的保证。
+- 面板复用 mtone Dialog 和 Input。示例动作只修改本地演示状态，不发送网络请求。
+
+```tsx
+import { useState } from "react";
+import { Search, Plus } from "lucide-react";
+import { Button, Spotlight } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [drafts, setDrafts] = useState(0);
+  return (
+    <>
+      <Spotlight
+        shortcut={false}
+        trigger={<Button icon={<Search size={16} />}>快捷操作</Button>}
+        actions={[
+          { id: "create", label: "新建草稿", group: "操作", keywords: ["new", "create"], icon: <Plus size={16} />, onSelect: () => setDrafts(n => n + 1) },
+          { id: "publish", label: "发布", group: "操作", disabled: true },
+        ]}
+        nothingFound="未找到操作"
+      />
+      <p role="status">草稿数：{drafts}</p>
+    </>
+  );
+}
+```
+
 ### Layout
 
 - [Layout](https://xingjianxu.github.io/mtone/#/components/Layout): 可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。

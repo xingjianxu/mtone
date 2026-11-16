@@ -26,6 +26,7 @@ jobs:
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: node tests/date-picker.browser.mjs
       - run: node tests/select-layout.browser.mjs
+      - run: node tests/spotlight.browser.mjs
       - run: node tests/modal-layout.browser.mjs
       - run: node tests/showcase.browser.mjs
       - uses: actions/upload-pages-artifact@v3

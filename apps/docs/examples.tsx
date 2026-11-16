@@ -1,3 +1,4 @@
+import { SpotlightExample } from "./spotlight-example";
 import { ToastAction } from "./toast-example";
 import { LayoutExample } from "./layout-example";
 import React, { useState } from "react";
@@ -115,6 +116,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
   );
 
   switch (name) {
+    case "Spotlight":
+      return <SpotlightExample />;
     case "Layout":
       return <LayoutExample compact={compact} />;
     case "Button":

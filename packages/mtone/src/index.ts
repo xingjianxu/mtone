@@ -5,3 +5,5 @@ export * from "./interactive";
 export * from "./data";
 
 export * from "./layout";
+
+export * from "./spotlight";

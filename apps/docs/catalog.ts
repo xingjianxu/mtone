@@ -15,6 +15,127 @@ export type ComponentDoc = {
   notes: string[];
 };
 export const componentDocs: ComponentDoc[] = [
+{
+  "name": "Spotlight",
+  "category": "反馈与浮层",
+  "description": "可搜索的快捷操作面板，支持分组、键盘导航和动作回调。",
+  "importNames": [
+    "Spotlight"
+  ],
+  "code": "import { useState } from \"react\";\nimport { Search, Plus } from \"lucide-react\";\nimport { Button, Spotlight } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [drafts, setDrafts] = useState(0);\n  return (\n    <>\n      <Spotlight\n        shortcut={false}\n        trigger={<Button icon={<Search size={16} />}>快捷操作</Button>}\n        actions={[\n          { id: \"create\", label: \"新建草稿\", group: \"操作\", keywords: [\"new\", \"create\"], icon: <Plus size={16} />, onSelect: () => setDrafts(n => n + 1) },\n          { id: \"publish\", label: \"发布\", group: \"操作\", disabled: true },\n        ]}\n        nothingFound=\"未找到操作\"\n      />\n      <p role=\"status\">草稿数：{drafts}</p>\n    </>\n  );\n}",
+  "props": [
+    {
+      "name": "actions",
+      "type": "SpotlightAction[]",
+      "description": "动作列表；id 与 label 必填。支持 description、keywords(string|string[])、group、icon、rightSection、disabled 和 onSelect。"
+    },
+    {
+      "name": "trigger",
+      "type": "ReactElement",
+      "description": "触发元素，建议使用 Button；省略时可通过快捷键或受控 open 打开。"
+    },
+    {
+      "name": "open / defaultOpen",
+      "type": "boolean",
+      "description": "受控打开状态或非受控初始状态。",
+      "default": "false（defaultOpen）"
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean) => void",
+      "description": "请求打开或关闭时调用。"
+    },
+    {
+      "name": "query / defaultQuery",
+      "type": "string",
+      "description": "受控搜索内容或非受控初始查询。",
+      "default": "\"\"（defaultQuery）"
+    },
+    {
+      "name": "onQueryChange",
+      "type": "(query: string) => void",
+      "description": "查询变化或关闭时请求重置查询。"
+    },
+    {
+      "name": "shortcut",
+      "type": "string | false",
+      "description": "配合 Ctrl 或 Meta 的 KeyboardEvent.key 值；false 禁用。不是快捷键表达式解析器，不传 \"mod+k\"。",
+      "default": "\"k\""
+    },
+    {
+      "name": "enableInInputs",
+      "type": "boolean",
+      "description": "是否允许快捷键在外部输入和可编辑内容中触发；面板自己的搜索框始终允许切换。",
+      "default": "false"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "description": "面板标题，默认按 Provider locale 选择。",
+      "default": "快捷操作 / Command palette"
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "description": "搜索输入提示，同时用于输入可访问名称。",
+      "default": "搜索操作或页面… / Search actions or pages…"
+    },
+    {
+      "name": "nothingFound",
+      "type": "ReactNode",
+      "description": "过滤后无结果时显示的内容。",
+      "default": "没有找到相关操作 / No actions found"
+    },
+    {
+      "name": "limit",
+      "type": "number",
+      "description": "最多显示的匹配项数量；向下取整，负数按 0，非有限值回退 20。",
+      "default": "20"
+    },
+    {
+      "name": "filter",
+      "type": "(query: string, action: SpotlightAction) => boolean",
+      "description": "替换默认匹配逻辑；不负责排序或异步请求。"
+    },
+    {
+      "name": "onActionSelect",
+      "type": "(action: SpotlightAction) => void",
+      "description": "执行可用动作时的统一回调，在动作自身 onSelect 之后调用。"
+    },
+    {
+      "name": "closeOnSelect",
+      "type": "boolean",
+      "description": "选择可用动作后请求关闭面板。",
+      "default": "true"
+    },
+    {
+      "name": "resetQueryOnClose",
+      "type": "boolean",
+      "description": "组件请求关闭时将查询重置为空字符串。",
+      "default": "true"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": "附加到面板的类名。"
+    },
+    {
+      "name": "action.onSelect",
+      "type": "() => void",
+      "description": "动作选择回调；与 id、label 一起定义在 actions 中。"
+    }
+  ],
+  "notes": [
+    "这是 mtone 自己的组件 API，不是 Mantine Spotlight API 的兼容实现；不提供全局 singleton、spotlight.open() 或命令注册中心。每个实例独立管理状态。",
+    "默认 Ctrl/Cmd+K 切换面板；默认不拦截 input、textarea、select 和可编辑内容中的按键，忽略组合输入、重复按键及 Alt/Shift 组合。文档演示使用 shortcut={false}，避免 Gallery 多实例争抢快捷键。应用中建议只挂载一个启用相同全局快捷键的实例。",
+    "默认搜索 label、description 和 keywords，不区分大小写，并去除查询首尾空白；group 不参与默认搜索。filter 接收未经裁剪的原始查询。",
+    "动作按传入顺序保留，连续相同 group 合并为一组；相同分组若不连续，会出现多个同名组。每个 action.id 必须在实例中唯一。limit 在过滤之后应用，禁用项也计入数量。",
+    "方向键上下循环选择可用项，Home/End 到首尾，Enter 执行，Esc 关闭。禁用项显示但不会执行。焦点保持在搜索框，关闭与焦点恢复由 Dialog 处理。",
+    "默认选择后先关闭并请求清空查询，然后调用 action.onSelect 和 onActionSelect。回调不自动导航、等待异步任务、捕获业务错误或保存数据，业务逻辑由应用负责。",
+    "open/query 受控时，父组件必须响应对应回调更新状态。resetQueryOnClose 作用于组件发出的关闭请求；外部直接改变 open 不应被视为自动重置 query 的保证。",
+    "面板复用 mtone Dialog 和 Input。示例动作只修改本地演示状态，不发送网络请求。"
+  ]
+},
   {
     name: "Layout",
     category: "页面布局",

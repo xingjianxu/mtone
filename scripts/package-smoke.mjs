@@ -59,10 +59,10 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Button, Layout, Toast, NumberInput, MultiSelect } from '@bixlab/mtone';
+import { Button, Layout, Toast, NumberInput, MultiSelect, Spotlight } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
-assert(Layout.Sider && Toast && NumberInput && MultiSelect);
+assert(Layout.Sider && Toast && NumberInput && MultiSelect && Spotlight);
 assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.css'));
 `,
   );
