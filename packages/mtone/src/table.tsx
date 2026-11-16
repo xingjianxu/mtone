@@ -1,5 +1,5 @@
 import * as React from "react";
-import RcTable, {
+import RcTableImport, {
   VirtualTable,
   EXPAND_COLUMN,
   Summary,
@@ -66,6 +66,9 @@ function jsxColumns<T>(children: React.ReactNode): TableColumn<T>[] {
   });
   return result;
 }
+// Bundlers use rc-table's ESM entry; native Node ESM loads its CommonJS
+// namespace as the default. Normalize only that wrapper, retaining forwardRef.
+const RcTable = (RcTableImport as unknown as { default?: typeof RcTableImport }).default ?? RcTableImport;
 const Engine = RcTable as unknown as <T>(
   props: RcTableProps<T> & React.RefAttributes<Reference>,
 ) => React.ReactElement;

@@ -2269,7 +2269,7 @@ export const componentDocs: ComponentDoc[] = [
         name: "title / footer / summary",
         type: "(currentData: T[]) => ReactNode",
         description:
-          "顶部、底部和汇总内容。Table.Summary、Row、Cell 可组成汇总表格。",
+          "顶部、底部和汇总内容。Table.Summary、Row、Cell 可组成汇总表格；virtual 模式需设置 Table.Summary fixed。",
       },
       {
         name: "components / onRow / onHeaderRow",

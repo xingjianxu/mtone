@@ -72,6 +72,12 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 
 ## Table
 
+### Version scope
+
+This section describes the Table API introduced in **0.3.0**. Version 0.2.0 contains only the legacy API below. The [live documentation](https://xingjianxu.github.io/mtone/#/components/Table) follows `master` and may be newer than npm; check the declarations bundled with your installed version.
+
+### Basic usage (legacy API retained)
+
 ```tsx
 <Table
   data={rows}
@@ -96,9 +102,23 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 />
 ```
 
-`Table<T>` accepts data, columns, rowKey (keyof T or `(row)=>React.Key`), selectable, selectedKeys/onSelectionChange, sort, filters, onChange, manual, pagination, empty, loading. Columns: key/title/dataIndex/render(value,row,index)/sortable/filterable. Sorting is single-column, filtering is case-insensitive text containment. Remote mode `manual` delegates sorting/filtering/paging to application and never reprocesses supplied rows; provide pagination.total and controlled page. `onChange` receives `{sort,filters,page,pageSize}`. Explicit `sort={null}` clears controlled sort. Row keys must be unique strings or numbers. Selection persists across pages; application controls removal of stale keys when data changes.
+### Current Table API
 
-No spreadsheet editing, frozen columns, virtualization or column resizing in this release.
+- **Data and columns:** use `dataSource` (takes precedence) or legacy `data`, and `columns` or `Table.Column` / `Table.ColumnGroup` children. `rowKey` defaults to `"key"`; provide stable, unique string or number keys. Columns support nested `dataIndex` paths, grouped `children`, `render`, width/alignment, `hidden`, `responsive`, `ellipsis`, `fixed`, `onCell`, `onHeaderCell` and `shouldCellUpdate`. `column` supplies shared column defaults. Use `onCell` to supply `rowSpan` / `colSpan` for merged cells.
+- **Sorting:** legacy `sortable` retains its simple behavior. `sorter` accepts a comparator or `{ compare, multiple }` for prioritized multi-column sorting. `sorter={true}` reports sorting intent rather than applying a local comparator. Use `sortOrder` / `defaultSortOrder` (`"ascend"`, `"descend"`, or `null`), `sortDirections`, `sortIcon` and `showSorterTooltip` for configuration.
+- **Filtering:** legacy `filterable` provides case-insensitive text containment. Modern column `filters` and `onFilter` support menu/tree options, search, multiple selection, controlled `filteredValue`, defaults and reset behavior. `filterDropdown` can render a custom panel using `selectedKeys`, `setSelectedKeys`, `confirm`, `clearFilters` and `close`.
+- **Selection:** legacy `selectable`, `selectedKeys` and `onSelectionChange` remain supported. `rowSelection` adds checkbox/radio selection, controlled/default keys, disabled rows, `checkStrictly={false}` tree association, `preserveSelectedRowKeys`, custom cells, callbacks and bulk actions. Bulk-action commands use mtone's `DropdownMenu`, not a value-holding Select. The application remains responsible for deciding when retained keys should be removed.
+- **Pagination and remote data:** pagination is disabled by default. `pagination` supports controlled `page`/`current`, defaults, page size choices, quick jumping, totals, placement and callbacks. `manual` delegates sorting, filtering and paging to the application and does not reprocess supplied rows; supply the server total and controlled page.
+- **Tree and expansion:** `expandable` configures tree children, controlled/default expanded keys, detail rows, custom icons and expansion callbacks. Render another Table in expanded content for nested tables.
+- **Layout:** `scroll`, `sticky`, fixed columns, grouped headers, `size`, `bordered`, `showHeader`, `tableLayout`, row properties and custom `components` support richer layouts. `title`, `footer` and `summary` receive the current data; use `Table.Summary.Row` and `Table.Summary.Cell` for summary rows.
+- **Virtualization:** enable `virtual`, preferably with numeric `scroll.x` and `scroll.y`. Defaults are a 1000×400 virtual viewport and `virtualItemHeight={38}`. The ref exposes `nativeElement` and `scrollTo` for row/index/offset positioning. Use `<Table.Summary fixed>` for summary rows with virtual scrolling; non-fixed summaries are not rendered by the virtual body. Validate complex combinations and custom body components in the target application.
+- **Presentation:** `loading` accepts a boolean or `{ spinning?, tip?, delay?, indicator? }`. Use `empty`, `locale`, `classNames` and `styles` for empty-state content, text and semantic styling.
+
+### Events and compatibility
+
+The legacy `onChange(state)` remains unchanged: it receives `{ sort, filters, page, pageSize }`, with legacy sort directions `"asc"` / `"desc"`. Explicit `sort={null}` clears the controlled legacy sort. Use the new `onTableChange(pagination, filters, sorter, extra)` for modern array-valued filters, single/multiple sorter results and `extra.action` (`"paginate"`, `"sort"`, `"filter"`). Do not replace a legacy callback with an Ant Design four-argument handler under the same prop name.
+
+This is **not a drop-in replacement for every Ant Design Table prop**. `filterDropdownProps` supports only `open`, `onOpenChange`, `className` and `style`; sorter tooltip options support `title` and `target`; loading supports the fields listed above. Arbitrary Ant Design Dropdown, Tooltip or Spin props are not forwarded. Editing and row/column dragging are application compositions demonstrated in the live documentation, not automatic persistence or a spreadsheet engine. Column-width resizing is not built in. Exact current types are in `packages/mtone/src/table-types.ts` and the built declarations; use your installed package's declarations for a released version.
 
 ## Upload
 

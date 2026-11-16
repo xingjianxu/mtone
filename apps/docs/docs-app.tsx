@@ -1,3 +1,4 @@
+import packageInfo from "../../packages/mtone/package.json";
 import React, { useEffect, useState } from "react";
 import {
   Search,
@@ -82,7 +83,7 @@ function ComponentPage({ doc }: { doc: ComponentDoc }) {
       <h1>{doc.name}</h1>
       <p className="lead">{doc.description}</p>
       <div className="page-meta">
-        <span>mtone 0.1.0</span>
+        <span>mtone {packageInfo.version}</span>
         <span>React 19.2</span>
         <a
           href="https://github.com/xingjianxu/mtone/tree/master/packages/mtone/src"
@@ -326,7 +327,7 @@ export function DocsApp() {
         </a>
         <header className="topbar">
           <a href="#/gallery" className="brand">
-            <span className="brand-mark">m</span> mtone <small>0.1.0</small>
+            <span className="brand-mark">m</span> mtone <small>{packageInfo.version}</small>
           </a>
           <div className="top-actions">
             <span className="top-tag">组件文档</span>

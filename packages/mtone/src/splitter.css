@@ -49,11 +49,11 @@
   outline-offset: -2px;
   z-index: 2;
 }
-.mt-splitter > @media (forced-colors: active) {
-  .mt-splitter-separator {
+@media (forced-colors: active) {
+  .mt-splitter > .mt-splitter-separator {
     border: 1px solid ButtonText;
   }
-  .mt-splitter-grip {
+  .mt-splitter > .mt-splitter-separator > .mt-splitter-grip {
     background: ButtonText;
   }
 }

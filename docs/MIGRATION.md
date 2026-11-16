@@ -1,3 +1,34 @@
+# Breaking changes in 0.3.0
+
+## Card title
+
+`Card.title` now renders a visible header instead of the native HTML tooltip.
+Replace `<Card title="Tooltip">` with `<Card htmlTitle="Tooltip">` to keep the
+old tooltip behavior. Plain Cards retain their previous markup and styling.
+
+## Modal renamed to Dialog
+
+Use `Dialog` and `DialogProps` in new code. `Modal` and `ModalProps` remain
+deprecated aliases for compatibility. The old documentation URL also resolves to Dialog.
+
+When upgrading from 0.2.0, note the new `modal` default is `true`, so outside
+clicks **do not close** the dialog by default. Set `modal={false}` to retain
+the earlier outside-dismissal behavior.
+
+For users of intermediate, unreleased checkouts only: the short-lived
+`closeOnOutsideClick` option has been replaced by `modal` with inverted semantics.
+Use `modal={!oldCloseOnOutsideClick}` for an explicit old value.
+
+This option only controls outside dismissal. Focus trapping, the backdrop,
+scroll locking, Escape, and the close button remain unchanged. Existing styling
+classes remain unchanged. Drawer and ConfirmDialog do not receive this option.
+
+## Table compatibility
+
+Legacy `data`, `sort`, textual filters and `onChange(state)` remain supported.
+Use `onTableChange` for the new four-argument callback; do not assign an Ant
+Design callback to legacy `onChange`. See [API guide](API.md#table) for limits.
+
 # Breaking changes in 0.2.0
 
 ## Tag consolidated into Badge
@@ -12,17 +43,3 @@ Applications still manage removal state themselves.
 
 If you override the internal CSS class `.mt-tag`, update it to `.mt-badge`.
 The documentation gallery now lists only Badge.
-
-## Modal renamed to Dialog
-
-Use `Dialog` and `DialogProps` in new code. `Modal` and `ModalProps` remain
-deprecated aliases for compatibility. The old documentation URL also resolves to Dialog.
-
-The short-lived `closeOnOutsideClick` option has been replaced by `modal` with
-inverted semantics: use `modal={!oldCloseOnOutsideClick}` for an explicit old value.
-The new default is `true`, so outside clicks **do not close** the dialog by default.
-Set `modal={false}` to retain the earlier outside-dismissal behavior.
-
-This option only controls outside dismissal. Focus trapping, the backdrop,
-scroll locking, Escape, and the close button remain unchanged. Existing styling
-classes remain unchanged. Drawer and ConfirmDialog do not receive this option.

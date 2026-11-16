@@ -114,3 +114,10 @@ it('keeps Select and MultiSelect highlights background-only, including forced co
   const interactive = readFileSync('packages/mtone/src/interactive.css', 'utf8');
   expect(interactive).toContain('background: var(--mt-hover, #f1f1ef)');
 });
+
+it('keeps Splitter forced-color rules inside a valid top-level media query', () => {
+  const css = readFileSync('packages/mtone/src/splitter.css', 'utf8');
+  expect(css).not.toMatch(/>\s*@media/);
+  expect(css).toMatch(/@media \(forced-colors: active\)\s*\{\s*\.mt-splitter\s*>\s*\.mt-splitter-separator\s*\{\s*border: 1px solid ButtonText;/);
+  expect(css).toMatch(/\.mt-splitter\s*>\s*\.mt-splitter-separator\s*>\s*\.mt-splitter-grip\s*\{\s*background: ButtonText;/);
+});

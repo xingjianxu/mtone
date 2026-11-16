@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.2.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.3.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 
@@ -1217,7 +1217,7 @@ export default function Demo() {
 - pagination: false | TablePagination (default: false). 支持 page/current、默认页、页容量、total、showSizeChanger、showQuickJumper、hideOnSinglePage、simple、disabled、showTotal、itemRender、placement/position 和变化回调。每页条数选择器使用本库 Select，支持键盘选择、Escape 取消与禁用状态，切换条数后回到第一页。
 - scroll / sticky: {x?, y?, scrollToFirstRowOnChange?} / boolean | object. 横纵滚动、固定表头和粘性布局；列 fixed 使用底层类型所支持的方向值。
 - virtual / virtualItemHeight: boolean / number (default: false / 38). 虚拟滚动。建议明确提供数字 scroll.x 与 scroll.y；缺省虚拟视口为 1000×400，virtualItemHeight 为行高估计。
-- title / footer / summary: (currentData: T[]) => ReactNode. 顶部、底部和汇总内容。Table.Summary、Row、Cell 可组成汇总表格。
+- title / footer / summary: (currentData: T[]) => ReactNode. 顶部、底部和汇总内容。Table.Summary、Row、Cell 可组成汇总表格；virtual 模式需设置 Table.Summary fixed。
 - components / onRow / onHeaderRow: TableComponents / function / function. 替换表格结构或配置行属性。编辑、拖拽、额外工具提示属于应用组合，不是自动持久化功能。
 - size / bordered / showHeader / tableLayout: small | middle | medium | large / boolean / boolean / auto | fixed (default: middle / false / true). 紧凑尺寸、边框、表头显示和布局。
 - loading: boolean | {spinning?, tip?, delay?, indicator?} (default: false). 加载状态、延迟与自定义指示内容。

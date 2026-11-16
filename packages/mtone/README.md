@@ -47,7 +47,7 @@ MIT © 2026 Xingjian Xu. See [LICENSE](LICENSE).
 ## AI coding reference
 
 This source checkout includes `llms.txt` in the package root and exports
-`@bixlab/mtone/llms.txt`. After a release containing this change, find it at
+`@bixlab/mtone/llms.txt`. Starting with 0.3.0, find it at
 `node_modules/@bixlab/mtone/llms.txt`. Older releases may not include it.
 Provide that file and `dist/index.d.ts` to your AI coding tool as context;
 loading is tool-specific, not automatic. The [live reference](https://xingjianxu.github.io/mtone/llms.txt)
