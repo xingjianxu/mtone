@@ -103,13 +103,14 @@ it('reserves menu icon columns only for direct rows of a panel with rendered ico
  const icon=css.slice(css.indexOf('.mt-menu-icon {')).split('}')[0];expect(icon).toContain('display: none');expect(icon).toContain('flex: 0 0 16px');
 });
 
-it('uses a thin Input-colored highlight for Select and MultiSelect options', () => {
+it('keeps Select and MultiSelect highlights background-only, including forced colors', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
-  const optionRules = rules.filter((rule) => rule[1].includes('.mt-option[data-highlighted]:not([data-disabled])'));
-  expect(optionRules).toHaveLength(2);
-  expect(optionRules[0][2]).toContain('outline: 1px solid #93b4dc');
-  expect(optionRules[0][2]).toContain('outline-offset: -1px');
-  expect(optionRules[0][2]).not.toMatch(/border-width|padding|height|box-shadow/);
-  expect(optionRules[1][2]).toContain('outline: 1px solid Highlight');
+  const optionRules = rules.filter((rule) => rule[1].includes('.mt-option[data-highlighted]'));
+  expect(optionRules).toHaveLength(1);
+  expect(optionRules[0][2]).not.toMatch(/outline|border|box-shadow/);
+  expect(optionRules[0][2]).toContain('background: Highlight');
+  expect(optionRules[0][2]).toContain('color: HighlightText');
+  const interactive = readFileSync('packages/mtone/src/interactive.css', 'utf8');
+  expect(interactive).toContain('background: var(--mt-hover, #f1f1ef)');
 });

@@ -16,7 +16,6 @@ try {
         await page.getByLabel('Reference input').waitFor();
         await page.evaluate(dark=>document.body.classList.toggle('dark',dark),dark);
         await page.getByLabel('Reference input').focus();
-        const reference = await page.getByLabel('Reference input').evaluate(el=>({color:getComputedStyle(el).borderTopColor,width:getComputedStyle(el).borderTopWidth}));
         const trigger=page.getByRole('combobox',{name:control,exact:true});
         if(control==='Select') await trigger.click();
         else await page.getByRole('button',{name:'Show options'}).click();
@@ -29,10 +28,9 @@ try {
         const size=await two.boundingBox();
         const check=async option=>{
           await expect(option).toHaveAttribute('data-highlighted','');
-          await expect(option).toHaveCSS('outline-width',reference.width);
-          await expect(option).toHaveCSS('outline-color',reference.color);
-          await expect(option).toHaveCSS('outline-style','solid');
-          await expect(option).toHaveCSS('outline-offset','-1px');
+          await expect(option).toHaveCSS('outline-style','none');
+          await expect(option).toHaveCSS('box-shadow','none');
+          await expect(option).toHaveCSS('background-color',dark?'rgb(56, 56, 56)':'rgb(241, 241, 239)');
         };
         await two.hover(); await check(two);
         const after=await two.boundingBox();
@@ -50,13 +48,14 @@ try {
         // WebKit does not expose forced-colors emulation on every platform.
         if (await page.evaluate(()=>matchMedia('(forced-colors: active)').matches)) {
           const systemHighlight = await page.evaluate(()=>{
-            const probe=document.createElement('span'); probe.style.outline='1px solid Highlight';
-            document.body.append(probe); const color=getComputedStyle(probe).outlineColor; probe.remove(); return color;
+            const probe=document.createElement('span'); probe.style.cssText='background:Highlight;color:HighlightText';
+            document.body.append(probe); const style=getComputedStyle(probe); const colors={background:style.backgroundColor,text:style.color}; probe.remove(); return colors;
           });
-          await expect(two).toHaveCSS('outline-color',systemHighlight);
+          await expect(two).toHaveCSS('background-color',systemHighlight.background);
+          await expect(two).toHaveCSS('color',systemHighlight.text);
+          assert.notEqual(systemHighlight.background,systemHighlight.text);
         }
-        await expect(two).toHaveCSS('outline-width','1px');
-        await expect(two).toHaveCSS('outline-style','solid');
+        await expect(two).toHaveCSS('outline-style','none');
         await page.emulateMedia({forcedColors:'none'});
         await page.keyboard.press('Enter');
         if(control==='Select') {
@@ -66,7 +65,7 @@ try {
         await expect(list.getByRole('option',{name:'Two',exact:true})).toHaveAttribute('aria-selected','true');
         await page.keyboard.press('Escape'); await expect(list).toBeHidden();
       }
-      assert.deepEqual(errors,[]); console.log(`${name}: Select/MultiSelect thin Input-colored highlight, pointer/keyboard/selection, disabled, light/dark and forced colors passed`);
+      assert.deepEqual(errors,[]); console.log(`${name}: Select/MultiSelect background-only highlight, pointer/keyboard/selection, disabled and light/dark passed; forced colors verified where supported`);
     } finally { await browser.close(); }
   }
 } finally { await server.close(); }
