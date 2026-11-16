@@ -1,7 +1,7 @@
 name: Table verification
 on:
   push:
-    branches: [feat-table]
+    branches: [feat-table, fix-table-header]
   workflow_dispatch:
 permissions:
   contents: read

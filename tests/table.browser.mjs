@@ -82,6 +82,21 @@ try {
         path: `artifacts/table-browser/${name}-fixed.png`,
       });
       const controls = page.getByTestId("controls");
+      const actions = controls.getByRole("button", { name: "Selection actions" });
+      await expect(actions).toHaveAttribute("aria-haspopup", "menu");
+      await actions.click();
+      await expect(page.getByRole("menu")).toBeVisible();
+      await page.screenshot({ path: `artifacts/table-browser/${name}-selection-menu.png` });
+      await page.getByRole("menuitem", { name: "Select all", exact: true }).click();
+      await actions.click();
+      await page.getByRole("menuitem", { name: "Select none", exact: true }).click();
+      await expect(controls.getByLabel("Selected keys", { exact: true })).toHaveText("");
+      await actions.focus();
+      await page.keyboard.press("ArrowDown");
+      await expect(page.getByRole("menu")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(actions).toBeFocused();
+
       await controls
         .getByRole("checkbox", { name: "Select all rows", exact: true })
         .check();

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
 import { useTableSelection } from "../packages/mtone/src/table-selection";
 import type {
@@ -149,7 +150,7 @@ test("tree conduction selects descendants, derives half checks and stops at disa
   expect(screen.getByLabelText("Select row 1")).not.toBeChecked();
   expect(screen.getByLabelText("Select row 3")).toBeChecked();
 });
-test("all invert none and custom selection commands are available and exclude disabled rows", () => {
+test("all invert none and custom selection commands are available and exclude disabled rows", async () => {
   const custom = vi.fn();
   render(
     <Harness
@@ -164,13 +165,25 @@ test("all invert none and custom selection commands are available and exclude di
       }}
     />,
   );
-  const actions = screen.getByLabelText("Selection actions");
-  fireEvent.change(actions, { target: { value: "0" } });
+  const actions = screen.getByRole("button", { name: "Selection actions" });
+  expect(actions).toHaveAttribute("aria-haspopup", "menu");
+  expect(screen.queryByRole("combobox")).toBeNull();
+  await userEvent.click(actions);
+  await userEvent.click(
+    await screen.findByRole("menuitem", { name: "Select all" }),
+  );
   expect(screen.getByTestId("keys")).toHaveTextContent("[1,3]");
-  fireEvent.change(actions, { target: { value: "1" } });
+  await userEvent.click(actions);
+  await userEvent.click(
+    await screen.findByRole("menuitem", { name: "Invert page selection" }),
+  );
   expect(screen.getByTestId("keys")).toHaveTextContent("[]");
-  fireEvent.change(actions, { target: { value: "3" } });
+  await userEvent.click(actions);
+  await userEvent.click(await screen.findByRole("menuitem", { name: "Odd" }));
   expect(custom).toHaveBeenCalledWith([1, 3]);
+  await userEvent.click(actions);
+  await userEvent.click(await screen.findByRole("menuitem", { name: "Odd" }));
+  expect(custom).toHaveBeenCalledTimes(2);
 });
 test("shift range selection skips disabled and emits multiple callback", () => {
   const change = vi.fn();
@@ -244,7 +257,7 @@ test("disabled-only header is disabled and hideSelectAll hides actions too", () 
   expect(screen.queryByLabelText("Selection actions")).toBeNull();
 });
 
-test("selection locale customizes header, rows and action labels while explicit aria labels win", () => {
+test("selection locale customizes header, rows and action labels while explicit aria labels win", async () => {
   render(
     <Harness
       locale={{
@@ -267,10 +280,10 @@ test("selection locale customizes header, rows and action labels while explicit 
   expect(screen.getByLabelText("Ligne 1")).toBeTruthy();
   expect(screen.getByLabelText("Custom row")).toBeTruthy();
   expect(screen.getByLabelText("Actions")).toBeTruthy();
-  expect(screen.getByRole("option", { name: "Tout" })).toBeTruthy();
-  expect(screen.getByRole("option", { name: "Inverser" })).toBeTruthy();
-  expect(screen.getByRole("option", { name: "Aucun" })).toBeTruthy();
-  expect(screen.getByRole("option", { name: "Choisir" })).toBeTruthy();
+  await userEvent.click(screen.getByLabelText("Actions"));
+  expect(await screen.findByRole("menuitem", { name: "Tout" })).toBeTruthy();
+  expect(screen.getByRole("menuitem", { name: "Inverser" })).toBeTruthy();
+  expect(screen.getByRole("menuitem", { name: "Aucun" })).toBeTruthy();
 });
 
 test("switching from checkbox to radio retains at most one selected row", () => {
@@ -281,4 +294,24 @@ test("switching from checkbox to radio retains at most one selected row", () => 
   expect(screen.getByTestId("keys")).toHaveTextContent("[1]");
   expect(screen.getByLabelText("Select row 1")).toBeChecked();
   expect(screen.getByLabelText("Select row 3")).not.toBeChecked();
+});
+
+test("selection command menu supports keyboard dismissal and repeated commands", async () => {
+  render(<Harness selection={{ selections: true }} />);
+  const trigger = screen.getByRole("button", { name: "Selection actions" });
+  trigger.focus();
+  await userEvent.keyboard("{ArrowDown}");
+  expect(await screen.findByRole("menu")).toBeVisible();
+  await userEvent.keyboard("{Escape}");
+  expect(trigger).toHaveFocus();
+  await userEvent.click(trigger);
+  await userEvent.click(
+    await screen.findByRole("menuitem", { name: "Select all" }),
+  );
+  expect(screen.getByTestId("keys")).toHaveTextContent("[1,2,3]");
+  await userEvent.click(trigger);
+  await userEvent.click(
+    await screen.findByRole("menuitem", { name: "Select none" }),
+  );
+  expect(screen.getByTestId("keys")).toHaveTextContent("[]");
 });

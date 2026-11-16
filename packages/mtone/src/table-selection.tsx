@@ -1,4 +1,6 @@
 import * as React from "react";
+import { ChevronDown } from "lucide-react";
+import { DropdownMenu } from "./interactive";
 import type {
   TableColumn,
   TableLocale,
@@ -296,31 +298,30 @@ export function useTableSelection<T>({
       {config.type !== "radio" &&
         !config.hideSelectAll &&
         commands.length > 0 && (
-          <select
-            className="mt-table-selection-actions"
-            aria-label={
-              locale.selectionActions ?? (zh ? "选择操作" : "Selection actions")
-            }
-            value=""
-            onClick={(event) => event.stopPropagation()}
-            onChange={(event) => {
-              const command = commands[Number(event.target.value)];
-              if (typeof command === "string") executeSelection(command);
-              else command?.onSelect(availableKeys);
-            }}
-          >
-            <option value="" disabled>
-              {locale.selectionPlaceholder ?? (zh ? "选择…" : "Select…")}
-            </option>
-            {commands.map((command, index) => (
-              <option
-                key={typeof command === "string" ? command : command.key}
-                value={index}
+          <DropdownMenu
+            trigger={
+              <button
+                type="button"
+                className="mt-table-selection-actions"
+                aria-label={
+                  locale.selectionActions ??
+                  (zh ? "选择操作" : "Selection actions")
+                }
+                onClick={(event) => event.stopPropagation()}
               >
-                {typeof command === "string" ? labels[command] : command.text}
-              </option>
-            ))}
-          </select>
+                <ChevronDown size={12} aria-hidden="true" />
+              </button>
+            }
+            items={commands.map((command, index) => ({
+              key: String(index),
+              label:
+                typeof command === "string" ? labels[command] : command.text,
+              onSelect: () => {
+                if (typeof command === "string") executeSelection(command);
+                else command.onSelect(availableKeys);
+              },
+            }))}
+          />
         )}
     </span>
   );
