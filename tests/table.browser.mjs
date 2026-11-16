@@ -185,7 +185,10 @@ try {
       await expect(page.getByRole("listbox")).toHaveCount(0);
       await expect(pageSizeSelect).toHaveText(/8 \/ page/);
       await pageSizeSelect.press("ArrowDown");
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await expect(page.getByRole("option", { name: "8 / page", exact: true })).toBeFocused();
       await page.keyboard.press("Home");
+      await expect(page.getByRole("option", { name: "4 / page", exact: true })).toBeFocused();
       await page.keyboard.press("Enter");
       await expect(pageSizeSelect).toHaveText(/4 \/ page/);
       await expect(controls.getByText("Person 7", { exact: true })).toHaveCount(0);
