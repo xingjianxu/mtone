@@ -1,3 +1,4 @@
+import { MentionsExample } from "./mentions-example";
 import { TableExample } from "./table-example";
 import { SplitterExample } from "./splitter-example";
 import { CardExample } from "./card-example";
@@ -215,6 +216,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
         </div>
       );
+    case "Mentions":
+    case "Mention":
+      return <MentionsExample compact={compact} />;
     case "Textarea":
       return (
         <div style={stackStyle}>

@@ -34,6 +34,65 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### Mentions
+
+- [Mentions](https://xingjianxu.github.io/mtone/#/components/Mentions): 紧凑的纯文本提及输入框，支持光标候选、多个触发符、键盘选择与异步搜索。
+- Import: Mentions, Mention, getMentions from @bixlab/mtone
+- value / defaultValue: string (default: defaultValue: ""). 受控值 / 初始纯文本；value 为受控时需在 onChange 中更新。
+- onChange: (value: string) => void. 文本编辑、选择和清空后返回字符串，不是 textarea 的 ChangeEvent。
+- options: MentionOption[] (default: []). 候选项 { value: string; label?: ReactNode; key?: React.Key; disabled?: boolean; className?: string; style?: CSSProperties }；value 是插入文本，label 只用于显示。
+- prefix: string | string[] (default: "@"). 触发符，可用 @、# 或多字符符号；必须位于文本开始、空白或 split 之后，因此不会在邮箱内部触发。
+- split: string (default: " "). 选择后追加的分隔符，右侧已有相同分隔符则不重复添加；也用于查询边界判断。
+- onSearch: (text: string, prefix: string) => void. 候选打开或有效查询变化时通知；不内置请求、缓存或取消。异步数据由调用方处理，并防止过期响应覆盖。
+- onSelect: (option: MentionOption, prefix: string) => void. 选择候选项后的通知，替代原生 textarea 的 onSelect；不返回 DOM 事件。
+- filterOption: false | ((input: string, option: MentionOption) => boolean). 默认按 option.value 忽略大小写包含匹配；false 关闭本地过滤，适用于服务端筛选。
+- validateSearch: (text: string, split: string) => boolean. 控制查询是否有效；默认遇到空白或 split 关闭候选。自定义校验替换默认查询校验，但不改变触发符边界。
+- loading / notFoundContent: boolean / ReactNode (default: loading: false). 加载中不允许选择；空候选内容可自定义，默认文案随 MtoneProvider locale 切换。
+- placement: "top" | "bottom" (default: "bottom"). 相对光标的优先位置；可用空间不足时自动翻转并约束到视口。
+- getPopupContainer: () => HTMLElement. 返回弹层挂载节点；默认 document.body。建议使用未受 transform / filter / perspective 影响的容器。
+- popupRender: (menu: React.ReactElement) => ReactNode. 包装完整候选弹层；保留传入 menu 以维持关联 id、角色和定位。
+- onPopupScroll: React.UIEventHandler<HTMLDivElement>. 候选弹层滚动事件，可由应用加载更多项；没有内置虚拟列表。
+- size / status: "sm" | "md" | "lg" / "error" | "warning" (default: size: "md"). mtone 尺寸与验证状态；error 也设置 aria-invalid。
+- autoSize: boolean | { minRows?: number; maxRows?: number } (default: false). 按内容调整高度，达到 maxRows 后滚动；默认最小行数取 rows。
+- allowClear: boolean | { clearIcon?: ReactNode; label?: string; tabIndex?: number } (default: false). 显示有可访问名称的清空按钮；禁用或只读时隐藏。
+- onClear: () => void. 清空按钮点击后通知，同时触发 onChange("")。
+- className / style: string / React.CSSProperties. 根包装元素样式；textarea 样式使用 classNames.textarea / styles.textarea。
+- classNames / styles: Partial<Record<MentionsSemantic, string>> / Partial<Record<MentionsSemantic, React.CSSProperties>>. 静态语义样式对象，键为 root、textarea、popup、option、clear；不支持 Ant 的回调形式。
+- ref: React.Ref<MentionsRef>. 提供 nativeElement: HTMLTextAreaElement | null、focus(options?: FocusOptions)、blur()。
+- native textarea attributes: Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "defaultValue" | "onChange" | "onSelect" | "prefix" | "children"> (default: rows: 3). 支持 id、name、rows、placeholder、disabled、readOnly、maxLength、required、onFocus/onBlur、aria-label 等。务必提供 label 或 aria-label。
+- getMentions(value, config?): (value: string, config?: { prefix?: string | string[]; split?: string }) => { prefix: string; value: string }[]. 单独导出的解析函数，不是静态方法；使用相同边界规则，不检查候选成员资格或服务端权限。
+- Mention 是 Mentions 的同一组件别名；推荐使用 Mentions。相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件属于未发布源码新增能力，不包含在 npm 0.3.0 中；请以已安装版本声明为准。
+- 这是原生 textarea 上的纯文本补全，不是富文本 token 编辑器，也不是 Ant Design Mentions 的完整 API 替代品。不支持 Mentions.Option、children 选项、Ant variant、ConfigProvider/design tokens 或函数式语义样式；尺寸使用 sm/md/lg。
+- ↑ / ↓ 在可用候选间循环，Enter 插入当前项，Escape 关闭，Tab 关闭并正常切换焦点；输入法组合期间不会选择候选。Home/End 保留文本编辑行为。选中一段文本时不弹出建议。
+- 插入替换光标之前的当前触发符和查询，保留光标之后的文本；超出 maxLength 时不插入，不截断候选。不会把已有提及变成不可分割的标签。默认查询禁止空白，含空格的实体值不适合默认解析规则。
+- 异步示例只模拟本地延迟，不发送网络请求。业务端须自行请求、处理错误、取消或忽略旧响应；loading 时不会选中旧候选，filterOption={false} 可保留服务端排序。
+- FormField 可直接绑定字符串 value/onChange。原生表单 reset 会恢复非受控 defaultValue，受控值仍由应用管理。getMentions 只解析文本，不能替代成员校验或权限检查。
+- 候选使用灰色背景高亮，不加蓝色边框。弹层挂到 document.body 时通过 MtoneProvider 继承 tokens/密度；自定义 popupRender 应保留完整 menu 与可访问语义。复杂变换容器、自定义候选内容需在目标布局验证。
+
+```tsx
+import { useState } from "react";
+import { Mentions, getMentions } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [value, setValue] = useState("");
+  return (
+    <>
+      <Mentions
+        aria-label="评论"
+        value={value}
+        onChange={setValue}
+        options={[{ value: "alice", label: "Alice" }, { value: "bob", label: "Bob" }]}
+        placeholder="输入 @ 提及成员"
+        allowClear
+        autoSize={{ minRows: 2, maxRows: 5 }}
+      />
+      <p>{getMentions(value).length} 个提及</p>
+    </>
+  );
+}
+```
+
 ### Splitter
 
 - [Splitter](https://xingjianxu.github.io/mtone/#/components/Splitter): 可拖动的紧凑分栏布局，支持横向、纵向、受控大小和可折叠面板。

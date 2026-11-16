@@ -157,3 +157,42 @@ Select and MultiSelect use the same decorative 16px Lucide ChevronDown and
 16px Check (1.5px stroke), keeping accessible labels unchanged. Checkbox uses
 the same thin-line Check/Minus in a 12px icon to fit its 16px control. Native
 table selection checkboxes and non-selection disclosure icons are unchanged.
+
+## Mentions (unreleased)
+
+`Mentions` (alias `Mention`) adds plain-text mention completion with mtone styling.
+It is not in npm 0.3.0. The live website follows master and can be ahead of npm;
+check the declarations shipped in your installed package.
+
+```tsx
+const [value, setValue] = useState("");
+<Mentions aria-label="评论" value={value} onChange={setValue}
+  options={[{ value: "alice", label: "Alice" }, { value: "bob", label: "Bob" }]}
+  allowClear autoSize={{ minRows: 2, maxRows: 5 }} />
+```
+
+- `value` / `defaultValue` are strings; `onChange(text)` is **not** a native change event. `onSelect(option, prefix)` reports candidate selection. Native textarea attributes and focus/blur events remain available. `ref` exposes `nativeElement`, `focus(options?)` and `blur()`.
+- `options` contains `{ value, label?, key?, disabled?, className?, style? }`. `value` is inserted; `label` is display-only. The default filter matches `value` case-insensitively. Supply `filterOption(query, option)` or `false` for externally filtered options.
+- `prefix` defaults to `"@"` and accepts strings or arrays, including multi-character prefixes. A trigger must follow the start of text, whitespace or `split` (default one space); email interiors do not activate it. Default searches stop at whitespace or split. `validateSearch(query, split)` replaces that validation. `split` is appended after selection only if not already present immediately after the caret.
+- `onSearch(query, prefix)` lets the application replace `options`. Applications own fetching, debounce, errors and stale-response cancellation. Use `loading` to block selection during a pending search, and `notFoundContent` for an empty state. The documentation's async demo is a local simulation and uses a generation check plus cleanup to reject outdated results.
+- `size` uses mtone's `"sm" | "md" | "lg"` (default md); `status` is `"error" | "warning"`. `autoSize` accepts a boolean or `{ minRows?, maxRows? }`; default false, `rows` defaults to 3. `allowClear` accepts a boolean or `{ clearIcon?, label?, tabIndex? }`; clearing also invokes `onClear`.
+- Inserting an option that would exceed native `maxLength` does nothing; the option is never partially inserted.
+- Suggestions follow the caret. `placement="top" | "bottom"` sets a preference, with viewport-aware flipping. `getPopupContainer()` overrides the default body portal; avoid transformed fixed-position containing blocks. `popupRender(menu)` should retain the supplied menu and its accessibility semantics. `onPopupScroll` supports application-managed pagination, not built-in virtualization.
+- `className/style` target the root. `classNames/styles` are static objects keyed by `root`, `textarea`, `popup`, `option`, `clear`. Provider locale, density and tokens are retained in the portal.
+
+Arrows move through enabled options; Enter selects; Escape closes; Tab closes and
+moves focus normally. Composition keys are left to the IME. Native Home/End,
+selection and editing semantics are preserved. The component remains plain text:
+selection replaces only the trigger/query before the caret and retains text after
+it. It does not render immutable mention chips or validate whether a person exists.
+
+`getMentions(text, { prefix?, split? })` is a **standalone exported helper**, returning
+`{ prefix, value }[]`. It applies boundary/whitespace splitting, not custom search
+validation or membership checks. Values containing spaces need an application-specific
+parsing strategy. Bind `Mentions` directly to `FormField` using its string change
+contract; enforce membership and authorization on your server.
+
+This is **not a drop-in Ant Design Mentions replacement**: no `Mentions.Option`
+children, Ant variants, ConfigProvider design tokens, function-style semantic
+customization or virtual suggestions. See the component catalog for the full
+current declaration-backed API.

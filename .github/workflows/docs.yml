@@ -34,6 +34,7 @@ jobs:
       - run: node tests/menu-icons.browser.mjs
       - run: node tests/card.browser.mjs
       - run: node tests/table.browser.mjs
+      - run: node tests/mentions.browser.mjs
       - name: Splitter browser regressions
         run: |
           status=0

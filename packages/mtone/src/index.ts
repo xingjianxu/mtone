@@ -11,3 +11,5 @@ export * from "./spotlight";
 export * from "./splitter";
 
 export * from "./table";
+
+export * from "./mentions";

@@ -1,0 +1,11 @@
+# Mentions design
+
+Add a plain-text `Mentions` textarea to mtone, inspired by Ant Design Mentions, not a drop-in Ant API replacement. Preserve compact inputs and grey-only candidate highlighting.
+
+Use native textarea editing plus an accessible suggestion list positioned at the active caret using a hidden text mirror. Avoid a new runtime dependency. A wrapper around Ant/rc-mentions could save editing machinery but adds dependency/style interoperability; a contenteditable token editor changes value semantics and is out of scope.
+
+Public API: `Mentions`, alias `Mention`, `MentionsProps`, `MentionOption`, `MentionsRef`, and `getMentions`. Controlled/uncontrolled text, string/string[] prefix (default @), split (space), options, custom filter/validation, search/select events, loading and empty states, top/bottom placement, popup container/render, native textarea attributes, sm/md/lg sizes, error/warning status, autoSize, clear button, semantic classes/styles and focus/blur ref. `onChange` receives a string. Native onSelect is replaced by option-selection callback. `onSearch` is for caller-managed async work; caller cancels stale requests. No fetching, rich token formatting, Ant ConfigProvider tokens, legacy Option children or virtualized suggestions.
+
+Keyboard arrows navigate enabled results; Enter selects, Escape dismisses, Tab closes without trapping or selecting. Never consume IME composition keys or text-editing Home/End. Pointer selection keeps focus/caret. Selection replaces the active prefix/query, retains surrounding text and appends split once. Disabled/readOnly prohibit suggestion and clear interaction. Programmatic controlled updates do not emit change. Prefix activation requires start, whitespace or configured split boundary, preventing email autocomplete. A collapsed caret only activates suggestions.
+
+Tests cover native editing, selection in middle, controlled refusal, async replacement, multi-prefix, disabled, IME, clear, reset, accessible ids, portal and CSS. Three-browser suite checks caret placement, scrolling, keyboard, disabled/loading and composition. Document known limits and API differences; update catalog, llms, exports and package smoke. No npm release or default-branch merge without owner instruction.

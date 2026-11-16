@@ -1,0 +1,97 @@
+.mt-mentions {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  vertical-align: top;
+}
+.mt-mentions .mt-mentions-input {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  padding: 6px 28px 6px 9px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.mt-mentions-sm .mt-mentions-input {
+  font-size: 12px;
+  padding: 4px 25px 4px 7px;
+}
+.mt-mentions-lg .mt-mentions-input {
+  font-size: 16px;
+  padding: 8px 30px 8px 11px;
+}
+.mt-mentions-error .mt-mentions-input {
+  border-color: #d44c47;
+}
+.mt-mentions-warning .mt-mentions-input {
+  border-color: #c28c32;
+}
+.mt-mentions-clear {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: flex;
+  padding: 2px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--mt-muted, #787774);
+  cursor: pointer;
+}
+.mt-mentions-clear:hover {
+  background: var(--mt-hover, #f1f1ef);
+}
+.mt-mentions-clear:focus-visible {
+  outline: 1px solid var(--mt-focus, #5378aa);
+  outline-offset: 2px;
+}
+.mt-mentions-popup {
+  z-index: 1100;
+  min-width: 160px;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 16px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: 5px;
+  background: var(--mt-bg, #fff);
+  box-shadow: 0 4px 16px #00000014;
+}
+.mt-mentions-option {
+  padding: 5px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.mt-mentions-option[aria-selected="true"],
+.mt-mentions-option:not(.is-disabled):hover {
+  background: var(--mt-hover, #f1f1ef);
+  outline: none;
+  box-shadow: none;
+}
+.mt-mentions-option.is-disabled {
+  color: var(--mt-muted, #787774);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.mt-mentions-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  color: var(--mt-muted, #787774);
+}
+@media (forced-colors: active) {
+  .mt-mentions-option[aria-selected="true"] {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+  .mt-mentions-option.is-disabled {
+    color: GrayText;
+    opacity: 1;
+  }
+}

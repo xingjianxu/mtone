@@ -1,3 +1,12 @@
+# Unreleased additions
+
+`Mentions` (`Mention` alias) is a new, opt-in plain-text mention component, not part
+of npm 0.3.0. No existing input API changes. It uses `onChange(text: string)`, unlike
+`Textarea`'s native change event. Size values are `sm` / `md` / `lg`. Ant Design
+`Mentions.Option`, variants, ConfigProvider tokens and static `Mentions.getMentions`
+are not provided; use `options` and the standalone `getMentions` export. See the
+[API guide](API.md#mentions-unreleased) for the supported API.
+
 # Breaking changes in 0.3.0
 
 ## Card title

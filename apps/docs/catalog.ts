@@ -27,6 +27,153 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "Mentions",
+  "category": "数据录入",
+  "description": "紧凑的纯文本提及输入框，支持光标候选、多个触发符、键盘选择与异步搜索。",
+  "importNames": [
+    "Mentions",
+    "Mention",
+    "getMentions"
+  ],
+  "code": "import { useState } from \"react\";\nimport { Mentions, getMentions } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [value, setValue] = useState(\"\");\n  return (\n    <>\n      <Mentions\n        aria-label=\"评论\"\n        value={value}\n        onChange={setValue}\n        options={[{ value: \"alice\", label: \"Alice\" }, { value: \"bob\", label: \"Bob\" }]}\n        placeholder=\"输入 @ 提及成员\"\n        allowClear\n        autoSize={{ minRows: 2, maxRows: 5 }}\n      />\n      <p>{getMentions(value).length} 个提及</p>\n    </>\n  );\n}",
+  "props": [
+    {
+      "name": "value / defaultValue",
+      "type": "string",
+      "description": "受控值 / 初始纯文本；value 为受控时需在 onChange 中更新。",
+      "default": "defaultValue: \"\""
+    },
+    {
+      "name": "onChange",
+      "type": "(value: string) => void",
+      "description": "文本编辑、选择和清空后返回字符串，不是 textarea 的 ChangeEvent。"
+    },
+    {
+      "name": "options",
+      "type": "MentionOption[]",
+      "description": "候选项 { value: string; label?: ReactNode; key?: React.Key; disabled?: boolean; className?: string; style?: CSSProperties }；value 是插入文本，label 只用于显示。",
+      "default": "[]"
+    },
+    {
+      "name": "prefix",
+      "type": "string | string[]",
+      "description": "触发符，可用 @、# 或多字符符号；必须位于文本开始、空白或 split 之后，因此不会在邮箱内部触发。",
+      "default": "\"@\""
+    },
+    {
+      "name": "split",
+      "type": "string",
+      "description": "选择后追加的分隔符，右侧已有相同分隔符则不重复添加；也用于查询边界判断。",
+      "default": "\" \""
+    },
+    {
+      "name": "onSearch",
+      "type": "(text: string, prefix: string) => void",
+      "description": "候选打开或有效查询变化时通知；不内置请求、缓存或取消。异步数据由调用方处理，并防止过期响应覆盖。"
+    },
+    {
+      "name": "onSelect",
+      "type": "(option: MentionOption, prefix: string) => void",
+      "description": "选择候选项后的通知，替代原生 textarea 的 onSelect；不返回 DOM 事件。"
+    },
+    {
+      "name": "filterOption",
+      "type": "false | ((input: string, option: MentionOption) => boolean)",
+      "description": "默认按 option.value 忽略大小写包含匹配；false 关闭本地过滤，适用于服务端筛选。"
+    },
+    {
+      "name": "validateSearch",
+      "type": "(text: string, split: string) => boolean",
+      "description": "控制查询是否有效；默认遇到空白或 split 关闭候选。自定义校验替换默认查询校验，但不改变触发符边界。"
+    },
+    {
+      "name": "loading / notFoundContent",
+      "type": "boolean / ReactNode",
+      "description": "加载中不允许选择；空候选内容可自定义，默认文案随 MtoneProvider locale 切换。",
+      "default": "loading: false"
+    },
+    {
+      "name": "placement",
+      "type": "\"top\" | \"bottom\"",
+      "description": "相对光标的优先位置；可用空间不足时自动翻转并约束到视口。",
+      "default": "\"bottom\""
+    },
+    {
+      "name": "getPopupContainer",
+      "type": "() => HTMLElement",
+      "description": "返回弹层挂载节点；默认 document.body。建议使用未受 transform / filter / perspective 影响的容器。"
+    },
+    {
+      "name": "popupRender",
+      "type": "(menu: React.ReactElement) => ReactNode",
+      "description": "包装完整候选弹层；保留传入 menu 以维持关联 id、角色和定位。"
+    },
+    {
+      "name": "onPopupScroll",
+      "type": "React.UIEventHandler<HTMLDivElement>",
+      "description": "候选弹层滚动事件，可由应用加载更多项；没有内置虚拟列表。"
+    },
+    {
+      "name": "size / status",
+      "type": "\"sm\" | \"md\" | \"lg\" / \"error\" | \"warning\"",
+      "description": "mtone 尺寸与验证状态；error 也设置 aria-invalid。",
+      "default": "size: \"md\""
+    },
+    {
+      "name": "autoSize",
+      "type": "boolean | { minRows?: number; maxRows?: number }",
+      "description": "按内容调整高度，达到 maxRows 后滚动；默认最小行数取 rows。",
+      "default": "false"
+    },
+    {
+      "name": "allowClear",
+      "type": "boolean | { clearIcon?: ReactNode; label?: string; tabIndex?: number }",
+      "description": "显示有可访问名称的清空按钮；禁用或只读时隐藏。",
+      "default": "false"
+    },
+    {
+      "name": "onClear",
+      "type": "() => void",
+      "description": "清空按钮点击后通知，同时触发 onChange(\"\")。"
+    },
+    {
+      "name": "className / style",
+      "type": "string / React.CSSProperties",
+      "description": "根包装元素样式；textarea 样式使用 classNames.textarea / styles.textarea。"
+    },
+    {
+      "name": "classNames / styles",
+      "type": "Partial<Record<MentionsSemantic, string>> / Partial<Record<MentionsSemantic, React.CSSProperties>>",
+      "description": "静态语义样式对象，键为 root、textarea、popup、option、clear；不支持 Ant 的回调形式。"
+    },
+    {
+      "name": "ref",
+      "type": "React.Ref<MentionsRef>",
+      "description": "提供 nativeElement: HTMLTextAreaElement | null、focus(options?: FocusOptions)、blur()。"
+    },
+    {
+      "name": "native textarea attributes",
+      "type": "Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, \"value\" | \"defaultValue\" | \"onChange\" | \"onSelect\" | \"prefix\" | \"children\">",
+      "description": "支持 id、name、rows、placeholder、disabled、readOnly、maxLength、required、onFocus/onBlur、aria-label 等。务必提供 label 或 aria-label。",
+      "default": "rows: 3"
+    },
+    {
+      "name": "getMentions(value, config?)",
+      "type": "(value: string, config?: { prefix?: string | string[]; split?: string }) => { prefix: string; value: string }[]",
+      "description": "单独导出的解析函数，不是静态方法；使用相同边界规则，不检查候选成员资格或服务端权限。"
+    }
+  ],
+  "notes": [
+    "Mention 是 Mentions 的同一组件别名；推荐使用 Mentions。相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件属于未发布源码新增能力，不包含在 npm 0.3.0 中；请以已安装版本声明为准。",
+    "这是原生 textarea 上的纯文本补全，不是富文本 token 编辑器，也不是 Ant Design Mentions 的完整 API 替代品。不支持 Mentions.Option、children 选项、Ant variant、ConfigProvider/design tokens 或函数式语义样式；尺寸使用 sm/md/lg。",
+    "↑ / ↓ 在可用候选间循环，Enter 插入当前项，Escape 关闭，Tab 关闭并正常切换焦点；输入法组合期间不会选择候选。Home/End 保留文本编辑行为。选中一段文本时不弹出建议。",
+    "插入替换光标之前的当前触发符和查询，保留光标之后的文本；超出 maxLength 时不插入，不截断候选。不会把已有提及变成不可分割的标签。默认查询禁止空白，含空格的实体值不适合默认解析规则。",
+    "异步示例只模拟本地延迟，不发送网络请求。业务端须自行请求、处理错误、取消或忽略旧响应；loading 时不会选中旧候选，filterOption={false} 可保留服务端排序。",
+    "FormField 可直接绑定字符串 value/onChange。原生表单 reset 会恢复非受控 defaultValue，受控值仍由应用管理。getMentions 只解析文本，不能替代成员校验或权限检查。",
+    "候选使用灰色背景高亮，不加蓝色边框。弹层挂到 document.body 时通过 MtoneProvider 继承 tokens/密度；自定义 popupRender 应保留完整 menu 与可访问语义。复杂变换容器、自定义候选内容需在目标布局验证。"
+  ]
+},
+{
   "name": "Splitter",
   "category": "布局容器",
   "description": "可拖动的紧凑分栏布局，支持横向、纵向、受控大小和可折叠面板。",
