@@ -82,11 +82,11 @@ try {
         path: `artifacts/table-browser/${name}-fixed.png`,
       });
       const controls = page.getByTestId("controls");
-      const selectionCenters = async (scope) => scope.locator(".mt-table-selection-column input").evaluateAll(inputs =>
+      const selectionCenters = async (scope) => scope.locator(".mt-table-selection-column input:visible").evaluateAll(inputs =>
         inputs.map(input => { const r = input.getBoundingClientRect(); return r.x + r.width / 2; }));
       for (const scope of [controls, ...await page.locator('[data-testid^="selection-"]').all()]) {
         const centers = await selectionCenters(scope);
-        const contained = await scope.locator(".mt-table-selection-actions").evaluate(button => {
+        const contained = await scope.locator(".mt-table-selection-actions:visible").evaluate(button => {
           const a = button.getBoundingClientRect(), b = button.closest("th").getBoundingClientRect();
           return a.left >= b.left && a.right <= b.right;
         });
