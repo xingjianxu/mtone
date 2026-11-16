@@ -390,3 +390,26 @@ test("sorter tooltip targets only the icon and accepts rich content", () => {
   );
 });
 test('legacy expandable expandIcon remains usable alongside expand-all default icon',()=>{render(<Table dataSource={rows} columns={[{title:'Name',dataIndex:'name'}]} expandable={{showExpandAll:true,expandedRowRender:r=>r.name+' detail',expandIcon:({record,onExpand})=><button onClick={e=>onExpand(record,e)}>Custom expand {record.name}</button>}}/>);fireEvent.click(screen.getByRole('button',{name:'Custom expand Bob'}));expect(screen.getByText('Bob detail')).toBeTruthy();expect(screen.getByRole('button',{name:'Expand all rows'})).toBeTruthy()});
+
+test("tree expand controls default to the first data column, not the selection column", () => {
+  const { container } = render(<Table
+    dataSource={[{ key: 1, name: "Parent", children: [{ key: 2, name: "Child" }] }]}
+    columns={[{ title: "Group", children: [{ title: "Name", dataIndex: "name" }] }]}
+    rowSelection={{ checkStrictly: false }}
+    expandable={{ defaultExpandAllRows: true }}
+  />);
+  const row = container.querySelector('tbody tr[data-row-key="1"]')!;
+  expect(row.querySelector('.mt-table-selection-column .mt-table-expand')).toBeNull();
+  expect(within(row as HTMLElement).getByRole('button', { name: 'Collapse row' }).closest('td')?.textContent).toBe('Parent');
+  expect(screen.getByText('Child').closest('td')?.querySelector('.indent-level-1')).toBeTruthy();
+});
+
+test("tree expand position honors explicit overrides and tables without selection", () => {
+  const data = [{ key: 1, name: "Parent", age: 20, children: [{ key: 2, name: "Child", age: 10 }] }];
+  const columns = [{ title: "Name", dataIndex: "name" }, { title: "Age", dataIndex: "age" }];
+  const { rerender } = render(<Table dataSource={data} columns={columns} />);
+  expect(screen.getByRole('button', { name: 'Expand row' }).closest('td')?.textContent).toBe('Parent');
+  rerender(<MtoneProvider locale="en"><Table dataSource={data} columns={columns} rowSelection={{}}
+    expandable={{ expandIconColumnIndex: 2 }} /></MtoneProvider>);
+  expect(screen.getByRole('button', { name: 'Expand row' }).closest('td')?.textContent).toBe('20');
+});

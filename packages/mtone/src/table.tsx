@@ -502,6 +502,18 @@ function TableInner<T>(
   );
   if (selection.column && !hasSelectionMarker)
     renderedColumns.unshift(selection.column);
+  // Tree controls belong to data, not to the injected selection column.
+  // Work in leaf coordinates, matching rc-table after grouped columns flatten.
+  const treeExpandColumnIndex = flattenColumns(renderedColumns)
+    .filter((column) => column !== EXPAND_COLUMN)
+    .findIndex((column) => column !== selection.column);
+  const resolvedExpandable = !expandable?.expandedRowRender
+    ? {
+        ...expandable,
+        expandIconColumnIndex:
+          expandable?.expandIconColumnIndex ?? treeExpandColumnIndex,
+      }
+    : expandable;
   const resolvedClasses =
     typeof classNames === "function"
       ? classNames({ props })
@@ -574,7 +586,7 @@ function TableInner<T>(
     columns: renderedColumns as ColumnsType<T>,
     rowKey,
     scroll,
-    expandable,
+    expandable: resolvedExpandable,
     components: rcComponents,
     emptyText: showLoading
       ? null

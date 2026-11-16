@@ -133,6 +133,21 @@ function Demo() {
             rowSelection={{ checkStrictly: false, onChange: setTreeSelection }}
           />
         </section>
+        {(["small", "middle", "large"] as const).flatMap(size =>
+          ([false, true] as const).map(rtl => (
+            <section key={`${size}-${rtl}`} data-testid={`tree-align-${size}-${rtl}`} dir={rtl ? "rtl" : "ltr"}>
+              <Table
+                direction={rtl ? "rtl" : "ltr"}
+                size={size}
+                dataSource={[{ ...rows[0], name: "Parent", children: [{ ...rows[1], name: "Child one" }] }, rows[2]]}
+                columns={columns}
+                rowSelection={size === "large" ? undefined : { selections: size === "small" }}
+                expandable={{ defaultExpandAllRows: true }}
+                scroll={size === "small" ? { x: 700, y: 150 } : undefined}
+              />
+            </section>
+          )),
+        )}
         <section data-testid="expanded">
           <h2>Expansion</h2>
           <Table

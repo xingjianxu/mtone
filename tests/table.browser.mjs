@@ -191,20 +191,43 @@ try {
         .getByRole("button", { name: "Expand row", exact: true })
         .click();
       await expect(tree.getByText("Child one", { exact: true })).toBeVisible();
-      const treeVertical = await tree.locator("tbody .mt-table-row").first().evaluate(row => {
-        const center = el => { const r = el.getBoundingClientRect(); return r.y + r.height / 2; };
-        const arrow = row.querySelector(".mt-table-expand");
-        const checkbox = row.querySelector('input[type="checkbox"]');
-        const textCell = [...row.querySelectorAll("td")].find(td => td.textContent === "Parent");
-        const range = document.createRange();
-        range.selectNodeContents(textCell);
-        const rect = range.getBoundingClientRect();
-        return { arrow: center(arrow), checkbox: center(checkbox), text: rect.y + rect.height / 2 };
-      });
-      assert(Math.abs(treeVertical.arrow - treeVertical.checkbox) <= 1,
-        `${name}: tree arrow and checkbox centers must align: ${JSON.stringify(treeVertical)}`);
-      assert(Math.abs(treeVertical.arrow - treeVertical.text) <= 2,
-        `${name}: tree arrow and row text centers must align: ${JSON.stringify(treeVertical)}`);
+      for (const scope of [tree, ...await page.locator('[data-testid^="tree-align-"]').all()]) {
+        const geometry = await scope.evaluate(root => {
+          const center = el => { const r = el.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; };
+          const row = root.querySelector('tbody tr[data-row-key="0"]');
+          const arrow = row.querySelector('.mt-table-expand');
+          const textRect = label => {
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            let node;
+            while (node = walker.nextNode()) if (node.textContent === label) {
+              const range = document.createRange(); range.selectNode(node);
+              return range.getBoundingClientRect();
+            }
+            throw new Error(`Missing text ${label}`);
+          };
+          const parent = textRect('Parent'), child = textRect('Child one');
+          const rtl = getComputedStyle(row).direction === 'rtl';
+          const boxes = [...root.querySelectorAll('.mt-table-selection-column input')]
+            .filter(el => !el.closest('[aria-hidden="true"]'));
+          return {
+            arrow: center(arrow), textY: parent.y + parent.height / 2,
+            dataCell: !arrow.closest('.mt-table-selection-column'),
+            checkboxCenters: boxes.map(center),
+            indent: rtl ? parent.right - child.right : child.left - parent.left,
+            beforeText: rtl ? arrow.getBoundingClientRect().left >= parent.right : arrow.getBoundingClientRect().right <= parent.left,
+          };
+        });
+        assert(geometry.dataCell && geometry.beforeText, `${name}: tree arrow must precede data text, outside selection column`);
+        assert(Math.abs(geometry.arrow.y - geometry.textY) <= 2, `${name}: tree arrow/text centers: ${JSON.stringify(geometry)}`);
+        assert(geometry.indent >= 14, `${name}: nested text must retain logical indentation: ${JSON.stringify(geometry)}`);
+        if (geometry.checkboxCenters.length) {
+          assert(geometry.checkboxCenters.every(p => Math.abs(p.x - geometry.checkboxCenters[0].x) <= 1),
+            `${name}: tree header/body checkboxes must align: ${JSON.stringify(geometry)}`);
+          assert(Math.abs(geometry.arrow.y - geometry.checkboxCenters[1].y) <= 1,
+            `${name}: tree arrow/checkbox centers: ${JSON.stringify(geometry)}`);
+        }
+      }
+      await tree.screenshot({ path: `artifacts/table-browser/${name}-tree-alignment.png` });
 
       await tree
         .getByRole("checkbox", { name: "Select row 0", exact: true })
