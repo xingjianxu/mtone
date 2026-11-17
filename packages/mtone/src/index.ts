@@ -33,3 +33,5 @@ export * from "./auto-complete";
 export * from "./cascader";
 
 export * from "./transfer";
+
+export * from "./typography";

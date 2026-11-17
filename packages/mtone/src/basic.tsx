@@ -208,13 +208,7 @@ export function Progress({ value, label }: { value: number; label?: string }) {
     </div>
   );
 }
-export const Text = ({
-  muted,
-  className,
-  ...p
-}: React.HTMLAttributes<HTMLSpanElement> & { muted?: boolean }) => (
-  <span {...p} className={cn("mt-text", muted && "mt-muted", className)} />
-);
+export { Text } from "./typography";
 export { Divider } from "./divider";
 export type { DividerProps } from "./divider";
 export { Card } from "./card";

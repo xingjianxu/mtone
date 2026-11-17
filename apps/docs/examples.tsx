@@ -1,3 +1,4 @@
+import { TypographyExample } from "./typography-example";
 import { TransferExample } from "./transfer-example";
 import { CascaderExample } from "./cascader-example";
 import { AutoCompleteExample } from "./auto-complete-example";
@@ -555,13 +556,12 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Card":
       return <CardExample />;
+    case "Typography":
     case "Text":
-      return (
-        <div style={stackStyle}>
-          <M.Text>正文内容清晰可读。</M.Text>
-          <M.Text muted>次要信息使用更克制的颜色。</M.Text>
-        </div>
-      );
+    case "Title":
+    case "Paragraph":
+    case "Link":
+      return <TypographyExample />;
     case "Divider":
       return (
         <div style={{ width: "100%" }}>

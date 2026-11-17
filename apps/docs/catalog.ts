@@ -3725,31 +3725,274 @@ export const componentDocs: ComponentDoc[] = [
     ]
   },
   {
-    name: "Text",
-    category: "数据展示",
-    description: "可使用次级颜色的行内文本。",
-    importNames: ["Text"],
-    code: 'import { Text } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Text muted>更新于今天</Text>\n  );\n}',
-    props: [
-      {
-        name: "muted",
-        type: "boolean",
-        description: "使用次级文字颜色。",
-      },
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "组件内容。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
-    ],
-    notes: [],
-  },
+  "name": "Typography",
+  "category": "数据展示",
+  "description": "统一的标题、正文、段落与链接，支持复制、纯文本编辑及省略展开。",
+  "importNames": [
+    "Typography"
+  ],
+  "code": "import { Typography } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <section>\n    <Typography.Title level={2}>工作笔记</Typography.Title>\n    <Typography.Paragraph copyable>让内容清晰、有层次。</Typography.Paragraph>\n    <Typography.Text muted>更新于今天</Typography.Text>\n    <Typography.Link href=\"/docs\">查看文档</Typography.Link>\n  </section>;\n}",
+  "props": [
+    {
+      "name": "muted / type",
+      "type": "boolean / \"secondary\" | \"success\" | \"warning\" | \"danger\"",
+      "description": "muted 保留旧版次级文字颜色；type 提供语义字色。"
+    },
+    {
+      "name": "strong / italic / underline / delete / mark / code / keyboard",
+      "type": "boolean",
+      "default": "false",
+      "description": "分别使用 strong/em/u/del/mark/code/kbd 语义标签，可组合使用。"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "description": "弱化文字并停用内置复制、编辑、展开按钮；不自动禁用 children 中的交互元素。"
+    },
+    {
+      "name": "copyable",
+      "type": "boolean | TypographyCopyable",
+      "default": "false",
+      "description": "显示复制按钮。对象支持 text: string | (() => string | Promise<string>)、onCopy(): void、onError(error: unknown): void、label?: string。默认复制完整文字而非裁切摘要。"
+    },
+    {
+      "name": "editable",
+      "type": "boolean | TypographyEditable",
+      "default": "false",
+      "description": "显示编辑按钮。对象支持 text?: string、editing?: boolean、onEditingChange(editing): void、onChange(text): void、onStart(): void、onCancel(): void、maxLength?: number、label?: string。"
+    },
+    {
+      "name": "ellipsis",
+      "type": "boolean | TypographyEllipsis",
+      "default": "false",
+      "description": "CSS 单行或多行省略。对象支持 rows?: number（默认 1）、expandable?: boolean、expanded?: boolean、defaultExpanded?: boolean、onExpandedChange(expanded): void、expandLabel?: string、collapseLabel?: string。"
+    },
+    {
+      "name": "children / ref / 原生属性",
+      "type": "ReactNode / 对应 HTML 元素 ref / HTMLAttributes",
+      "description": "支持 className、style、title 与适用的 DOM 属性；Text 为 span，Title 为 heading，Paragraph 为 p。"
+    }
+  ],
+  "notes": [
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
+    "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
+    "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
+    "不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。"
+  ]
+},
+  {
+  "name": "Text",
+  "category": "数据展示",
+  "description": "兼容原有 muted 的行内文本，支持文字修饰与交互。",
+  "importNames": [
+    "Text"
+  ],
+  "code": "import { Text } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Text muted copyable>更新于今天</Text>;\n}",
+  "props": [
+    {
+      "name": "muted / type",
+      "type": "boolean / \"secondary\" | \"success\" | \"warning\" | \"danger\"",
+      "description": "muted 保留旧版次级文字颜色；type 提供语义字色。"
+    },
+    {
+      "name": "strong / italic / underline / delete / mark / code / keyboard",
+      "type": "boolean",
+      "default": "false",
+      "description": "分别使用 strong/em/u/del/mark/code/kbd 语义标签，可组合使用。"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "description": "弱化文字并停用内置复制、编辑、展开按钮；不自动禁用 children 中的交互元素。"
+    },
+    {
+      "name": "copyable",
+      "type": "boolean | TypographyCopyable",
+      "default": "false",
+      "description": "显示复制按钮。对象支持 text: string | (() => string | Promise<string>)、onCopy(): void、onError(error: unknown): void、label?: string。默认复制完整文字而非裁切摘要。"
+    },
+    {
+      "name": "editable",
+      "type": "boolean | TypographyEditable",
+      "default": "false",
+      "description": "显示编辑按钮。对象支持 text?: string、editing?: boolean、onEditingChange(editing): void、onChange(text): void、onStart(): void、onCancel(): void、maxLength?: number、label?: string。"
+    },
+    {
+      "name": "ellipsis",
+      "type": "boolean | TypographyEllipsis",
+      "default": "false",
+      "description": "CSS 单行或多行省略。对象支持 rows?: number（默认 1）、expandable?: boolean、expanded?: boolean、defaultExpanded?: boolean、onExpandedChange(expanded): void、expandLabel?: string、collapseLabel?: string。"
+    },
+    {
+      "name": "children / ref / 原生属性",
+      "type": "ReactNode / 对应 HTML 元素 ref / HTMLAttributes",
+      "description": "支持 className、style、title 与适用的 DOM 属性；Text 为 span，Title 为 heading，Paragraph 为 p。"
+    }
+  ],
+  "notes": [
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
+    "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
+    "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
+    "不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。"
+  ]
+},
+  {
+  "name": "Title",
+  "category": "数据展示",
+  "description": "遵循 mtone 字号与间距的语义标题，支持 h1 至 h6。",
+  "importNames": [
+    "Title"
+  ],
+  "code": "import { Title } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Title level={2}>项目概览</Title>;\n}",
+  "props": [
+    {
+      "name": "level",
+      "type": "1 | 2 | 3 | 4 | 5 | 6",
+      "default": "1",
+      "description": "使用对应 h1-h6 标签。按文档结构选择标题层级。"
+    },
+    {
+      "name": "muted / type",
+      "type": "boolean / \"secondary\" | \"success\" | \"warning\" | \"danger\"",
+      "description": "muted 保留旧版次级文字颜色；type 提供语义字色。"
+    },
+    {
+      "name": "strong / italic / underline / delete / mark / code / keyboard",
+      "type": "boolean",
+      "default": "false",
+      "description": "分别使用 strong/em/u/del/mark/code/kbd 语义标签，可组合使用。"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "description": "弱化文字并停用内置复制、编辑、展开按钮；不自动禁用 children 中的交互元素。"
+    },
+    {
+      "name": "copyable",
+      "type": "boolean | TypographyCopyable",
+      "default": "false",
+      "description": "显示复制按钮。对象支持 text: string | (() => string | Promise<string>)、onCopy(): void、onError(error: unknown): void、label?: string。默认复制完整文字而非裁切摘要。"
+    },
+    {
+      "name": "editable",
+      "type": "boolean | TypographyEditable",
+      "default": "false",
+      "description": "显示编辑按钮。对象支持 text?: string、editing?: boolean、onEditingChange(editing): void、onChange(text): void、onStart(): void、onCancel(): void、maxLength?: number、label?: string。"
+    },
+    {
+      "name": "ellipsis",
+      "type": "boolean | TypographyEllipsis",
+      "default": "false",
+      "description": "CSS 单行或多行省略。对象支持 rows?: number（默认 1）、expandable?: boolean、expanded?: boolean、defaultExpanded?: boolean、onExpandedChange(expanded): void、expandLabel?: string、collapseLabel?: string。"
+    },
+    {
+      "name": "children / ref / 原生属性",
+      "type": "ReactNode / 对应 HTML 元素 ref / HTMLAttributes",
+      "description": "支持 className、style、title 与适用的 DOM 属性；Text 为 span，Title 为 heading，Paragraph 为 p。"
+    }
+  ],
+  "notes": [
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
+    "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
+    "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
+    "不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。"
+  ]
+},
+  {
+  "name": "Paragraph",
+  "category": "数据展示",
+  "description": "支持复制、编辑和多行省略的语义段落。",
+  "importNames": [
+    "Paragraph"
+  ],
+  "code": "import { Paragraph } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Paragraph ellipsis={{ rows: 2, expandable: true }}>长段落内容……</Paragraph>;\n}",
+  "props": [
+    {
+      "name": "muted / type",
+      "type": "boolean / \"secondary\" | \"success\" | \"warning\" | \"danger\"",
+      "description": "muted 保留旧版次级文字颜色；type 提供语义字色。"
+    },
+    {
+      "name": "strong / italic / underline / delete / mark / code / keyboard",
+      "type": "boolean",
+      "default": "false",
+      "description": "分别使用 strong/em/u/del/mark/code/kbd 语义标签，可组合使用。"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "description": "弱化文字并停用内置复制、编辑、展开按钮；不自动禁用 children 中的交互元素。"
+    },
+    {
+      "name": "copyable",
+      "type": "boolean | TypographyCopyable",
+      "default": "false",
+      "description": "显示复制按钮。对象支持 text: string | (() => string | Promise<string>)、onCopy(): void、onError(error: unknown): void、label?: string。默认复制完整文字而非裁切摘要。"
+    },
+    {
+      "name": "editable",
+      "type": "boolean | TypographyEditable",
+      "default": "false",
+      "description": "显示编辑按钮。对象支持 text?: string、editing?: boolean、onEditingChange(editing): void、onChange(text): void、onStart(): void、onCancel(): void、maxLength?: number、label?: string。"
+    },
+    {
+      "name": "ellipsis",
+      "type": "boolean | TypographyEllipsis",
+      "default": "false",
+      "description": "CSS 单行或多行省略。对象支持 rows?: number（默认 1）、expandable?: boolean、expanded?: boolean、defaultExpanded?: boolean、onExpandedChange(expanded): void、expandLabel?: string、collapseLabel?: string。"
+    },
+    {
+      "name": "children / ref / 原生属性",
+      "type": "ReactNode / 对应 HTML 元素 ref / HTMLAttributes",
+      "description": "支持 className、style、title 与适用的 DOM 属性；Text 为 span，Title 为 heading，Paragraph 为 p。"
+    }
+  ],
+  "notes": [
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
+    "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
+    "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
+    "不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。"
+  ]
+},
+  {
+  "name": "Link",
+  "category": "数据展示",
+  "description": "使用 mtone 中性色和轻量悬停背景的语义链接。",
+  "importNames": [
+    "Link"
+  ],
+  "code": "import { Link } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Link href=\"https://example.com\" target=\"_blank\">查看资料</Link>;\n}",
+  "props": [
+    {
+      "name": "href / target / rel / ref / 原生属性",
+      "type": "AnchorHTMLAttributes<HTMLAnchorElement> / Ref<HTMLAnchorElement>",
+      "description": "原生 a 链接。target=\"_blank\" 且未传 rel 时添加 noopener noreferrer。"
+    },
+    {
+      "name": "muted / type",
+      "type": "boolean / TypographyTone",
+      "description": "次级或语义字色，type 为 secondary/success/warning/danger。"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "description": "移除 href，从 Tab 顺序移除，阻止自身点击，并设置 aria-disabled。"
+    }
+  ],
+  "notes": [
+    "Link 只支持原生链接属性及 muted/type/disabled，不支持 Text 的 copyable/editable/ellipsis 或文字修饰布尔属性。",
+    "可通过 Typography.Link 使用。禁用链接内部不要放置其他可交互元素。"
+  ]
+},
   {
     name: "Divider",
     category: "布局容器",
