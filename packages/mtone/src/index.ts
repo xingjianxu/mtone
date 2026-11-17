@@ -19,3 +19,5 @@ export * from "./calendar";
 export * from "./rate";
 
 export * from "./popconfirm";
+
+export * from "./result";

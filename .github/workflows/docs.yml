@@ -38,6 +38,7 @@ jobs:
       - run: node tests/calendar.browser.mjs
       - run: node tests/rate.browser.mjs
       - run: node tests/avatar-popconfirm.browser.mjs
+      - run: node tests/result.browser.mjs
       - name: Splitter browser regressions
         run: |
           status=0

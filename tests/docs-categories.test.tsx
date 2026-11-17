@@ -11,7 +11,7 @@ const expected: Record<string, string[]> = {
   数据录入: ["Rate", "Input", "SearchInput", "Textarea", "Mentions", "Form", "FormField", "Checkbox", "Switch", "RadioGroup", "Select", "MultiSelect", "Slider", "NumberInput", "DatePicker", "FilterBar", "FilterChip", "Upload", "Dropzone"],
   数据展示: ["Calendar", "Card", "Text", "List", "ListItem", "DocumentList", "DocumentCard", "Table", "Tree", "Badge", "Avatar", "AvatarGroup", "PropertyList", "PropertyItem"],
   浮层对话: ["Popconfirm", "Popover", "Tooltip", "Dialog", "Drawer", "ConfirmDialog"],
-  状态反馈: ["Status", "Progress", "Alert", "Empty", "Skeleton", "Spinner", "Toast", "ToastProvider"],
+  状态反馈: ["Result", "Status", "Progress", "Alert", "Empty", "Skeleton", "Spinner", "Toast", "ToastProvider"],
   全局配置: ["MtoneProvider", "MtoneScope"],
 };
 describe("documentation taxonomy", () => {

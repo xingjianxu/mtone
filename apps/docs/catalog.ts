@@ -27,6 +27,55 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "Result",
+  "category": "状态反馈",
+  "description": "操作结果页：状态图标、标题、说明、动作与详细内容，沿用 mtone 紧凑风格。",
+  "importNames": [
+    "Result",
+    "Button"
+  ],
+  "code": "import { Result, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Result status=\"success\" title=\"保存成功\" subTitle=\"你的修改已保存。\" extra={<Button>继续编辑</Button>} />;\n}",
+  "props": [
+    {
+      "name": "status",
+      "type": "\"success\" | \"error\" | \"info\" | \"warning\" | \"403\" | \"404\" | \"500\"",
+      "default": "info",
+      "description": "状态决定默认图标与配色。403/404/500 使用简洁线性图标，不附带插画或自动标题。"
+    },
+    {
+      "name": "title / subTitle",
+      "type": "ReactNode",
+      "description": "标题和辅助说明；支持富文本与数字 0，未传入不渲染该区域。"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "description": "覆盖默认图标；null 或 false 隐藏图标。"
+    },
+    {
+      "name": "extra / children",
+      "type": "ReactNode",
+      "description": "操作区与详细内容区，传入本库 Button 等内容。"
+    },
+    {
+      "name": "classNames / styles",
+      "type": "Partial<Record<ResultSemantic, string | CSSProperties>> | callback",
+      "description": "分别传 class 字符串或样式对象；语义键 root/icon/title/subTitle/extra/body。回调接收 { props }，status 已解析默认值。"
+    },
+    {
+      "name": "ref / 原生 div 属性",
+      "type": "Ref<HTMLDivElement> / HTMLAttributes<HTMLDivElement>",
+      "description": "转发 ref、id、aria-*、role 等；原生 title 属性由 ReactNode 标题取代。className 与 root 类合并，style 覆盖 styles.root。"
+    }
+  ],
+  "notes": [
+    "Result 是静态反馈布局，不会自动抢焦点或宣读。动态状态可显式设置 role=\"status\" 或 aria-live；错误详情需由业务提供。",
+    "title 默认是 div，不假定页面标题层级；可传入合适的 h1/h2。",
+    "没有 Ant Design 的 ConfigProvider/设计令牌依赖；状态色可用 --mt-result-success/error/info/warning 覆盖。",
+    "默认图标为装饰性 SVG；自定义图标的无障碍标签由调用者负责。"
+  ]
+},
+{
   "name": "Popconfirm",
   "category": "浮层对话",
   "description": "轻量的锚定确认浮层，支持异步确认、失败重试、键盘操作和边界避让。",

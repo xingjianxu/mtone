@@ -1,3 +1,4 @@
+import { ResultExample } from "./result-example";
 import { AvatarExample } from "./avatar-example";
 import { PopconfirmExample } from "./popconfirm-example";
 import { RateExample } from "./rate-example";
@@ -220,6 +221,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
         </div>
       );
+    case "Result":
+      return <ResultExample compact={compact} />;
     case "Rate":
       return <RateExample compact={compact} />;
     case "Calendar":
