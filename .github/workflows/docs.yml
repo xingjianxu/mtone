@@ -40,6 +40,7 @@ jobs:
       - run: node tests/timeline.browser.mjs
       - run: node tests/tree.browser.mjs
       - run: node tests/image.browser.mjs
+      - run: node tests/table-of-contents.browser.mjs
       - run: node tests/avatar-popconfirm.browser.mjs
       - run: node tests/affix.browser.mjs
       - run: node tests/result.browser.mjs

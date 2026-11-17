@@ -27,6 +27,130 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "TableOfContents",
+  "category": "导航切换",
+  "description": "自动采集文章标题、跟随滚动高亮并跳转的页内目录，适合文档与知识库。",
+  "importNames": [
+    "TableOfContents"
+  ],
+  "code": "import { useCallback, useRef } from \"react\";\nimport { TableOfContents } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const article = useRef<HTMLElement>(null);\n  const getArticle = useCallback(() => article.current, []);\n  return <div style={{ display: \"flex\", gap: 24 }}>\n    <TableOfContents root={getArticle} offset={56} style={{ width: 180 }} />\n    <article ref={article}>\n      <h2 id=\"overview\">概览</h2><p>内容</p>\n      <h3 id=\"details\">详细说明</h3><p>内容</p>\n      <h2 id=\"usage\">使用方式</h2><p>内容</p>\n    </article>\n  </div>;\n}",
+  "props": [
+    {
+      "name": "root",
+      "type": "HTMLElement | null | (() => HTMLElement | null)",
+      "default": "document",
+      "description": "采集标题的作用域，不含作用域元素自身。建议 getter 配合 ref，避免采集页面其他标题；显式 null 表示作用域尚未准备好。"
+    },
+    {
+      "name": "scrollContainer",
+      "type": "HTMLElement | null | (() => HTMLElement | null)",
+      "default": "window",
+      "description": "实际包含文章的垂直滚动容器；null 回退为 window。"
+    },
+    {
+      "name": "selector",
+      "type": "string",
+      "default": "\"h2, h3, h4\"",
+      "description": "在 root 中匹配标题的 CSS 选择器；无效选择器显示空目录。"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "default": "\"目录\"",
+      "description": "目录标题，null 隐藏。"
+    },
+    {
+      "name": "initialItems",
+      "type": "TableOfContentsItem[]",
+      "default": "[]",
+      "description": "SSR 和首次渲染使用的 { id, label, level } 列表；挂载后由真实 DOM 采集结果替换，不是受控 items。"
+    },
+    {
+      "name": "observe",
+      "type": "boolean",
+      "default": "true",
+      "description": "自动刷新 DOM 增删、文本及相关属性变化；关闭后通过 ref.refresh() 重新采集。"
+    },
+    {
+      "name": "offset",
+      "type": "number",
+      "default": "0",
+      "description": "跳转与激活判定距离滚动容器顶部的像素偏移，可避开固定工具栏。"
+    },
+    {
+      "name": "behavior",
+      "type": "ScrollBehavior",
+      "default": "\"smooth\"",
+      "description": "点击目录时的滚动方式；系统偏好减少动画时改为 auto。"
+    },
+    {
+      "name": "indent",
+      "type": "number",
+      "default": "12",
+      "description": "每级缩进像素，以采集结果的最小层级为基准；最多缩进 12 级。"
+    },
+    {
+      "name": "variant",
+      "type": "\"default\" | \"subtle\"",
+      "default": "\"default\"",
+      "description": "default 使用灰底活动项；subtle 使用细侧边标记。"
+    },
+    {
+      "name": "emptyContent",
+      "type": "ReactNode",
+      "default": "null",
+      "description": "没有匹配标题时的内容。"
+    },
+    {
+      "name": "getLabel",
+      "type": "(element: HTMLElement) => string",
+      "default": "textContent.trim()",
+      "description": "读取目录标题；空白标签不显示。"
+    },
+    {
+      "name": "getLevel",
+      "type": "(element: HTMLElement) => number",
+      "default": "标题级别或 1",
+      "description": "读取标题层级，默认从 h1-h6 标签读取；可与自定义 selector 搭配。"
+    },
+    {
+      "name": "renderLabel",
+      "type": "(item: TableOfContentsItem, active: boolean) => ReactNode",
+      "description": "自定义链接内部显示内容，不应包含嵌套交互控件。"
+    },
+    {
+      "name": "onActiveChange",
+      "type": "(id: string | null) => void",
+      "description": "活动标题改变时触发；没有可用标题时为 null。"
+    },
+    {
+      "name": "onItemClick",
+      "type": "(item: TableOfContentsItem, event: MouseEvent<HTMLAnchorElement>) => void",
+      "description": "点击目录项时触发；event.preventDefault() 取消内置导航，便于自行接入路由。"
+    },
+    {
+      "name": "ref",
+      "type": "Ref<TableOfContentsHandle>",
+      "description": "暴露 refresh() 手动重新采集标题；不是 nav DOM ref。"
+    },
+    {
+      "name": "className / style / aria-label",
+      "type": "HTMLAttributes<HTMLElement>",
+      "description": "其余属性传给 nav；aria-label 默认“目录”，可按页面语言设置。"
+    }
+  ],
+  "notes": [
+    "功能参考 Mantine，API 独立设计，不是其直接替代。组件只负责页内目录，不自动提供 sticky 固定定位、折叠导航或全文检索。",
+    "默认跳转不修改 location.hash，适合 hash 路由；Ctrl/Cmd 等修饰点击保留原生链接行为。需要分享固定锚点时应自行给标题指定稳定、唯一的 id。",
+    "没有 id 的匹配元素会被分配唯一 id，并保留在 DOM 上。自动 id 不保证跨页面重新挂载稳定；已有 id 不改写。重复 authored id 仅保留第一个匹配标题，请保证全页面唯一。",
+    "目录自己的标题与后代、hidden 元素及其后代、空白标签不会被采集；显示样式隐藏的标题需要通过 selector 或应用逻辑排除。",
+    "层级只影响缩进，目录使用平铺有序列表；aria-current=\"location\" 标记活动链接。点击后焦点移至目标标题，自动添加的 tabindex 在失焦时移除。",
+    "滚动监听以当前滚动容器顶部加 offset 为阈值，按 DOM 顺序取最后经过阈值的标题；尚未到达任何标题时选择首项。标题应按页面垂直阅读顺序排列。",
+    "自动观察当前 root 中节点、文本和属性变化。React 重新渲染时会重新解析 root 与 scrollContainer getter；在 React 外部替换作用域或滚动容器后请调用 refresh()。",
+    "initialItems 仅供服务端及首次渲染；挂载后以 DOM 为准。自定义 getLabel/getLevel 建议保持引用稳定。"
+  ]
+},
+{
   "name": "Image",
   "category": "数据展示",
   "description": "带加载占位、失败备用图和模态大图预览的图片。",

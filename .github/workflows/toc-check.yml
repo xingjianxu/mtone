@@ -1,0 +1,61 @@
+name: Table of Contents verification
+on:
+  push:
+    branches: [feat-toc]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: toc-check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build:docs
+      - run: npm run test:package
+      - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: node tests/date-picker.browser.mjs
+      - run: node tests/select-layout.browser.mjs
+      - run: node tests/select-focus.browser.mjs
+      - run: node tests/spotlight.browser.mjs
+      - run: node tests/input-focus.browser.mjs
+      - run: node tests/field-focus.browser.mjs
+      - run: node tests/control-height.browser.mjs
+      - run: node tests/menu-icons.browser.mjs
+      - run: node tests/card.browser.mjs
+      - run: node tests/table.browser.mjs
+      - run: node tests/mentions.browser.mjs
+      - run: node tests/calendar.browser.mjs
+      - run: node tests/rate.browser.mjs
+      - run: node tests/timeline.browser.mjs
+      - run: node tests/tree.browser.mjs
+      - run: node tests/image.browser.mjs
+      - run: node tests/table-of-contents.browser.mjs
+      - run: node tests/result.browser.mjs
+      - run: node tests/affix.browser.mjs
+      - run: node tests/avatar-popconfirm.browser.mjs
+      - name: Splitter browser regressions
+        run: |
+          status=0
+          node tests/splitter-cycle.browser.mjs || status=1
+          node tests/splitter.browser.mjs || status=1
+          exit $status
+      - run: node tests/form.browser.mjs
+      - run: node tests/modal-layout.browser.mjs
+      - run: node tests/showcase.browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: toc-browser-results
+          path: artifacts
+          if-no-files-found: ignore

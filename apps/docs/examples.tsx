@@ -1,3 +1,4 @@
+import { TableOfContentsExample } from "./table-of-contents-example";
 import { ImageExample } from "./image-example";
 import { TreeExample } from "./tree-example";
 import { TimelineExample } from "./timeline-example";
@@ -225,6 +226,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
         </div>
       );
+    case "TableOfContents":
+      return <TableOfContentsExample compact={compact} />;
     case "Image":
     case "ImageGroup":
     case "ImagePreview":

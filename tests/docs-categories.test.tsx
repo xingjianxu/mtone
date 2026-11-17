@@ -7,7 +7,7 @@ const categories = ["布局容器", "操作命令", "导航切换", "数据录�
 const expected: Record<string, string[]> = {
   布局容器: ["Affix", "Layout", "Splitter", "Divider"],
   操作命令: ["Button", "IconButton", "ButtonGroup", "DropdownMenu", "ContextMenu", "Spotlight"],
-  导航切换: ["Sidebar", "NavItem", "NavGroup", "Breadcrumb", "Tabs", "Pagination", "Segmented"],
+  导航切换: ["TableOfContents", "Sidebar", "NavItem", "NavGroup", "Breadcrumb", "Tabs", "Pagination", "Segmented"],
   数据录入: ["Rate", "Input", "SearchInput", "Textarea", "Mentions", "Form", "FormField", "Checkbox", "Switch", "RadioGroup", "Select", "MultiSelect", "Slider", "NumberInput", "DatePicker", "FilterBar", "FilterChip", "Upload", "Dropzone"],
   数据展示: ["Image", "ImageGroup", "ImagePreview", "Calendar", "Card", "Text", "List", "ListItem", "DocumentList", "DocumentCard", "Table", "Tree", "DirectoryTree", "Badge", "Avatar", "Timeline", "AvatarGroup", "PropertyList", "PropertyItem"],
   浮层对话: ["Popconfirm", "Popover", "Tooltip", "Dialog", "Drawer", "ConfirmDialog"],
