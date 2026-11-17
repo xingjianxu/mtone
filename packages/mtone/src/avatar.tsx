@@ -79,15 +79,19 @@ const AvatarBase = React.forwardRef<HTMLSpanElement, AvatarProps>(
     const shape = ownShape ?? group.shape ?? "circle";
     const root = React.useRef<HTMLSpanElement>(null);
     const text = React.useRef<HTMLSpanElement>(null);
-    const [failedSource, setFailedSource] = React.useState<{
-      src: typeof src;
-      srcSet: typeof srcSet;
-    } | null>(null);
-    const failed =
-      failedSource !== null &&
-      failedSource.src === src &&
-      failedSource.srcSet === srcSet;
-    React.useEffect(() => setFailedSource(null), [src, srcSet]);
+    const [sourceState, setSourceState] = React.useState({
+      src,
+      srcSet,
+      failed: false,
+    });
+    // Reset during render, not in a passive effect: cached/broken images can
+    // dispatch error during commit before passive effects run. A later reset
+    // would erase that failure. Recording every source transition also permits
+    // A -> B -> A to retry A rather than retaining A's earlier failure.
+    const sourceChanged =
+      sourceState.src !== src || sourceState.srcSet !== srcSet;
+    if (sourceChanged) setSourceState({ src, srcSet, failed: false });
+    const failed = !sourceChanged && sourceState.failed;
     const [scale, setScale] = React.useState(1);
     const content =
       icon ?? children ?? Array.from(name).slice(0, 2).join("").toUpperCase();
@@ -126,7 +130,13 @@ const AvatarBase = React.forwardRef<HTMLSpanElement, AvatarProps>(
       };
     }, [content, image, textContent, gap, size]);
     const handleError = (event: React.SyntheticEvent<HTMLImageElement>) => {
-      if (onError?.(event) !== false) setFailedSource({ src, srcSet });
+      if (onError?.(event) !== false) {
+        setSourceState((current) =>
+          current.src === src && current.srcSet === srcSet
+            ? { ...current, failed: true }
+            : current,
+        );
+      }
     };
     let imageNode: React.ReactNode = null;
     if (image) {

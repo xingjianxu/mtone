@@ -183,3 +183,23 @@ it("renders English overflow labels through the provider", async () => {
     "More members",
   );
 });
+
+it("preserves an image error dispatched during commit before passive effects", () => {
+  let sent = false;
+  render(
+    <Avatar
+      name="Fast failure"
+      src="bad"
+      ref={(node) => {
+        if (node && !sent) {
+          sent = true;
+          node
+            .querySelector("img")
+            ?.dispatchEvent(new Event("error", { bubbles: false }));
+        }
+      }}
+    />,
+  );
+  expect(screen.getByText("FA")).toBeInTheDocument();
+  expect(screen.queryByRole("img")).not.toBeInTheDocument();
+});
