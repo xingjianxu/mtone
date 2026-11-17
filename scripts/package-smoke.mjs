@@ -62,13 +62,14 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
 assert.equal(Mention, Mentions);
 assert.equal(Avatar.Group, AvatarGroup);
 assert(renderToStaticMarkup(createElement(Avatar, {name:"Alice",shape:"square"})).includes("AL"));
 assert(renderToStaticMarkup(createElement(Popconfirm, {title:"Confirm?",trigger:createElement(Button,null,"Delete")})).includes("Delete"));
+assert(renderToStaticMarkup(createElement(Timeline, {items:[{content:'Timeline check'}]})).includes('Timeline check'));
 assert(renderToStaticMarkup(createElement(Affix, {}, 'fixed')).includes('fixed'));
 assert(renderToStaticMarkup(createElement(Result, {status:"success",title:"Saved"})).includes("Saved"));
 assert(renderToStaticMarkup(createElement(Rate, {defaultValue:2.5, allowHalf:true})).includes('aria-valuenow="2.5"'));
@@ -94,7 +95,7 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
 import '@bixlab/mtone/styles.css';
 export const demo = <Layout><Layout.Sider version="v1" collapsible /><Layout><Layout.Header /><Layout.Content><Toast><Button variant="blue">OK</Button></Toast></Layout.Content></Layout></Layout>;
 export function FormDemo() { const [form] = Form.useForm(); return <Form form={form} onFinish={values => console.log(values)}><Form.Item name='email' label='Email' rules={[{type:'email',required:true}]}><Input /></Form.Item></Form>; }
@@ -111,6 +112,8 @@ export const avatarDemo = <Avatar.Group max={{count:2}}><Avatar {...avatarProps}
 export const resultDemo = <Result status="404" title="Not found" styles={({props})=>({root:{opacity:props.status === "404" ? 1 : .5}})} />;
 const popconfirmProps: PopconfirmProps = {title:"Confirm?",trigger:<Button>Delete</Button>,onConfirm:async()=>true};
 export const popconfirmDemo = <Popconfirm {...popconfirmProps}/>;
+const timelineProps: TimelineProps = { items:[{title:"Today",content:"Done",placement:"end"}], orientation:"horizontal" };
+export const timelineDemo = <Timeline {...timelineProps} />;
 const rateProps: RateProps = { value:2.5, allowHalf:true, onChange: value => value.toFixed(1) };
 export const rateDemo = <Rate {...rateProps} ref={rateRef} character={({index}) => index + 1} />;
 rateRef.current?.focus();

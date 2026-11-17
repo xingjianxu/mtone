@@ -37,6 +37,7 @@ jobs:
       - run: node tests/mentions.browser.mjs
       - run: node tests/calendar.browser.mjs
       - run: node tests/rate.browser.mjs
+      - run: node tests/timeline.browser.mjs
       - run: node tests/avatar-popconfirm.browser.mjs
       - run: node tests/affix.browser.mjs
       - run: node tests/result.browser.mjs

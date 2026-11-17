@@ -20,5 +20,6 @@ export * from "./rate";
 
 export * from "./popconfirm";
 
+export * from "./timeline";
 export * from "./affix";
 export * from "./result";

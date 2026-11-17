@@ -1,3 +1,4 @@
+import { TimelineExample } from "./timeline-example";
 import { AffixExample } from "./affix-example";
 import { ResultExample } from "./result-example";
 import { AvatarExample } from "./avatar-example";
@@ -222,6 +223,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
         </div>
       );
+    case "Timeline":
+      return <TimelineExample compact={compact} />;
     case "Rate":
       return <RateExample compact={compact} />;
     case "Affix":

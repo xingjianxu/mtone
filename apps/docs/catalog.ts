@@ -27,6 +27,74 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "Timeline",
+  "category": "数据展示",
+  "description": "紧凑的时间线，支持横向、纵向、交替排列、标题、加载节点及倒序。",
+  "importNames": [
+    "Timeline"
+  ],
+  "code": "import { Timeline } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n return <Timeline items={[{title:\"09:00\",content:\"已创建\",color:\"green\"},{content:\"处理中\",loading:true}]} />;\n}",
+  "props": [
+    {
+      "name": "items",
+      "type": "readonly TimelineItem[]",
+      "default": "[]",
+      "description": "节点数组，支持 key、title、content、icon、color、loading、placement、className、style 及 li 属性。"
+    },
+    {
+      "name": "mode",
+      "type": "\"start\" | \"end\" | \"alternate\"",
+      "default": "start",
+      "description": "内容侧边；start 为逻辑起点轴后，end 在轴前，alternate 交替。兼容 left/right。"
+    },
+    {
+      "name": "orientation",
+      "type": "\"vertical\" | \"horizontal\"",
+      "default": "vertical",
+      "description": "水平布局在窄容器内部滚动。"
+    },
+    {
+      "name": "reverse",
+      "type": "boolean",
+      "default": "false",
+      "description": "倒序展示，不修改输入数组。"
+    },
+    {
+      "name": "variant",
+      "type": "\"outlined\" | \"filled\"",
+      "default": "outlined",
+      "description": "默认节点的描边/实心样式。"
+    },
+    {
+      "name": "titleSpan",
+      "type": "number | string",
+      "default": "120px（窄屏72px）",
+      "description": "纵向 start 布局标题宽度，上限40%；数字表示px，不是 Ant Design 的栅格份数。"
+    },
+    {
+      "name": "pending / pendingDot",
+      "type": "ReactNode",
+      "description": "兼容末尾待办节点和图标；推荐显式 item.loading。倒序时待办节点位于开头。"
+    },
+    {
+      "name": "classNames / styles",
+      "type": "Partial<Record<TimelineSemantic, string / CSSProperties>>",
+      "description": "对象形式的 root/item/tail/icon/title/content 样式。"
+    },
+    {
+      "name": "原生属性 / ref",
+      "type": "HTMLAttributes<HTMLOListElement> / Ref<HTMLOListElement>",
+      "description": "支持 ol 属性；节点支持 li 属性。"
+    }
+  ],
+  "notes": [
+    "不依赖 Ant Design；使用 mtone 中性灰节点，可用 blue/red/green/gray 或 CSS 颜色。",
+    "节点支持 content/title/icon/placement，并兼容 children/label/dot/position；新属性优先。自定义 icon 是装饰内容，不应放交互控件。",
+    "通过 aria-busy 标记加载项，读屏顺序与显示顺序一致。无自动播报、事件编辑或拖拽调度。",
+    "titleSpan 仅控制纵向 start 布局；end/alternate 居中。styles/classNames 仅支持对象，不支持回调。"
+  ]
+},
+{
  name: "Affix", category: "布局容器", description: "将操作栏固定到窗口或滚动容器的顶部、底部，并保留原位置占位。",
  importNames: ["Affix", "Button"],
  code: 'import { Affix, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() { return <Affix offsetTop={16}><Button>保存</Button></Affix>; }',
