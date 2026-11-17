@@ -56,6 +56,24 @@ try {
             }),
           );
         assert(aligned, "horizontal title and content must share track");
+        const lineCentered = await page
+          .getByTestId("horizontal")
+          .locator(".mt-timeline-item")
+          .evaluateAll((es) =>
+            es.slice(0, -1).every((e) => {
+              const a = e
+                  .querySelector(".mt-timeline-icon")
+                  .getBoundingClientRect(),
+                b = e
+                  .querySelector(".mt-timeline-tail")
+                  .getBoundingClientRect();
+              return Math.abs(a.y + a.height / 2 - b.y - b.height / 2) < 1;
+            }),
+          );
+        assert(
+          lineCentered,
+          "horizontal lines must pass through marker centers",
+        );
         const dots = await page
           .getByTestId("horizontal")
           .locator(".mt-timeline-icon")

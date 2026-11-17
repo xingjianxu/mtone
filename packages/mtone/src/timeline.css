@@ -148,10 +148,13 @@
   grid-column: 1;
   grid-row: 2;
   justify-self: start;
+  align-self: center;
   width: 20px;
 }
 .mt-timeline[data-orientation="horizontal"] .mt-timeline-tail {
-  top: auto;
+  position: relative;
+  grid-column: 1;
+  top: 0;
   bottom: auto;
   inset-inline-start: 24px;
   width: calc(100% - 24px);
