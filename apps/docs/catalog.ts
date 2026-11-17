@@ -2747,37 +2747,102 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "Tabs",
     category: "导航切换",
-    description: "切换一组关联内容面板。",
+    description: "中性风格的标签切换，支持卡片编辑、多方向布局和溢出导航。",
     importNames: ["Tabs"],
-    code: 'import { Tabs } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />\n  );\n}',
+    code: 'import { Tabs } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />;\n}',
     props: [
       {
         name: "items",
         type: "TabItem[]",
-        description: "必填；value、label、content，可带 disabled。",
+        description:
+          "必填；value、label、content，另可设 disabled、icon、closable、closeLabel、forceRender、destroyOnHidden。",
       },
       {
-        name: "value",
+        name: "value / defaultValue",
         type: "string",
-        description: "受控值；提供后需在回调中更新。",
-      },
-      {
-        name: "defaultValue",
-        type: "string",
-        description: "非受控初始值。",
+        description: "受控/初始值；省略时选择首个未禁用项。",
       },
       {
         name: "onValueChange",
         type: "(value: string) => void",
-        description: "值变化回调。",
+        description: "用户切换及非受控有效回退时触发。",
       },
       {
-        name: "className",
+        name: "placement",
+        type: '"top" | "bottom" | "start" | "end"',
+        description: "默认 top；start/end 为逻辑方向。",
+      },
+      {
+        name: "variant",
+        type: '"line" | "card" | "editable-card"',
+        description: "默认 line。",
+      },
+      {
+        name: "size",
+        type: '"small" | "medium" | "large"',
+        description: "默认 medium。",
+      },
+      {
+        name: "centered / gap",
+        type: "boolean / number",
+        description: "居中排列（溢出时回到起点）；间隔单位px，最小0。",
+      },
+      {
+        name: "extraStart / extraEnd",
+        type: "ReactNode",
+        description: "导航栏前后附加内容。",
+      },
+      {
+        name: "activateOnFocus",
+        type: "boolean",
+        description: "默认 false，方向键移动焦点不立即切换。",
+      },
+      {
+        name: "destroyOnHidden",
+        type: "boolean",
+        description: "默认 true，卸载隐藏面板；false 保留已访问面板状态。",
+      },
+      {
+        name: "onEdit",
+        type: '(action: "add" | "remove", value?: string) => void',
+        description: "仅请求增删；缺少回调时编辑按钮禁用。",
+      },
+      {
+        name: "hideAdd / addIcon",
+        type: "boolean / ReactNode",
+        description: "编辑卡片隐藏或自定义新增按钮图标。",
+      },
+      {
+        name: "label / addLabel / moreLabel",
         type: "string",
-        description: "附加样式类。",
+        description: "标签列表、新增和更多按钮的可访问名称，默认随语言切换。",
+      },
+      {
+        name: "onTabClick",
+        type: "(value: string, event: MouseEvent<HTMLButtonElement>) => void",
+        description: "点击标签回调。",
+      },
+      {
+        name: "reorderable / onOrderChange",
+        type: "boolean / (values: string[]) => void",
+        description:
+          "默认关闭；请求重排后的完整键列表，禁用标签不可作为拖动源/目标。",
+      },
+      {
+        name: "ref / 原生属性",
+        type: "Ref<HTMLDivElement> / HTMLAttributes<HTMLDivElement>",
+        description: "根节点ref、className、style、dir和ARIA等。",
       },
     ],
-    notes: ["未指定 defaultValue 时使用第一项的 value。"],
+    notes: [
+      "保留旧 items/value/defaultValue/onValueChange；value 必须唯一。不是 Ant Design Tabs API 的兼容替代。",
+      "默认 destroyOnHidden=true 延续旧版隐藏面板卸载行为；false 时仅保留访问过的面板。forceRender 让该面板始终挂载；项目级 destroyOnHidden 可覆盖全局值。",
+      "非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。",
+      "editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。",
+      "溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。",
+      "默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。",
+      "未实现自定义 tabBar 渲染器、指示线动画引擎或 Ant Design 更多菜单搜索。标签 label 请勿嵌入交互控件。",
+    ],
   },
   {
     name: "FilterBar",

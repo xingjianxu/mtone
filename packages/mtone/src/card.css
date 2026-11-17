@@ -18,7 +18,7 @@
   .mt-card-meta-description
 ),
 .mt-card-actions > li,
-.mt-card-tabs > :is(.mt-tab-list, .mt-tab-panel) {
+.mt-card-tabs > :is(.mt-tab-bar, .mt-tab-panel) {
   box-sizing: border-box;
 }
 /* Structured card additions preserve the bare Card's 16px content spacing. */
@@ -131,7 +131,7 @@
 .mt-card-tabs {
   display: contents;
 }
-.mt-card-tabs > .mt-tab-list {
+.mt-card-tabs > .mt-tab-bar {
   grid-column: 1;
   grid-row: 1;
   padding-inline: var(--mt-card-header-padding, 16px);

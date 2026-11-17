@@ -1,3 +1,4 @@
+import { TabsExample } from "./tabs-example";
 import { TableOfContentsExample } from "./table-of-contents-example";
 import { ImageExample } from "./image-example";
 import { TreeExample } from "./tree-example";
@@ -427,15 +428,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "Tree":
       return <TreeExample compact={compact} />;
     case "Tabs":
-      return (
-        <M.Tabs
-          items={[
-            { value: "all", label: "全部", content: "所有文档都在这里。" },
-            { value: "recent", label: "最近", content: "最近编辑的文档。" },
-            { value: "disabled", label: "未开放", content: "", disabled: true },
-          ]}
-        />
-      );
+      return <TabsExample compact={compact} />;
     case "Segmented":
       return (
         <div style={stackStyle}>

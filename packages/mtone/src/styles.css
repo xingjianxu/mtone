@@ -629,3 +629,5 @@
 .mt-affix-content[data-affixed] { z-index: var(--mt-affix-z-index, 10); }
 
 @import "./tree.css";
+
+@import "./tabs.css";

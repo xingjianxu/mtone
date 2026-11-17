@@ -8,7 +8,6 @@ import { Select as BSelect } from "@base-ui/react/select";
 import { Combobox } from "@base-ui/react/combobox";
 import { Slider as BSlider } from "@base-ui/react/slider";
 import { NumberField } from "@base-ui/react/number-field";
-import { Tabs as BTabs } from "@base-ui/react/tabs";
 import { Menu } from "@base-ui/react/menu";
 import { ContextMenu as BContextMenu } from "@base-ui/react/context-menu";
 import { Popover as BPopover } from "@base-ui/react/popover";
@@ -310,47 +309,8 @@ export function NumberInput({ label, className, ...props }: NumberInputProps) {
     </NumberField.Root>
   );
 }
-export interface TabItem extends Option {
-  content: React.ReactNode;
-}
-export interface TabsProps extends ValueProps<string> {
-  items: TabItem[];
-  className?: string;
-}
-export function Tabs({
-  items,
-  className,
-  onValueChange,
-  defaultValue,
-  ...props
-}: TabsProps) {
-  return (
-    <BTabs.Root
-      className={cn("mt-tabs", className)}
-      defaultValue={defaultValue ?? items[0]?.value}
-      onValueChange={(v) => onValueChange?.(String(v))}
-      {...props}
-    >
-      <BTabs.List className="mt-tab-list">
-        {items.map((i) => (
-          <BTabs.Tab
-            className="mt-tab"
-            key={i.value}
-            value={i.value}
-            disabled={i.disabled}
-          >
-            {i.label}
-          </BTabs.Tab>
-        ))}
-      </BTabs.List>
-      {items.map((i) => (
-        <BTabs.Panel className="mt-tab-panel" key={i.value} value={i.value}>
-          {i.content}
-        </BTabs.Panel>
-      ))}
-    </BTabs.Root>
-  );
-}
+export { Tabs } from "./tabs";
+export type { TabItem, TabsProps } from "./tabs";
 export function Segmented({
   options,
   label,
