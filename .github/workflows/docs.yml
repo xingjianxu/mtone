@@ -42,6 +42,7 @@ jobs:
       - run: node tests/image.browser.mjs
       - run: node tests/table-of-contents.browser.mjs
       - run: node tests/divider.browser.mjs
+      - run: node tests/breadcrumb.browser.mjs
       - run: node tests/avatar-popconfirm.browser.mjs
       - run: node tests/affix.browser.mjs
       - run: node tests/result.browser.mjs

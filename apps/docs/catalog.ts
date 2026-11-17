@@ -2460,7 +2460,7 @@ export const componentDocs: ComponentDoc[] = [
         default: "Breadcrumb",
       },
     ],
-    notes: ['最后一项使用 aria-current="page"，不渲染链接。'],
+    notes: ['最后一项使用 aria-current="page"，不渲染链接。', '链接悬停采用中性灰底与正文色，不显示下划线；键盘焦点保留可见轮廓。'],
   },
   {
     name: "Tree",

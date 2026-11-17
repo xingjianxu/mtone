@@ -121,3 +121,12 @@ it('keeps Splitter forced-color rules inside a valid top-level media query', () 
   expect(css).toMatch(/@media \(forced-colors: active\)\s*\{\s*\.mt-splitter\s*>\s*\.mt-splitter-separator\s*\{\s*border: 1px solid ButtonText;/);
   expect(css).toMatch(/\.mt-splitter\s*>\s*\.mt-splitter-separator\s*>\s*\.mt-splitter-grip\s*\{\s*background: ButtonText;/);
 });
+
+it('keeps breadcrumb hover neutral and underline-free without removing keyboard focus', () => {
+  const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
+  const rule = css.slice(css.indexOf('.mt-breadcrumb a:hover {')).split('}')[0];
+  expect(rule).toContain('text-decoration: none');
+  expect(rule).toContain('color: var(--mt-fg, #37352f)');
+  expect(rule).toContain('background: var(--mt-hover, #f1f1ef)');
+  expect(css).toContain('.mt-breadcrumb a:focus-visible');
+});

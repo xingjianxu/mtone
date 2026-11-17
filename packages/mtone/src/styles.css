@@ -494,9 +494,12 @@
 .mt-breadcrumb a {
   color: inherit;
   text-decoration: none;
+  border-radius: var(--mt-radius, 4px);
 }
 .mt-breadcrumb a:hover {
-  text-decoration: underline;
+  color: var(--mt-fg, #37352f);
+  background: var(--mt-hover, #f1f1ef);
+  text-decoration: none;
 }
 .mt-filter-chip {
   box-sizing: border-box;
