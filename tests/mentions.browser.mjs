@@ -70,7 +70,12 @@ try {
       await expect(basic).toHaveValue("@bob ");
       await expect(page.getByTestId("selected")).toHaveText("1");
       await expect(popup).toHaveCount(0);
+      // Selection restores its caret on the next animation frame. Wait for
+      // that interaction to finish before fill selects/replaces the text.
+      await expect.poll(() => basic.evaluate(el => el.selectionStart)).toBe(5);
+      await expect.poll(() => basic.evaluate(el => el.selectionEnd)).toBe(5);
       await basic.fill("Hi @al and bye");
+      await expect(basic).toHaveValue("Hi @al and bye");
       await basic.press("Control+Home");
       for (let i = 0; i < 6; i++) await basic.press("ArrowRight");
       await expect.poll(() => basic.evaluate(el => el.selectionStart)).toBe(6);
