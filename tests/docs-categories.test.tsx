@@ -19,7 +19,7 @@ const expected: Record<string, string[]> = {
     "Button",
     "IconButton",
     "ButtonGroup",
-    "DropdownMenu",
+    "Menu",
     "ContextMenu",
     "Spotlight",
   ],

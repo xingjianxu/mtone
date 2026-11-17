@@ -215,7 +215,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           </M.ButtonGroup>
           <M.ButtonGroup connected aria-label="导出文档">
             <M.Button onClick={() => setNotice("已选择导出 PDF")}>导出 PDF</M.Button>
-            <M.DropdownMenu
+            <M.Menu
               trigger={<M.IconButton aria-label="更多导出格式"><ChevronDown size={14} /></M.IconButton>}
               items={[
                 { key: "markdown", label: "导出 Markdown", onSelect: () => setNotice("已选择导出 Markdown") },
@@ -510,11 +510,26 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     case "DropdownMenu":
+    case "Menu":
       return (
         <div style={stackStyle}>
-          <M.DropdownMenu
+          <M.Menu
             trigger={<M.Button>文档操作</M.Button>}
-            items={menuItems}
+            items={[
+              { type: "group", key: "documents", label: "文档操作", children: menuItems },
+              { type: "divider", key: "divider" },
+              { type: "group", key: "sharing", label: "共享与导出", children: [
+                { key: "export", label: "导出", children: [
+                  { key: "PDF", label: "PDF" },
+                  { key: "Markdown", label: "Markdown" },
+                  { key: "Word", label: "Word（不可用）", disabled: true },
+                ] },
+                { key: "share", label: "共享", children: [
+                  { key: "copy-link", label: "复制链接" },
+                  { key: "invite", label: "邀请成员" },
+                ] },
+              ] },
+            ]}
             onSelect={setNotice}
           />
           {output}

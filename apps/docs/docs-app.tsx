@@ -21,6 +21,7 @@ export type Route =
   | { kind: "component"; name: string };
 export function parseRoute(hash: string): Route {
   if (hash === "#/components/Mention") return { kind: "component", name: "Mentions" };
+  if (hash === "#/components/DropdownMenu") return { kind: "component", name: "Menu" };
   if (hash === "#/components/Modal") return { kind: "component", name: "Dialog" };
   if (!hash || hash === "#" || hash === "#/" || hash === "#/gallery")
     return { kind: "gallery" };

@@ -1,5 +1,5 @@
 import React, { useId, useState } from "react";
-import { Check, ChevronDown, Minus, X } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Minus, X } from "lucide-react";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BSwitch } from "@base-ui/react/switch";
 import { Radio as BRadio } from "@base-ui/react/radio";
@@ -8,7 +8,7 @@ import { Select as BSelect } from "@base-ui/react/select";
 import { Combobox } from "@base-ui/react/combobox";
 import { Slider as BSlider } from "@base-ui/react/slider";
 import { NumberField } from "@base-ui/react/number-field";
-import { Menu } from "@base-ui/react/menu";
+import { Menu as BMenu } from "@base-ui/react/menu";
 import { ContextMenu as BContextMenu } from "@base-ui/react/context-menu";
 import { Popover as BPopover } from "@base-ui/react/popover";
 import { Tooltip as BTooltip } from "@base-ui/react/tooltip";
@@ -337,6 +337,7 @@ export function Segmented({
   );
 }
 export interface MenuItem {
+  type?: "item";
   icon?: React.ReactNode;
   key: string;
   label: React.ReactNode;
@@ -344,76 +345,137 @@ export interface MenuItem {
   danger?: boolean;
   shortcut?: string;
   onSelect?: () => void;
+  /** Nonempty children open a submenu; parent callbacks are not invoked. */
+  children?: MenuEntry[];
 }
-export interface DropdownMenuProps extends OpenProps {
+export interface MenuGroup {
+  type: "group";
+  key: string;
+  label: React.ReactNode;
+  children: MenuEntry[];
+}
+export interface MenuDivider {
+  type: "divider";
+  key: string;
+}
+export type MenuEntry = MenuItem | MenuGroup | MenuDivider;
+export interface MenuProps extends OpenProps {
   trigger: React.ReactElement;
-  items: MenuItem[];
+  items: MenuEntry[];
   onSelect?: (key: string) => void;
 }
-function MenuItems({
-  items,
-  onSelect,
-}: Pick<DropdownMenuProps, "items" | "onSelect">) {
+function MenuItemLabel({ item }: { item: MenuItem }) {
+  return (
+    <span className="mt-menu-label">
+      <span aria-hidden="true" className="mt-menu-icon">
+        {item.icon}
+      </span>
+      <span className="mt-menu-text">{item.label}</span>
+    </span>
+  );
+}
+function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
   return (
     <>
-      {items.map((i) => (
-        <Menu.Item
-          className={cn("mt-menu-item", i.danger ? "mt-danger" : "")}
-          key={i.key}
-          disabled={i.disabled}
-          onClick={() => {
-            i.onSelect?.();
-            onSelect?.(i.key);
-          }}
-        >
-          <span className="mt-menu-label">
-            <span aria-hidden="true" className="mt-menu-icon">{i.icon}</span>
-            <span className="mt-menu-text">{i.label}</span>
-          </span>
-          {i.shortcut && <span className="mt-shortcut">{i.shortcut}</span>}
-        </Menu.Item>
-      ))}
+      {items.map((item) => {
+        if (item.type === "divider")
+          return <BMenu.Separator key={item.key} className="mt-menu-divider" />;
+        if (item.type === "group")
+          return (
+            <BMenu.Group key={item.key} className="mt-menu-group">
+              <BMenu.GroupLabel className="mt-menu-group-label">
+                {item.label}
+              </BMenu.GroupLabel>
+              <MenuItems items={item.children} onSelect={onSelect} />
+            </BMenu.Group>
+          );
+        const className = cn("mt-menu-item", item.danger && "mt-danger");
+        if (item.children?.length)
+          return (
+            <BMenu.SubmenuRoot key={item.key}>
+              <BMenu.SubmenuTrigger
+                className={className}
+                disabled={item.disabled}
+              >
+                <MenuItemLabel item={item} />
+                <ChevronRight
+                  aria-hidden="true"
+                  className="mt-menu-submenu-arrow"
+                />
+              </BMenu.SubmenuTrigger>
+              <BMenu.Portal>
+                <MtoneScope>
+                  <BMenu.Positioner
+                    className="mt-positioner"
+                    side="inline-end"
+                    align="start"
+                    sideOffset={4}
+                  >
+                    <BMenu.Popup className="mt-popup mt-menu-popup">
+                      <MenuItems items={item.children} onSelect={onSelect} />
+                    </BMenu.Popup>
+                  </BMenu.Positioner>
+                </MtoneScope>
+              </BMenu.Portal>
+            </BMenu.SubmenuRoot>
+          );
+        return (
+          <BMenu.Item
+            key={item.key}
+            className={className}
+            disabled={item.disabled}
+            onClick={() => {
+              item.onSelect?.();
+              onSelect?.(item.key);
+            }}
+          >
+            <MenuItemLabel item={item} />
+            {item.shortcut && (
+              <span className="mt-shortcut">{item.shortcut}</span>
+            )}
+          </BMenu.Item>
+        );
+      })}
     </>
   );
 }
-export function DropdownMenu({
-  trigger,
-  items,
-  onSelect,
-  ...props
-}: DropdownMenuProps) {
+export function Menu({ trigger, items, onSelect, ...props }: MenuProps) {
   return (
-    <Menu.Root {...props}>
-      <Menu.Trigger render={trigger} />
-      <Menu.Portal>
+    <BMenu.Root {...props}>
+      <BMenu.Trigger render={trigger} />
+      <BMenu.Portal>
         <MtoneScope>
-          <Menu.Positioner
+          <BMenu.Positioner
             className="mt-positioner"
             sideOffset={4}
             align="start"
           >
-            <Menu.Popup className="mt-popup">
+            <BMenu.Popup className="mt-popup mt-menu-popup">
               <MenuItems items={items} onSelect={onSelect} />
-            </Menu.Popup>
-          </Menu.Positioner>
+            </BMenu.Popup>
+          </BMenu.Positioner>
         </MtoneScope>
-      </Menu.Portal>
-    </Menu.Root>
+      </BMenu.Portal>
+    </BMenu.Root>
   );
 }
+/** @deprecated Use MenuProps instead. */
+export type DropdownMenuProps = MenuProps;
+/** @deprecated Use Menu instead. */
+export const DropdownMenu = Menu;
 export function ContextMenu({
   children,
   items,
   onSelect,
   ...props
-}: Omit<DropdownMenuProps, "trigger"> & { children: React.ReactNode }) {
+}: Omit<MenuProps, "trigger"> & { children: React.ReactNode }) {
   return (
     <BContextMenu.Root {...props}>
       <BContextMenu.Trigger>{children}</BContextMenu.Trigger>
       <BContextMenu.Portal>
         <MtoneScope>
           <BContextMenu.Positioner className="mt-positioner">
-            <BContextMenu.Popup className="mt-popup">
+            <BContextMenu.Popup className="mt-popup mt-menu-popup">
               <MenuItems items={items} onSelect={onSelect} />
             </BContextMenu.Popup>
           </BContextMenu.Positioner>

@@ -23,7 +23,7 @@ export function TypographyExample() {
         maxWidth: 640,
       }}
     >
-      <section>
+      <section style={{ margin: 0 }}>
         <Title level={2}>让内容清晰、有层次</Title>
         <Paragraph>
           Typography 沿用 mtone
@@ -37,7 +37,7 @@ export function TypographyExample() {
           <Text disabled>不可用</Text>
         </div>
       </section>
-      <section>
+      <section style={{ margin: 0 }}>
         <Title level={4}>文字修饰</Title>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
           <Text strong>重点</Text>
@@ -49,7 +49,7 @@ export function TypographyExample() {
           <Text keyboard>⌘ K</Text>
         </div>
       </section>
-      <section>
+      <section style={{ margin: 0 }}>
         <Title level={4}>复制与编辑</Title>
         <Paragraph
           copyable={{
@@ -78,7 +78,7 @@ export function TypographyExample() {
           {message}
         </div>
       </section>
-      <section>
+      <section style={{ margin: 0 }}>
         <Title level={4}>省略与展开</Title>
         <div style={{ maxWidth: 300 }}>
           <Text ellipsis>
@@ -101,7 +101,7 @@ export function TypographyExample() {
           {expanded ? "从外部收起" : "从外部展开"}
         </Button>
       </section>
-      <section>
+      <section style={{ margin: 0 }}>
         <Typography.Title level={4}>链接与语义标题</Typography.Title>
         <Typography.Paragraph>
           Title 支持 h1 到 h6；请选择符合页面结构的层级，而不只按字号选择。

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
-import { DropdownMenu } from "./interactive";
+import { Menu } from "./interactive";
 import type {
   TableColumn,
   TableLocale,
@@ -301,7 +301,7 @@ export function useTableSelection<T>({
     <span className={controlsClass}>
       {checkbox}
       {hasActions && (
-        <DropdownMenu
+        <Menu
           trigger={
             <button
               type="button"

@@ -1759,7 +1759,7 @@ export const componentDocs: ComponentDoc[] = [
         name: "Layout.Header.extra",
         type: "ReactNode",
         description:
-          "顶部右对齐操作插槽，可组合 IconButton、DropdownMenu、Avatar 等。",
+          "顶部右对齐操作插槽，可组合 IconButton、Menu、Avatar 等。",
       },
       {
         name: "Layout.Header.children",
@@ -1906,8 +1906,8 @@ export const componentDocs: ComponentDoc[] = [
     name: "ButtonGroup",
     category: "操作命令",
     description: "将关联按钮组织为一个操作组，支持默认分开排列或相连组合。",
-    importNames: ["ButtonGroup", "Button", "IconButton", "DropdownMenu"],
-    code: "import { useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { ButtonGroup, Button, IconButton, DropdownMenu } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [message, setMessage] = useState(\"\");\n  return (\n    <div>\n      <ButtonGroup connected aria-label=\"导出文档\">\n        <Button onClick={() => setMessage(\"已选择导出 PDF\")}>导出 PDF</Button>\n        <DropdownMenu\n          trigger={<IconButton aria-label=\"更多导出格式\"><ChevronDown size={14} /></IconButton>}\n          items={[\n            { key: \"markdown\", label: \"导出 Markdown\", onSelect: () => setMessage(\"已选择导出 Markdown\") },\n            { key: \"html\", label: \"导出 HTML\", onSelect: () => setMessage(\"已选择导出 HTML\") },\n          ]}\n        />\n      </ButtonGroup>\n      <p role=\"status\">{message}</p>\n    </div>\n  );\n}",
+    importNames: ["ButtonGroup", "Button", "IconButton", "Menu"],
+    code: "import { useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { ButtonGroup, Button, IconButton, Menu } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [message, setMessage] = useState(\"\");\n  return (\n    <div>\n      <ButtonGroup connected aria-label=\"导出文档\">\n        <Button onClick={() => setMessage(\"已选择导出 PDF\")}>导出 PDF</Button>\n        <Menu\n          trigger={<IconButton aria-label=\"更多导出格式\"><ChevronDown size={14} /></IconButton>}\n          items={[\n            { key: \"markdown\", label: \"导出 Markdown\", onSelect: () => setMessage(\"已选择导出 Markdown\") },\n            { key: \"html\", label: \"导出 HTML\", onSelect: () => setMessage(\"已选择导出 HTML\") },\n          ]}\n        />\n      </ButtonGroup>\n      <p role=\"status\">{message}</p>\n    </div>\n  );\n}",
     props: [
       { name: "connected", type: "boolean", default: "false", description: "相连样式：移除间距、共享边框，仅保留外侧圆角。" },
       {
@@ -1922,7 +1922,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ['DropdownMenu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
+    notes: ['Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
   },
   {
     name: "Input",
@@ -3431,11 +3431,11 @@ export const componentDocs: ComponentDoc[] = [
     notes: ["不自动加载数据。首尾翻页按钮会禁用；大量页码显示省略。"],
   },
   {
-    name: "DropdownMenu",
+    name: "Menu",
     category: "操作命令",
-    description: "点击触发器打开的操作菜单。",
-    importNames: ["DropdownMenu", "Button"],
-    code: 'import { DropdownMenu, Button } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DropdownMenu trigger={<Button>文档操作</Button>} items={[{key:"open",label:"打开",icon:<FileText />},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
+    description: "点击打开的操作菜单，支持分组与多级子菜单。",
+    importNames: ["Menu", "Button"],
+    code: 'import { Menu, Button } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu trigger={<Button>文档操作</Button>} items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
     props: [
       {
         name: "trigger",
@@ -3444,14 +3444,14 @@ export const componentDocs: ComponentDoc[] = [
       },
       {
         name: "items",
-        type: "MenuItem[]",
+        type: "MenuEntry[]",
         description:
-          "必填；key、label，可选 icon、shortcut、disabled、danger、onSelect。",
+          "必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}。",
       },
       {
         name: "onSelect",
         type: "(key: string) => void",
-        description: "选中菜单项时调用。",
+        description: "选中叶子项时调用；展开子菜单不触发。先执行项自己的 onSelect，再执行此回调。",
       },
       {
         name: "open",
@@ -3470,8 +3470,10 @@ export const componentDocs: ComponentDoc[] = [
       },
     ],
     notes: [
-      "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。当前 items 为扁平数组，尚不支持分组、子菜单或勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",
+      "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线；尚不支持勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",
       "快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。",
+      "Menu / MenuProps 是正式名称；DropdownMenu / DropdownMenuProps 仍作为已弃用兼容别名保留。旧文档链接自动转到 Menu。",
+      "子菜单支持悬停、点击与左右方向键；Escape 关闭当前子菜单，再次 Escape 关闭主菜单并返回触发器。空 children 按普通叶子项处理，父项 onSelect 和 shortcut 不用于子菜单。key 请在每个同级列表内保持唯一。菜单项高亮使用灰色背景与 1px 淡蓝边框，不改变 Select 样式。",
     ],
   },
   {
@@ -3488,14 +3490,14 @@ export const componentDocs: ComponentDoc[] = [
       },
       {
         name: "items",
-        type: "MenuItem[]",
+        type: "MenuEntry[]",
         description:
-          "必填；key、label，可选 icon、shortcut、disabled、danger、onSelect。",
+          "必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}。",
       },
       {
         name: "onSelect",
         type: "(key: string) => void",
-        description: "选中菜单项时调用。",
+        description: "选中叶子项时调用；展开子菜单不触发。先执行项自己的 onSelect，再执行此回调。",
       },
       {
         name: "open",
@@ -3513,7 +3515,7 @@ export const componentDocs: ComponentDoc[] = [
         description: "开关变化回调。",
       },
     ],
-    notes: ["同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。当前 items 为扁平数组，尚不支持分组、子菜单或勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。", "children 为右键区域；不要向其传 DropdownMenu 的 trigger 属性。"],
+    notes: ["同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线；尚不支持勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。", "children 为右键区域；不要向其传 Menu 的 trigger 属性。"],
   },
   {
     name: "Popover",
@@ -4230,7 +4232,7 @@ export const componentDocs: ComponentDoc[] = [
         name: "rowSelection",
         type: "TableRowSelection<T>",
         description:
-          "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用库内 DropdownMenu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。有批量操作菜单时，默认选择列宽为 64px（否则 40px），表头和各行保留相同菜单空间以对齐复选框；columnWidth 可覆盖。",
+          "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用库内 Menu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。有批量操作菜单时，默认选择列宽为 64px（否则 40px），表头和各行保留相同菜单空间以对齐复选框；columnWidth 可覆盖。",
       },
       {
         name: "expandable",

@@ -97,9 +97,9 @@ it('uses border-box 28px single-line surfaces without fixing multiline chips', (
  expect(filter).toContain('height: 28px');expect(filter).toContain('box-sizing: border-box');
 });
 
-it('reserves menu icon columns only for direct rows of a panel with rendered icons',()=>{
+it('reserves menu icon columns for all grouped rows of a panel with rendered icons',()=>{
  const css=readFileSync('packages/mtone/src/interactive.css','utf8');
- expect(css).toContain('.mt-popup:has(> .mt-menu-item > .mt-menu-label > .mt-menu-icon:not(:empty)) > .mt-menu-item');
+ expect(css).toContain('.mt-menu-popup:has(.mt-menu-icon:not(:empty)) .mt-menu-icon');
  const icon=css.slice(css.indexOf('.mt-menu-icon {')).split('}')[0];expect(icon).toContain('display: none');expect(icon).toContain('flex: 0 0 16px');
 });
 

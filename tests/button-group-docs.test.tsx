@@ -17,8 +17,8 @@ it("demonstrates independent primary and dropdown actions in a connected group",
 });
 it("publishes a complete copyable split-button example", () => {
   const doc = componentDocs.find(d => d.name === "ButtonGroup")!;
-  expect(doc.importNames).toContain("DropdownMenu");
-  expect(doc.code).toContain("<DropdownMenu");
+  expect(doc.importNames).toContain("Menu");
+  expect(doc.code).toContain("<Menu");
   expect(doc.code).toContain('aria-label="更多导出格式"');
   expect(doc.code).toContain("onSelect");
 });
