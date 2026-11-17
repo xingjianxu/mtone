@@ -441,7 +441,7 @@ test("page size Select preserves controlled values and numeric callbacks", async
   );
   const trigger = screen.getByRole("combobox", { name: "Page size" });
   await userEvent.click(trigger);
-  expect(screen.getAllByRole("option")).toHaveLength(2);
+  expect(await screen.findAllByRole("option")).toHaveLength(2);
   await userEvent.click(screen.getByRole("option", { name: "2 / page" }));
   expect(onChange).toHaveBeenCalledExactlyOnceWith(1, 2);
   expect(onShowSizeChange).toHaveBeenCalledExactlyOnceWith(1, 2);
