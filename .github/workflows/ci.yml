@@ -1,0 +1,128 @@
+name: Verify and deploy
+on:
+  push:
+    branches: [master, 'verify/**']
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      keep_screenshots:
+        description: Retain successful browser screenshots for review
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find exact-SHA verified documentation
+        id: reuse
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await require('./scripts/ci-reuse.cjs').findVerifiedArtifact({ github, context, core });
+      - name: Restore verified documentation
+        if: steps.reuse.outputs.run-id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: verified-docs-${{ github.sha }}
+          path: dist/docs
+          run-id: ${{ steps.reuse.outputs.run-id }}
+          github-token: ${{ github.token }}
+      - name: Verify restored artifact integrity
+        if: steps.reuse.outputs.run-id != ''
+        working-directory: dist/docs
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          test "$(cat .verified-sha)" = "$EXPECTED_SHA"
+          sha256sum --check .verified-checksums
+      - uses: actions/setup-node@v4
+        if: steps.reuse.outputs.run-id == ''
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: steps.reuse.outputs.run-id == ''
+      - run: node --test scripts/ci-reuse.node.cjs
+        if: steps.reuse.outputs.run-id == ''
+      - run: npm run typecheck
+        if: steps.reuse.outputs.run-id == ''
+      - run: npm test
+        if: steps.reuse.outputs.run-id == ''
+      - run: npm run build:docs
+        if: steps.reuse.outputs.run-id == ''
+      - run: npm run test:package
+        if: steps.reuse.outputs.run-id == ''
+      - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
+      - run: npx playwright install --with-deps chromium firefox webkit
+        if: steps.reuse.outputs.run-id == ''
+      - name: All browser regressions
+        if: steps.reuse.outputs.run-id == ''
+        run: |
+          status=0
+          for test in tests/*.browser.mjs; do
+            echo "::group::$test"
+            node "$test" || status=1
+            echo '::endgroup::'
+          done
+          exit "$status"
+      - name: Browser diagnostics
+        if: failure() || inputs.keep_screenshots == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-results-${{ github.sha }}
+          path: artifacts
+          if-no-files-found: ignore
+          retention-days: 3
+          overwrite: true
+      - name: Seal verified documentation
+        if: steps.reuse.outputs.run-id == '' && github.event_name != 'pull_request'
+        working-directory: dist/docs
+        env:
+          VERIFIED_SHA: ${{ github.sha }}
+        run: |
+          printf '%s\n' "$VERIFIED_SHA" > .verified-sha
+          find . -type f ! -name .verified-checksums -print0 | sort -z | xargs -0 sha256sum > .verified-checksums
+      - name: Save verified documentation
+        if: steps.reuse.outputs.run-id == '' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: verified-docs-${{ github.sha }}
+          path: dist/docs
+          include-hidden-files: true
+          retention-days: 3
+          overwrite: true
+          if-no-files-found: error
+      - name: Remove verification metadata from public site
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        run: rm -f dist/docs/.verified-sha dist/docs/.verified-checksums
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        with:
+          path: dist/docs
+  deploy:
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    needs: verify
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy verified documentation
+        id: deployment
+        uses: actions/deploy-pages@v4
