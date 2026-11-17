@@ -94,6 +94,23 @@ try {
         ),
         "calendar page fits 375px viewport",
       );
+      assert(
+        await custom.locator(".mt-calendar-day").evaluateAll((buttons) =>
+          buttons.every((button) => {
+            const box = button.getBoundingClientRect();
+            return (
+              button.scrollWidth <= button.clientWidth + 1 &&
+              [...button.children].every((child) => {
+                const content = child.getBoundingClientRect();
+                return (
+                  content.left >= box.left - 1 && content.right <= box.right + 1
+                );
+              })
+            );
+          }),
+        ),
+        "full-cell custom content wraps within each date cell",
+      );
       await page.setViewportSize({ width: 320, height: 800 });
       await card.scrollIntoViewIfNeeded();
       const box = await card.locator(".mt-calendar").boundingBox();

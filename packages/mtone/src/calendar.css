@@ -54,6 +54,8 @@
   gap: 5px;
   width: 100%;
   min-height: 90px;
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding: 8px;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -62,6 +64,10 @@
   font: inherit;
   text-align: start;
   cursor: pointer;
+}
+.mt-calendar-day > * {
+  min-width: 0;
+  max-width: 100%;
 }
 .mt-calendar-number {
   align-self: flex-end;
