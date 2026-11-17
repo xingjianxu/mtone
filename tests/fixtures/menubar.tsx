@@ -10,5 +10,5 @@ function Demo(){const [result,setResult]=React.useState('');return <DirectionPro
 {key:'edit',label:'Edit',items:[{key:'copy',label:'Copy'}]},
 {key:'view',label:'View',items:[{type:'checkbox',key:'sidebar',label:'Sidebar'}]},
 {key:'locked',label:'Locked',disabled:true,items:[]},
-]}/><button>Outside</button><p role="status">{result}</p></main></MtoneProvider></DirectionProvider>}
+]}/><button style={{display:"block",marginTop:220}}>Outside</button><p role="status">{result}</p></main></MtoneProvider></DirectionProvider>}
 createRoot(document.getElementById('root')!).render(<Demo/>);
