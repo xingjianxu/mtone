@@ -736,7 +736,7 @@ export default function Demo() {
 - Import: Button from @bixlab/mtone
 - variant: "blue" | "solid" | "outline" | "soft" | "ghost" (default: outline). 按钮外观。
 - size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
-- danger: boolean. 危险操作样式。
+- danger: boolean. 危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。
 - loading: boolean. 显示加载图标并禁用点击。
 - icon: ReactNode. 前置图标。
 - disabled: boolean. 禁用按钮。
@@ -763,7 +763,7 @@ export default function Demo() {
 - aria-label: string. 必填；读屏器朗读的操作名称。
 - variant: "blue" | "solid" | "outline" | "soft" | "ghost" (default: outline). 按钮外观。
 - size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
-- danger: boolean. 危险操作样式。
+- danger: boolean. 危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。
 - loading: boolean. 显示加载图标并禁用点击。
 - icon: ReactNode. 前置图标。
 - disabled: boolean. 禁用按钮。
@@ -784,10 +784,14 @@ export default function Demo() {
 
 ### ButtonGroup
 
-- [ButtonGroup](https://xingjianxu.github.io/mtone/#/components/ButtonGroup): 将关联按钮组织为一个操作组。
+- [ButtonGroup](https://xingjianxu.github.io/mtone/#/components/ButtonGroup): 将关联按钮组织为一个操作组，支持默认分开排列或相连组合。
 - Import: ButtonGroup, Button from @bixlab/mtone
+- connected: boolean (default: false). 相连样式：移除间距、共享边框，仅保留外侧圆角。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。
+- 使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。
+- 危险实心按钮使用 <Button danger variant="solid">删除</Button>。
 
 ```tsx
 import { ButtonGroup, Button } from "@bixlab/mtone";
@@ -795,7 +799,7 @@ import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <ButtonGroup aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>
+    <ButtonGroup connected aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>
   );
 }
 ```

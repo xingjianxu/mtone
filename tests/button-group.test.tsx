@@ -1,0 +1,40 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import { expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import postcss from "postcss";
+import { Button, ButtonGroup, IconButton } from "../packages/mtone/src/basic";
+
+it("keeps separated groups as the default and supports connected groups without forwarding the prop", () => {
+  const { rerender } = render(<ButtonGroup aria-label="Actions"><Button>Copy</Button></ButtonGroup>);
+  expect(screen.getByRole("group")).not.toHaveClass("mt-button-group-connected");
+  rerender(<ButtonGroup connected aria-label="Actions" className="custom"><Button>Copy</Button><IconButton aria-label="More">+</IconButton></ButtonGroup>);
+  expect(screen.getByRole("group")).toHaveClass("mt-button-group-connected", "custom");
+  expect(screen.getByRole("group")).not.toHaveAttribute("connected");
+  expect(screen.getAllByRole("button")).toHaveLength(2);
+});
+it("preserves button click, loading and disabled semantics in connected groups", () => {
+  const click = vi.fn();
+  render(<ButtonGroup connected><Button onClick={click}>Copy</Button><Button danger variant="solid" loading onClick={click}>Delete</Button><Button disabled onClick={click}>Disabled</Button></ButtonGroup>);
+  for (const button of screen.getAllByRole("button")) fireEvent.click(button);
+  expect(click).toHaveBeenCalledOnce();
+  expect(screen.getByText("Delete")).toHaveClass("mt-btn-solid", "mt-danger");
+  expect(screen.getByText("Delete")).toHaveAttribute("aria-busy", "true");
+});
+const css = postcss.parse(readFileSync("packages/mtone/src/styles.css", "utf8"));
+function declarations(selector: string) {
+  const values: Record<string, string> = {};
+  css.walkRules(rule => { if (rule.selectors.includes(selector)) rule.walkDecls(d => { values[d.prop] = d.value; }); });
+  return values;
+}
+it("joins borders without clipping focus and preserves logical outer corners", () => {
+  expect(declarations(".mt-button-group").gap).toBe("4px");
+  expect(declarations(".mt-button-group-connected").gap).toBe("0");
+  expect(declarations(".mt-button-group-connected > .mt-btn + .mt-btn")["margin-inline-start"]).toBe("-1px");
+  expect(declarations(".mt-button-group-connected > .mt-btn:not(:first-child)")["border-start-start-radius"]).toBe("0");
+  expect(declarations(".mt-button-group-connected > .mt-btn:not(:last-child)")["border-end-end-radius"]).toBe("0");
+  expect(declarations(".mt-button-group-connected > .mt-btn:focus-visible")["z-index"]).toBe("2");
+});
+it("keeps solid danger hover red rather than neutral", () => {
+  expect(declarations(".mt-btn-solid.mt-danger").background).toBe("#b6403b");
+  expect(declarations(".mt-btn-solid.mt-danger:hover:not(:disabled)").background).toBe("#9e3632");
+});

@@ -110,11 +110,16 @@ export const IconButton = React.forwardRef<
 >(function IconButton(p, r) {
   return <Button {...p} ref={r} className={cn("mt-icon-btn", p.className)} />;
 });
+export type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** Join adjacent buttons, keeping only the outside corners rounded. */
+  connected?: boolean;
+};
 export const ButtonGroup = ({
   className,
+  connected = false,
   ...p
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div role="group" {...p} className={cn("mt-button-group", className)} />
+}: ButtonGroupProps) => (
+  <div role="group" {...p} className={cn("mt-button-group", connected && "mt-button-group-connected", className)} />
 );
 export const Input = React.forwardRef<
   HTMLInputElement,

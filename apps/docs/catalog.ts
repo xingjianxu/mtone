@@ -1812,7 +1812,7 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "danger",
         type: "boolean",
-        description: "危险操作样式。",
+        description: '危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。',
       },
       {
         name: "loading",
@@ -1872,7 +1872,7 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "danger",
         type: "boolean",
-        description: "危险操作样式。",
+        description: '危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。',
       },
       {
         name: "loading",
@@ -1905,10 +1905,11 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "ButtonGroup",
     category: "操作命令",
-    description: "将关联按钮组织为一个操作组。",
+    description: "将关联按钮组织为一个操作组，支持默认分开排列或相连组合。",
     importNames: ["ButtonGroup", "Button"],
-    code: 'import { ButtonGroup, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ButtonGroup aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>\n  );\n}',
+    code: 'import { ButtonGroup, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ButtonGroup connected aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>\n  );\n}',
     props: [
+      { name: "connected", type: "boolean", default: "false", description: "相连样式：移除间距、共享边框，仅保留外侧圆角。" },
       {
         name: "children",
         type: "ReactNode",
@@ -1921,7 +1922,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: [],
+    notes: ['默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
   },
   {
     name: "Input",

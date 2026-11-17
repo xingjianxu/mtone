@@ -203,6 +203,15 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
             <M.Button onClick={() => setNotice("已选择复制")}>复制</M.Button>
             <M.Button onClick={() => setNotice("已选择归档")}>归档</M.Button>
           </M.ButtonGroup>
+          <M.ButtonGroup connected aria-label="相连文档操作">
+            <M.Button onClick={() => setNotice("已选择复制")}>复制</M.Button>
+            <M.Button onClick={() => setNotice("已选择粘贴")}>粘贴</M.Button>
+            <M.Button onClick={() => setNotice("已选择归档")}>归档</M.Button>
+          </M.ButtonGroup>
+          <M.ButtonGroup connected aria-label="危险操作">
+            <M.Button danger variant="solid" onClick={() => setNotice("删除示例")}>删除</M.Button>
+            <M.Button danger variant="solid" onClick={() => setNotice("永久删除示例")}>永久删除</M.Button>
+          </M.ButtonGroup>
           {output}
         </div>
       );
