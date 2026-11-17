@@ -196,3 +196,41 @@ This is **not a drop-in Ant Design Mentions replacement**: no `Mentions.Option`
 children, Ant variants, ConfigProvider design tokens, function-style semantic
 customization or virtual suggestions. See the component catalog for the full
 current declaration-backed API.
+
+## Calendar (unreleased)
+
+`Calendar` displays a month/date grid or a year/month grid using mtone styles.
+It is a date-display component, separate from the native-input `DatePicker`.
+All date values are ISO `YYYY-MM-DD` **strings**, not Dayjs or Date instances.
+Supported years are `0001`–`9999`; year `0000` is invalid. Grid cells overflowing
+these endpoints are empty.
+
+```tsx
+const [date, setDate] = useState("2026-11-16");
+<Calendar value={date} onChange={setDate} showWeek
+  cellRender={(current, info) =>
+    info.type === "date" && current === "2026-11-16" ? "Release planning" : null}
+/>
+<Calendar fullscreen={false} defaultValue="2026-11-16"
+  validRange={["2026-11-05", "2026-12-20"]} />
+```
+
+- `value` / `defaultValue`, `onChange` / `onValueChange`: controlled/uncontrolled date selection.
+- `mode` / `defaultMode`: `month` (dates) or `year` (months); selecting a month keeps year mode.
+- `onPanelChange(date, mode)` and `onSelect(date, { source })`: panel and selection notifications.
+- `validRange` is inclusive; `disabledDate(date)` blocks individual dates; `disabled` blocks interaction.
+- `fullscreen` defaults to true; false is compact card layout, not a browser full-screen operation.
+- `locale` is `zh` or `en`, defaulting to `MtoneProvider`; `weekStartsOn` overrides week start (Chinese Monday, English Sunday), `showWeek` displays the ISO week number of each row’s Thursday.
+- `cellRender(date, info)` appends content; `fullCellRender(date, info)` replaces the internal content while preserving the accessible cell button. Do not nest interactive controls inside either render result.
+- `headerRender({ value, type, onChange, onTypeChange })` replaces the default Select/Button header.
+- Exported types: `CalendarProps`, `CalendarMode`, `CalendarSelectInfo`, `CalendarCellInfo`, `CalendarHeaderInfo`, `CalendarSemanticSlot`.
+- Invalid `value` / `defaultValue` or an invalid/reversed `validRange` throws `RangeError`. Initial defaults are clamped to range. Custom-header changes clamp valid dates to range, then check `disabledDate`; malformed strings are ignored.
+- Both change callbacks run when supplied, only on actual value changes. Controlled callers must update `value` to accept a selection; refusing it preserves the selected date and panel, while keyboard focus navigation remains independent.
+- Default-header navigation uses the first enabled day in the target month when its corresponding date is disabled. If no day is available, the value does not change.
+- `classNames` and `styles` accept objects for `root`, `header`, `body`, `cell`.
+- Direction keys, Home/End and Page Up/Down move focus; Shift + Page Up/Down moves by year. Enter/Space selects; Tab leaves the grid normally. Keyboard navigation skips disabled dates/months in its target direction, bounded to 366 probes; if no enabled cell is found, focus stays put.
+
+This is not a drop-in Ant Calendar replacement: no Dayjs, Ant locale object/design tokens,
+legacy date/month render callbacks, lunar conversion, time/range selection or event drag-and-drop.
+Use render callbacks for calculated lunar labels or event text and show interactive details outside
+the calendar. No network request or data persistence is performed. Not included in npm 0.3.0.

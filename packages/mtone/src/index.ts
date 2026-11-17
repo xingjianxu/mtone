@@ -13,3 +13,5 @@ export * from "./splitter";
 export * from "./table";
 
 export * from "./mentions";
+
+export * from "./calendar";

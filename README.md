@@ -57,6 +57,8 @@ Production assets use the GitHub Pages `/mtone/` base. Component URLs use hash r
 
 The source checkout also includes `Mentions` (`Mention` alias) for plain-text @ / # completion. This feature is not included in npm 0.3.0 yet; see the [API guide](docs/API.md#mentions-unreleased) for current scope and version guidance.
 
+`Calendar` is also available in the source checkout, with month/year panels, custom date content, range restrictions and keyboard navigation. It uses ISO date strings and mtone styling; see [Calendar API](docs/API.md#calendar-unreleased). It is not included in npm 0.3.0 yet.
+
 ## npm releases
 
 GitHub Actions uses trusted publishing (OIDC), without a stored npm token. See [release setup and workflow](docs/RELEASING.md). Manual workflow runs validate only; stable GitHub Releases publish after checks and the configured environment approval.

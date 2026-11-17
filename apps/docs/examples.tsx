@@ -1,3 +1,4 @@
+import { CalendarExample } from "./calendar-example";
 import { MentionsExample } from "./mentions-example";
 import { TableExample } from "./table-example";
 import { SplitterExample } from "./splitter-example";
@@ -216,6 +217,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
         </div>
       );
+    case "Calendar":
+      return <CalendarExample compact={compact} />;
     case "Mentions":
     case "Mention":
       return <MentionsExample compact={compact} />;

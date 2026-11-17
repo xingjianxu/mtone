@@ -59,10 +59,11 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
 assert.equal(Mention, Mentions);
+assert(renderToStaticMarkup(createElement(Calendar, {defaultValue:"2026-11-16"})).includes("2026-11-16"));
 assert(renderToStaticMarkup(createElement(Mentions, {defaultValue:'Hi @alice', options:[{value:'alice'}]})).includes('Hi @alice'));
 assert.deepEqual(getMentions('@alice'), [{prefix:'@',value:'alice'}]);
 assert(Card.Meta && Card.Grid && Splitter.Panel && Table.Column && Table.ColumnGroup && Table.Summary);
@@ -84,13 +85,15 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Mentions, type MentionsRef } from '@bixlab/mtone';
 import '@bixlab/mtone/styles.css';
 export const demo = <Layout><Layout.Sider version="v1" collapsible /><Layout><Layout.Header /><Layout.Content><Toast><Button variant="blue">OK</Button></Toast></Layout.Content></Layout></Layout>;
 export function FormDemo() { const [form] = Form.useForm(); return <Form form={form} onFinish={values => console.log(values)}><Form.Item name='email' label='Email' rules={[{type:'email',required:true}]}><Input /></Form.Item></Form>; }
 export const cardDemo = <Card title="Title" htmlTitle="Tooltip" size="small" variant="outlined" styles={{body:{padding:12}}} classNames={({props})=>({root:props.size==='small'?'compact':''})} tabList={[{key:'one',label:'One'}]}><Card.Meta title="Metadata" description="Details"/><Card.Grid hoverable={false}>Grid</Card.Grid></Card>;
 export const splitterDemo = <Splitter orientation="horizontal" sizes={["40%","60%"]} onResize={sizes=>console.log(sizes)} style={{height:240}}><Splitter.Panel id="a" min="20%" collapsible>A</Splitter.Panel><Splitter.Panel id="b">B</Splitter.Panel></Splitter>;
 import {createRef} from 'react';
+const calendarProps: CalendarProps = { value:"2026-11-16", mode:"month", onChange: date => date.toUpperCase(), validRange:["2026-01-01","2026-12-31"] };
+export const calendarDemo = <Calendar {...calendarProps} cellRender={(date, info) => info.type === "date" ? date : null} />;
 const mentionsRef = createRef<MentionsRef>();
 export const mentionDemo = <Mentions ref={mentionsRef} prefix={["@","#"]} options={[{value:"alice"}]} onChange={value=>value.toUpperCase()} onSelect={(option,prefix)=>console.log(option.value,prefix)} autoSize={{minRows:2,maxRows:5}} />;
 mentionsRef.current?.focus();

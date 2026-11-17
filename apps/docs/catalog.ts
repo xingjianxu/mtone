@@ -27,6 +27,111 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "Calendar",
+  "category": "数据展示",
+  "description": "使用 mtone 样式展示月历、年度概览与日期内容，支持完整面板及紧凑卡片。",
+  "importNames": [
+    "Calendar"
+  ],
+  "code": "import { useState } from \"react\";\nimport { Calendar } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [value, setValue] = useState(\"2026-11-16\");\n  return <Calendar aria-label=\"项目日历\" value={value} onChange={setValue}\n    cellRender={(date, info) => info.type === \"date\" && date === \"2026-11-16\" ? \"版本计划\" : null} />;\n}",
+  "props": [
+    {
+      "name": "value / defaultValue",
+      "type": "string",
+      "description": "受控日期 / 非受控初始日期；严格 YYYY-MM-DD，年份 0001–9999（不支持 0000）。",
+      "default": "当天"
+    },
+    {
+      "name": "onChange / onValueChange",
+      "type": "(date: string) => void",
+      "description": "日期确实变化时触发；两者都提供时都会调用。onValueChange 提供本库惯用命名。"
+    },
+    {
+      "name": "mode / defaultMode",
+      "type": "\"month\" | \"year\"",
+      "description": "受控面板模式 / 非受控初始面板模式。",
+      "default": "month"
+    },
+    {
+      "name": "onPanelChange",
+      "type": "(date: string, mode: CalendarMode) => void",
+      "description": "头部导航、跨面板选择或模式切换时触发；键盘仅移动焦点不触发选择。"
+    },
+    {
+      "name": "onSelect",
+      "type": "(date: string, info: { source: \"date\" | \"month\" | \"year\" | \"customize\" }) => void",
+      "description": "选择事件及触发来源。"
+    },
+    {
+      "name": "validRange",
+      "type": "readonly [string, string]",
+      "description": "包含首尾日期的可选范围。"
+    },
+    {
+      "name": "disabledDate",
+      "type": "(date: string) => boolean",
+      "description": "返回 true 的日期不可选择，绘制禁用状态。"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "description": "禁用日历交互。",
+      "default": "false"
+    },
+    {
+      "name": "fullscreen",
+      "type": "boolean",
+      "description": "完整月历或紧凑卡片布局，并非浏览器全屏 API。",
+      "default": "true"
+    },
+    {
+      "name": "showWeek",
+      "type": "boolean",
+      "description": "月视图显示每一行周四所属的 ISO 周编号，与 weekStartsOn 独立。",
+      "default": "false"
+    },
+    {
+      "name": "locale",
+      "type": "\"zh\" | \"en\"",
+      "description": "覆盖 Provider 的中英文文案。",
+      "default": "MtoneProvider locale"
+    },
+    {
+      "name": "weekStartsOn",
+      "type": "0 | 1 | 2 | 3 | 4 | 5 | 6",
+      "description": "每周起始日，0 为周日。中文默认 1（周一），英文默认 0（周日）。"
+    },
+    {
+      "name": "cellRender / fullCellRender",
+      "type": "(date: string, info: CalendarCellInfo) => React.ReactNode",
+      "description": "追加内容 / 替换内部内容；info 包含 type、originNode、today。"
+    },
+    {
+      "name": "headerRender",
+      "type": "(info: CalendarHeaderInfo) => React.ReactNode",
+      "description": "自定义头部，参数包含 value、type、onChange(date)、onTypeChange(mode)。"
+    },
+    {
+      "name": "classNames / styles",
+      "type": "Partial<Record<CalendarSemanticSlot, string>> / Partial<Record<CalendarSemanticSlot, React.CSSProperties>>",
+      "description": "语义部位 root、header、body、cell 的样式覆盖。"
+    },
+    {
+      "name": "原生 div 属性",
+      "type": "React.HTMLAttributes<HTMLDivElement>",
+      "description": "支持 aria-label、className、style 等；onChange/onSelect 改用上述日期回调。"
+    }
+  ],
+  "notes": [
+    "日期值和所有日期回调均使用 YYYY-MM-DD 字符串，与 DatePicker 一致；无效 value/defaultValue 或无效、倒置 validRange 会抛出 RangeError。默认初始值会收敛到范围内；自定义头部 onChange 的越界值先收敛再检查 disabledDate，无效字符串忽略。可用年份为 0001–9999；边缘网格越出此范围的日期显示空单元格。不接收 Dayjs 或 Date 对象，不是 Ant Design Calendar 的即插即用 API 替代品。此组件属于未发布源码新增能力，不包含在 npm 0.3.0 中；请以已安装版本声明为准。",
+    "默认头部使用本库 Select 和 Button，保留紧凑样式与 Provider 主题。导航对应日不可选时改选目标月首个可用日；该月全禁用时不改变值。month 展示日期，year 展示月份；选择月份不会自动切换模式。受控 value 必须由调用方接受回调并更新；拒绝更新则保留已选日期及选择前面板（键盘仍可独立移动焦点）。",
+    "方向键移动焦点，Home / End 定位行边缘，Page Up / Page Down 翻页，Enter / Space 选择。Shift + Page Up / Page Down 按年翻页。Tab 正常离开网格。禁用日期不可选择。键盘沿目标方向跳过禁用日期或月份，最多探测 366 步；没有可用项则保持原焦点。",
+    "cellRender 在日期或月份数字后追加内容；fullCellRender 替换单元格内部内容并优先于 cellRender，组件保留可访问按钮。不要在渲染内容内嵌套按钮、链接或输入框。",
+    "仅单日期公历展示和选择；不内置日期范围多选、时间选择、农历换算、拖拽日程、网络请求或日程持久化。农历文字、事件列表等可通过单元格回调自行计算展示。",
+    "不实现 Ant ConfigProvider、Dayjs locale、旧 dateCellRender/monthCellRender API 或函数式 semantic styles。使用 MtoneProvider、locale、cellRender/fullCellRender 及对象形式 classNames/styles。"
+  ]
+},
+{
   "name": "Mentions",
   "category": "数据录入",
   "description": "紧凑的纯文本提及输入框，支持光标候选、多个触发符、键盘选择与异步搜索。",
