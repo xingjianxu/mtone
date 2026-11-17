@@ -5,6 +5,11 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import assert from "node:assert/strict";
 const root = resolve(import.meta.dirname, "..");
+// Keep the consumer's type dependency on the repository-verified release.
+// A floating @types/react range can resolve a just-published, unavailable tarball.
+const lock = JSON.parse(readFileSync(join(root, "package-lock.json"), "utf8"));
+const csstypeVersion = lock.packages["node_modules/csstype"].version;
+assert.match(csstypeVersion, /^\d+\.\d+\.\d+$/);
 const dir = mkdtempSync(join(tmpdir(), "mtone-consumer-"));
 const npm = (args, cwd = root) =>
   execFileSync("npm", args, {
@@ -38,7 +43,7 @@ try {
   );
   writeFileSync(
     join(dir, "package.json"),
-    JSON.stringify({ private: true, type: "module" }),
+    JSON.stringify({ private: true, type: "module", overrides: { csstype: csstypeVersion } }),
   );
   npm(
     [
@@ -53,6 +58,10 @@ try {
       "@types/react-dom@^19.2.0",
     ],
     dir,
+  );
+  assert.equal(
+    JSON.parse(readFileSync(join(dir, "node_modules/csstype/package.json"), "utf8")).version,
+    csstypeVersion,
   );
   assert.equal(
     readFileSync(join(dir, "node_modules/@bixlab/mtone/llms.txt"), "utf8"),
