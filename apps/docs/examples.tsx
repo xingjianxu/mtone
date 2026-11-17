@@ -1,3 +1,6 @@
+import { AvatarExample } from "./avatar-example";
+import { PopconfirmExample } from "./popconfirm-example";
+import { RateExample } from "./rate-example";
 import { CalendarExample } from "./calendar-example";
 import { MentionsExample } from "./mentions-example";
 import { TableExample } from "./table-example";
@@ -217,6 +220,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
         </div>
       );
+    case "Rate":
+      return <RateExample compact={compact} />;
     case "Calendar":
       return <CalendarExample compact={compact} />;
     case "Mentions":
@@ -607,14 +612,10 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Status tone="green">已完成</M.Status>
         </div>
       );
+    case "Popconfirm":
+      return <PopconfirmExample compact={compact} />;
     case "Avatar":
-      return (
-        <div style={rowStyle}>
-          <M.Avatar name="林" />
-          <M.Avatar name="Alex" size={36} />
-          <M.Avatar name="周" size={48} />
-        </div>
-      );
+      return <AvatarExample compact={compact} />;
     case "AvatarGroup":
       return (
         <M.AvatarGroup

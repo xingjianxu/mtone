@@ -8,9 +8,9 @@ const expected: Record<string, string[]> = {
   布局容器: ["Layout", "Splitter", "Divider"],
   操作命令: ["Button", "IconButton", "ButtonGroup", "DropdownMenu", "ContextMenu", "Spotlight"],
   导航切换: ["Sidebar", "NavItem", "NavGroup", "Breadcrumb", "Tabs", "Pagination", "Segmented"],
-  数据录入: ["Input", "SearchInput", "Textarea", "Mentions", "Form", "FormField", "Checkbox", "Switch", "RadioGroup", "Select", "MultiSelect", "Slider", "NumberInput", "DatePicker", "FilterBar", "FilterChip", "Upload", "Dropzone"],
+  数据录入: ["Rate", "Input", "SearchInput", "Textarea", "Mentions", "Form", "FormField", "Checkbox", "Switch", "RadioGroup", "Select", "MultiSelect", "Slider", "NumberInput", "DatePicker", "FilterBar", "FilterChip", "Upload", "Dropzone"],
   数据展示: ["Calendar", "Card", "Text", "List", "ListItem", "DocumentList", "DocumentCard", "Table", "Tree", "Badge", "Avatar", "AvatarGroup", "PropertyList", "PropertyItem"],
-  浮层对话: ["Popover", "Tooltip", "Dialog", "Drawer", "ConfirmDialog"],
+  浮层对话: ["Popconfirm", "Popover", "Tooltip", "Dialog", "Drawer", "ConfirmDialog"],
   状态反馈: ["Status", "Progress", "Alert", "Empty", "Skeleton", "Spinner", "Toast", "ToastProvider"],
   全局配置: ["MtoneProvider", "MtoneScope"],
 };

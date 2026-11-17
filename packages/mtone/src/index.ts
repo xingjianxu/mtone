@@ -15,3 +15,7 @@ export * from "./table";
 export * from "./mentions";
 
 export * from "./calendar";
+
+export * from "./rate";
+
+export * from "./popconfirm";

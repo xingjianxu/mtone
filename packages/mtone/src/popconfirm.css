@@ -1,0 +1,74 @@
+.mt-popup.mt-popconfirm {
+  width: max-content;
+  min-width: 0;
+  overflow: visible;
+  max-height: none;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+.mt-popconfirm-body {
+  min-width: 0;
+  max-height: max(0px, calc(min(320px, var(--available-height, 320px)) - 26px));
+  overflow: auto;
+}
+.mt-popconfirm-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.mt-popconfirm-icon {
+  flex: none;
+  display: flex;
+  padding-top: 2px;
+  color: var(--mt-muted);
+}
+.mt-popconfirm-copy {
+  min-width: 0;
+}
+.mt-popconfirm-title {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.mt-popconfirm-description {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--mt-muted);
+}
+.mt-popconfirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.mt-popconfirm-error {
+  color: var(--mt-danger, #b42318);
+  font-size: 12px;
+  margin-top: 8px;
+}
+.mt-popconfirm-arrow {
+  display: flex;
+}
+.mt-popconfirm-arrow svg {
+  fill: var(--mt-bg, white);
+  stroke: var(--mt-border, #e5e5e5);
+}
+.mt-popconfirm-arrow[data-side="top"] {
+  bottom: -6px;
+  transform: rotate(180deg);
+}
+.mt-popconfirm-arrow[data-side="bottom"] {
+  top: -6px;
+}
+.mt-popconfirm-arrow[data-side="left"] {
+  right: -9px;
+  transform: rotate(90deg);
+}
+.mt-popconfirm-arrow[data-side="right"] {
+  left: -9px;
+  transform: rotate(-90deg);
+}

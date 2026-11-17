@@ -1,0 +1,124 @@
+.mt-avatar {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: var(--mt-avatar-size, 24px);
+  height: var(--mt-avatar-size, 24px);
+  border-radius: 50%;
+  background: var(--mt-avatar-bg, #eeede9);
+  color: var(--mt-avatar-color, #68645d);
+  overflow: hidden;
+  font-size: calc(var(--mt-avatar-size, 24px) * 0.416667);
+  font-weight: 600;
+  flex: none;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.mt-avatar-square {
+  border-radius: var(--mt-radius, 5px);
+}
+.mt-avatar > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mt-avatar-text {
+  flex: none;
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1;
+  transform-origin: center;
+}
+.mt-avatar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 65%;
+  height: 65%;
+}
+.mt-avatar-icon > svg {
+  width: 100%;
+  height: 100%;
+}
+.mt-avatar-responsive {
+  --mt-avatar-size: var(--mt-avatar-size-xs, 24px);
+}
+@media (min-width: 576px) {
+  .mt-avatar-responsive {
+    --mt-avatar-size: var(--mt-avatar-size-sm);
+  }
+}
+@media (min-width: 768px) {
+  .mt-avatar-responsive {
+    --mt-avatar-size: var(--mt-avatar-size-md);
+  }
+}
+@media (min-width: 992px) {
+  .mt-avatar-responsive {
+    --mt-avatar-size: var(--mt-avatar-size-lg);
+  }
+}
+@media (min-width: 1200px) {
+  .mt-avatar-responsive {
+    --mt-avatar-size: var(--mt-avatar-size-xl);
+  }
+}
+@media (min-width: 1600px) {
+  .mt-avatar-responsive {
+    --mt-avatar-size: var(--mt-avatar-size-xxl);
+  }
+}
+.mt-avatar-group {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+.mt-avatar-group > .mt-avatar + .mt-avatar,
+.mt-avatar-group > .mt-avatar-overflow:not(:first-child) {
+  margin-inline-start: -6px;
+}
+.mt-avatar-group > .mt-avatar:not(:first-child),
+.mt-avatar-group > .mt-avatar-overflow:not(:first-child) > .mt-avatar {
+  box-shadow: 0 0 0 2px var(--mt-bg, #fff);
+}
+.mt-avatar-overflow {
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  font: inherit;
+}
+.mt-avatar-overflow:focus-visible {
+  outline: 2px solid var(--mt-focus, #a4bcd7);
+  outline-offset: 3px;
+  z-index: 1;
+}
+.mt-popup.mt-avatar-popup {
+  padding: 12px;
+  min-width: 0;
+  max-height: min(320px, calc(100dvh - 24px));
+  overflow: auto;
+  max-width: min(320px, calc(100vw - 24px));
+}
+.mt-avatar-overflow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: min(240px, calc(100dvh - 96px));
+  overflow: auto;
+}
+.mt-avatar-overflow-member {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.mt-avatar-overflow-member > span:not(.mt-avatar) {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}

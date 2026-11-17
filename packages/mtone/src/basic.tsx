@@ -186,47 +186,8 @@ export const Status = ({
     {children}
   </span>
 );
-export function Avatar({
-  src,
-  name = "",
-  size = 24,
-}: {
-  src?: string;
-  name?: string;
-  size?: number;
-}) {
-  const [failed, setFailed] = React.useState(false);
-  React.useEffect(() => setFailed(false), [src]);
-  return (
-    <span
-      className="mt-avatar"
-      style={{ width: size, height: size }}
-      aria-label={name}
-    >
-      {src && !failed ? (
-        <img src={src} alt={name} onError={() => setFailed(true)} />
-      ) : (
-        name.slice(0, 2).toUpperCase()
-      )}
-    </span>
-  );
-}
-export function AvatarGroup({
-  items,
-  max = 4,
-}: {
-  items: { name: string; src?: string }[];
-  max?: number;
-}) {
-  return (
-    <span className="mt-avatar-group">
-      {items.slice(0, max).map((x, i) => (
-        <Avatar key={i} {...x} />
-      ))}
-      {items.length > max && <Avatar name={`+${items.length - max}`} />}
-    </span>
-  );
-}
+export { Avatar, AvatarGroup } from "./avatar";
+export type { AvatarProps, AvatarGroupProps, AvatarSize, AvatarBreakpoint } from "./avatar";
 export function Progress({ value, label }: { value: number; label?: string }) {
   const n = Math.min(100, Math.max(0, Number.isFinite(value) ? value : 0));
   return (

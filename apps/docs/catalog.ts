@@ -27,6 +27,196 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "Popconfirm",
+  "category": "浮层对话",
+  "description": "轻量的锚定确认浮层，支持异步确认、失败重试、键盘操作和边界避让。",
+  "importNames": [
+    "Popconfirm",
+    "Button"
+  ],
+  "code": "import { Popconfirm, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Popconfirm trigger={<Button danger>移除</Button>} title=\"确认移除？\" description=\"请核对后再执行。\" onConfirm={() => Promise.resolve()} />;\n}",
+  "props": [
+    {
+      "name": "trigger",
+      "type": "ReactElement",
+      "description": "必填；触发元素，应是可聚焦按钮，并转发 ref、事件和 aria 属性。"
+    },
+    {
+      "name": "title / description",
+      "type": "ReactNode | (() => ReactNode)",
+      "description": "确认标题必填，可选补充说明。"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "description": "标题前图标；null 隐藏。",
+      "default": "问号图标"
+    },
+    {
+      "name": "open / defaultOpen / onOpenChange",
+      "type": "boolean / boolean / (open: boolean) => void",
+      "description": "受控或非受控显示状态。受控模式由父组件更新 open。",
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "description": "禁用触发和确认，并隐藏浮层。",
+      "default": "false"
+    },
+    {
+      "name": "placement",
+      "type": "\"top\" | \"topLeft\" | \"topRight\" | \"bottom\" | \"bottomLeft\" | \"bottomRight\" | \"left\" | \"leftTop\" | \"leftBottom\" | \"right\" | \"rightTop\" | \"rightBottom\"",
+      "description": "十二个锚定方向。",
+      "default": "top"
+    },
+    {
+      "name": "arrow / autoAdjustOverflow",
+      "type": "boolean",
+      "description": "箭头和屏幕边缘自动翻转/平移避让。",
+      "default": "true / true"
+    },
+    {
+      "name": "okText / cancelText / showCancel",
+      "type": "ReactNode / ReactNode / boolean",
+      "description": "按钮文本及是否显示取消。",
+      "default": "确定 / 取消 / true（英文为 OK / Cancel）"
+    },
+    {
+      "name": "okButtonProps / cancelButtonProps",
+      "type": "Omit<ButtonProps, \"onClick\" | \"children\">",
+      "description": "复用 mtone Button；确认默认为 solid，小尺寸。"
+    },
+    {
+      "name": "onConfirm",
+      "type": "(event: MouseEvent<HTMLButtonElement>) => void | boolean | Promise<void | boolean>",
+      "description": "确认回调；返回 false 或 resolve(false) 保持打开，其他成功结果关闭；Promise 自动进入 loading。"
+    },
+    {
+      "name": "onCancel",
+      "type": "(event: MouseEvent<HTMLButtonElement>) => void",
+      "description": "仅点击取消按钮触发；preventDefault() 可保持打开。Escape/外部点击仅请求 onOpenChange(false)。"
+    },
+    {
+      "name": "onConfirmError / errorText",
+      "type": "(error: unknown) => void / ReactNode",
+      "description": "同步抛错或 Promise 拒绝时保持打开并显示错误提示，可自定义文案和错误处理。"
+    },
+    {
+      "name": "onPopupClick / className / style",
+      "type": "MouseEventHandler<HTMLDivElement> / string / CSSProperties",
+      "description": "浮层点击事件及样式。"
+    }
+  ],
+  "notes": [
+    "异步操作期间禁用按钮、外部点击和 Escape 关闭，防止重复请求。父组件仍可通过 open 强制关闭；旧 Promise 不会影响重新打开的确认。",
+    "弹层使用 portal 和本库主题上下文，关闭后恢复触发焦点；默认聚焦安全的取消按钮。",
+    "这是 mtone 风格的独立 API，并非 Ant Design 即插即用替代：使用 trigger 元素而非 children，不支持 hover/contextMenu、多种触发数组或 Ant Design 主题令牌。",
+    "拒绝结果显示通用本地化错误而不直接暴露异常内容，业务可通过 errorText 与 onConfirmError 提供反馈。"
+  ]
+},
+{
+  "name": "Rate",
+  "category": "数据录入",
+  "description": "紧凑的星级评分，支持半星、受控值、键盘操作与自定义字符。",
+  "importNames": [
+    "Rate"
+  ],
+  "code": "import { useState } from \"react\";\nimport { Rate } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [value, setValue] = useState(3.5);\n  return <Rate aria-label=\"体验评分\" value={value} onChange={setValue} allowHalf\n    tooltips={[\"不满意\", \"一般\", \"还不错\", \"满意\", \"非常满意\"]} />;\n}",
+  "props": [
+    {
+      "name": "value / defaultValue",
+      "type": "number",
+      "default": "defaultValue=0",
+      "description": "受控或非受控评分。有限数值会限制到 [0, count]，按 1 或 0.5 四舍五入；非有限值抛出 RangeError。"
+    },
+    {
+      "name": "onChange",
+      "type": "(value: number) => void",
+      "description": "用户提交不同分数时回调；悬停、程序改值和边界处重复按键不触发。受控时父组件需更新 value。"
+    },
+    {
+      "name": "count",
+      "type": "number",
+      "default": "5",
+      "description": "字符数量，必须为正整数，否则抛出 RangeError。"
+    },
+    {
+      "name": "allowHalf",
+      "type": "boolean",
+      "default": "false",
+      "description": "允许 0.5 步长。指针命中字符前半区域选半星；从右向左时前半区域在右侧。"
+    },
+    {
+      "name": "allowClear",
+      "type": "boolean",
+      "default": "true",
+      "description": "再次点击相同分数或用 Home/Delete/Backspace 清零；false 时交互最低分为一个步长，但允许初始或受控值为 0。"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "description": "只读展示，禁用点击、悬停预览、键盘与自动聚焦，并移出 Tab 序列。"
+    },
+    {
+      "name": "keyboard",
+      "type": "boolean",
+      "default": "true",
+      "description": "方向键增减，Home/End 跳到边界，Delete/Backspace 在允许时清除。false 仅关闭内置快捷键，不影响指针操作或 Tab 聚焦。"
+    },
+    {
+      "name": "size",
+      "type": "'small' | 'medium' | 'large'",
+      "default": "'medium'",
+      "description": "字符尺寸分别为 16 / 20 / 24px。窄容器中按完整字符换行，不压缩命中区域。"
+    },
+    {
+      "name": "character",
+      "type": "React.ReactNode | ((info: RateCharacterInfo) => React.ReactNode)",
+      "description": "替换默认实心星形；info 包括从 0 开始的 index、已提交 value、包含悬停的 displayValue、count、disabled。仅放纯展示内容。"
+    },
+    {
+      "name": "tooltips",
+      "type": "readonly string[]",
+      "description": "按字符顺序对应提示文案，悬停或聚焦时显示，Escape 可关闭；浮层复用本库定位，传送到 portal 并避让视口边缘。当前已选项文案加入 aria-valuetext。半星使用对应整颗字符的文案。"
+    },
+    {
+      "name": "onHoverChange",
+      "type": "(value: number | undefined) => void",
+      "description": "预览分数改变时触发；离开、取消、失焦或提交后回调 undefined。触屏不产生悬停预览。"
+    },
+    {
+      "name": "autoFocus",
+      "type": "boolean",
+      "default": "false",
+      "description": "启用时聚焦根元素（disabled 时不聚焦）。"
+    },
+    {
+      "name": "ref",
+      "type": "React.Ref<HTMLSpanElement>",
+      "description": "根元素引用，支持 focus()、blur() 和 DOM 测量。"
+    },
+    {
+      "name": "dir / tabIndex / onFocus / onBlur / onKeyDown",
+      "type": "原生 span 属性与事件",
+      "description": "支持继承 RTL；消费者 onKeyDown.preventDefault() 可阻止内置快捷键。aria-label、aria-labelledby、aria-valuetext 可自定义。"
+    },
+    {
+      "name": "className / style",
+      "type": "string / React.CSSProperties",
+      "description": "根元素样式。可设置 --mt-rate-color、--mt-rate-empty-color、--mt-rate-size、--mt-rate-gap；默认填充为 mtone 中性主色，焦点为单层细线。"
+    }
+  ],
+  "notes": [
+    "单个 slider Tab 停靠点支持 0 和半星；读屏值描述使用已提交分数，不播报未确认的鼠标预览。未提供标签时按 MtoneProvider locale 使用“评分”或“Rating”；推荐给多个实例设置不同 aria-label。",
+    "字符绘制两层以裁剪半星。自定义字符是固定方形中的纯展示内容，长文本会裁剪；请勿包含交互元素、有副作用组件或重复 DOM id。没有拖拽评分或表单隐藏字段；需要表单时通过 value/onChange 绑定。",
+    "该组件不是 Ant Design 的即插即用包装：tooltips 只接收字符串数组，不接收 Ant Design TooltipProps；character 函数接收明确的 RateCharacterInfo，不接收完整 RateProps；不提供 Ant Design ConfigProvider 或设计令牌 API。",
+    "数值按配置步长归一化（关闭半星时 2.5 显示为 3）；动态 count/allowHalf/value 变化会重算显示并清除旧预览，不触发 onChange。非受控初始值仅首次挂载读取。",
+    "属于未发布源码新增能力，不包含在 npm 0.3.0；文档站跟随 master，使用前请检查所安装版本的导出与类型。"
+  ]
+},
+{
   "name": "Calendar",
   "category": "数据展示",
   "description": "使用 mtone 样式展示月历、年度概览与日期内容，支持完整面板及紧凑卡片。",
@@ -2660,54 +2850,119 @@ export const componentDocs: ComponentDoc[] = [
     ],
     notes: ["状态必须同时有文字，不应仅依赖颜色。"],
   },
-  {
-    name: "Avatar",
-    category: "数据展示",
-    description: "展示头像，加载失败时回退到名字前两个字符。",
-    importNames: ["Avatar"],
-    code: 'import { Avatar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Avatar name="张三" size={32} />\n  );\n}',
-    props: [
-      {
-        name: "name",
-        type: "string",
-        description: "显示名称与图片替代文本。",
-        default: "空字符串",
-      },
-      {
-        name: "src",
-        type: "string",
-        description: "图片地址。",
-      },
-      {
-        name: "size",
-        type: "number",
-        description: "宽高像素值。",
-        default: "24",
-      },
-    ],
-    notes: ["未传图片或图片加载失败时显示文字。"],
-  },
-  {
-    name: "AvatarGroup",
-    category: "数据展示",
-    description: "叠放一组头像并展示溢出数量。",
-    importNames: ["AvatarGroup"],
-    code: 'import { AvatarGroup } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AvatarGroup items={[{name:"张三"},{name:"李四"},{name:"王五"}]} max={2} />\n  );\n}',
-    props: [
-      {
-        name: "items",
-        type: "{name: string; src?: string}[]",
-        description: "必填；头像数据。",
-      },
-      {
-        name: "max",
-        type: "number",
-        description: "最多可见头像数。",
-        default: "4",
-      },
-    ],
-    notes: ["各头像使用默认大小，多余人数以 +N 表示。"],
-  },
+{
+  "name": "Avatar",
+  "category": "数据展示",
+  "description": "支持图片、图标、自动缩放文字、响应式尺寸及方形头像。",
+  "importNames": [
+    "Avatar"
+  ],
+  "code": "import { Avatar } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Avatar name=\"张三\" size={{ xs: 24, md: 40 }} shape=\"square\" gap={4}>研究团队</Avatar>;\n}",
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "description": "可访问名称；没有 icon 或 children 时显示前两个字符。",
+      "default": "空字符串"
+    },
+    {
+      "name": "src / srcSet / alt",
+      "type": "string | ReactElement / string / string",
+      "description": "图片地址或图片元素、响应式图片源及替代文本。图片元素需转发图片属性和错误事件。"
+    },
+    {
+      "name": "icon / children",
+      "type": "ReactNode",
+      "description": "无图片或图片失败时优先 icon，其次 children，再次姓名缩写。"
+    },
+    {
+      "name": "size",
+      "type": "number | \"sm\" | \"md\" | \"lg\" | \"small\" | \"medium\" | \"large\" | Partial<Record<\"xs\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | \"xxl\", number>>",
+      "description": "像素尺寸；命名尺寸为 24 / 32 / 40px；响应式值向较大断点继承。",
+      "default": "24"
+    },
+    {
+      "name": "shape",
+      "type": "\"circle\" | \"square\"",
+      "description": "圆形或圆角方形。",
+      "default": "circle"
+    },
+    {
+      "name": "gap",
+      "type": "number",
+      "description": "文字与左右边缘的距离；超长文字自动缩小。",
+      "default": "4"
+    },
+    {
+      "name": "onError",
+      "type": "(event: SyntheticEvent<HTMLImageElement>) => boolean | void",
+      "description": "图片失败时触发；返回 false 保留图片、不自动回退。"
+    },
+    {
+      "name": "crossOrigin / draggable",
+      "type": "HTMLImageElement 属性",
+      "description": "透传图片跨域和拖动配置。"
+    },
+    {
+      "name": "ref / className / style / ...",
+      "type": "HTMLSpanElement / 原生 span 属性",
+      "description": "支持 ref 与根元素样式、事件和无障碍属性。"
+    }
+  ],
+  "notes": [
+    "保留 name/src/数字 size 的旧用法和 24px 默认尺寸；src 或 srcSet 改变后会重新尝试图片。",
+    "响应式断点：xs 0、sm 576、md 768、lg 992、xl 1200、xxl 1600px。",
+    "采用 mtone 的中性灰样式，不是 Ant Design 的包装；复杂自定义图片元素需自行正确转发属性，建议使用字符串 src。"
+  ]
+},
+{
+  "name": "AvatarGroup",
+  "category": "数据展示",
+  "description": "叠放头像，并通过可键盘操作的 +N 按钮查看溢出成员。",
+  "importNames": [
+    "AvatarGroup"
+  ],
+  "code": "import { AvatarGroup } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <AvatarGroup items={[{name:\"张三\"},{name:\"李四\"},{name:\"王五\"}]} max={2} size={32} />;\n}",
+  "props": [
+    {
+      "name": "items",
+      "type": "AvatarProps[]",
+      "description": "头像数据；与 children 二选一。"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "description": "也可通过 Avatar 子元素组合；Avatar.Group 为别名。"
+    },
+    {
+      "name": "max",
+      "type": "number | { count?: number; style?: CSSProperties }",
+      "description": "最多显示的普通头像数，溢出指示另外占一个位置；style 设置溢出按钮。",
+      "default": "4"
+    },
+    {
+      "name": "size / shape",
+      "type": "AvatarProps[\"size\"] / AvatarProps[\"shape\"]",
+      "description": "组默认尺寸和形状，单项显式值优先。",
+      "default": "24 / circle"
+    },
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\"",
+      "description": "溢出成员浮层方向，自动避让边界。",
+      "default": "top"
+    },
+    {
+      "name": "className / style / ...",
+      "type": "原生 span 属性",
+      "description": "组容器属性。"
+    }
+  ],
+  "notes": [
+    "保留 items 和数值 max 旧接口。溢出名单点击或键盘打开，Escape 关闭。",
+    "不照搬 Ant Design 的任意 popover 配置；使用明确的 side 和 max.style。"
+  ]
+},
   {
     name: "Progress",
     category: "状态反馈",
