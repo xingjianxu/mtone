@@ -69,10 +69,10 @@ try {
               ),
             )
             .toBe(true);
-          await expect(list).toHaveAttribute(
-            "aria-orientation",
-            ["start", "end"].includes(placement) ? "vertical" : "horizontal",
-          );
+          // Horizontal is the implicit ARIA tablist default; Base UI omits it.
+          await expect.poll(() => list.getAttribute("aria-orientation").then(
+            orientation => orientation ?? "horizontal",
+          )).toBe(["start", "end"].includes(placement) ? "vertical" : "horizontal");
           await page.screenshot({
             path: `artifacts/tabs-browser/${name}-${width}-${placement}.png`,
             fullPage: true,
