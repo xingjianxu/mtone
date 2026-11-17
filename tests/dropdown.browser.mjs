@@ -38,7 +38,7 @@ try{for(const [engineName,engine] of [['chromium',chromium],['firefox',firefox],
    await page.keyboard.press('Escape');await expect(popup).toHaveCount(0);
   }
   await page.goto('http://127.0.0.1:5199/tests/fixtures/dropdown.html?kind=context&long=1&width=600');
-  await page.getByText('Open context',{exact:true}).click({button:'right',position:{x:130,y:280}});
+  await page.getByText('Open context',{exact:true}).click({button:'right',position:{x:100,y:280}});
   const context=page.getByRole('menu');await expect(context).toBeVisible();
   const contextBox=await context.boundingBox();assert(contextBox.x>=-1&&contextBox.x+contextBox.width<=181,'context panel constrained at pointer edge');
   await page.keyboard.press('Escape');await expect(context).toHaveCount(0);
