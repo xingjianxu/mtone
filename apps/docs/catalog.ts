@@ -27,6 +27,123 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "AutoComplete",
+  "category": "数据录入",
+  "description": "允许自由输入的自动补全，支持分组建议、远程搜索与完整键盘交互。",
+  "importNames": [
+    "AutoComplete"
+  ],
+  "code": "<AutoComplete aria-label=\"邮箱\" options={[{value:\"alice@example.com\",label:\"Alice\"}]} allowClear onChange={setValue} />",
+  "props": [
+    {
+      "name": "options",
+      "type": "(AutoCompleteOption | AutoCompleteGroup)[]",
+      "default": "[]",
+      "description": "候选项或分组"
+    },
+    {
+      "name": "value / defaultValue",
+      "type": "string",
+      "default": "空字符串",
+      "description": "受控值或初始值"
+    },
+    {
+      "name": "onChange",
+      "type": "(value:string)=>void",
+      "default": "—",
+      "description": "文字变化"
+    },
+    {
+      "name": "onSelect",
+      "type": "(value:string, option:AutoCompleteOption)=>void",
+      "default": "—",
+      "description": "鼠标或键盘确认候选"
+    },
+    {
+      "name": "onSearch",
+      "type": "(query:string)=>void",
+      "default": "—",
+      "description": "输入搜索回调"
+    },
+    {
+      "name": "open / defaultOpen / onOpenChange",
+      "type": "boolean / boolean / (open:boolean)=>void",
+      "default": "false",
+      "description": "弹层状态"
+    },
+    {
+      "name": "filterOption",
+      "type": "false | (query,option)=>boolean",
+      "default": "内置包含匹配",
+      "description": "false 表示应用过滤"
+    },
+    {
+      "name": "autoHighlight / backfill",
+      "type": "boolean",
+      "default": "false",
+      "description": "自动首项高亮 / 键盘临时回填"
+    },
+    {
+      "name": "allowClear / onClear",
+      "type": "boolean / ()=>void",
+      "default": "false",
+      "description": "清除按钮及回调"
+    },
+    {
+      "name": "loading / notFoundContent",
+      "type": "boolean / ReactNode",
+      "default": "false / 本地化空状态",
+      "description": "加载状态和无结果内容"
+    },
+    {
+      "name": "size / status",
+      "type": "sm | md | lg / error | warning",
+      "default": "md",
+      "description": "高度24/28/34px和校验状态"
+    },
+    {
+      "name": "prefix / suffix",
+      "type": "ReactNode",
+      "default": "—",
+      "description": "输入前后装饰"
+    },
+    {
+      "name": "placement / popupWidth",
+      "type": "top | bottom / number",
+      "default": "bottom / 跟随输入",
+      "description": "浮层方向/像素宽度"
+    },
+    {
+      "name": "popupClassName / popupStyle",
+      "type": "string / CSSProperties",
+      "default": "—",
+      "description": "浮层样式"
+    },
+    {
+      "name": "ref",
+      "type": "Ref<HTMLInputElement>",
+      "default": "—",
+      "description": "原生输入引用"
+    },
+    {
+      "name": "原生 input 属性",
+      "type": "InputHTMLAttributes",
+      "default": "—",
+      "description": "name/form/id/required/disabled/readOnly/aria 等；className/style 属于输入容器"
+    }
+  ],
+  "notes": [
+    "自由输入不限定为选项值；选择后填入 value 而不是富文本 label。值必须在整个列表唯一。键盘可聚焦禁用项以朗读，但不能选中。",
+    "options 支持 {label:string,options:AutoCompleteOption[]} 分组；选项支持 value、label、disabled、keywords。",
+    "默认按 value、字符串 label 和 keywords 忽略大小写包含匹配；远程数据请使用 filterOption={false}，应用自行处理防抖、取消及过期响应。",
+    "onSearch 只在用户输入（包括 IME 完成）时触发，选择和清除不触发；onChange 包含输入、选择及清除。",
+    "默认无结果显示空状态。open 受控时仍由调用方响应 onOpenChange；disabled/readOnly 始终关闭弹层。",
+    "原生 input ref 支持 focus/blur；FormField 绑定字符串 value/onChange。非受控原生表单 reset 恢复 defaultValue。",
+    "这是 mtone API，不兼容 Ant Design 全部属性；不支持 textarea/任意输入替换、虚拟滚动、多选、完整 Ant 主题/variant API。大数据建议服务端筛选。",
+    "源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。"
+  ]
+},
+{
   "name": "TableOfContents",
   "category": "导航切换",
   "description": "自动采集文章标题、跟随滚动高亮并跳转的页内目录，适合文档与知识库。",
