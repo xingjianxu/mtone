@@ -16,6 +16,7 @@ import { Dialog as BDialog } from "@base-ui/react/dialog";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
 import { MtoneScope, useMtone, cn } from "./basic";
+import { DropdownSurface, type DropdownLayoutProps } from "./dropdown";
 
 export interface Option {
   value: string;
@@ -359,7 +360,7 @@ export interface MenuDivider {
   key: string;
 }
 export type MenuEntry = MenuItem | MenuGroup | MenuDivider;
-export interface MenuProps extends OpenProps {
+export interface MenuProps extends OpenProps, DropdownLayoutProps {
   trigger: React.ReactElement;
   items: MenuEntry[];
   onSelect?: (key: string) => void;
@@ -403,20 +404,9 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
                   className="mt-menu-submenu-arrow"
                 />
               </BMenu.SubmenuTrigger>
-              <BMenu.Portal>
-                <MtoneScope>
-                  <BMenu.Positioner
-                    className="mt-positioner"
-                    side="inline-end"
-                    align="start"
-                    sideOffset={4}
-                  >
-                    <BMenu.Popup className="mt-popup mt-menu-popup">
-                      <MenuItems items={item.children} onSelect={onSelect} />
-                    </BMenu.Popup>
-                  </BMenu.Positioner>
-                </MtoneScope>
-              </BMenu.Portal>
+              <DropdownSurface kind="submenu">
+                <MenuItems items={item.children} onSelect={onSelect} />
+              </DropdownSurface>
             </BMenu.SubmenuRoot>
           );
         return (
@@ -439,23 +429,13 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
     </>
   );
 }
-export function Menu({ trigger, items, onSelect, ...props }: MenuProps) {
+export function Menu({ trigger, items, onSelect, width, align, ...props }: MenuProps) {
   return (
     <BMenu.Root {...props}>
       <BMenu.Trigger render={trigger} />
-      <BMenu.Portal>
-        <MtoneScope>
-          <BMenu.Positioner
-            className="mt-positioner"
-            sideOffset={4}
-            align="start"
-          >
-            <BMenu.Popup className="mt-popup mt-menu-popup">
-              <MenuItems items={items} onSelect={onSelect} />
-            </BMenu.Popup>
-          </BMenu.Positioner>
-        </MtoneScope>
-      </BMenu.Portal>
+      <DropdownSurface kind="menu" width={width} align={align}>
+        <MenuItems items={items} onSelect={onSelect} />
+      </DropdownSurface>
     </BMenu.Root>
   );
 }
@@ -467,20 +447,15 @@ export function ContextMenu({
   children,
   items,
   onSelect,
+  width,
   ...props
-}: Omit<MenuProps, "trigger"> & { children: React.ReactNode }) {
+}: Omit<MenuProps, "trigger" | "align"> & { children: React.ReactNode }) {
   return (
     <BContextMenu.Root {...props}>
       <BContextMenu.Trigger>{children}</BContextMenu.Trigger>
-      <BContextMenu.Portal>
-        <MtoneScope>
-          <BContextMenu.Positioner className="mt-positioner">
-            <BContextMenu.Popup className="mt-popup mt-menu-popup">
-              <MenuItems items={items} onSelect={onSelect} />
-            </BContextMenu.Popup>
-          </BContextMenu.Positioner>
-        </MtoneScope>
-      </BContextMenu.Portal>
+      <DropdownSurface kind="context" width={width}>
+        <MenuItems items={items} onSelect={onSelect} />
+      </DropdownSurface>
     </BContextMenu.Root>
   );
 }

@@ -3431,12 +3431,37 @@ export const componentDocs: ComponentDoc[] = [
     notes: ["不自动加载数据。首尾翻页按钮会禁用；大量页码显示省略。"],
   },
   {
+    name: "Dropdown",
+    category: "浮层对话",
+    description: "独立的触发式下拉容器，承载任意自定义内容，默认按内容宽度。",
+    importNames: ["Dropdown", "Button"],
+    code: "import { Dropdown, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Dropdown trigger={<Button>查看信息</Button>} align=\"right\" width={240} label=\"文档信息\" content={<div style={{padding:8}}>这里可以放置说明、表单或自定义内容。</div>} />;\n}",
+    props: [
+      { name: "trigger", type: "ReactElement", description: "必填；触发元素，需转发 ref 与 DOM props。" },
+      { name: "content", type: "ReactNode", description: "必填；任意下拉内容。点击内部内容不会自动关闭。" },
+      { name: "label", type: "string", description: "非模态 dialog 的可访问名称；默认中文为下拉内容，英文为 Dropdown content。" },
+      { name: "width", type: "CSSProperties['width']", description: "默认按内容宽度，最小 160px，不跟随 trigger；number 为 px，也可用 rem/ch/vw 等 CSS 宽度。显式宽度允许小于 160px；最终受可用视口宽度约束。" },
+      { name: "align", type: "'start' | 'end' | 'left' | 'right'", default: "start", description: "首选与 trigger 的对齐边。left/right 是物理左右；start/end 在 RTL 中反转。空间不足时自动避让、移位或翻转。" },
+      { name: "open", type: "boolean", description: "受控开关。" },
+      { name: "defaultOpen", type: "boolean", description: "非受控初始开关。" },
+      { name: "onOpenChange", type: "(open: boolean) => void", description: "开关变化回调。" },
+    ],
+    notes: [
+      "Dropdown 是非模态 dialog，使用 Tab 导航自定义交互内容。操作菜单请使用 Menu，它保留菜单语义与方向键导航；两者共享浮层实现而不是嵌套浮层。",
+      "Escape、外部点击可关闭并由 Base UI 管理焦点返回。内部保存/取消动作需要关闭时，使用 open/onOpenChange 自行控制。",
+      "LTR 下 start 是左边、end 是右边；RTL 下相反。left/right 始终表示物理左右。RTL 交互需由 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 提供方向上下文，并设置相应 DOM dir。",
+      "默认宽度 max-content，最小宽度 160px；窄屏时最小宽度也会收缩。超长文本折行，超过最大高度的内容滚动。百分比宽度相对于定位容器，不是 trigger，优先使用像素或 rem/ch 等明确长度。",
+    ],
+  },
+  {
     name: "Menu",
     category: "操作命令",
     description: "点击打开的操作菜单，支持分组与多级子菜单。",
     importNames: ["Menu", "Button"],
     code: 'import { Menu, Button } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu trigger={<Button>文档操作</Button>} items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
     props: [
+      { name: "width", type: "CSSProperties['width']", description: "主菜单默认按内容宽度（最小160px），不再与trigger等宽；可指定number像素或CSS宽度，受可用视口宽度限制。子菜单独立按内容宽度，不继承此值。" },
+      { name: "align", type: "'start' | 'end' | 'left' | 'right'", default: "start", description: "主菜单与trigger对齐边；left/right是物理左右，start/end随DirectionProvider的RTL方向变化，碰撞时可自动调整。" },
       {
         name: "trigger",
         type: "ReactElement",
@@ -3470,6 +3495,7 @@ export const componentDocs: ComponentDoc[] = [
       },
     ],
     notes: [
+      "Menu 复用 Dropdown 的浮层布局，但仍使用菜单语义、方向键与选择关闭。通用自定义内容使用 Dropdown。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。",
       "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线；尚不支持勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",
       "快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。",
       "Menu / MenuProps 是正式名称；DropdownMenu / DropdownMenuProps 仍作为已弃用兼容别名保留。旧文档链接自动转到 Menu。",
@@ -3483,6 +3509,7 @@ export const componentDocs: ComponentDoc[] = [
     importNames: ["ContextMenu"],
     code: 'import { ContextMenu } from "@bixlab/mtone";\nimport { Copy } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ContextMenu items={[{key:"copy",label:"复制",icon:<Copy />},{key:"paste",label:"粘贴",shortcut:"⌘V"}]} onSelect={(key) => console.log(key)}><div style={{padding:24}}>在此区域点击右键</div></ContextMenu>\n  );\n}',
     props: [
+      { name: "width", type: "CSSProperties['width']", description: "主面板宽度；默认按内容，最小160px，受可用视口约束，子菜单独立按内容宽度。右键菜单不提供trigger左右对齐属性。" },
       {
         name: "children",
         type: "ReactNode",

@@ -170,8 +170,6 @@ it("shares groups and submenus with ContextMenu, respecting disabled leaves", as
 });
 
 it('positions RTL submenus on the logical end side', async () => {
-  const {readFileSync}=await import('node:fs');
-  expect(readFileSync('packages/mtone/src/interactive.tsx','utf8')).toContain('side="inline-end"');
   const {DirectionProvider}=await import('@base-ui/react/direction-provider');
   render(<DirectionProvider direction="rtl"><Menu trigger={<button>RTL actions</button>} items={[{key:'parent',label:'Parent',children:[{key:'child',label:'Child'}]}]}/></DirectionProvider>);
   await userEvent.click(screen.getByRole('button',{name:'RTL actions'}));

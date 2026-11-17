@@ -85,7 +85,7 @@ const expected: Record<string, string[]> = {
   ],
   浮层对话: [
     "Popconfirm",
-    "Popover",
+    "Dropdown", "Popover",
     "Tooltip",
     "Dialog",
     "Drawer",

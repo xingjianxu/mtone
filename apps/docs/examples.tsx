@@ -1,3 +1,4 @@
+import { DropdownExample } from "./dropdown-example";
 import { TypographyExample } from "./typography-example";
 import { TransferExample } from "./transfer-example";
 import { CascaderExample } from "./cascader-example";
@@ -509,6 +510,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>当前第 {page} 页</M.Text>
         </div>
       );
+    case "Dropdown":
+      return <DropdownExample />;
     case "DropdownMenu":
     case "Menu":
       return (
@@ -532,6 +535,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
             ]}
             onSelect={setNotice}
           />
+          <M.Menu trigger={<M.Button>右对齐菜单，宽度 240px</M.Button>} width={240} align="right" items={menuItems} onSelect={setNotice}/>
           {output}
         </div>
       );

@@ -563,3 +563,15 @@
 @media (forced-colors: active) {
   .mt-menu-item[data-highlighted]:not([data-disabled]) { border-color: Highlight; }
 }
+
+/* Dropdown surfaces size to content, not the trigger. Existing Select/Popover
+   retain their anchor-based .mt-popup sizing. Min/max both clamp narrow screens. */
+.mt-dropdown-popup {
+  box-sizing: border-box;
+  min-width: min(160px, var(--available-width, 100vw), calc(100vw - 16px));
+  max-width: min(var(--available-width, 100vw), calc(100vw - 16px));
+  overflow-wrap: anywhere;
+}
+.mt-dropdown-popup .mt-menu-label { min-width: 0; }
+.mt-dropdown-popup .mt-menu-text { min-width: 0; overflow-wrap: anywhere; }
+.mt-dropdown-popup .mt-shortcut { min-width: 0; max-width: 40%; overflow-wrap: anywhere; }

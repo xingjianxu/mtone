@@ -35,3 +35,6 @@ export * from "./cascader";
 export * from "./transfer";
 
 export * from "./typography";
+
+export { Dropdown } from "./dropdown";
+export type { DropdownProps, DropdownAlign, DropdownLayoutProps } from "./dropdown";
