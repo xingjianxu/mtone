@@ -64,12 +64,11 @@ try {
       await page.keyboard.press("ArrowLeft");
       await expect(dialog.getByAltText("Second")).toBeVisible();
       await page.keyboard.press("Tab");
-      assert(
-        await page.evaluate(
-          () => !!document.activeElement?.closest('[role="dialog"]'),
-        ),
-        "focus remains trapped",
-      );
+      // Base UI's focus guard redirects to the first control in requestAnimationFrame.
+      // Await that actual focus destination rather than inspecting the transient guard.
+      await expect(
+        dialog.getByRole("button", { name: "关闭预览" }),
+      ).toBeFocused();
       await page.getByRole("button", { name: "关闭预览" }).click();
       await expect(
         page.getByRole("button", { name: "预览 First" }),
