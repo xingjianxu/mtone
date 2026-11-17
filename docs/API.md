@@ -42,8 +42,8 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 
 - Sidebar, NavGroup(label), NavItem(active, icon, native button props): layout and navigation buttons. Routing remains the application's responsibility.
 - Breadcrumb: items `{label,href?}`; final item is current page.
-- Tree: items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange, expanded/defaultExpanded/onExpandedChange, label. Arrow keys, Home/End, Enter/Space supported; no drag/drop or lazy-loading protocol.
-- Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange.
+- Tree/DirectoryTree: legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
+- Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
 - Segmented: options, value/defaultValue/onValueChange, label.
 - FilterBar: flexible layout; FilterChip(children,onRemove).
 - Pagination: total, pageSize (default10), **controlled** page/onPageChange.
@@ -158,10 +158,10 @@ Select and MultiSelect use the same decorative 16px Lucide ChevronDown and
 the same thin-line Check/Minus in a 12px icon to fit its 16px control. Native
 table selection checkboxes and non-selection disclosure icons are unchanged.
 
-## Mentions (unreleased)
+## Mentions
 
 `Mentions` (alias `Mention`) adds plain-text mention completion with mtone styling.
-It is not in npm 0.3.0. The live website follows master and can be ahead of npm;
+Available starting in 0.4.0. The live website follows master and can be ahead of npm;
 check the declarations shipped in your installed package.
 
 ```tsx
@@ -197,7 +197,7 @@ children, Ant variants, ConfigProvider design tokens, function-style semantic
 customization or virtual suggestions. See the component catalog for the full
 current declaration-backed API.
 
-## Calendar (unreleased)
+## Calendar
 
 `Calendar` displays a month/date grid or a year/month grid using mtone styles.
 It is a date-display component, separate from the native-input `DatePicker`.
@@ -233,4 +233,4 @@ const [date, setDate] = useState("2026-11-16");
 This is not a drop-in Ant Calendar replacement: no Dayjs, Ant locale object/design tokens,
 legacy date/month render callbacks, lunar conversion, time/range selection or event drag-and-drop.
 Use render callbacks for calculated lunar labels or event text and show interactive details outside
-the calendar. No network request or data persistence is performed. Not included in npm 0.3.0.
+the calendar. No network request or data persistence is performed. Available starting in 0.4.0.

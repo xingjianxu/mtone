@@ -55,9 +55,9 @@ npm run build:docs
 
 Production assets use the GitHub Pages `/mtone/` base. Component URLs use hash routes, e.g. `#/components/Button`, so refreshing a deep link does not require a server rewrite. See [deployment instructions](docs/DEPLOYMENT.md) for initial Pages setup and [the documentation workflow](.github/workflows/docs.yml). The ChatGPT Site is no longer updated.
 
-The source checkout also includes `Mentions` (`Mention` alias) for plain-text @ / # completion. This feature is not included in npm 0.3.0 yet; see the [API guide](docs/API.md#mentions-unreleased) for current scope and version guidance.
+The source checkout also includes `Mentions` (`Mention` alias) for plain-text @ / # completion. Available starting in 0.4.0; see the [API guide](docs/API.md#mentions) for current scope and version guidance.
 
-`Calendar` is also available in the source checkout, with month/year panels, custom date content, range restrictions and keyboard navigation. It uses ISO date strings and mtone styling; see [Calendar API](docs/API.md#calendar-unreleased). It is not included in npm 0.3.0 yet.
+`Calendar` is also available in the source checkout, with month/year panels, custom date content, range restrictions and keyboard navigation. It uses ISO date strings and mtone styling; see [Calendar API](docs/API.md#calendar). Available starting in 0.4.0.
 
 ## npm releases
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.0
+
+### Added
+- Mentions/Mention, Calendar, Rate, Popconfirm, Timeline, Affix, Result, Image/preview groups, TableOfContents, AutoComplete, Cascader/CascaderPanel and Transfer.
+- Enhanced Avatar/AvatarGroup, Tree/DirectoryTree, Tabs and Divider while retaining existing entry points.
+- Expanded documentation examples, AI reference and real tarball consumer checks for the new APIs.
+
+### Fixed and refined
+- Compact Tabs/card styling, neutral Breadcrumb hover styling, AutoComplete popup spacing and Timeline connector alignment.
+- Browser regression synchronization and isolated consumer dependency verification.
+
+### Compatibility
+- Tree IDs now accept numeric keys, default ancestor expansion is enabled, and Tabs skips disabled items and recovers uncontrolled selection. See [migration notes](docs/MIGRATION.md).
+- React/ReactDOM ^19.2.0 and ESM remain required. These are mtone APIs, not drop-in Ant Design replacements. See each component reference for supported features and limitations.
+
 ## 0.3.0
 
 ### Added

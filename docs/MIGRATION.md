@@ -1,11 +1,18 @@
-# Unreleased additions
+# Upgrade notes for 0.4.0
 
-`Mentions` (`Mention` alias) is a new, opt-in plain-text mention component, not part
-of npm 0.3.0. No existing input API changes. It uses `onChange(text: string)`, unlike
+- `TreeItem.id` now accepts `string | number`. Narrow the type or use `String(id)` when passing it to string-only code. Numeric keys use `selectedKeys` / `onSelect`; legacy `value` / `onValueChange` remain string-only.
+- Tree now rejects duplicate keys and keys that are neither strings nor finite numbers. Ensure keys are stable and unique before rendering.
+- AvatarGroup overflow now uses an interactive popover button; review custom DOM/CSS selectors targeting the previous static +N avatar.
+- Tree `defaultExpandParent` defaults to `true`, automatically expanding ancestors of `defaultExpanded` nodes. Set it to `false` to retain exact legacy default-expanded lists.
+- Tabs now initially selects the first enabled item. Removing or disabling the current uncontrolled item selects an enabled fallback and calls `onValueChange`. Controlled consumers remain responsible for supplying a valid enabled value.
+
+## Additions
+
+`Mentions` (`Mention` alias) is a new, opt-in plain-text mention component, available starting in 0.4.0. No existing input API changes. It uses `onChange(text: string)`, unlike
 `Textarea`'s native change event. Size values are `sm` / `md` / `lg`. Ant Design
 `Mentions.Option`, variants, ConfigProvider tokens and static `Mentions.getMentions`
 are not provided; use `options` and the standalone `getMentions` export. See the
-[API guide](API.md#mentions-unreleased) for the supported API.
+[API guide](API.md#mentions) for the supported API.
 
 # Breaking changes in 0.3.0
 

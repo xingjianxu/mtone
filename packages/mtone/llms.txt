@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.3.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.4.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 
@@ -71,7 +71,7 @@ This file describes this package checkout, not necessarily the latest published 
 - 上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。
 - 这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
 - name 提交 JSON 字符串，不自动接入 FormField 的 onChange 协议，也不实现原生表单 reset；需受控值时请响应 onValueChange。
-- 源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。
+- 自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。
 
 ```tsx
 <Cascader aria-label="地区" options={[{value:"zhejiang",label:"浙江",children:[{value:"hangzhou",label:"杭州"}]}]} searchable allowClear onValueChange={(path) => console.log(path)} />
@@ -104,7 +104,7 @@ This file describes this package checkout, not necessarily the latest published 
 - options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。
 - 上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。
 - 这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
-- 源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。
+- 自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。
 
 ```tsx
 <CascaderPanel aria-label="地区面板" options={[{value:"zhejiang",label:"浙江",children:[{value:"hangzhou",label:"杭州"}]}]} multiple searchable />
@@ -169,7 +169,7 @@ This file describes this package checkout, not necessarily the latest published 
 - 默认无结果显示空状态。open 受控时仍由调用方响应 onOpenChange；disabled/readOnly 始终关闭弹层。
 - 原生 input ref 支持 focus/blur；FormField 绑定字符串 value/onChange。非受控原生表单 reset 恢复 defaultValue。
 - 这是 mtone API，不兼容 Ant Design 全部属性；不支持 textarea/任意输入替换、虚拟滚动、多选、完整 Ant 主题/variant API。大数据建议服务端筛选。
-- 源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。
+- 自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。
 
 ```tsx
 <AutoComplete aria-label="邮箱" options={[{value:"alice@example.com",label:"Alice"}]} allowClear onChange={setValue} />
@@ -439,7 +439,7 @@ export default function Demo() {
 - 字符绘制两层以裁剪半星。自定义字符是固定方形中的纯展示内容，长文本会裁剪；请勿包含交互元素、有副作用组件或重复 DOM id。没有拖拽评分或表单隐藏字段；需要表单时通过 value/onChange 绑定。
 - 该组件不是 Ant Design 的即插即用包装：tooltips 只接收字符串数组，不接收 Ant Design TooltipProps；character 函数接收明确的 RateCharacterInfo，不接收完整 RateProps；不提供 Ant Design ConfigProvider 或设计令牌 API。
 - 数值按配置步长归一化（关闭半星时 2.5 显示为 3）；动态 count/allowHalf/value 变化会重算显示并清除旧预览，不触发 onChange。非受控初始值仅首次挂载读取。
-- 属于未发布源码新增能力，不包含在 npm 0.3.0；文档站跟随 master，使用前请检查所安装版本的导出与类型。
+- 自 0.4.0 提供；文档站跟随 master，使用前请检查所安装版本的导出与类型。
 
 ```tsx
 import { useState } from "react";
@@ -473,7 +473,7 @@ export default function Demo() {
 - headerRender: (info: CalendarHeaderInfo) => React.ReactNode. 自定义头部，参数包含 value、type、onChange(date)、onTypeChange(mode)。
 - classNames / styles: Partial<Record<CalendarSemanticSlot, string>> / Partial<Record<CalendarSemanticSlot, React.CSSProperties>>. 语义部位 root、header、body、cell 的样式覆盖。
 - 原生 div 属性: React.HTMLAttributes<HTMLDivElement>. 支持 aria-label、className、style 等；onChange/onSelect 改用上述日期回调。
-- 日期值和所有日期回调均使用 YYYY-MM-DD 字符串，与 DatePicker 一致；无效 value/defaultValue 或无效、倒置 validRange 会抛出 RangeError。默认初始值会收敛到范围内；自定义头部 onChange 的越界值先收敛再检查 disabledDate，无效字符串忽略。可用年份为 0001–9999；边缘网格越出此范围的日期显示空单元格。不接收 Dayjs 或 Date 对象，不是 Ant Design Calendar 的即插即用 API 替代品。此组件属于未发布源码新增能力，不包含在 npm 0.3.0 中；请以已安装版本声明为准。
+- 日期值和所有日期回调均使用 YYYY-MM-DD 字符串，与 DatePicker 一致；无效 value/defaultValue 或无效、倒置 validRange 会抛出 RangeError。默认初始值会收敛到范围内；自定义头部 onChange 的越界值先收敛再检查 disabledDate，无效字符串忽略。可用年份为 0001–9999；边缘网格越出此范围的日期显示空单元格。不接收 Dayjs 或 Date 对象，不是 Ant Design Calendar 的即插即用 API 替代品。此组件自 0.4.0 提供；请以已安装版本声明为准。
 - 默认头部使用本库 Select 和 Button，保留紧凑样式与 Provider 主题。导航对应日不可选时改选目标月首个可用日；该月全禁用时不改变值。month 展示日期，year 展示月份；选择月份不会自动切换模式。受控 value 必须由调用方接受回调并更新；拒绝更新则保留已选日期及选择前面板（键盘仍可独立移动焦点）。
 - 方向键移动焦点，Home / End 定位行边缘，Page Up / Page Down 翻页，Enter / Space 选择。Shift + Page Up / Page Down 按年翻页。Tab 正常离开网格。禁用日期不可选择。键盘沿目标方向跳过禁用日期或月份，最多探测 366 步；没有可用项则保持原焦点。
 - cellRender 在日期或月份数字后追加内容；fullCellRender 替换单元格内部内容并优先于 cellRender，组件保留可访问按钮。不要在渲染内容内嵌套按钮、链接或输入框。
@@ -519,7 +519,7 @@ export default function Demo() {
 - ref: React.Ref<MentionsRef>. 提供 nativeElement: HTMLTextAreaElement | null、focus(options?: FocusOptions)、blur()。
 - native textarea attributes: Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "defaultValue" | "onChange" | "onSelect" | "prefix" | "children"> (default: rows: 3). 支持 id、name、rows、placeholder、disabled、readOnly、maxLength、required、onFocus/onBlur、aria-label 等。务必提供 label 或 aria-label。
 - getMentions(value, config?): (value: string, config?: { prefix?: string | string[]; split?: string }) => { prefix: string; value: string }[]. 单独导出的解析函数，不是静态方法；使用相同边界规则，不检查候选成员资格或服务端权限。
-- Mention 是 Mentions 的同一组件别名；推荐使用 Mentions。相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件属于未发布源码新增能力，不包含在 npm 0.3.0 中；请以已安装版本声明为准。
+- Mention 是 Mentions 的同一组件别名；推荐使用 Mentions。相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件自 0.4.0 提供；请以已安装版本声明为准。
 - 这是原生 textarea 上的纯文本补全，不是富文本 token 编辑器，也不是 Ant Design Mentions 的完整 API 替代品。不支持 Mentions.Option、children 选项、Ant variant、ConfigProvider/design tokens 或函数式语义样式；尺寸使用 sm/md/lg。
 - ↑ / ↓ 在可用候选间循环，Enter 插入当前项，Escape 关闭，Tab 关闭并正常切换焦点；输入法组合期间不会选择候选。Home/End 保留文本编辑行为。选中一段文本时不弹出建议。
 - 插入替换光标之前的当前触发符和查询，保留光标之后的文本；超出 maxLength 时不插入，不截断候选。不会把已有提及变成不可分割的标签。默认查询禁止空白，含空格的实体值不适合默认解析规则。
