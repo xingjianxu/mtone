@@ -306,6 +306,118 @@ export const componentDocs: ComponentDoc[] = [
     ],
   },
 {
+  "name": "Transfer",
+  "category": "数据录入",
+  "description": "双栏穿梭选择，支持搜索、分页、单向移动和自定义列表。",
+  "importNames": [
+    "Transfer"
+  ],
+  "code": "<Transfer items={[{key:\"a\",label:\"资料 A\"}]} defaultTargetKeys={[]} showSearch onChange={setKeys} />",
+  "props": [
+    {
+      "name": "items",
+      "type": "TransferItem[]",
+      "description": "完整数据；唯一字符串 key、label、可选 description/searchText/disabled。富内容使用 searchText 提供搜索与移除名称。"
+    },
+    {
+      "name": "targetKeys / defaultTargetKeys",
+      "type": "string[]",
+      "description": "目标项受控或非受控；顺序按 keys。缺失数据的目标 key 保留，不显示。",
+      "default": "[]"
+    },
+    {
+      "name": "onChange",
+      "type": "(keys, direction, movedKeys) => void",
+      "description": "移动后通知；right 移入，left 移回。"
+    },
+    {
+      "name": "selectedKeys / defaultSelectedKeys",
+      "type": "string[]",
+      "description": "两侧复选状态，不是已移入目标的值。",
+      "default": "[]"
+    },
+    {
+      "name": "onSelectChange",
+      "type": "(sourceKeys, targetKeys) => void",
+      "description": "选中状态变更通知，移动后清除移动项选中状态。"
+    },
+    {
+      "name": "showSearch / filterOption / onSearch",
+      "type": "boolean / (query,item,direction)=>boolean / (direction,query)=>void",
+      "description": "两侧独立过滤，默认 label 字符串或 searchText，富节点无 searchText 时按 key。",
+      "default": "false"
+    },
+    {
+      "name": "pagination",
+      "type": "boolean | {pageSize?:number}",
+      "description": "默认每页10条；全选仅当前过滤后的页，搜索重置页码；renderList 时关闭内置分页。",
+      "default": "false"
+    },
+    {
+      "name": "oneWay",
+      "type": "boolean",
+      "description": "右侧显示逐项移除而不是复选框。",
+      "default": "false"
+    },
+    {
+      "name": "disabled / loading",
+      "type": "boolean",
+      "description": "禁用所有选择、移动和搜索；loading 显示提示，已有数据仍可见。",
+      "default": "false"
+    },
+    {
+      "name": "showSelectAll",
+      "type": "boolean",
+      "description": "显示全选；只影响当前可见且可用项，保留隐藏选中项。",
+      "default": "true"
+    },
+    {
+      "name": "titles / panelLabels / operationLabels",
+      "type": "[ReactNode,ReactNode] / [string,string] / [string,string]",
+      "description": "显示标题、可访问区域名称、移入/移回按钮名称；缺省随 MtoneProvider locale。"
+    },
+    {
+      "name": "searchPlaceholder / emptyContent",
+      "type": "string / ReactNode",
+      "description": "搜索占位与空列表内容。"
+    },
+    {
+      "name": "height",
+      "type": "number | string",
+      "description": "每侧列表高度。",
+      "default": "220"
+    },
+    {
+      "name": "status",
+      "type": "\"error\" | \"warning\"",
+      "description": "边框反馈状态，不自动校验。"
+    },
+    {
+      "name": "renderItem",
+      "type": "(item,direction)=>ReactNode",
+      "description": "自定义项目内容；不要嵌套交互控件到复选标签内。"
+    },
+    {
+      "name": "renderList / footer",
+      "type": "(context: TransferListContext)=>ReactNode",
+      "description": "自定义列表或页脚；context含direction、过滤items、该侧selectedKeys、disabled、select(keys,boolean) 与 remove(keys)，过滤未知/禁用/异侧项；remove 只对目标侧生效。"
+    },
+    {
+      "name": "ref / ...divProps",
+      "type": "HTMLDivElement / HTMLAttributes",
+      "description": "根节点 ref、className、style、aria 属性。"
+    }
+  ],
+  "notes": [
+    "与 Ant Design API 不兼容；支持受控和非受控，未内置 Tree/Table 适配器，可通过 renderList 自行连接。",
+    "key 必须唯一且稳定。items 应包含两侧完整记录；未知 targetKeys 保留以支持外部数据更新。",
+    "搜索和分页不会清除隐藏选择，移动按钮移动该侧所有选中可用项，不仅当前页。分页全选仅当前页；不提供反选菜单或虚拟化。",
+    "键盘使用原生/本库复选框 Tab 与空格，操作按钮 Enter/空格；不使用伪 listbox 组合键。",
+    "窄于480px时两栏上下排列；仅布局改变，left/right 仍代表来源/目标。",
+    "自定义 renderList 自行负责键盘和无障碍，不提供远端请求或请求竞态管理。"
+  ]
+},
+{
   "name": "AutoComplete",
   "category": "数据录入",
   "description": "允许自由输入的自动补全，支持分组建议、远程搜索与完整键盘交互。",

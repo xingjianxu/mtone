@@ -31,3 +31,5 @@ export * from "./table-of-contents";
 export * from "./auto-complete";
 
 export * from "./cascader";
+
+export * from "./transfer";

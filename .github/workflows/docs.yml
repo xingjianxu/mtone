@@ -41,6 +41,7 @@ jobs:
       - run: node tests/tree.browser.mjs
       - run: node tests/image.browser.mjs
       - run: node tests/table-of-contents.browser.mjs
+      - run: node tests/transfer.browser.mjs
       - run: node tests/tabs.browser.mjs
       - run: node tests/divider.browser.mjs
       - run: node tests/breadcrumb.browser.mjs

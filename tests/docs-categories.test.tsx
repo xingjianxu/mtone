@@ -36,6 +36,7 @@ const expected: Record<string, string[]> = {
   数据录入: [
     "Cascader",
     "CascaderPanel",
+    "Transfer",
     "AutoComplete",
     "Rate",
     "Input",

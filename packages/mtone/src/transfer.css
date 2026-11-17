@@ -1,0 +1,119 @@
+.mt-transfer {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--mt-fg, #292524);
+}
+.mt-transfer-panel {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid var(--mt-border, #e7e5e4);
+  border-radius: var(--mt-radius, 6px);
+  overflow: hidden;
+  background: var(--mt-bg, #fff);
+}
+.mt-transfer-header {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--mt-border, #e7e5e4);
+}
+.mt-transfer-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 500;
+}
+.mt-transfer-count {
+  color: var(--mt-muted, #78716c);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.mt-transfer-search {
+  padding: 6px;
+}
+.mt-transfer-search .mt-input {
+  width: 100%;
+  min-width: 0;
+}
+.mt-transfer-list {
+  overflow: auto;
+  min-height: 40px;
+}
+.mt-transfer-row {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+.mt-transfer-row > .mt-check-label {
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+}
+.mt-transfer-row:hover:not([data-disabled]),
+.mt-transfer-row[data-selected] {
+  background: var(--mt-hover, #f5f5f4);
+}
+.mt-transfer-row[data-disabled] {
+  opacity: 0.5;
+}
+.mt-transfer-item {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.mt-transfer-item small {
+  display: block;
+  color: var(--mt-muted, #78716c);
+  font-size: 12px;
+}
+.mt-transfer-message {
+  padding: 12px 8px;
+  color: var(--mt-muted, #78716c);
+  text-align: center;
+}
+.mt-transfer-operations {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+.mt-transfer-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--mt-border, #e7e5e4);
+  padding: 4px;
+  font-size: 12px;
+}
+.mt-transfer-footer {
+  padding: 6px 8px;
+  border-top: 1px solid var(--mt-border, #e7e5e4);
+}
+.mt-transfer[data-status="error"] > .mt-transfer-panel {
+  border-color: var(--mt-danger, #dc2626);
+}
+.mt-transfer[data-status="warning"] > .mt-transfer-panel {
+  border-color: #b7791f;
+}
+@media (max-width: 480px) {
+  .mt-transfer {
+    flex-direction: column;
+  }
+  .mt-transfer-panel {
+    flex: auto;
+  }
+  .mt-transfer-operations {
+    flex-direction: row;
+  }
+  .mt-transfer-operations svg {
+    transform: rotate(90deg);
+  }
+}
