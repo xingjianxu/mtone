@@ -210,7 +210,8 @@ export const Text = ({
 }: React.HTMLAttributes<HTMLSpanElement> & { muted?: boolean }) => (
   <span {...p} className={cn("mt-text", muted && "mt-muted", className)} />
 );
-export const Divider = () => <hr className="mt-divider" />;
+export { Divider } from "./divider";
+export type { DividerProps } from "./divider";
 export { Card } from "./card";
 export type { CardProps, CardTokens, CardSemantic, CardTabItem, CardMetaProps, CardMetaSemantic, CardGridProps } from "./card";
 export const List = ({

@@ -545,10 +545,19 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Divider":
       return (
-        <div style={stackStyle}>
-          <M.Text>上一部分</M.Text>
+        <div style={{ width: "100%" }}>
+          <M.Text>默认分隔</M.Text>
           <M.Divider />
-          <M.Text>下一部分</M.Text>
+          <M.Divider titlePlacement="start">基本信息</M.Divider>
+          <M.Divider variant="dashed">虚线标题</M.Divider>
+          <M.Divider variant="dotted" titlePlacement="end" plain>
+            更多内容
+          </M.Divider>
+          <M.Divider size="small" />
+          <M.Divider size="large" />
+          <span>编辑</span>
+          <M.Divider orientation="vertical" />
+          <span>归档</span>
         </div>
       );
     case "List":

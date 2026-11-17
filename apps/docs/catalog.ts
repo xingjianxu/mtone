@@ -3179,11 +3179,62 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "Divider",
     category: "布局容器",
-    description: "内容段落之间的水平分隔线。",
+    description: "水平或垂直分隔线，支持标题、对齐、线型与紧凑间距。",
     importNames: ["Divider"],
-    code: 'import { Divider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <div><p>基本信息</p><Divider /><p>详细内容</p></div>\n  );\n}',
-    props: [],
-    notes: ["Divider 无额外公开属性。"],
+    code: 'import { Divider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <div><Divider titlePlacement="start">基本信息</Divider><p>内容</p><Divider variant="dashed" plain>更多</Divider><span>编辑</span><Divider orientation="vertical" /><span>归档</span></div>;\n}',
+    props: [
+      {
+        name: "orientation",
+        type: '"horizontal" | "vertical"',
+        default: '"horizontal"',
+        description: "分隔方向；默认无标题时保留原 hr 元素。",
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        description: "水平分隔线的标题，支持文字和图标；垂直模式忽略。",
+      },
+      {
+        name: "titlePlacement",
+        type: '"start" | "center" | "end"',
+        default: '"center"',
+        description: "标题的逻辑位置，支持 RTL。",
+      },
+      {
+        name: "variant",
+        type: '"solid" | "dashed" | "dotted"',
+        default: '"solid"',
+        description: "线型。",
+      },
+      {
+        name: "size",
+        type: '"small" | "medium" | "large"',
+        default: '"medium"',
+        description: "水平上下间距分别为 8、12、20px，不影响垂直模式。",
+      },
+      {
+        name: "plain",
+        type: "boolean",
+        default: "false",
+        description: "标题使用普通字重和次要文字色。",
+      },
+      {
+        name: "titleClassName / titleStyle",
+        type: "string / CSSProperties",
+        description: "标题样式。",
+      },
+      {
+        name: "className / style / ref",
+        type: "DOM 属性 / CSSProperties / Ref<HTMLHRElement | HTMLDivElement>",
+        description: "根元素属性与引用，无标题为 hr，有标题为 div。",
+      },
+    ],
+    notes: [
+      "保留原无参数 Divider 的水平细线及 12px 间距。",
+      "分隔线不参与键盘焦点；请勿在标题中放交互控件。长标题可换行。",
+      "使用 mtone 边框和文字 token；垂直高度默认 1em、左右间距 8px，可用 style 覆盖。",
+      "不提供 Ant Design 的旧属性别名或 API 兼容。",
+    ],
   },
   {
     name: "List",

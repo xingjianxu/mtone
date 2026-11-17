@@ -62,12 +62,13 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { Divider, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
 assert(renderToStaticMarkup(createElement(Image, {src:'/image.png',alt:'Image package check',preview:false})).includes('Image package check'));
 assert(renderToStaticMarkup(createElement(ImageGroup, {items:[{src:'/group.png',alt:'Group package check'}]})).includes('Group package check'));
 assert.equal(typeof ImagePreview, 'function');
+assert(renderToStaticMarkup(createElement(Divider, {titlePlacement:'start',variant:'dashed'}, 'Section')).includes('Section'));
 assert(renderToStaticMarkup(createElement(TableOfContents, {initialItems:[{id:'intro',label:'SSR contents check',level:2}]})).includes('SSR contents check'));
 assert.equal(Mention, Mentions);
 assert.equal(Avatar.Group, AvatarGroup);
@@ -101,13 +102,15 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { Divider, type DividerProps, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
 import '@bixlab/mtone/styles.css';
 export const demo = <Layout><Layout.Sider version="v1" collapsible /><Layout><Layout.Header /><Layout.Content><Toast><Button variant="blue">OK</Button></Toast></Layout.Content></Layout></Layout>;
 export function FormDemo() { const [form] = Form.useForm(); return <Form form={form} onFinish={values => console.log(values)}><Form.Item name='email' label='Email' rules={[{type:'email',required:true}]}><Input /></Form.Item></Form>; }
 export const cardDemo = <Card title="Title" htmlTitle="Tooltip" size="small" variant="outlined" styles={{body:{padding:12}}} classNames={({props})=>({root:props.size==='small'?'compact':''})} tabList={[{key:'one',label:'One'}]}><Card.Meta title="Metadata" description="Details"/><Card.Grid hoverable={false}>Grid</Card.Grid></Card>;
 export const splitterDemo = <Splitter orientation="horizontal" sizes={["40%","60%"]} onResize={sizes=>console.log(sizes)} style={{height:240}}><Splitter.Panel id="a" min="20%" collapsible>A</Splitter.Panel><Splitter.Panel id="b">B</Splitter.Panel></Splitter>;
 import {createRef} from 'react';
+const dividerProps: DividerProps = {orientation:"horizontal",variant:"dotted",size:"small",titlePlacement:"end",plain:true};
+export const dividerDemo = <Divider {...dividerProps}>Section</Divider>;
 const tocRef = createRef<TableOfContentsHandle>();
 const tocItems: TableOfContentsItem[] = [{id:'intro',label:'Introduction',level:2}];
 const tocProps: TableOfContentsProps = {initialItems:tocItems,root:()=>document.querySelector('article'),scrollContainer:()=>document.querySelector('main'),selector:'h2,h3',offset:48,observe:false,variant:'subtle',onActiveChange:id=>console.log(id),getLabel:node=>node.textContent || '',getLevel:node=>Number(node.tagName.slice(1)),renderLabel:(item,active)=><span data-active={active}>{item.label}</span>};
