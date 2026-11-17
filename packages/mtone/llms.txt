@@ -34,6 +34,82 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### Cascader
+
+- [Cascader](https://xingjianxu.github.io/mtone/#/components/Cascader): 路径式级联选择，支持单选、多选联动、搜索、异步加载与独立面板。
+- Import: Cascader from @bixlab/mtone
+- options: CascaderOption[]. 树形数据；同一父节点下 value 必须唯一
+- value / defaultValue: CascaderPath | CascaderPath[] (default: []). 单选为完整值路径；multiple 时为路径数组
+- multiple: boolean (default: false). 多选：父节点联动已加载、未禁用的叶节点
+- onValueChange: (value, optionPath | optionPaths) => void. 单选回传路径及选项路径，多选回传路径数组及选项路径数组；清除回传 []
+- changeOnSelect: boolean (default: false). 单选允许选择非叶节点；选择父级保持面板打开。多选不改变叶路径值模型
+- expandTrigger: "click" | "hover" (default: click). 鼠标展开方式；键盘始终可用
+- searchable: boolean (default: false). 在面板顶部显示搜索框，默认按完整路径的各词匹配
+- searchValue / defaultSearchValue / onSearchChange: string / string / (value:string)=>void (default: 空字符串). 受控或非受控搜索词；弹层关闭时请求清空搜索
+- filterOption: (query:string, path:CascaderOption[])=>boolean. 替换本地搜索匹配逻辑；仅处理已加载的可选路径
+- loadOptions: (path:CascaderOption[])=>Promise<CascaderOption[]>. 展开 isLeaf:false 的未加载分支时加载子项；失败可重试，空数组表示无子项
+- onLoadError: (error:unknown, path:CascaderOption[])=>void. 异步加载失败回调
+- renderOption: (option:CascaderOption, path:CascaderOption[])=>ReactNode. 自定义每行内容；不替换行交互
+- emptyContent / loadingText / loadErrorText: ReactNode (default: 本地化文案). 空结果、加载中、加载失败文案
+- searchPlaceholder: string (default: 本地化文案). 搜索框提示文字
+- disabled / readOnly: boolean (default: false). 禁用或只读；不允许修改值。弹出式 Cascader 不打开弹层
+- open / defaultOpen / onOpenChange: boolean / boolean / (open:boolean)=>void (default: false). 仅 Cascader：控制弹层
+- placeholder / allowClear / onClear: string / boolean / ()=>void (default: 本地化提示 / false). 仅 Cascader：提示文字、清除按钮及清除回调
+- size / status: "sm" | "md" | "lg" / "error" | "warning" (default: md). 仅 Cascader：高度 24 / 28 / 34px，及校验状态
+- placement: "bottom-start" | "bottom-end" | "top-start" | "top-end" (default: bottom-start). 仅 Cascader：弹层位置
+- showCheckedStrategy: "parent" | "leaf" (default: parent). 仅 Cascader：多选标签合并父级或展示叶级，不改变回调的叶路径数组
+- maxTagCount: number (default: 3). 仅 Cascader：最大可见标签数，其余显示计数
+- renderValue: (options:CascaderOption[], path:CascaderPath)=>ReactNode. 仅 Cascader：单选值和多选标签渲染；不存在的路径 options 为空
+- prefix / name / id: ReactNode / string / string. 仅 Cascader：前缀、JSON 序列化值的隐藏表单字段名、触发按钮 ID
+- ref: Ref<HTMLButtonElement>. 仅 Cascader：触发按钮的原生引用
+- className / style / aria-label / aria-labelledby: string / CSSProperties / string / string. 外层样式与可访问名称
+- CascaderPath = (string | number)[]。单选如 ["zhejiang","hangzhou"]，多选如 [["zhejiang","hangzhou"]]；数字 1 和字符串 "1" 是不同值。
+- CascaderOption 支持 value、label、textValue、children、disabled、isLeaf。富文本 label 应提供 textValue，用于搜索、路径文字和可访问名称。禁用分支的后代也不可选。
+- CascaderPanel 使用同一选项、选择、搜索与加载 API，但常驻页面，不支持触发器、标签展示、清除按钮、尺寸、定位及隐藏表单字段属性。
+- 搜索只处理当前已加载的路径，不触发递归远程加载。自定义远程检索需调用方更新 options。多选父级联动仅包括当前已加载的可用叶节点，不自动选择后来加载的数据。
+- options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。
+- 上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。
+- 这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
+- name 提交 JSON 字符串，不自动接入 FormField 的 onChange 协议，也不实现原生表单 reset；需受控值时请响应 onValueChange。
+- 源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。
+
+```tsx
+<Cascader aria-label="地区" options={[{value:"zhejiang",label:"浙江",children:[{value:"hangzhou",label:"杭州"}]}]} searchable allowClear onValueChange={(path) => console.log(path)} />
+```
+
+### CascaderPanel
+
+- [CascaderPanel](https://xingjianxu.github.io/mtone/#/components/CascaderPanel): 常驻页面的级联选择面板，复用路径选择、多选联动、搜索与异步加载交互。
+- Import: CascaderPanel from @bixlab/mtone
+- options: CascaderOption[]. 树形数据；同一父节点下 value 必须唯一
+- value / defaultValue: CascaderPath | CascaderPath[] (default: []). 单选为完整值路径；multiple 时为路径数组
+- multiple: boolean (default: false). 多选：父节点联动已加载、未禁用的叶节点
+- onValueChange: (value, optionPath | optionPaths) => void. 单选回传路径及选项路径，多选回传路径数组及选项路径数组；清除回传 []
+- changeOnSelect: boolean (default: false). 单选允许选择非叶节点；选择父级保持面板打开。多选不改变叶路径值模型
+- expandTrigger: "click" | "hover" (default: click). 鼠标展开方式；键盘始终可用
+- searchable: boolean (default: false). 在面板顶部显示搜索框，默认按完整路径的各词匹配
+- searchValue / defaultSearchValue / onSearchChange: string / string / (value:string)=>void (default: 空字符串). 受控或非受控搜索词；弹层关闭时请求清空搜索
+- filterOption: (query:string, path:CascaderOption[])=>boolean. 替换本地搜索匹配逻辑；仅处理已加载的可选路径
+- loadOptions: (path:CascaderOption[])=>Promise<CascaderOption[]>. 展开 isLeaf:false 的未加载分支时加载子项；失败可重试，空数组表示无子项
+- onLoadError: (error:unknown, path:CascaderOption[])=>void. 异步加载失败回调
+- renderOption: (option:CascaderOption, path:CascaderOption[])=>ReactNode. 自定义每行内容；不替换行交互
+- emptyContent / loadingText / loadErrorText: ReactNode (default: 本地化文案). 空结果、加载中、加载失败文案
+- searchPlaceholder: string (default: 本地化文案). 搜索框提示文字
+- disabled / readOnly: boolean (default: false). 禁用或只读；不允许修改值。弹出式 Cascader 不打开弹层
+- className / style / aria-label / aria-labelledby: string / CSSProperties / string / string. 外层样式与可访问名称
+- CascaderPath = (string | number)[]。单选如 ["zhejiang","hangzhou"]，多选如 [["zhejiang","hangzhou"]]；数字 1 和字符串 "1" 是不同值。
+- CascaderOption 支持 value、label、textValue、children、disabled、isLeaf。富文本 label 应提供 textValue，用于搜索、路径文字和可访问名称。禁用分支的后代也不可选。
+- CascaderPanel 使用同一选项、选择、搜索与加载 API，但常驻页面，不支持触发器、标签展示、清除按钮、尺寸、定位及隐藏表单字段属性。
+- 搜索只处理当前已加载的路径，不触发递归远程加载。自定义远程检索需调用方更新 options。多选父级联动仅包括当前已加载的可用叶节点，不自动选择后来加载的数据。
+- options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。
+- 上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。
+- 这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
+- 源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。
+
+```tsx
+<CascaderPanel aria-label="地区面板" options={[{value:"zhejiang",label:"浙江",children:[{value:"hangzhou",label:"杭州"}]}]} multiple searchable />
+```
+
 ### AutoComplete
 
 - [AutoComplete](https://xingjianxu.github.io/mtone/#/components/AutoComplete): 允许自由输入的自动补全，支持分组建议、远程搜索与完整键盘交互。

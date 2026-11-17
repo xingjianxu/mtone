@@ -1,3 +1,4 @@
+import { CascaderExample } from "./cascader-example";
 import { AutoCompleteExample } from "./auto-complete-example";
 import { TabsExample } from "./tabs-example";
 import { TableOfContentsExample } from "./table-of-contents-example";
@@ -244,6 +245,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <ResultExample compact={compact} />;
     case "Calendar":
       return <CalendarExample compact={compact} />;
+    case "CascaderPanel": return <CascaderExample panelOnly />;
+    case "Cascader": return <CascaderExample compact={compact} />;
     case "AutoComplete": return <AutoCompleteExample compact={compact} />;
     case "Mentions":
     case "Mention":

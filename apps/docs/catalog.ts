@@ -26,6 +26,285 @@ export type ComponentDoc = {
   notes: string[];
 };
 export const componentDocs: ComponentDoc[] = [
+  {
+    name: "Cascader",
+    category: "数据录入",
+    description:
+      "路径式级联选择，支持单选、多选联动、搜索、异步加载与独立面板。",
+    importNames: ["Cascader"],
+    code: '<Cascader aria-label="地区" options={[{value:"zhejiang",label:"浙江",children:[{value:"hangzhou",label:"杭州"}]}]} searchable allowClear onValueChange={(path) => console.log(path)} />',
+    props: [
+      {
+        name: "options",
+        type: "CascaderOption[]",
+        description: "树形数据；同一父节点下 value 必须唯一",
+      },
+      {
+        name: "value / defaultValue",
+        type: "CascaderPath | CascaderPath[]",
+        description: "单选为完整值路径；multiple 时为路径数组",
+        default: "[]",
+      },
+      {
+        name: "multiple",
+        type: "boolean",
+        description: "多选：父节点联动已加载、未禁用的叶节点",
+        default: "false",
+      },
+      {
+        name: "onValueChange",
+        type: "(value, optionPath | optionPaths) => void",
+        description:
+          "单选回传路径及选项路径，多选回传路径数组及选项路径数组；清除回传 []",
+      },
+      {
+        name: "changeOnSelect",
+        type: "boolean",
+        description:
+          "单选允许选择非叶节点；选择父级保持面板打开。多选不改变叶路径值模型",
+        default: "false",
+      },
+      {
+        name: "expandTrigger",
+        type: '"click" | "hover"',
+        description: "鼠标展开方式；键盘始终可用",
+        default: "click",
+      },
+      {
+        name: "searchable",
+        type: "boolean",
+        description: "在面板顶部显示搜索框，默认按完整路径的各词匹配",
+        default: "false",
+      },
+      {
+        name: "searchValue / defaultSearchValue / onSearchChange",
+        type: "string / string / (value:string)=>void",
+        description: "受控或非受控搜索词；弹层关闭时请求清空搜索",
+        default: "空字符串",
+      },
+      {
+        name: "filterOption",
+        type: "(query:string, path:CascaderOption[])=>boolean",
+        description: "替换本地搜索匹配逻辑；仅处理已加载的可选路径",
+      },
+      {
+        name: "loadOptions",
+        type: "(path:CascaderOption[])=>Promise<CascaderOption[]>",
+        description:
+          "展开 isLeaf:false 的未加载分支时加载子项；失败可重试，空数组表示无子项",
+      },
+      {
+        name: "onLoadError",
+        type: "(error:unknown, path:CascaderOption[])=>void",
+        description: "异步加载失败回调",
+      },
+      {
+        name: "renderOption",
+        type: "(option:CascaderOption, path:CascaderOption[])=>ReactNode",
+        description: "自定义每行内容；不替换行交互",
+      },
+      {
+        name: "emptyContent / loadingText / loadErrorText",
+        type: "ReactNode",
+        description: "空结果、加载中、加载失败文案",
+        default: "本地化文案",
+      },
+      {
+        name: "searchPlaceholder",
+        type: "string",
+        description: "搜索框提示文字",
+        default: "本地化文案",
+      },
+      {
+        name: "disabled / readOnly",
+        type: "boolean",
+        description: "禁用或只读；不允许修改值。弹出式 Cascader 不打开弹层",
+        default: "false",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open:boolean)=>void",
+        description: "仅 Cascader：控制弹层",
+        default: "false",
+      },
+      {
+        name: "placeholder / allowClear / onClear",
+        type: "string / boolean / ()=>void",
+        description: "仅 Cascader：提示文字、清除按钮及清除回调",
+        default: "本地化提示 / false",
+      },
+      {
+        name: "size / status",
+        type: '"sm" | "md" | "lg" / "error" | "warning"',
+        description: "仅 Cascader：高度 24 / 28 / 34px，及校验状态",
+        default: "md",
+      },
+      {
+        name: "placement",
+        type: '"bottom-start" | "bottom-end" | "top-start" | "top-end"',
+        description: "仅 Cascader：弹层位置",
+        default: "bottom-start",
+      },
+      {
+        name: "showCheckedStrategy",
+        type: '"parent" | "leaf"',
+        description:
+          "仅 Cascader：多选标签合并父级或展示叶级，不改变回调的叶路径数组",
+        default: "parent",
+      },
+      {
+        name: "maxTagCount",
+        type: "number",
+        description: "仅 Cascader：最大可见标签数，其余显示计数",
+        default: "3",
+      },
+      {
+        name: "renderValue",
+        type: "(options:CascaderOption[], path:CascaderPath)=>ReactNode",
+        description:
+          "仅 Cascader：单选值和多选标签渲染；不存在的路径 options 为空",
+      },
+      {
+        name: "prefix / name / id",
+        type: "ReactNode / string / string",
+        description:
+          "仅 Cascader：前缀、JSON 序列化值的隐藏表单字段名、触发按钮 ID",
+      },
+      {
+        name: "ref",
+        type: "Ref<HTMLButtonElement>",
+        description: "仅 Cascader：触发按钮的原生引用",
+      },
+      {
+        name: "className / style / aria-label / aria-labelledby",
+        type: "string / CSSProperties / string / string",
+        description: "外层样式与可访问名称",
+      },
+    ],
+    notes: [
+      'CascaderPath = (string | number)[]。单选如 ["zhejiang","hangzhou"]，多选如 [["zhejiang","hangzhou"]]；数字 1 和字符串 "1" 是不同值。',
+      "CascaderOption 支持 value、label、textValue、children、disabled、isLeaf。富文本 label 应提供 textValue，用于搜索、路径文字和可访问名称。禁用分支的后代也不可选。",
+      "CascaderPanel 使用同一选项、选择、搜索与加载 API，但常驻页面，不支持触发器、标签展示、清除按钮、尺寸、定位及隐藏表单字段属性。",
+      "搜索只处理当前已加载的路径，不触发递归远程加载。自定义远程检索需调用方更新 options。多选父级联动仅包括当前已加载的可用叶节点，不自动选择后来加载的数据。",
+      "options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。",
+      "上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。",
+      "这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。",
+      "name 提交 JSON 字符串，不自动接入 FormField 的 onChange 协议，也不实现原生表单 reset；需受控值时请响应 onValueChange。",
+      "源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。",
+    ],
+  },
+  {
+    name: "CascaderPanel",
+    category: "数据录入",
+    description:
+      "常驻页面的级联选择面板，复用路径选择、多选联动、搜索与异步加载交互。",
+    importNames: ["CascaderPanel"],
+    code: '<CascaderPanel aria-label="地区面板" options={[{value:"zhejiang",label:"浙江",children:[{value:"hangzhou",label:"杭州"}]}]} multiple searchable />',
+    props: [
+      {
+        name: "options",
+        type: "CascaderOption[]",
+        description: "树形数据；同一父节点下 value 必须唯一",
+      },
+      {
+        name: "value / defaultValue",
+        type: "CascaderPath | CascaderPath[]",
+        description: "单选为完整值路径；multiple 时为路径数组",
+        default: "[]",
+      },
+      {
+        name: "multiple",
+        type: "boolean",
+        description: "多选：父节点联动已加载、未禁用的叶节点",
+        default: "false",
+      },
+      {
+        name: "onValueChange",
+        type: "(value, optionPath | optionPaths) => void",
+        description:
+          "单选回传路径及选项路径，多选回传路径数组及选项路径数组；清除回传 []",
+      },
+      {
+        name: "changeOnSelect",
+        type: "boolean",
+        description:
+          "单选允许选择非叶节点；选择父级保持面板打开。多选不改变叶路径值模型",
+        default: "false",
+      },
+      {
+        name: "expandTrigger",
+        type: '"click" | "hover"',
+        description: "鼠标展开方式；键盘始终可用",
+        default: "click",
+      },
+      {
+        name: "searchable",
+        type: "boolean",
+        description: "在面板顶部显示搜索框，默认按完整路径的各词匹配",
+        default: "false",
+      },
+      {
+        name: "searchValue / defaultSearchValue / onSearchChange",
+        type: "string / string / (value:string)=>void",
+        description: "受控或非受控搜索词；弹层关闭时请求清空搜索",
+        default: "空字符串",
+      },
+      {
+        name: "filterOption",
+        type: "(query:string, path:CascaderOption[])=>boolean",
+        description: "替换本地搜索匹配逻辑；仅处理已加载的可选路径",
+      },
+      {
+        name: "loadOptions",
+        type: "(path:CascaderOption[])=>Promise<CascaderOption[]>",
+        description:
+          "展开 isLeaf:false 的未加载分支时加载子项；失败可重试，空数组表示无子项",
+      },
+      {
+        name: "onLoadError",
+        type: "(error:unknown, path:CascaderOption[])=>void",
+        description: "异步加载失败回调",
+      },
+      {
+        name: "renderOption",
+        type: "(option:CascaderOption, path:CascaderOption[])=>ReactNode",
+        description: "自定义每行内容；不替换行交互",
+      },
+      {
+        name: "emptyContent / loadingText / loadErrorText",
+        type: "ReactNode",
+        description: "空结果、加载中、加载失败文案",
+        default: "本地化文案",
+      },
+      {
+        name: "searchPlaceholder",
+        type: "string",
+        description: "搜索框提示文字",
+        default: "本地化文案",
+      },
+      {
+        name: "disabled / readOnly",
+        type: "boolean",
+        description: "禁用或只读；不允许修改值。弹出式 Cascader 不打开弹层",
+        default: "false",
+      },
+      {
+        name: "className / style / aria-label / aria-labelledby",
+        type: "string / CSSProperties / string / string",
+        description: "外层样式与可访问名称",
+      },
+    ],
+    notes: [
+      'CascaderPath = (string | number)[]。单选如 ["zhejiang","hangzhou"]，多选如 [["zhejiang","hangzhou"]]；数字 1 和字符串 "1" 是不同值。',
+      "CascaderOption 支持 value、label、textValue、children、disabled、isLeaf。富文本 label 应提供 textValue，用于搜索、路径文字和可访问名称。禁用分支的后代也不可选。",
+      "CascaderPanel 使用同一选项、选择、搜索与加载 API，但常驻页面，不支持触发器、标签展示、清除按钮、尺寸、定位及隐藏表单字段属性。",
+      "搜索只处理当前已加载的路径，不触发递归远程加载。自定义远程检索需调用方更新 options。多选父级联动仅包括当前已加载的可用叶节点，不自动选择后来加载的数据。",
+      "options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。",
+      "上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。",
+      "这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。",
+      "源码新增功能不代表 npm 0.3.0 已包含，请以安装版本为准。",
+    ],
+  },
 {
   "name": "AutoComplete",
   "category": "数据录入",

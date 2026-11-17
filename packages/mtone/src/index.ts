@@ -29,3 +29,5 @@ export * from "./image";
 export * from "./table-of-contents";
 
 export * from "./auto-complete";
+
+export * from "./cascader";
