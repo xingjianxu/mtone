@@ -25,8 +25,8 @@ try {
         await expect(page.getByRole('menuitem',{name:'PDF',exact:true})).toBeVisible();
         const after=await exporter.boundingBox();
         assert.deepEqual(after,before,'hover must not shift menu item geometry');
-        const style=await exporter.evaluate(el=>({border:getComputedStyle(el).borderTopColor,width:getComputedStyle(el).borderTopWidth,outline:getComputedStyle(el).outlineWidth}));
-        assert.equal(style.border,'rgb(147, 180, 220)'); assert.equal(style.width,'1px'); assert.equal(style.outline,'0px');
+        const style=await exporter.evaluate(el=>({border:getComputedStyle(el).borderTopColor,width:getComputedStyle(el).borderTopWidth,outlineStyle:getComputedStyle(el).outlineStyle}));
+        assert.equal(style.border,'rgb(147, 180, 220)'); assert.equal(style.width,'1px'); assert.equal(style.outlineStyle,'none');
         await page.getByRole('menuitem',{name:'PDF',exact:true}).hover();
         await expect(page.getByRole('menuitem',{name:'PDF',exact:true})).toBeVisible();
         if(iteration===0) await page.screenshot({path:`artifacts/menu/${name}-submenu.png`});
