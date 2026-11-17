@@ -27,6 +27,204 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "Image",
+  "category": "数据展示",
+  "description": "带加载占位、失败备用图和模态大图预览的图片。",
+  "importNames": [
+    "Image"
+  ],
+  "code": "import { Image } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Image src=\"/photo-small.jpg\" previewSrc=\"/photo-large.jpg\" alt=\"山间湖泊\" width={240} height={160} fallback=\"/placeholder.jpg\" />;\n}",
+  "props": [
+    {
+      "name": "src",
+      "type": "string",
+      "description": "图片地址，必填。"
+    },
+    {
+      "name": "alt",
+      "type": "string",
+      "description": "图片替代文本，也作为预览按钮和标题的说明。"
+    },
+    {
+      "name": "width / height",
+      "type": "number | string",
+      "description": "图片和外层尺寸，建议显式设置以避免布局跳动。"
+    },
+    {
+      "name": "fit",
+      "type": "CSSProperties[\"objectFit\"]",
+      "description": "缩略图适配方式；预览始终 contain。",
+      "default": "cover"
+    },
+    {
+      "name": "fallback",
+      "type": "string",
+      "description": "主图失败后尝试一次备用地址；备用图失败则显示错误内容。"
+    },
+    {
+      "name": "placeholder / errorContent",
+      "type": "ReactNode",
+      "description": "自定义加载占位或失败内容，不应包含交互控件。",
+      "default": "加载图标 / 本地化错误提示"
+    },
+    {
+      "name": "preview",
+      "type": "boolean",
+      "description": "是否允许点击打开预览。",
+      "default": "true"
+    },
+    {
+      "name": "previewSrc",
+      "type": "string",
+      "description": "独立大图地址；缺省使用 src。"
+    },
+    {
+      "name": "open / defaultOpen",
+      "type": "boolean",
+      "description": "受控打开状态或非受控初始状态。",
+      "default": "false"
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean) => void",
+      "description": "请求打开或关闭时调用；受控模式需由使用方更新 open。"
+    },
+    {
+      "name": "wrapperClassName",
+      "type": "string",
+      "description": "外层样式类。"
+    },
+    {
+      "name": "className / style / 原生 img 属性",
+      "type": "ImgHTMLAttributes<HTMLImageElement>",
+      "description": "传给内部 img；支持 loading、srcSet、onLoad、onError 等。"
+    }
+  ],
+  "notes": [
+    "此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。",
+    "预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。",
+    "预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。",
+    "不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。",
+    "MtoneProvider locale 控制界面中文/英文。Image 本身不是按钮替代品；原生 img 事件作用于图片节点。"
+  ]
+},
+{
+  "name": "ImageGroup",
+  "category": "数据展示",
+  "description": "使用显式图片数组展示缩略图，并在同一个预览器中前后切换。",
+  "importNames": [
+    "ImageGroup"
+  ],
+  "code": "import { ImageGroup } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <ImageGroup items={[{src:\"/one.jpg\",alt:\"山谷\"},{src:\"/two.jpg\",alt:\"海岸\"}]} thumbnailWidth={120} thumbnailHeight={90} />;\n}",
+  "props": [
+    {
+      "name": "items",
+      "type": "readonly ImageItem[]；ImageItem = { src: string; alt?: string; previewSrc?: string; fallback?: string; crossOrigin?; referrerPolicy? }",
+      "description": "必填；数组顺序就是展示及切换顺序。空数组不显示预览。"
+    },
+    {
+      "name": "open / defaultOpen",
+      "type": "boolean",
+      "description": "受控打开状态或非受控初始状态。",
+      "default": "false"
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean) => void",
+      "description": "请求打开或关闭时调用；受控模式需由使用方更新 open。"
+    },
+    {
+      "name": "current / defaultCurrent",
+      "type": "number",
+      "description": "受控索引或非受控初始索引，从 0 开始；超界索引会限制到有效范围。",
+      "default": "0"
+    },
+    {
+      "name": "onCurrentChange",
+      "type": "(index: number) => void",
+      "description": "点击缩略图或请求切换时调用；受控模式需更新 current。"
+    },
+    {
+      "name": "thumbnailWidth / thumbnailHeight",
+      "type": "number | string",
+      "description": "缩略图尺寸。",
+      "default": "120 / 90"
+    },
+    {
+      "name": "className / style / 原生 div 属性",
+      "type": "HTMLAttributes<HTMLDivElement>",
+      "description": "传给外层缩略图容器。"
+    }
+  ],
+  "notes": [
+    "此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。",
+    "预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。",
+    "预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。",
+    "不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。",
+    "到达首尾时停止切换，不循环。点击第几张就从该张打开；关闭后恢复到对应缩略图按钮。"
+  ]
+},
+{
+  "name": "ImagePreview",
+  "category": "数据展示",
+  "description": "独立、受控的模态图片预览器，可由任意业务按钮打开而不渲染缩略图。",
+  "importNames": [
+    "ImagePreview"
+  ],
+  "code": "import { useState } from \"react\";\nimport { Button, ImagePreview } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [open, setOpen] = useState(false);\n  return <><Button onClick={() => setOpen(true)}>打开图片</Button><ImagePreview items={[{src:\"/photo.jpg\",alt:\"山间湖泊\"}]} open={open} onOpenChange={setOpen} /></>;\n}",
+  "props": [
+    {
+      "name": "items",
+      "type": "readonly ImageItem[]；ImageItem = { src: string; alt?: string; previewSrc?: string; fallback?: string; crossOrigin?; referrerPolicy? }",
+      "description": "必填；空数组不显示预览。"
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "description": "必填，受控打开状态。"
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean) => void",
+      "description": "必填；关闭请求需由使用方更新 open。"
+    },
+    {
+      "name": "current / defaultCurrent",
+      "type": "number",
+      "description": "受控索引或非受控初始索引，从 0 开始；超界会限制到有效范围。",
+      "default": "0"
+    },
+    {
+      "name": "onCurrentChange",
+      "type": "(index: number) => void",
+      "description": "请求切换图片时调用。"
+    },
+    {
+      "name": "returnFocus",
+      "type": "RefObject<HTMLElement | null>",
+      "description": "关闭后的焦点目标；缺省由底层对话框恢复先前焦点。"
+    },
+    {
+      "name": "closeOnBackdrop",
+      "type": "boolean",
+      "description": "是否允许点击外侧遮罩或画布空白关闭；点击图片或拖动不会关闭。",
+      "default": "true"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": "传给预览对话框。"
+    }
+  ],
+  "notes": [
+    "此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。",
+    "预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。",
+    "预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。",
+    "不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。",
+    "使用 Base UI 模态对话框并通过 Portal 挂载。预览关闭后不保留缩放和拖动位置。"
+  ]
+},
+{
   "name": "Timeline",
   "category": "数据展示",
   "description": "紧凑的时间线，支持横向、纵向、交替排列、标题、加载节点及倒序。",

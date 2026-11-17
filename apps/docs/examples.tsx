@@ -1,3 +1,4 @@
+import { ImageExample } from "./image-example";
 import { TreeExample } from "./tree-example";
 import { TimelineExample } from "./timeline-example";
 import { AffixExample } from "./affix-example";
@@ -224,6 +225,10 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
         </div>
       );
+    case "Image":
+    case "ImageGroup":
+    case "ImagePreview":
+      return <ImageExample compact={compact} variant={name} />;
     case "Timeline":
       return <TimelineExample compact={compact} />;
     case "Rate":

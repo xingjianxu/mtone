@@ -34,6 +34,92 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### Image
+
+- [Image](https://xingjianxu.github.io/mtone/#/components/Image): 带加载占位、失败备用图和模态大图预览的图片。
+- Import: Image from @bixlab/mtone
+- src: string. 图片地址，必填。
+- alt: string. 图片替代文本，也作为预览按钮和标题的说明。
+- width / height: number | string. 图片和外层尺寸，建议显式设置以避免布局跳动。
+- fit: CSSProperties["objectFit"] (default: cover). 缩略图适配方式；预览始终 contain。
+- fallback: string. 主图失败后尝试一次备用地址；备用图失败则显示错误内容。
+- placeholder / errorContent: ReactNode (default: 加载图标 / 本地化错误提示). 自定义加载占位或失败内容，不应包含交互控件。
+- preview: boolean (default: true). 是否允许点击打开预览。
+- previewSrc: string. 独立大图地址；缺省使用 src。
+- open / defaultOpen: boolean (default: false). 受控打开状态或非受控初始状态。
+- onOpenChange: (open: boolean) => void. 请求打开或关闭时调用；受控模式需由使用方更新 open。
+- wrapperClassName: string. 外层样式类。
+- className / style / 原生 img 属性: ImgHTMLAttributes<HTMLImageElement>. 传给内部 img；支持 loading、srcSet、onLoad、onError 等。
+- 此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。
+- 预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。
+- 预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。
+- 不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。
+- MtoneProvider locale 控制界面中文/英文。Image 本身不是按钮替代品；原生 img 事件作用于图片节点。
+
+```tsx
+import { Image } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <Image src="/photo-small.jpg" previewSrc="/photo-large.jpg" alt="山间湖泊" width={240} height={160} fallback="/placeholder.jpg" />;
+}
+```
+
+### ImageGroup
+
+- [ImageGroup](https://xingjianxu.github.io/mtone/#/components/ImageGroup): 使用显式图片数组展示缩略图，并在同一个预览器中前后切换。
+- Import: ImageGroup from @bixlab/mtone
+- items: readonly ImageItem[]；ImageItem = { src: string; alt?: string; previewSrc?: string; fallback?: string; crossOrigin?; referrerPolicy? }. 必填；数组顺序就是展示及切换顺序。空数组不显示预览。
+- open / defaultOpen: boolean (default: false). 受控打开状态或非受控初始状态。
+- onOpenChange: (open: boolean) => void. 请求打开或关闭时调用；受控模式需由使用方更新 open。
+- current / defaultCurrent: number (default: 0). 受控索引或非受控初始索引，从 0 开始；超界索引会限制到有效范围。
+- onCurrentChange: (index: number) => void. 点击缩略图或请求切换时调用；受控模式需更新 current。
+- thumbnailWidth / thumbnailHeight: number | string (default: 120 / 90). 缩略图尺寸。
+- className / style / 原生 div 属性: HTMLAttributes<HTMLDivElement>. 传给外层缩略图容器。
+- 此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。
+- 预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。
+- 预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。
+- 不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。
+- 到达首尾时停止切换，不循环。点击第几张就从该张打开；关闭后恢复到对应缩略图按钮。
+
+```tsx
+import { ImageGroup } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <ImageGroup items={[{src:"/one.jpg",alt:"山谷"},{src:"/two.jpg",alt:"海岸"}]} thumbnailWidth={120} thumbnailHeight={90} />;
+}
+```
+
+### ImagePreview
+
+- [ImagePreview](https://xingjianxu.github.io/mtone/#/components/ImagePreview): 独立、受控的模态图片预览器，可由任意业务按钮打开而不渲染缩略图。
+- Import: ImagePreview from @bixlab/mtone
+- items: readonly ImageItem[]；ImageItem = { src: string; alt?: string; previewSrc?: string; fallback?: string; crossOrigin?; referrerPolicy? }. 必填；空数组不显示预览。
+- open: boolean. 必填，受控打开状态。
+- onOpenChange: (open: boolean) => void. 必填；关闭请求需由使用方更新 open。
+- current / defaultCurrent: number (default: 0). 受控索引或非受控初始索引，从 0 开始；超界会限制到有效范围。
+- onCurrentChange: (index: number) => void. 请求切换图片时调用。
+- returnFocus: RefObject<HTMLElement | null>. 关闭后的焦点目标；缺省由底层对话框恢复先前焦点。
+- closeOnBackdrop: boolean (default: true). 是否允许点击外侧遮罩或画布空白关闭；点击图片或拖动不会关闭。
+- className: string. 传给预览对话框。
+- 此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。
+- 预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。
+- 预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。
+- 不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。
+- 使用 Base UI 模态对话框并通过 Portal 挂载。预览关闭后不保留缩放和拖动位置。
+
+```tsx
+import { useState } from "react";
+import { Button, ImagePreview } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [open, setOpen] = useState(false);
+  return <><Button onClick={() => setOpen(true)}>打开图片</Button><ImagePreview items={[{src:"/photo.jpg",alt:"山间湖泊"}]} open={open} onOpenChange={setOpen} /></>;
+}
+```
+
 ### Timeline
 
 - [Timeline](https://xingjianxu.github.io/mtone/#/components/Timeline): 紧凑的时间线，支持横向、纵向、交替排列、标题、加载节点及倒序。

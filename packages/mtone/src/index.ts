@@ -23,3 +23,5 @@ export * from "./popconfirm";
 export * from "./timeline";
 export * from "./affix";
 export * from "./result";
+
+export * from "./image";
