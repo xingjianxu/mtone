@@ -5,7 +5,7 @@ import * as catalog from "../apps/docs/catalog";
 import { DocsApp, searchDocs } from "../apps/docs/docs-app";
 const categories = ["布局容器", "操作命令", "导航切换", "数据录入", "数据展示", "浮层对话", "状态反馈", "全局配置"];
 const expected: Record<string, string[]> = {
-  布局容器: ["Layout", "Splitter", "Divider"],
+  布局容器: ["Affix", "Layout", "Splitter", "Divider"],
   操作命令: ["Button", "IconButton", "ButtonGroup", "DropdownMenu", "ContextMenu", "Spotlight"],
   导航切换: ["Sidebar", "NavItem", "NavGroup", "Breadcrumb", "Tabs", "Pagination", "Segmented"],
   数据录入: ["Rate", "Input", "SearchInput", "Textarea", "Mentions", "Form", "FormField", "Checkbox", "Switch", "RadioGroup", "Select", "MultiSelect", "Slider", "NumberInput", "DatePicker", "FilterBar", "FilterChip", "Upload", "Dropzone"],

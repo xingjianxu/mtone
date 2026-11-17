@@ -27,6 +27,21 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+ name: "Affix", category: "布局容器", description: "将操作栏固定到窗口或滚动容器的顶部、底部，并保留原位置占位。",
+ importNames: ["Affix", "Button"],
+ code: 'import { Affix, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() { return <Affix offsetTop={16}><Button>保存</Button></Affix>; }',
+ props: [
+ { name: "offsetTop", type: "number", default: "0（未提供 offsetBottom 时）", description: "到目标顶部的像素偏移，同时提供时优先于 offsetBottom。" },
+ { name: "offsetBottom", type: "number", description: "到目标底部的像素偏移；仅在未指定 offsetTop 时生效。" },
+ { name: "target", type: "() => Window | HTMLElement | null", default: "() => window", description: "滚动目标；null 暂不固定，重新渲染后重新解析。容器按边框内的可视区域计算。" },
+ { name: "onChange", type: "(affixed: boolean) => void", description: "仅固定状态变化时调用，不在初始未固定状态调用。" },
+ { name: "children", type: "ReactNode", description: "被固定的内容，应参与常规文档流。" },
+ { name: "ref / className / style / HTML 属性", type: "HTMLDivElement / string / CSSProperties", description: "作用于外层占位容器；固定时高度由内容测量值管理。" }
+ ],
+ notes: ["支持窗口及嵌套垂直滚动、窗口/容器/内容尺寸变化。监听祖先滚动以更新目标位置。", "使用 position: fixed，不是 position: sticky；内容可能超出滚动容器，不做容器裁剪。不要用于 transform/filter/perspective 或 contain 创建固定包含块的祖先中。", "仅支持垂直滚动；子元素不要使用 absolute/fixed 脱离文档流，外层避免 padding/border、显式高度及高度依赖百分比的子元素。", "自定义 --mt-affix-z-index 可调整固定层叠级别（默认 10）；小屏时确保不遮挡关键内容。", "SSR 输出普通文档流，挂载测量后才固定。target 引用改变后需触发渲染；不提供 Ant Design 内部实例方法。"]
+},
+
+{
   "name": "Result",
   "category": "状态反馈",
   "description": "操作结果页：状态图标、标题、说明、动作与详细内容，沿用 mtone 紧凑风格。",
