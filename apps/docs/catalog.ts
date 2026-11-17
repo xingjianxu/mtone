@@ -2143,56 +2143,285 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "Tree",
     category: "数据展示",
-    description: "支持展开、单选和键盘导航的目录树。",
-    importNames: ["Tree"],
-    code: 'import { Tree } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tree label="文档目录" defaultExpanded={["root"]} defaultValue="notes" items={[{id:"root",label:"知识库",children:[{id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}]}]} />\n  );\n}',
+    description:
+      "保持紧凑风格的层级树，支持多选、级联勾选、目录模式、异步加载、拖放事件与虚拟滚动。",
+    importNames: ["Tree", "DirectoryTree"],
+    code: 'import { useState } from "react";\nimport { Tree, type TreeKey } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [checked, setChecked] = useState<TreeKey[]>([]);\n  return <Tree label="资料目录" checkable defaultExpandAll\n    checkedKeys={checked}\n    onCheck={keys => setChecked(Array.isArray(keys) ? keys : keys.checked)}\n    items={[{id:"root",label:"知识库",children:[\n      {id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}\n    ]}]} />;\n}',
     props: [
       {
         name: "items",
         type: "TreeItem[]",
-        description: "必填；节点含 id、label、children、disabled、icon。",
+        description:
+          "原有数据格式：id、label、children；可含 disabled、disableCheckbox、checkable、selectable、isLeaf、icon 及自定义字段。",
+        default: "[]",
       },
       {
-        name: "value",
-        type: "string",
-        description: "受控值；提供后需在回调中更新。",
+        name: "treeData",
+        type: "TreeNode[] | Record<string, unknown>[]",
+        description:
+          "key、title、children 数据格式；提供时优先于 items。标准化后的事件节点仍使用 id / label。",
       },
       {
-        name: "defaultValue",
+        name: "fieldNames",
+        type: "{ key?: string; title?: string; children?: string }",
+        description:
+          "映射输入数据字段。items 默认 id / label / children，treeData 默认 key / title / children。",
+      },
+      {
+        name: "value / defaultValue",
         type: "string",
-        description: "非受控初始值。",
+        description:
+          "保留原有单选受控值或初始值；数字键、多选或清空选择请用 selectedKeys。",
       },
       {
         name: "onValueChange",
         type: "(value: string) => void",
-        description: "值变化回调。",
+        description: "原有单选回调；仅为字符串节点键触发。",
+      },
+      {
+        name: "selectedKeys / defaultSelectedKeys",
+        type: "TreeKey[]",
+        description:
+          "受控或初始选中列表；selectedKeys 优先于 value，空数组可清空选择。",
+      },
+      {
+        name: "multiple / selectable",
+        type: "boolean",
+        description:
+          "multiple 开启多选，selectable 控制是否可选择；勾选与选择互相独立。",
+        default: "false / true",
+      },
+      {
+        name: "onSelect",
+        type: "(keys: TreeKey[], info) => void",
+        description:
+          "info 含 selected、node、selectedNodes、event；受控时应用需更新 selectedKeys。",
       },
       {
         name: "expanded / defaultExpanded",
         type: "string[]",
-        description: "受控或初始展开节点 ID。",
+        description:
+          "保留原有受控或初始展开 ID；新版 expandedKeys / defaultExpandedKeys 优先。",
       },
       {
         name: "onExpandedChange",
         type: "(ids: string[]) => void",
-        description: "展开状态变化。",
+        description:
+          "保留原有展开回调，仅包含字符串键；混合或数字键请使用 onExpand。",
       },
       {
-        name: "label",
-        type: "string",
-        description: "目录树可访问名称。",
+        name: "expandedKeys / defaultExpandedKeys",
+        type: "TreeKey[]",
+        description: "受控或初始展开节点；空数组折叠全部。",
       },
       {
-        name: "className",
-        type: "string",
-        description: "附加样式类。",
+        name: "defaultExpandAll / defaultExpandParent / autoExpandParent",
+        type: "boolean",
+        description:
+          "分别控制初始全部展开、初始展开祖先、每次根据展开键派生祖先展开。默认值只在挂载时生效，不随异步数据重新应用。",
+        default: "false / true / false",
+      },
+      {
+        name: "onExpand",
+        type: "(keys: TreeKey[], info: { expanded: boolean; node: TreeItem }) => void",
+        description: "用户展开 / 折叠时回调。受控时应用需更新展开键。",
+      },
+      {
+        name: "checkable / checkStrictly",
+        type: "boolean",
+        description: "开启复选框；checkStrictly=true 关闭父子关联。",
+        default: "false / false",
+      },
+      {
+        name: "checkedKeys",
+        type: "TreeKey[] | { checked: TreeKey[]; halfChecked: TreeKey[] }",
+        description:
+          "受控勾选。非严格模式根据 checked 列表派生父子全选和半选；严格模式支持显式 halfChecked。",
+      },
+      {
+        name: "defaultCheckedKeys",
+        type: "TreeKey[]",
+        description: "非受控初始勾选列表。",
+        default: "[]",
+      },
+      {
+        name: "onCheck",
+        type: "(keys: TreeCheckedKeys, info) => void",
+        description:
+          "严格模式返回 { checked, halfChecked }，否则返回全选键数组。info 含 checked、node、checkedNodes、halfCheckedKeys、event。",
+      },
+      {
+        name: "disabled",
+        type: "boolean",
+        description: "禁用整棵树的选择、勾选、展开及拖放交互。",
+        default: "false",
+      },
+      {
+        name: "blockNode / showLine",
+        type: "boolean",
+        description: "整行占宽或仅内容占宽；showLine 显示层级线条。",
+        default: "true / false",
+      },
+      {
+        name: "showIcon",
+        type: "boolean",
+        description:
+          "控制节点图标。默认保留原有节点 icon；目录模式默认显示文件夹 / 文件图标。根 icon 需配合 showIcon。",
+      },
+      {
+        name: "icon / switcherIcon",
+        type: "ReactNode | (info: TreeNodeInfo) => ReactNode",
+        description:
+          "根级节点图标或展开图标；info 含 node、expanded、selected、checked、loading。节点自身 icon 优先，节点 icon 函数接收 TreeItem。",
+      },
+      {
+        name: "switcherLoadingIcon",
+        type: "ReactNode",
+        description: "自定义加载图标。",
+      },
+      {
+        name: "titleRender",
+        type: "(node: TreeItem) => ReactNode",
+        description: "自定义标题内容；节点 label 仍提供默认可访问名称。",
+      },
+      {
+        name: "filterTreeNode",
+        type: "(node: TreeItem) => boolean",
+        description: "高亮返回 true 的节点，不删除其他节点或自动展开祖先。",
+      },
+      {
+        name: "loadData",
+        type: "(node: TreeItem) => Promise<unknown>",
+        description:
+          "展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。",
+      },
+      {
+        name: "loadedKeys / defaultLoadedKeys",
+        type: "TreeKey[]",
+        description:
+          "受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。",
+      },
+      {
+        name: "onLoad / onLoadError",
+        type: "(keys, { node }) => void / (error, node) => void",
+        description:
+          "加载成功或失败回调。失败显示错误提示并允许通过展开控件重试。",
+      },
+      {
+        name: "height / itemHeight / virtual",
+        type: "number / number / boolean",
+        description:
+          "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px；virtual=false 保留滚动容器但渲染全部节点。",
+        default: "— / 30 / true",
+      },
+      {
+        name: "draggable",
+        type: "boolean | (node: TreeItem) => boolean",
+        description: "启用 HTML 原生拖放，可按节点决定是否允许拖动。",
+        default: "false",
+      },
+      {
+        name: "allowDrop",
+        type: "({ dragNode, dropNode, dropPosition }) => boolean",
+        description:
+          "可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。",
+      },
+      {
+        name: "onDrop",
+        type: "(info: TreeDropInfo) => void",
+        description:
+          "info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap。应用按结果更新数据，组件不自动移动节点。",
+      },
+      {
+        name: "onDragStart / onDragEnd / onDragOver / onDragLeave",
+        type: "({ event, node }) => void",
+        description: "原生拖放阶段回调。",
+      },
+      {
+        name: "onDragEnter",
+        type: "({ event, node, expandedKeys }) => void",
+        description:
+          "有效目标进入回调，可由应用结合受控展开键实现悬停展开；组件不自动延时展开。",
+      },
+      {
+        name: "onRightClick / onDoubleClick",
+        type: "({ event, node }) => void / (event, node) => void",
+        description: "节点右键或双击回调。",
+      },
+      {
+        name: "directory / expandAction",
+        type: 'boolean / false | "click" | "doubleClick"',
+        description:
+          "DirectoryTree 等价于 directory=true；目录模式默认点击展开，false 禁用标题触发展开但保留箭头 / 方向键。",
+        default: 'false / "click"',
+      },
+      {
+        name: "label / className / style",
+        type: "string / string / CSSProperties",
+        description: "可访问名称、根类名与样式；支持其余不冲突的 div 属性。",
+      },
+      {
+        name: "ref",
+        type: "React.Ref<TreeRef>",
+        description:
+          "暴露 nativeElement、focus()、scrollTo({ key, align?, offset?, autoExpand? })；align 为 top / bottom / auto。autoExpand 只在非受控展开模式生效。",
       },
     ],
     notes: [
-      "支持方向键、Home/End、Enter/Space。节点 id 应全树唯一。",
-      "不含拖拽排序、懒加载协议或复选树。",
+      "TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。",
+      "勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。",
+      "支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。",
+      "loadData 只管理异步状态，不负责请求协议或合并数据；叶节点需 isLeaf=true。defaultExpandAll 仅初始化有效，加载后展开由 expandedKeys 控制。",
+      "虚拟化要求标题单行、固定行高；不支持自动测量变高行。长标题省略显示。scrollTo 自动展开只适用于已存在的数据，不能自动加载未知后代。",
+      "拖放使用桌面原生 HTML 拖放事件，不包含触摸拖放或键盘拖动。onDrop 不自动修改树，应用负责不可变移动和持久化数据。",
+      "DirectoryTree 为独立具名导出，并非 Tree.DirectoryTree；未实现 Ant Design 的 JSX TreeNode、Tree.useTree、motion、语义 classNames / styles，以及 showLine / draggable 的对象配置。接口不是 Ant Design 的直接替换。",
+      "保持 mtone 主题变量与本库复选框视觉风格，不引入 Ant Design 运行时依赖。",
     ],
   },
+  {
+  "name": "DirectoryTree",
+  "category": "数据展示",
+  "description": "Tree 的目录交互模式，默认文件夹 / 文件图标，支持点击展开与桌面式多选。",
+  "importNames": [
+    "DirectoryTree"
+  ],
+  "code": "import { DirectoryTree } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <DirectoryTree multiple defaultExpandedKeys={[\"root\"]} expandAction=\"doubleClick\"\n    items={[{id:\"root\",label:\"工作区\",children:[{id:\"notes\",label:\"笔记\"},{id:\"archive\",label:\"归档\"}]}]} />;\n}",
+  "props": [
+    {
+      "name": "items / treeData",
+      "type": "TreeItem[] / TreeNode[]",
+      "description": "与 Tree 共用数据格式、勾选、加载、拖放及虚拟滚动能力，完整属性见 Tree 文档。"
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "default": "false",
+      "description": "目录多选模式：普通点击单选，Ctrl / Command 点击追加或取消，Shift 点击选择可见范围。"
+    },
+    {
+      "name": "expandAction",
+      "type": "false | \"click\" | \"doubleClick\"",
+      "default": "\"click\"",
+      "description": "控制标题触发展开方式；false 保留箭头和键盘展开。"
+    },
+    {
+      "name": "showIcon",
+      "type": "boolean",
+      "default": "true",
+      "description": "默认显示目录 / 文件图标，节点 icon 或根 icon 可覆盖，false 隐藏。"
+    },
+    {
+      "name": "ref",
+      "type": "React.Ref<TreeRef>",
+      "description": "同 Tree，暴露 nativeElement、focus() 与 scrollTo(options)。"
+    }
+  ],
+  "notes": [
+    "DirectoryTree 是具名导出，等价于 <Tree directory />，不是 Tree.DirectoryTree。",
+    "继承 Tree 全部其他属性、受控状态规则和限制；保持数据展示分组，不重复创建导航类目。",
+    "完整交互示例与 Tree 共用，目录专用操作见示例中的“目录模式”。"
+  ]
+},
   {
     name: "Tabs",
     category: "导航切换",

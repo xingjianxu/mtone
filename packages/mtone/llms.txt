@@ -1058,27 +1058,90 @@ export default function Demo() {
 
 ### Tree
 
-- [Tree](https://xingjianxu.github.io/mtone/#/components/Tree): 支持展开、单选和键盘导航的目录树。
-- Import: Tree from @bixlab/mtone
-- items: TreeItem[]. 必填；节点含 id、label、children、disabled、icon。
-- value: string. 受控值；提供后需在回调中更新。
-- defaultValue: string. 非受控初始值。
-- onValueChange: (value: string) => void. 值变化回调。
-- expanded / defaultExpanded: string[]. 受控或初始展开节点 ID。
-- onExpandedChange: (ids: string[]) => void. 展开状态变化。
-- label: string. 目录树可访问名称。
-- className: string. 附加样式类。
-- 支持方向键、Home/End、Enter/Space。节点 id 应全树唯一。
-- 不含拖拽排序、懒加载协议或复选树。
+- [Tree](https://xingjianxu.github.io/mtone/#/components/Tree): 保持紧凑风格的层级树，支持多选、级联勾选、目录模式、异步加载、拖放事件与虚拟滚动。
+- Import: Tree, DirectoryTree from @bixlab/mtone
+- items: TreeItem[] (default: []). 原有数据格式：id、label、children；可含 disabled、disableCheckbox、checkable、selectable、isLeaf、icon 及自定义字段。
+- treeData: TreeNode[] | Record<string, unknown>[]. key、title、children 数据格式；提供时优先于 items。标准化后的事件节点仍使用 id / label。
+- fieldNames: { key?: string; title?: string; children?: string }. 映射输入数据字段。items 默认 id / label / children，treeData 默认 key / title / children。
+- value / defaultValue: string. 保留原有单选受控值或初始值；数字键、多选或清空选择请用 selectedKeys。
+- onValueChange: (value: string) => void. 原有单选回调；仅为字符串节点键触发。
+- selectedKeys / defaultSelectedKeys: TreeKey[]. 受控或初始选中列表；selectedKeys 优先于 value，空数组可清空选择。
+- multiple / selectable: boolean (default: false / true). multiple 开启多选，selectable 控制是否可选择；勾选与选择互相独立。
+- onSelect: (keys: TreeKey[], info) => void. info 含 selected、node、selectedNodes、event；受控时应用需更新 selectedKeys。
+- expanded / defaultExpanded: string[]. 保留原有受控或初始展开 ID；新版 expandedKeys / defaultExpandedKeys 优先。
+- onExpandedChange: (ids: string[]) => void. 保留原有展开回调，仅包含字符串键；混合或数字键请使用 onExpand。
+- expandedKeys / defaultExpandedKeys: TreeKey[]. 受控或初始展开节点；空数组折叠全部。
+- defaultExpandAll / defaultExpandParent / autoExpandParent: boolean (default: false / true / false). 分别控制初始全部展开、初始展开祖先、每次根据展开键派生祖先展开。默认值只在挂载时生效，不随异步数据重新应用。
+- onExpand: (keys: TreeKey[], info: { expanded: boolean; node: TreeItem }) => void. 用户展开 / 折叠时回调。受控时应用需更新展开键。
+- checkable / checkStrictly: boolean (default: false / false). 开启复选框；checkStrictly=true 关闭父子关联。
+- checkedKeys: TreeKey[] | { checked: TreeKey[]; halfChecked: TreeKey[] }. 受控勾选。非严格模式根据 checked 列表派生父子全选和半选；严格模式支持显式 halfChecked。
+- defaultCheckedKeys: TreeKey[] (default: []). 非受控初始勾选列表。
+- onCheck: (keys: TreeCheckedKeys, info) => void. 严格模式返回 { checked, halfChecked }，否则返回全选键数组。info 含 checked、node、checkedNodes、halfCheckedKeys、event。
+- disabled: boolean (default: false). 禁用整棵树的选择、勾选、展开及拖放交互。
+- blockNode / showLine: boolean (default: true / false). 整行占宽或仅内容占宽；showLine 显示层级线条。
+- showIcon: boolean. 控制节点图标。默认保留原有节点 icon；目录模式默认显示文件夹 / 文件图标。根 icon 需配合 showIcon。
+- icon / switcherIcon: ReactNode | (info: TreeNodeInfo) => ReactNode. 根级节点图标或展开图标；info 含 node、expanded、selected、checked、loading。节点自身 icon 优先，节点 icon 函数接收 TreeItem。
+- switcherLoadingIcon: ReactNode. 自定义加载图标。
+- titleRender: (node: TreeItem) => ReactNode. 自定义标题内容；节点 label 仍提供默认可访问名称。
+- filterTreeNode: (node: TreeItem) => boolean. 高亮返回 true 的节点，不删除其他节点或自动展开祖先。
+- loadData: (node: TreeItem) => Promise<unknown>. 展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。
+- loadedKeys / defaultLoadedKeys: TreeKey[]. 受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。
+- onLoad / onLoadError: (keys, { node }) => void / (error, node) => void. 加载成功或失败回调。失败显示错误提示并允许通过展开控件重试。
+- height / itemHeight / virtual: number / number / boolean (default: — / 30 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px；virtual=false 保留滚动容器但渲染全部节点。
+- draggable: boolean | (node: TreeItem) => boolean (default: false). 启用 HTML 原生拖放，可按节点决定是否允许拖动。
+- allowDrop: ({ dragNode, dropNode, dropPosition }) => boolean. 可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。
+- onDrop: (info: TreeDropInfo) => void. info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap。应用按结果更新数据，组件不自动移动节点。
+- onDragStart / onDragEnd / onDragOver / onDragLeave: ({ event, node }) => void. 原生拖放阶段回调。
+- onDragEnter: ({ event, node, expandedKeys }) => void. 有效目标进入回调，可由应用结合受控展开键实现悬停展开；组件不自动延时展开。
+- onRightClick / onDoubleClick: ({ event, node }) => void / (event, node) => void. 节点右键或双击回调。
+- directory / expandAction: boolean / false | "click" | "doubleClick" (default: false / "click"). DirectoryTree 等价于 directory=true；目录模式默认点击展开，false 禁用标题触发展开但保留箭头 / 方向键。
+- label / className / style: string / string / CSSProperties. 可访问名称、根类名与样式；支持其余不冲突的 div 属性。
+- ref: React.Ref<TreeRef>. 暴露 nativeElement、focus()、scrollTo({ key, align?, offset?, autoExpand? })；align 为 top / bottom / auto。autoExpand 只在非受控展开模式生效。
+- TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。
+- 勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。
+- 支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。
+- loadData 只管理异步状态，不负责请求协议或合并数据；叶节点需 isLeaf=true。defaultExpandAll 仅初始化有效，加载后展开由 expandedKeys 控制。
+- 虚拟化要求标题单行、固定行高；不支持自动测量变高行。长标题省略显示。scrollTo 自动展开只适用于已存在的数据，不能自动加载未知后代。
+- 拖放使用桌面原生 HTML 拖放事件，不包含触摸拖放或键盘拖动。onDrop 不自动修改树，应用负责不可变移动和持久化数据。
+- DirectoryTree 为独立具名导出，并非 Tree.DirectoryTree；未实现 Ant Design 的 JSX TreeNode、Tree.useTree、motion、语义 classNames / styles，以及 showLine / draggable 的对象配置。接口不是 Ant Design 的直接替换。
+- 保持 mtone 主题变量与本库复选框视觉风格，不引入 Ant Design 运行时依赖。
 
 ```tsx
-import { Tree } from "@bixlab/mtone";
+import { useState } from "react";
+import { Tree, type TreeKey } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
-  return (
-    <Tree label="文档目录" defaultExpanded={["root"]} defaultValue="notes" items={[{id:"root",label:"知识库",children:[{id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}]}]} />
-  );
+  const [checked, setChecked] = useState<TreeKey[]>([]);
+  return <Tree label="资料目录" checkable defaultExpandAll
+    checkedKeys={checked}
+    onCheck={keys => setChecked(Array.isArray(keys) ? keys : keys.checked)}
+    items={[{id:"root",label:"知识库",children:[
+      {id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}
+    ]}]} />;
+}
+```
+
+### DirectoryTree
+
+- [DirectoryTree](https://xingjianxu.github.io/mtone/#/components/DirectoryTree): Tree 的目录交互模式，默认文件夹 / 文件图标，支持点击展开与桌面式多选。
+- Import: DirectoryTree from @bixlab/mtone
+- items / treeData: TreeItem[] / TreeNode[]. 与 Tree 共用数据格式、勾选、加载、拖放及虚拟滚动能力，完整属性见 Tree 文档。
+- multiple: boolean (default: false). 目录多选模式：普通点击单选，Ctrl / Command 点击追加或取消，Shift 点击选择可见范围。
+- expandAction: false | "click" | "doubleClick" (default: "click"). 控制标题触发展开方式；false 保留箭头和键盘展开。
+- showIcon: boolean (default: true). 默认显示目录 / 文件图标，节点 icon 或根 icon 可覆盖，false 隐藏。
+- ref: React.Ref<TreeRef>. 同 Tree，暴露 nativeElement、focus() 与 scrollTo(options)。
+- DirectoryTree 是具名导出，等价于 <Tree directory />，不是 Tree.DirectoryTree。
+- 继承 Tree 全部其他属性、受控状态规则和限制；保持数据展示分组，不重复创建导航类目。
+- 完整交互示例与 Tree 共用，目录专用操作见示例中的“目录模式”。
+
+```tsx
+import { DirectoryTree } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <DirectoryTree multiple defaultExpandedKeys={["root"]} expandAction="doubleClick"
+    items={[{id:"root",label:"工作区",children:[{id:"notes",label:"笔记"},{id:"archive",label:"归档"}]}]} />;
 }
 ```
 

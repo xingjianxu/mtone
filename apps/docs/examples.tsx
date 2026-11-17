@@ -1,3 +1,4 @@
+import { TreeExample } from "./tree-example";
 import { TimelineExample } from "./timeline-example";
 import { AffixExample } from "./affix-example";
 import { ResultExample } from "./result-example";
@@ -414,30 +415,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           ]}
         />
       );
+    case "DirectoryTree":
     case "Tree":
-      return (
-        <div style={stackStyle}>
-          <M.Tree
-            label="知识库目录"
-            value={value ?? undefined}
-            onValueChange={setValue}
-            defaultExpanded={["root"]}
-            items={[
-              {
-                id: "root",
-                label: "我的知识库",
-                icon: <Folder size={14} />,
-                children: [
-                  { id: "design", label: "设计规范" },
-                  { id: "research", label: "研究笔记" },
-                  { id: "locked", label: "不可用节点", disabled: true },
-                ],
-              },
-            ]}
-          />
-          <M.Text muted>选中节点：{value}</M.Text>
-        </div>
-      );
+      return <TreeExample compact={compact} />;
     case "Tabs":
       return (
         <M.Tabs

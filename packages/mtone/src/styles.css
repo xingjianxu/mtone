@@ -583,3 +583,5 @@
 .mt-affix { min-width: 0; }
 .mt-affix-content { display: flow-root; box-sizing: border-box; }
 .mt-affix-content[data-affixed] { z-index: var(--mt-affix-z-index, 10); }
+
+@import "./tree.css";
