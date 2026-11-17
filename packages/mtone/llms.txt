@@ -785,21 +785,37 @@ export default function Demo() {
 ### ButtonGroup
 
 - [ButtonGroup](https://xingjianxu.github.io/mtone/#/components/ButtonGroup): 将关联按钮组织为一个操作组，支持默认分开排列或相连组合。
-- Import: ButtonGroup, Button from @bixlab/mtone
+- Import: ButtonGroup, Button, IconButton, DropdownMenu from @bixlab/mtone
 - connected: boolean (default: false). 相连样式：移除间距、共享边框，仅保留外侧圆角。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- DropdownMenu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。
 - 默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。
 - 使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。
 - 危险实心按钮使用 <Button danger variant="solid">删除</Button>。
 
 ```tsx
-import { ButtonGroup, Button } from "@bixlab/mtone";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { ButtonGroup, Button, IconButton, DropdownMenu } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
+  const [message, setMessage] = useState("");
   return (
-    <ButtonGroup connected aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>
+    <div>
+      <ButtonGroup connected aria-label="导出文档">
+        <Button onClick={() => setMessage("已选择导出 PDF")}>导出 PDF</Button>
+        <DropdownMenu
+          trigger={<IconButton aria-label="更多导出格式"><ChevronDown size={14} /></IconButton>}
+          items={[
+            { key: "markdown", label: "导出 Markdown", onSelect: () => setMessage("已选择导出 Markdown") },
+            { key: "html", label: "导出 HTML", onSelect: () => setMessage("已选择导出 HTML") },
+          ]}
+        />
+      </ButtonGroup>
+      <p role="status">{message}</p>
+    </div>
   );
 }
 ```

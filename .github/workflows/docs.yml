@@ -44,6 +44,7 @@ jobs:
       - run: node tests/transfer.browser.mjs
       - run: node tests/tabs.browser.mjs
       - run: node tests/divider.browser.mjs
+      - run: node tests/button-group.browser.mjs
       - run: node tests/breadcrumb.browser.mjs
       - run: node tests/auto-complete.browser.mjs
       - run: node tests/cascader.browser.mjs

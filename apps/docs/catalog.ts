@@ -1906,8 +1906,8 @@ export const componentDocs: ComponentDoc[] = [
     name: "ButtonGroup",
     category: "操作命令",
     description: "将关联按钮组织为一个操作组，支持默认分开排列或相连组合。",
-    importNames: ["ButtonGroup", "Button"],
-    code: 'import { ButtonGroup, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ButtonGroup connected aria-label="编辑操作"><Button>复制</Button><Button>粘贴</Button></ButtonGroup>\n  );\n}',
+    importNames: ["ButtonGroup", "Button", "IconButton", "DropdownMenu"],
+    code: "import { useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { ButtonGroup, Button, IconButton, DropdownMenu } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [message, setMessage] = useState(\"\");\n  return (\n    <div>\n      <ButtonGroup connected aria-label=\"导出文档\">\n        <Button onClick={() => setMessage(\"已选择导出 PDF\")}>导出 PDF</Button>\n        <DropdownMenu\n          trigger={<IconButton aria-label=\"更多导出格式\"><ChevronDown size={14} /></IconButton>}\n          items={[\n            { key: \"markdown\", label: \"导出 Markdown\", onSelect: () => setMessage(\"已选择导出 Markdown\") },\n            { key: \"html\", label: \"导出 HTML\", onSelect: () => setMessage(\"已选择导出 HTML\") },\n          ]}\n        />\n      </ButtonGroup>\n      <p role=\"status\">{message}</p>\n    </div>\n  );\n}",
     props: [
       { name: "connected", type: "boolean", default: "false", description: "相连样式：移除间距、共享边框，仅保留外侧圆角。" },
       {
@@ -1922,7 +1922,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ['默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
+    notes: ['DropdownMenu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
   },
   {
     name: "Input",

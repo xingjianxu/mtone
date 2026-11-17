@@ -1,7 +1,7 @@
 name: ButtonGroup verification
 on:
   push:
-    branches: [feat-button-group]
+    branches: [feat-button-group, docs-button-dropdown]
   workflow_dispatch:
 permissions:
   contents: read

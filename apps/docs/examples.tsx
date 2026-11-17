@@ -22,7 +22,7 @@ import { ToastAction } from "./toast-example";
 import { LayoutExample } from "./layout-example";
 import React, { useState } from "react";
 import * as M from "../../packages/mtone/src";
-import { BookOpen, FileText, Folder, Plus, Search, Star } from "lucide-react";
+import { ChevronDown, BookOpen, FileText, Folder, Plus, Search, Star } from "lucide-react";
 
 const options = [
   { value: "design", label: "产品设计" },
@@ -211,6 +211,16 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.ButtonGroup connected aria-label="危险操作">
             <M.Button danger variant="solid" onClick={() => setNotice("删除示例")}>删除</M.Button>
             <M.Button danger variant="solid" onClick={() => setNotice("永久删除示例")}>永久删除</M.Button>
+          </M.ButtonGroup>
+          <M.ButtonGroup connected aria-label="导出文档">
+            <M.Button onClick={() => setNotice("已选择导出 PDF")}>导出 PDF</M.Button>
+            <M.DropdownMenu
+              trigger={<M.IconButton aria-label="更多导出格式"><ChevronDown size={14} /></M.IconButton>}
+              items={[
+                { key: "markdown", label: "导出 Markdown", onSelect: () => setNotice("已选择导出 Markdown") },
+                { key: "html", label: "导出 HTML", onSelect: () => setNotice("已选择导出 HTML") },
+              ]}
+            />
           </M.ButtonGroup>
           {output}
         </div>
