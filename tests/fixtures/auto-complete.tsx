@@ -26,5 +26,22 @@ createRoot(document.getElementById("root")!).render(
         },
       ]}
     />
+    <AutoComplete aria-label="Empty" options={[]} />
+    <AutoComplete aria-label="Loading empty" options={[]} loading />
+    <AutoComplete
+      aria-label="Loading suggestions"
+      options={[{ value: "stale" }]}
+      loading
+    />
+    <AutoComplete
+      aria-label="Custom empty"
+      options={[]}
+      notFoundContent="Nothing yet"
+    />
+    <AutoComplete
+      aria-label="Suppressed empty"
+      options={[]}
+      notFoundContent={false}
+    />
   </main>,
 );

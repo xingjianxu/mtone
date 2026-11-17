@@ -90,6 +90,10 @@
 .mt-auto-complete-message {
   padding: 8px;
 }
+/* Keep the live region mounted, but do not reserve space without a message. */
+.mt-auto-complete-empty:empty {
+  padding: 0;
+}
 .mt-auto-complete-spinner {
   flex: none;
   animation: mt-auto-complete-spin 1s linear infinite;

@@ -202,3 +202,55 @@ test("native text editing keys do not select or lose input focus", async () => {
   expect(input).toHaveFocus();
   expect(select).not.toHaveBeenCalled();
 });
+
+test("keeps the empty live region mounted without padding when suggestions exist", async () => {
+  const { readFileSync } = await import("node:fs");
+  const style = document.createElement("style");
+  style.textContent = readFileSync(
+    "packages/mtone/src/auto-complete.css",
+    "utf8",
+  );
+  document.head.append(style);
+  try {
+    const user = userEvent.setup();
+    render(<AutoComplete aria-label="Spacing" options={options} />);
+    await user.click(screen.getByRole("combobox"));
+    const region = screen.getByRole("status");
+    expect(region).toHaveAttribute("aria-live", "polite");
+    expect(region).toBeEmptyDOMElement();
+    expect(getComputedStyle(region).paddingTop).toBe("0px");
+    expect(getComputedStyle(region).paddingBottom).toBe("0px");
+    await user.type(screen.getByRole("combobox"), "no-match");
+    expect(region).toHaveTextContent(/No suggestions|无匹配建议/);
+    expect(getComputedStyle(region).paddingTop).toBe("8px");
+    await user.clear(screen.getByRole("combobox"));
+    expect(region).toBeEmptyDOMElement();
+    expect(getComputedStyle(region).paddingTop).toBe("0px");
+  } finally {
+    style.remove();
+  }
+});
+
+test.each([
+  {
+    label: "grouped",
+    options: [{ label: "People", options: [{ value: "alice" }] }],
+  },
+  { label: "loading empty", options: [], loading: true },
+  { label: "loading suggestions", options, loading: true },
+  { label: "suppressed empty", options: [], notFoundContent: false },
+])(
+  "does not create an empty message spacer: $label",
+  async ({ label, ...props }) => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <AutoComplete aria-label={label} {...props} />,
+    );
+    await user.click(screen.getByRole("combobox"));
+    const empty = document.querySelector(".mt-auto-complete-empty")!;
+    expect(empty).toBeEmptyDOMElement();
+    expect(empty).toHaveAttribute("role", "status");
+    expect(empty).not.toHaveAttribute("hidden");
+    expect(empty).not.toHaveAttribute("aria-hidden");
+  },
+);

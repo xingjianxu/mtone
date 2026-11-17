@@ -218,7 +218,7 @@ export const AutoComplete = React.forwardRef<
                   {zh ? "加载中…" : "Loading…"}
                 </A.Status>
               )}
-              <A.Empty className="mt-auto-complete-message">
+              <A.Empty className="mt-auto-complete-message mt-auto-complete-empty">
                 {loading
                   ? null
                   : (notFoundContent ?? (zh ? "无匹配建议" : "No suggestions"))}

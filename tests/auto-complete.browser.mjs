@@ -14,10 +14,18 @@ try {
     ["chromium", chromium],
     ["firefox", firefox],
     ["webkit", webkit],
-  ]) {
+  ].filter(
+    ([name]) =>
+      !process.env.MTONE_BROWSER || process.env.MTONE_BROWSER === name,
+  )) {
     let browser, page;
     try {
-      browser = await engine.launch({ headless: true });
+      browser = await engine.launch({
+        headless: true,
+        ...(name === "chromium" && process.env.CHROMIUM_PATH
+          ? { executablePath: process.env.CHROMIUM_PATH }
+          : {}),
+      });
       page = await browser.newPage({ viewport: { width: 375, height: 760 } });
       const errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
@@ -27,6 +35,15 @@ try {
       const input = page.getByRole("combobox", { name: "Query" });
       await input.fill("free");
       await expect(page.getByRole("option", { name: "Alice" })).toBeVisible();
+      const emptyLiveRegion = page
+        .locator(".mt-auto-complete-popup [role=status]")
+        .last();
+      await expect(emptyLiveRegion).toHaveText("");
+      expect(
+        await emptyLiveRegion.evaluate(
+          (el) => el.getBoundingClientRect().height,
+        ),
+      ).toBe(0);
       await input.press("ArrowDown");
       await input.press("ArrowDown");
       await input.press("Enter");
@@ -49,6 +66,17 @@ try {
       await group.click();
       await expect(page.getByRole("option")).toHaveCount(1);
       await expect(page.getByText("People")).toBeVisible();
+      expect(
+        await page
+          .locator(".mt-auto-complete-empty")
+          .evaluate((el) => el.getBoundingClientRect().height),
+      ).toBe(0);
+      const popupTop = (
+        await page.locator(".mt-auto-complete-popup").boundingBox()
+      ).y;
+      const labelTop = (await page.getByText("People").boundingBox()).y;
+      expect(labelTop - popupTop).toBeLessThan(10);
+
       await page.screenshot({
         path: `artifacts/auto-complete-browser/${name}.png`,
         fullPage: true,
@@ -58,6 +86,37 @@ try {
           () => document.documentElement.scrollWidth <= innerWidth,
         ),
       ).toBe(true);
+      for (const [label, text] of [
+        ["Empty", /No suggestions|无匹配建议/],
+        ["Custom empty", "Nothing yet"],
+      ]) {
+        await page.keyboard.press("Escape");
+        await page.getByRole("combobox", { name: label, exact: true }).click();
+        const message = page.locator(".mt-auto-complete-empty");
+        await expect(message).toHaveText(text);
+        expect(
+          await message.evaluate((el) => getComputedStyle(el).paddingTop),
+        ).toBe("8px");
+      }
+      for (const label of [
+        "Loading empty",
+        "Loading suggestions",
+        "Suppressed empty",
+      ]) {
+        await page.keyboard.press("Escape");
+        await page.getByRole("combobox", { name: label, exact: true }).click();
+        const empty = page.locator(".mt-auto-complete-empty");
+        await expect(empty).toHaveText("");
+        expect(
+          await empty.evaluate((el) => el.getBoundingClientRect().height),
+        ).toBe(0);
+        if (label.startsWith("Loading"))
+          await expect(page.getByText(/Loading…|加载中…/)).toBeVisible();
+      }
+      await page.screenshot({
+        path: `artifacts/auto-complete-browser/${name}-empty-states.png`,
+        fullPage: true,
+      });
       expect(errors).toEqual([]);
     } catch (e) {
       failed = true;
