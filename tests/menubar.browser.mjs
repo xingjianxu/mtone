@@ -7,9 +7,10 @@ try { for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['we
  if(process.env.MENUBAR_BROWSER && process.env.MENUBAR_BROWSER!==name) continue;
  const browser=await engine.launch({headless:true,...(name==='chromium'&&process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
  try {const page=await browser.newPage();
- for(const rtl of [false,true]) {
+ for(const rtl of [false,true]) { console.log(`Menubar ${name} ${rtl?'rtl':'ltr'}`);
   await page.goto(`http://127.0.0.1:5198/tests/fixtures/menubar.html${rtl?'?rtl=1':''}`);
   const file=page.getByRole('menuitem',{name:'File',exact:true}), edit=page.getByRole('menuitem',{name:'Edit',exact:true});
+  await expect(file).toBeVisible();
   await page.keyboard.press('Tab'); await expect(file).toBeFocused();
   await page.keyboard.press(rtl?'ArrowLeft':'ArrowRight'); await expect(edit).toBeFocused();
   await page.keyboard.press('ArrowDown'); await expect(page.getByRole('menuitem',{name:'Copy',exact:true})).toBeFocused();
