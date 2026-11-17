@@ -76,8 +76,12 @@ try {
       await page.setViewportSize({ width: 320, height: 640 });
       await page.getByRole("button", { name: "预览 First" }).click();
       await expect(dialog).toBeVisible();
+      // Opening focus is scheduled by Base UI; do not send keys to the old trigger.
+      await expect(dialog.getByRole("button", { name: "关闭预览" })).toBeFocused();
       await page.keyboard.press("ArrowRight");
+      await expect(dialog.getByAltText("Second")).toBeVisible();
       await page.keyboard.press("ArrowRight");
+      await expect(dialog.getByAltText("Third")).toBeVisible();
       await page.getByRole("button", { name: "旋转", exact: true }).click();
       await expect(dialog.locator("img")).toHaveJSProperty("naturalWidth", 400);
       const rotated = await dialog.locator("img").boundingBox();
