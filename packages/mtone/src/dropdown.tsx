@@ -6,6 +6,10 @@ import { useDirection } from "@base-ui/react/direction-provider";
 import { MtoneScope, useMtone, cn } from "./basic";
 import type { OpenProps } from "./interactive";
 
+export const DropdownOwnerContext = React.createContext<string | undefined>(
+  undefined,
+);
+
 export type DropdownAlign = "start" | "end" | "left" | "right";
 export interface DropdownLayoutProps {
   /** Content-sized by default. Numbers are CSS pixels; strings are CSS widths. */
@@ -27,12 +31,15 @@ export function DropdownSurface({
   width,
   align = "start",
   label,
+  finalFocus,
 }: DropdownLayoutProps & {
   children: React.ReactNode;
   kind?: "popover" | "menu" | "submenu" | "context";
   label?: string;
+  finalFocus?: boolean | (() => boolean);
 }) {
   const direction = useDirection();
+  const owner = React.useContext(DropdownOwnerContext);
   const resolvedAlign =
     align === "left"
       ? direction === "rtl"
@@ -46,15 +53,23 @@ export function DropdownSurface({
   const Primitive =
     kind === "popover" ? BPopover : kind === "context" ? BContextMenu : BMenu;
   return (
-    <Primitive.Portal>
+    <Primitive.Portal keepMounted={kind !== "popover"}>
       <MtoneScope>
         <Primitive.Positioner
           className="mt-positioner"
-          side={kind === "context" ? undefined : kind === "submenu" ? "inline-end" : "bottom"}
+          side={
+            kind === "context"
+              ? undefined
+              : kind === "submenu"
+                ? "inline-end"
+                : "bottom"
+          }
           sideOffset={kind === "context" ? undefined : 4}
           align={kind === "submenu" ? "start" : resolvedAlign}
         >
           <Primitive.Popup
+            finalFocus={finalFocus}
+            data-dropdown-owner={owner}
             className={cn(
               "mt-popup",
               "mt-dropdown-popup",

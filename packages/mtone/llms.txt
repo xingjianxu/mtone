@@ -1572,6 +1572,36 @@ export default function Demo() {
 }
 ```
 
+### Menubar
+
+- [Menubar](https://xingjianxu.github.io/mtone/#/components/Menubar): 桌面应用式菜单栏，协调多个操作菜单，支持子菜单、分组及键盘导航。
+- Import: Menubar from @bixlab/mtone
+- menus: MenubarMenu[]. 必填；每个顶层菜单包含唯一 key、label、items: MenuEntry[]，可选 icon、disabled、width、align。items 与 Menu 共用，支持分组、分隔线、多级子菜单、复选项与单选组。
+- openKey / defaultOpenKey: string | null (default: null). 受控打开的顶层菜单 key / 非受控初始 key；null 表示全部关闭。受控时配合 onOpenChange 更新。
+- onOpenChange: (key: string | null) => void. 请求打开、切换或关闭顶层菜单时调用。
+- onSelect: (itemKey: string, menuKey: string) => void. 普通叶子命令选中后调用；先执行条目自己的 onSelect。展开子菜单和切换勾选项不触发此回调。
+- trigger: 'click' | 'hover' (default: click). 默认点击打开；已有菜单打开时，悬停其他标签可切换。hover 允许直接悬停打开，点击与键盘仍可用。
+- loop: boolean (default: true). 顶层方向键导航是否首尾循环。
+- disabled: boolean (default: false). 禁用整条菜单栏；单个菜单也可设置 disabled。
+- width: CSSProperties['width']. 顶层浮层默认按内容宽度（最小 160px），不跟随标签；可指定 px 或 CSS 宽度。单个菜单 width 优先，子菜单独立按内容宽度。
+- align: 'start' | 'end' | 'left' | 'right' (default: start). 顶层浮层首选对齐边；单个菜单 align 优先。start/end 随 RTL 变化，left/right 是物理左右，受视口碰撞处理约束。
+- HTML div attributes: HTMLAttributes<HTMLDivElement>. 支持 aria-label、className、style 等根元素属性；不接受 children，通过 menus 定义菜单。
+- Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一操作入口用 Menu，任意自定义浮层内容用 Dropdown。三者共享浮层样式，Menubar 与 Menu 保留菜单语义，不嵌套额外 dialog。
+- 菜单栏作为一个 Tab 停靠点，左右方向键移动顶层焦点；Enter、Space 或向下键进入菜单，Escape 退出并返回触发项。键盘逻辑由 Base UI 管理。快捷键文字仅展示，不注册全局快捷键。
+- RTL 同时提供 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 与 DOM dir=rtl；start/end 和左右方向键按方向上下文工作。
+- 菜单栏保持单行，窄屏时横向滚动；浮层受可用视口宽高限制。保留 mtone 紧凑高度、灰色背景与淡蓝色细边框。
+- 复选项 {type:'checkbox', key, label, checked/defaultChecked, onCheckedChange, closeOnClick?} 默认选择后不关闭。单选组 {type:'radio-group', key, label, value/defaultValue, onValueChange, children:[{key,label,...}]} 以子项 key 为值，选择后保持打开。通过各自变更回调处理，不触发 Menubar 的 onSelect。
+- 菜单 key 在同一栏内唯一，条目 key 在同级内唯一。示例命令仅更新演示状态，不执行保存、删除或剪贴板操作。
+
+```tsx
+import { Menubar } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <Menubar aria-label="编辑器菜单" menus={[{key:"file",label:"文件",items:[{key:"new",label:"新建"},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"md",label:"Markdown"}]}]},{key:"edit",label:"编辑",items:[{key:"undo",label:"撤销"}]}]} onSelect={(itemKey, menuKey) => console.log(menuKey, itemKey)} />;
+}
+```
+
 ### Menu
 
 - [Menu](https://xingjianxu.github.io/mtone/#/components/Menu): 点击打开的操作菜单，支持分组与多级子菜单。
@@ -1579,14 +1609,15 @@ export default function Demo() {
 - width: CSSProperties['width']. 主菜单默认按内容宽度（最小160px），不再与trigger等宽；可指定number像素或CSS宽度，受可用视口宽度限制。子菜单独立按内容宽度，不继承此值。
 - align: 'start' | 'end' | 'left' | 'right' (default: start). 主菜单与trigger对齐边；left/right是物理左右，start/end随DirectionProvider的RTL方向变化，碰撞时可自动调整。
 - trigger: ReactElement. 必填；触发元素。
-- items: MenuEntry[]. 必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}。
+- items: MenuEntry[]. 必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}；复选项 type: 'checkbox'；单选组 type: 'radio-group'。
 - onSelect: (key: string) => void. 选中叶子项时调用；展开子菜单不触发。先执行项自己的 onSelect，再执行此回调。
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
 - Menu 复用 Dropdown 的浮层布局，但仍使用菜单语义、方向键与选择关闭。通用自定义内容使用 Dropdown。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。
-- 同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线；尚不支持勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。
+- 同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。
 - 快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。
+- 复选项 type: checkbox 支持 checked/defaultChecked、onCheckedChange 与 closeOnClick（默认 false）。单选组 type: radio-group 支持 label、value/defaultValue、onValueChange 与 children，子项 key 是选择值；选择后保持打开。两类选择使用各自变更回调，不调用 Menu 的 onSelect。
 - Menu / MenuProps 是正式名称；DropdownMenu / DropdownMenuProps 仍作为已弃用兼容别名保留。旧文档链接自动转到 Menu。
 - 子菜单支持悬停、点击与左右方向键；Escape 关闭当前子菜单，再次 Escape 关闭主菜单并返回触发器。空 children 按普通叶子项处理，父项 onSelect 和 shortcut 不用于子菜单。key 请在每个同级列表内保持唯一。菜单项高亮使用灰色背景与 1px 淡蓝边框，不改变 Select 样式。
 
@@ -1608,12 +1639,12 @@ export default function Demo() {
 - Import: ContextMenu from @bixlab/mtone
 - width: CSSProperties['width']. 主面板宽度；默认按内容，最小160px，受可用视口约束，子菜单独立按内容宽度。右键菜单不提供trigger左右对齐属性。
 - children: ReactNode. 组件内容。
-- items: MenuEntry[]. 必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}。
+- items: MenuEntry[]. 必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}；复选项 type: 'checkbox'；单选组 type: 'radio-group'。
 - onSelect: (key: string) => void. 选中叶子项时调用；展开子菜单不触发。先执行项自己的 onSelect，再执行此回调。
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
-- 同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线；尚不支持勾选项。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。
+- 同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。
 - children 为右键区域；不要向其传 Menu 的 trigger 属性。
 
 ```tsx
