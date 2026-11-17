@@ -1324,7 +1324,7 @@ export default function Demo() {
 - onValueChange: (value: string) => void. 用户切换及非受控有效回退时触发。
 - placement: "top" | "bottom" | "start" | "end". 默认 top；start/end 为逻辑方向。
 - variant: "line" | "card" | "editable-card". 默认 line。
-- size: "small" | "medium" | "large". 默认 medium。
+- size: "small" | "medium" | "large". 默认 medium。card/editable-card 外框高度：small 24px、medium 28px、large 32px；line 保持原间距。
 - centered / gap: boolean / number. 居中排列（溢出时回到起点）；间隔单位px，最小0。
 - extraStart / extraEnd: ReactNode. 导航栏前后附加内容。
 - activateOnFocus: boolean. 默认 false，方向键移动焦点不立即切换。

@@ -2897,7 +2897,7 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "size",
         type: '"small" | "medium" | "large"',
-        description: "默认 medium。",
+        description: "默认 medium。card/editable-card 外框高度：small 24px、medium 28px、large 32px；line 保持原间距。",
       },
       {
         name: "centered / gap",

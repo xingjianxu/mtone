@@ -87,6 +87,32 @@ try {
       await expect(
         page.getByRole("tab", { name: "Second RTL", exact: true }),
       ).toBeFocused();
+      await page.goto("http://127.0.0.1:5212/tests/fixtures/tabs-compact.html");
+      for (const variant of ["card", "editable-card"]) {
+        for (const [size, height, font] of [["small", 24, 12], ["medium", 28, 14], ["large", 32, 15]]) {
+          for (const placement of ["top", "bottom", "start", "end"]) {
+            const region = page.getByTestId(`${variant}-${size}-${placement}`);
+            const frames = region.locator(".mt-tab-item");
+            for (const frame of await frames.all()) {
+              await expect(frame).toHaveCSS("height", `${height}px`);
+              await expect(frame).toHaveCSS("border-bottom-left-radius", "0px");
+              await expect(frame).toHaveCSS("border-bottom-right-radius", "0px");
+            }
+            const tab = region.getByRole("tab", {name:"Icon tab", exact:true});
+            await expect(tab).toHaveCSS("font-size", `${font}px`);
+            await expect(tab).toHaveCSS("gap", "6px");
+            await expect(tab).toHaveCSS("border-bottom-left-radius", "0px");
+            await expect(tab.locator("svg")).toHaveCSS("height", "14px");
+            await tab.hover();
+            await expect(tab).toHaveCSS("border-bottom-right-radius", "0px");
+            await expect(region.getByRole("tab", {name:"Disabled", exact:true})).toBeDisabled();
+          }
+        }
+      }
+      await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "28px");
+      await expect(page.getByRole("tab", {name:"Line tab", exact:true})).toHaveCSS("padding-top", "9px");
+      await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "28px");
+      await page.getByTestId("editable-card-medium-top").screenshot({path:`artifacts/tabs-browser/${name}-compact-card.png`});
       if (errors.length) throw Error(errors.join("\n"));
       console.log(`${name}: Tabs passed`);
     } catch (e) {
