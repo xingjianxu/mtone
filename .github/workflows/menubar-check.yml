@@ -24,10 +24,10 @@ jobs:
       - run: npm run build:docs
       - run: npm run test:package
       - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
-      - run: node tests/menu-spacing.browser.mjs
-      - run: node tests/menu.browser.mjs
-      - run: node tests/menubar.browser.mjs
-      - run: node tests/dropdown.browser.mjs
+      - run: HOME=/root node tests/menu-spacing.browser.mjs
+      - run: HOME=/root node tests/menu.browser.mjs
+      - run: HOME=/root node tests/menubar.browser.mjs
+      - run: HOME=/root node tests/dropdown.browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
