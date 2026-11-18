@@ -332,7 +332,36 @@ export function DocsApp() {
             <span className="brand-mark">m</span> mtone <small>{packageInfo.version}</small>
           </a>
           <div className="top-actions">
-            <span className="top-tag">组件文档</span>
+            <M.Spotlight
+              title="搜索组件"
+              placeholder="按名称、分类或描述搜索组件…"
+              nothingFound="没有匹配的组件，试试其他关键词。"
+              limit={componentDocs.length}
+              actions={groups.flatMap((group) =>
+                componentDocs.filter((item) => item.category === group).map((item) => ({
+                  id: item.name,
+                  label: item.name,
+                  description: item.description,
+                  keywords: item.category,
+                  group,
+                  onSelect: () => {
+                    setMobile(false);
+                    window.location.hash = `/components/${item.name}`;
+                  },
+                })),
+              )}
+              filter={(value, action) =>
+                `${action.label} ${action.group} ${action.description}`.toLowerCase().includes(value.trim().toLowerCase())
+              }
+              onOpenChange={(open) => { if (open) setMobile(false); }}
+              trigger={
+                <button className="docs-search-trigger" aria-label="搜索组件" aria-keyshortcuts="Control+k Meta+k">
+                  <Search size={15} aria-hidden="true" />
+                  <span className="docs-search-label">搜索组件…</span>
+                  <kbd aria-hidden="true">Ctrl / ⌘ K</kbd>
+                </button>
+              }
+            />
             <button
               onClick={() =>
                 setDensity(density === "compact" ? "comfortable" : "compact")
@@ -365,20 +394,6 @@ export function DocsApp() {
           />
         )}
         <aside className={`docs-sidebar ${mobile ? "is-open" : ""}`}>
-          <label className="search">
-            <Search size={15} />
-            <input
-              aria-label="搜索组件"
-              placeholder="搜索组件…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            {query && (
-              <button aria-label="清除搜索" onClick={() => setQuery("")}>
-                <X size={13} />
-              </button>
-            )}
-          </label>
           <nav
             aria-label="文档导航"
             onClick={(event) => {
@@ -409,13 +424,8 @@ export function DocsApp() {
             >
               主题与样式
             </a>
-            {results.length === 0 ? (
-              <p className="no-results" role="status">
-                没有匹配的组件。
-              </p>
-            ) : (
-              groups.map((group) => {
-                const members = results.filter((d) => d.category === group);
+            {groups.map((group) => {
+                const members = componentDocs.filter((d) => d.category === group);
                 return (
                   members.length > 0 && (
                     <div key={group}>
@@ -434,8 +444,7 @@ export function DocsApp() {
                     </div>
                   )
                 );
-              })
-            )}
+              })}
           </nav>
           <div className="sidebar-foot">BASE UI · TAILWIND · LUCIDE</div>
         </aside>

@@ -1,7 +1,7 @@
 name: Menubar verification
 on:
   push:
-    branches: [feat-menubar]
+    branches: [feat-menubar, integrate-search-arrow]
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,6 +24,12 @@ jobs:
       - run: npm run test:package
       - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
       - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Docs search browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/docs-search.browser.mjs
+          done
+      - run: node tests/hover-card-arrow.browser.mjs
       - run: node tests/date-picker.browser.mjs
       - run: node tests/select-layout.browser.mjs
       - run: node tests/select-focus.browser.mjs
