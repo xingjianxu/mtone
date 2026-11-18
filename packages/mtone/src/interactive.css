@@ -620,6 +620,7 @@
   margin-top: 3px;
 }
 
-.mt-menu-item + .mt-menu-item {
+.mt-menu-item + .mt-menu-item,
+.mt-menu-item-spaced {
   margin-top: 3px;
 }

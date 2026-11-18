@@ -33,6 +33,7 @@ jobs:
       - run: node tests/control-height.browser.mjs
       - run: node tests/menu-icons.browser.mjs
       - run: node tests/menu.browser.mjs
+      - run: node tests/menu-spacing.browser.mjs
       - run: node tests/dropdown.browser.mjs
       - run: node tests/menubar.browser.mjs
       - run: node tests/loading-overlay.browser.mjs

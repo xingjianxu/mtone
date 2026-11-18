@@ -425,7 +425,10 @@ export function DocsApp() {
               主题与样式
             </a>
             {groups.map((group) => {
-                const members = componentDocs.filter((d) => d.category === group);
+                // Preserve semantic group order, but make each component easy to find by name.
+                const members = componentDocs
+                  .filter((d) => d.category === group)
+                  .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
                 return (
                   members.length > 0 && (
                     <div key={group}>
@@ -529,7 +532,7 @@ export function DocsApp() {
                 <a href="#/gallery">返回组件总览</a>
               </>
             )}
-            <footer>
+            <footer className="docs-footer">
               mtone · 有样式的组件，无多余的噪音。
               <a href="https://github.com/xingjianxu/mtone/issues">
                 反馈问题 ↗
