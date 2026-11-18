@@ -363,8 +363,71 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
     />
   ),
 );
+export interface BlockquoteProps extends Omit<
+  React.BlockquoteHTMLAttributes<HTMLQuoteElement>,
+  "cite" | "color"
+> {
+  /** Visible attribution; use citeUrl for the HTML source URL. */
+  cite?: React.ReactNode;
+  citeUrl?: string;
+  /** Decorative icon. Keep interactive controls in children or cite instead. */
+  icon?: React.ReactNode;
+  iconSize?: number | string;
+  /** Any CSS color value, including a theme variable. */
+  color?: React.CSSProperties["color"];
+  radius?: React.CSSProperties["borderRadius"];
+  textWrap?: React.CSSProperties["textWrap"];
+}
+export const Blockquote = React.forwardRef<HTMLQuoteElement, BlockquoteProps>(
+  function Blockquote(
+    {
+      children,
+      cite,
+      citeUrl,
+      icon,
+      iconSize = 28,
+      color,
+      radius = 4,
+      textWrap = "wrap",
+      className,
+      style,
+      ...props
+    },
+    ref,
+  ) {
+    return (
+      <blockquote
+        {...props}
+        ref={ref}
+        cite={citeUrl}
+        className={cn("mt-typography mt-blockquote", className)}
+        style={
+          {
+            "--mt-blockquote-color": color,
+            "--mt-blockquote-icon-size":
+              typeof iconSize === "number" ? `${iconSize}px` : iconSize,
+            borderRadius: radius,
+            textWrap,
+            ...style,
+          } as React.CSSProperties
+        }
+      >
+        {icon != null && icon !== false && (
+          <span className="mt-blockquote-icon" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <div className="mt-blockquote-body">{children}</div>
+        {cite != null && cite !== false && (
+          <footer className="mt-blockquote-cite">{cite}</footer>
+        )}
+      </blockquote>
+    );
+  },
+);
+
 Text.displayName = "Text";
 Title.displayName = "Title";
 Paragraph.displayName = "Paragraph";
 Link.displayName = "Link";
-export const Typography = { Text, Title, Paragraph, Link };
+export const Typography = { Text, Title, Paragraph, Link, Blockquote };

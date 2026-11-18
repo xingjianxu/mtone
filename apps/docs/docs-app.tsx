@@ -529,7 +529,7 @@ export function DocsApp() {
                 <a href="#/gallery">返回组件总览</a>
               </>
             )}
-            <footer>
+            <footer className="docs-footer">
               mtone · 有样式的组件，无多余的噪音。
               <a href="https://github.com/xingjianxu/mtone/issues">
                 反馈问题 ↗

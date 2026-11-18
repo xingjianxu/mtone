@@ -582,6 +582,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Card":
       return <CardExample />;
+    case "Blockquote":
+      return <M.Typography.Blockquote cite="— mtone 设计笔记">让内容成为主角，用一致的间距建立层次。</M.Typography.Blockquote>;
     case "Typography":
     case "Text":
     case "Title":

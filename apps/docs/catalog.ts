@@ -3893,12 +3893,13 @@ export const componentDocs: ComponentDoc[] = [
   {
   "name": "Typography",
   "category": "数据展示",
-  "description": "统一的标题、正文、段落与链接，支持复制、纯文本编辑及省略展开。",
+  "description": "统一的标题、正文、段落、链接与引用，按子组件独立演示，支持复制、纯文本编辑及省略展开。",
   "importNames": [
     "Typography"
   ],
   "code": "import { Typography } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <section>\n    <Typography.Title level={2}>工作笔记</Typography.Title>\n    <Typography.Paragraph copyable>让内容清晰、有层次。</Typography.Paragraph>\n    <Typography.Text muted>更新于今天</Typography.Text>\n    <Typography.Link href=\"/docs\">查看文档</Typography.Link>\n  </section>;\n}",
   "props": [
+    {"name":"Blockquote", "type":"BlockquoteProps", "description":"引用子组件；支持 cite 可见署名、citeUrl 来源 URL、icon、iconSize（默认 28）、color（CSS 色值）、radius（默认 4）、textWrap（默认 wrap）。它不支持 Text 的复制、编辑或省略属性；完整 API 见 Blockquote 条目。"},
     {
       "name": "muted / type",
       "type": "boolean / \"secondary\" | \"success\" | \"warning\" | \"danger\"",
@@ -3941,11 +3942,62 @@ export const componentDocs: ComponentDoc[] = [
     }
   ],
   "notes": [
-    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。",
     "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
     "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
     "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
     "不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。"
+  ]
+},
+  {
+  "name": "Blockquote",
+  "category": "数据展示",
+  "description": "Typography.Blockquote 引用块，支持署名、来源 URL、装饰图标与可选强调色。",
+  "importNames": [
+    "Blockquote",
+    "Typography"
+  ],
+  "code": "import { Typography } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Typography.Blockquote cite=\"— mtone 设计笔记\">\n    让内容成为主角，用一致的间距建立层次。\n  </Typography.Blockquote>;\n}",
+  "props": [
+    {
+      "name": "cite",
+      "type": "ReactNode",
+      "description": "可见署名，支持文本或链接；不是 HTML cite URL。"
+    },
+    {
+      "name": "citeUrl",
+      "type": "string",
+      "description": "映射到原生 blockquote 的 cite 来源 URL。"
+    },
+    {
+      "name": "icon / iconSize",
+      "type": "ReactNode / number | string",
+      "default": "无图标 / 28",
+      "description": "装饰性图标及容器尺寸；数字为 px，字符串为 CSS 长度。图标会对屏幕阅读器隐藏，不要放置交互元素。"
+    },
+    {
+      "name": "color",
+      "type": "CSSProperties[\"color\"]",
+      "default": "主题中性色",
+      "description": "左边框和图标的强调色，支持 CSS 色值或 var()；不是 Mantine 调色板名称。背景保持 mtone 中性灰。"
+    },
+    {
+      "name": "radius / textWrap",
+      "type": "CSSProperties[\"borderRadius\"] / CSSProperties[\"textWrap\"]",
+      "default": "4 / wrap",
+      "description": "圆角与文字换行策略；radius 数字按 px，textWrap 可用 wrap/balance/pretty 等浏览器支持值。"
+    },
+    {
+      "name": "children / ref / 原生属性",
+      "type": "ReactNode / Ref<HTMLQuoteElement> / BlockquoteHTMLAttributes",
+      "description": "正文支持富内容；支持 className、style、dir、aria-* 等。style 可覆盖内置样式。"
+    }
+  ],
+  "notes": [
+    "可单独导入 Blockquote 或使用 Typography.Blockquote；渲染语义 blockquote，署名放在 footer 中。不会自动为署名添加破折号。",
+    "无图标或署名时不渲染占位；有图标时上方预留半个图标高度。支持继承 RTL 的逻辑方向边框与图标位置。",
+    "Blockquote 是引用容器，不继承 Text 的 copyable/editable/ellipsis 等属性；需要时可在正文内组合 Typography.Text/Paragraph。",
+    "不要求 Mantine API 兼容；颜色、圆角、字距与默认大小遵循 mtone。"
   ]
 },
   {
@@ -3999,7 +4051,7 @@ export const componentDocs: ComponentDoc[] = [
     }
   ],
   "notes": [
-    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。",
     "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
     "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
     "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
@@ -4063,7 +4115,7 @@ export const componentDocs: ComponentDoc[] = [
     }
   ],
   "notes": [
-    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。",
     "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
     "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
     "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
@@ -4121,7 +4173,7 @@ export const componentDocs: ComponentDoc[] = [
     }
   ],
   "notes": [
-    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。",
     "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
     "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
     "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
