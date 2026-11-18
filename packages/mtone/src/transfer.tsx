@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button, Input, cn, useMtone } from "./basic";
@@ -93,6 +94,7 @@ export const Transfer = React.forwardRef<HTMLDivElement, TransferProps>(
     },
     ref,
   ) {
+    disabled = useFieldsetDisabled(disabled);
     const { locale } = useMtone(),
       en = locale === "en";
     const labels =

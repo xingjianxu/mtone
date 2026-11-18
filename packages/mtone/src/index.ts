@@ -41,3 +41,5 @@ export type { DropdownProps, DropdownAlign, DropdownLayoutProps } from "./dropdo
 
 export * from "./loading-overlay";
 export * from "./hover-card";
+
+export * from "./fieldset";

@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { X, LoaderCircle } from "lucide-react";
@@ -152,6 +153,7 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
     },
     forwardedRef,
   ) {
+    disabled = useFieldsetDisabled(disabled);
     const { locale, density, tokens } = useMtone();
     const inputRef = React.useRef<HTMLTextAreaElement>(null),
       popupRef = React.useRef<HTMLDivElement>(null);

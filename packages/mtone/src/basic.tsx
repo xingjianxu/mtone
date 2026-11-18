@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import { FloatingOwnerContext } from "./floating-owner";
 import { Card } from "./card";
 import * as React from "react";
@@ -91,7 +92,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <BaseButton
         {...props}
         ref={ref}
-        disabled={disabled || loading}
+        disabled={useFieldsetDisabled(disabled) || loading}
         aria-busy={loading || undefined}
         className={cn(
           "mt-btn",
@@ -128,12 +129,14 @@ export const Input = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
 >(function Input({ className, ...p }, r) {
+  p = { ...p, disabled: useFieldsetDisabled(p.disabled) };
   return <BaseInput {...p} ref={r} className={cn("mt-input mt-input-control", className)} />;
 });
 export const Textarea = React.forwardRef<
   HTMLTextAreaElement,
   React.TextareaHTMLAttributes<HTMLTextAreaElement>
 >(function Textarea({ className, ...p }, r) {
+  p = { ...p, disabled: useFieldsetDisabled(p.disabled) };
   return (
     <textarea
       {...p}
@@ -196,21 +199,8 @@ export const Status = ({
 );
 export { Avatar, AvatarGroup } from "./avatar";
 export type { AvatarProps, AvatarGroupProps, AvatarSize, AvatarBreakpoint } from "./avatar";
-export function Progress({ value, label }: { value: number; label?: string }) {
-  const n = Math.min(100, Math.max(0, Number.isFinite(value) ? value : 0));
-  return (
-    <div
-      className="mt-progress"
-      role="progressbar"
-      aria-label={label || "Progress"}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={n}
-    >
-      <span style={{ width: `${n}%` }} />
-    </div>
-  );
-}
+export { Progress } from "./progress";
+export type { ProgressProps, ProgressType, ProgressStatus, ProgressColor } from "./progress";
 export { Text } from "./typography";
 export { Divider } from "./divider";
 export type { DividerProps } from "./divider";

@@ -1,4 +1,6 @@
 import { BreadcrumbExample } from "./breadcrumb-example";
+import { ProgressExamples } from "./ProgressExamples";
+import { FieldsetExample } from "./fieldset-example";
 import { LoadingOverlayExample } from "./loading-overlay-example";
 import { HoverCardExample } from "./hover-card-example";
 import { MenubarExample } from "./menubar-example";
@@ -290,6 +292,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>{text.length} 个字符</M.Text>
         </div>
       );
+    case "Fieldset":
+      return <FieldsetExample />;
     case "Form":
       return <FormExample />;
     case "FormField":
@@ -676,17 +680,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         />
       );
     case "Progress":
-      return (
-        <div style={stackStyle}>
-          <M.Progress value={number ?? 0} label="任务进度" />
-          <div style={rowStyle}>
-            <M.Button onClick={() => setNumber((n) => ((n ?? 0) + 20) % 120)}>
-              增加进度
-            </M.Button>
-            <M.Text>{number}%</M.Text>
-          </div>
-        </div>
-      );
+      return <ProgressExamples compact={compact} />;
     case "PropertyList":
     case "PropertyItem":
       return properties;

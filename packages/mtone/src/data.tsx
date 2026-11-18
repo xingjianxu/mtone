@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { Button, cn, useMtone } from "./basic";
 import { ChevronDown, ChevronRight, Upload as UploadIcon } from "lucide-react";
@@ -102,6 +103,7 @@ export function DatePicker({
   className,
   name,
 }: DatePickerProps) {
+  disabled = useFieldsetDisabled(disabled);
   const zh = useMtone().locale === "zh";
   const [local, setLocal] = React.useState(defaultValue);
   const [error, setError] = React.useState(false);
@@ -192,6 +194,7 @@ export function Upload({
   className,
   children,
 }: UploadProps) {
+  disabled = useFieldsetDisabled(disabled);
   const zh = useMtone().locale === "zh";
   const [files, setFiles] = React.useState<UploadFile[]>([]);
   const [drag, setDrag] = React.useState(false);
