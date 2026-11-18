@@ -18,3 +18,9 @@ Review focus: pointer transit between trigger and popup; keyboard focus retained
 - Documentation and package builds pass; package smoke uses a writable temporary npm cache in this executor.
 - Independent review caught a disabled-state control-mode bug; regression added and fixed, re-review passed.
 - Three-engine browser script added. Local execution is blocked because Playwright browser binaries are absent; browser/visual validation remains pending. No temporary verification workflow is included.
+
+## Portal-focus follow-up
+- Reproduced delayed Base UI trigger blur closing a preview after focus entered a descendant portal (regression test failed before the fix).
+- Added an internal React ownership chain projected by MtoneScope, so only descendant portals qualify as inside this HoverCard. Unrelated portals remain outside.
+- Preserved Escape/outside dismissal; added popup blur handling for keyboard departure from descendants. No public API changes.
+- Ten HoverCard unit tests pass, including actual nested Dropdown and two-stage Escape; typecheck passes. Added a separate three-engine browser regression, pending execution in integration CI (local browser launch blocked by socket permissions).

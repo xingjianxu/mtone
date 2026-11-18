@@ -154,3 +154,121 @@ describe("HoverCard", () => {
     expect(await screen.findByText("Toggle preview")).toBeVisible();
   });
 });
+
+describe("HoverCard portal focus boundaries", () => {
+  it("keeps a nested portal open when the trigger blur check runs later", async () => {
+    const { createPortal } = await import("react-dom");
+    const { MtoneScope } = await import("../packages/mtone/src/basic");
+    const { act } = await import("@testing-library/react");
+    const change = vi.fn();
+    render(
+      <>
+        <HoverCard
+          defaultOpen
+          openDelay={0}
+          onOpenChange={change}
+          trigger={<button>Portal author</button>}
+          content={
+            <>
+              <span>Parent preview</span>
+              {createPortal(
+                <MtoneScope>
+                  <button>Nested action</button>
+                </MtoneScope>,
+                document.body,
+              )}
+            </>
+          }
+        />
+        <button>Outside preview</button>
+      </>,
+    );
+    const trigger = screen.getByText("Portal author");
+    const nested = screen.getByText("Nested action");
+    act(() => {
+      trigger.focus();
+      nested.focus();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(screen.getByText("Parent preview")).toBeVisible();
+    expect(nested).toHaveFocus();
+    expect(change).not.toHaveBeenCalledWith(false);
+    act(() => {
+      screen.getByText("Outside preview").focus();
+    });
+    await waitFor(() =>
+      expect(screen.queryByText("Parent preview")).not.toBeInTheDocument(),
+    );
+  });
+});
+
+it("does not treat an unrelated portal as its own", async () => {
+  const { createPortal } = await import("react-dom");
+  const { MtoneScope } = await import("../packages/mtone/src/basic");
+  const { act } = await import("@testing-library/react");
+  render(
+    <>
+      <HoverCard
+        defaultOpen
+        openDelay={0}
+        trigger={<button>Owned trigger</button>}
+        content="Owned preview"
+      />
+      {createPortal(
+        <MtoneScope>
+          <button>Unrelated portal</button>
+        </MtoneScope>,
+        document.body,
+      )}
+    </>,
+  );
+  act(() => {
+    screen.getByText("Owned trigger").focus();
+    screen.getByText("Unrelated portal").focus();
+  });
+  await waitFor(() =>
+    expect(screen.queryByText("Owned preview")).not.toBeInTheDocument(),
+  );
+});
+
+it("keeps the preview while a real nested Dropdown closes with Escape", async () => {
+  const { Dropdown } = await import("../packages/mtone/src");
+  const { act } = await import("@testing-library/react");
+  render(
+    <HoverCard
+      defaultOpen
+      openDelay={0}
+      trigger={<button>Nested owner</button>}
+      content={
+        <>
+          <span>Nested parent content</span>
+          <Dropdown
+            defaultOpen
+            trigger={<button>Dropdown trigger</button>}
+            content={<button>Dropdown action</button>}
+          />
+        </>
+      }
+    />,
+  );
+  const nested = await screen.findByText("Dropdown action");
+  act(() => {
+    screen.getByText("Nested owner").focus();
+    nested.focus();
+  });
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 30));
+  });
+  expect(screen.getByText("Nested parent content")).toBeVisible();
+  await userEvent.keyboard("{Escape}");
+  await waitFor(() =>
+    expect(screen.queryByText("Dropdown action")).not.toBeInTheDocument(),
+  );
+  expect(screen.getByText("Nested parent content")).toBeVisible();
+  await userEvent.keyboard("{Escape}");
+  await waitFor(() =>
+    expect(screen.queryByText("Nested parent content")).not.toBeInTheDocument(),
+  );
+});

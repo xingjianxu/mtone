@@ -24,7 +24,9 @@ jobs:
       - run: npm run test:package
       - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
       - run: npx playwright install --with-deps chromium firefox webkit
+        timeout-minutes: 10
       - run: node tests/hover-card.browser.mjs
+      - run: node tests/hover-card-portals.browser.mjs
       - run: node tests/loading-overlay.browser.mjs
       - run: node tests/menubar.browser.mjs
       - run: node tests/date-picker.browser.mjs

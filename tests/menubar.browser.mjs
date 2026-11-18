@@ -7,13 +7,8 @@ try { for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['we
  if(process.env.MENUBAR_BROWSER && process.env.MENUBAR_BROWSER!==name) continue;
  const browser=await engine.launch({headless:true,...(name==='chromium'&&process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
  try {const page=await browser.newPage();
- await page.addInitScript(() => {
-  const label = (node) => node instanceof Element ? `${node.tagName}[${node.getAttribute('role') || ''}]#${node.id}:${node.textContent?.slice(0,80)}` : String(node);
-  for (const type of ['focusin','focusout','mouseover','keydown']) document.addEventListener(type, event => console.log('MT_EVENT', performance.now(), type, label(event.target), 'related', label(event.relatedTarget), 'active', label(document.activeElement), event.key || ''), true);
- });
- page.on('console', message => { if (message.text().startsWith('MT_')) console.log(message.text()); });
  for(const rtl of [false,true]) { console.log(`Menubar ${name} ${rtl?'rtl':'ltr'}`);
-  await page.goto(`http://127.0.0.1:5198/tests/fixtures/menubar.html?debugFocus=1${rtl?'&rtl=1':''}`);
+  await page.goto(`http://127.0.0.1:5198/tests/fixtures/menubar.html${rtl?'?rtl=1':''}`);
   const file=page.getByRole('menuitem',{name:'File',exact:true}), edit=page.getByRole('menuitem',{name:'Edit',exact:true});
   await expect(file).toBeVisible();
   await page.keyboard.press('Tab'); await expect(file).toBeFocused();
@@ -30,6 +25,10 @@ try { for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['we
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('menuitem',{name:'Recent',exact:true})).toBeFocused();
   await page.keyboard.press(rtl?'ArrowLeft':'ArrowRight');
+  await expect(page.getByRole('menuitem',{name:'Project',exact:true})).toBeFocused();
+  // Replay a root-trigger blur after focus crossed into the submenu portal.
+  await file.evaluate(el => el.dispatchEvent(new FocusEvent('focusout', {bubbles:true,relatedTarget:document.activeElement})));
+  await page.waitForTimeout(50);
   await expect(page.getByRole('menuitem',{name:'Project',exact:true})).toBeFocused();
   await page.keyboard.press('Enter'); await expect(page.getByRole('status')).toHaveText('project');
   await page.getByRole('menuitem',{name:'View',exact:true}).click();
