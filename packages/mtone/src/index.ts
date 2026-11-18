@@ -43,3 +43,5 @@ export * from "./loading-overlay";
 export * from "./hover-card";
 
 export * from "./fieldset";
+
+export * from "./tree-select";

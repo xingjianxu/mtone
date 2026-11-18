@@ -7,6 +7,7 @@ import { MenubarExample } from "./menubar-example";
 import { DropdownExample } from "./dropdown-example";
 import { TypographyExample } from "./typography-example";
 import { TransferExample } from "./transfer-example";
+import { TreeSelectExample } from "./tree-select-example";
 import { CascaderExample } from "./cascader-example";
 import { AutoCompleteExample } from "./auto-complete-example";
 import { TabsExample } from "./tabs-example";
@@ -274,6 +275,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "Calendar":
       return <CalendarExample compact={compact} />;
     case "Transfer": return <TransferExample compact={compact} />;
+    case "TreeSelect": return <TreeSelectExample compact={compact} />;
     case "CascaderPanel": return <CascaderExample panelOnly />;
     case "Cascader": return <CascaderExample compact={compact} />;
     case "AutoComplete": return <AutoCompleteExample compact={compact} />;

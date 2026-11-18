@@ -71,9 +71,10 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { TreeSelect, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
+assert(renderToStaticMarkup(createElement(TreeSelect,{items:[{id:'one',label:'Package node'}],defaultValue:'one'})).includes('Package node'));
 assert(renderToStaticMarkup(createElement(Image, {src:'/image.png',alt:'Image package check',preview:false})).includes('Image package check'));
 assert(renderToStaticMarkup(createElement(ImageGroup, {items:[{src:'/group.png',alt:'Group package check'}]})).includes('Group package check'));
 assert.equal(typeof ImagePreview, 'function');

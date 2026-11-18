@@ -38,6 +38,7 @@ const expected: Record<string, string[]> = {
     "Cascader",
     "CascaderPanel",
     "Transfer",
+    "TreeSelect",
     "AutoComplete",
     "Rate",
     "Input",
