@@ -615,3 +615,11 @@
 .mt-menubar-trigger[data-disabled] { opacity: .45; cursor: not-allowed; }
 .mt-menubar-icon { display: inline-flex; }
 .mt-menubar-icon svg { width: 14px; height: 14px; }
+
+.mt-option + .mt-option {
+  margin-top: 3px;
+}
+
+.mt-menu-item + .mt-menu-item {
+  margin-top: 3px;
+}

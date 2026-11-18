@@ -130,3 +130,28 @@ it('keeps breadcrumb hover neutral and underline-free without removing keyboard 
   expect(rule).toContain('background: var(--mt-hover, #f1f1ef)');
   expect(css).toContain('.mt-breadcrumb a:focus-visible');
 });
+
+it('spaces consecutive NavGroup items like sidebar menus without widening group boundaries', () => {
+  const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
+  expect(css).toMatch(/\.mt-nav-group > \.mt-nav-item \+ \.mt-nav-item\s*\{\s*margin-top: 3px;\s*\}/);
+  const showcase = readFileSync('apps/docs/app-showcase.css', 'utf8');
+  const item = showcase.slice(showcase.indexOf('.showcase .showcase-sidebar .mt-nav-item {')).split('}')[0];
+  expect(item).not.toContain('margin-bottom');
+  expect(showcase).toMatch(/\.showcase \.showcase-sidebar \.mt-nav-item \+ \.mt-nav-item\s*\{\s*margin-top: 3px;\s*\}/);
+});
+
+it.each([
+  ['styles.css', '.mt-sidebar-content > .mt-nav-item + .mt-nav-item'],
+  ['interactive.css', '.mt-option + .mt-option'],
+  ['interactive.css', '.mt-menu-item + .mt-menu-item'],
+  ['mentions.css', '.mt-mentions-option + .mt-mentions-option'],
+  ['cascader.css', '.mt-cascader-option + .mt-cascader-option'],
+  ['spotlight.css', '.mt-spotlight-option + .mt-spotlight-option'],
+  ['table-of-contents.css', '.mt-toc-item + .mt-toc-item'],
+])('separates adjacent rounded list rows without padding the first row: %s %s', (file, selector) => {
+  const css = readFileSync(`packages/mtone/src/${file}`, 'utf8');
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+  const rule = rules.find((entry) => entry[1].trim().split(/,\s*/).includes(selector));
+  expect(rule, selector).toBeDefined();
+  expect(rule?.[2].trim()).toBe('margin-top: 3px;');
+});

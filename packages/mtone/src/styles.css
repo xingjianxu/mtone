@@ -507,6 +507,11 @@
 .mt-nav-group {
   margin-top: 12px;
 }
+.mt-sidebar > .mt-nav-item + .mt-nav-item,
+.mt-sidebar-content > .mt-nav-item + .mt-nav-item,
+.mt-nav-group > .mt-nav-item + .mt-nav-item {
+  margin-top: 3px;
+}
 .mt-nav-label {
   font-size: 11px;
   letter-spacing: 0.04em;

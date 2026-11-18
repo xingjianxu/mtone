@@ -251,3 +251,7 @@
     color: HighlightText;
   }
 }
+
+.mt-cascader-option + .mt-cascader-option {
+  margin-top: 3px;
+}
