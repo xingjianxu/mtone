@@ -1,3 +1,5 @@
+import { LoadingOverlayExample } from "./loading-overlay-example";
+import { HoverCardExample } from "./hover-card-example";
 import { MenubarExample } from "./menubar-example";
 import { DropdownExample } from "./dropdown-example";
 import { TypographyExample } from "./typography-example";
@@ -560,6 +562,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           {output}
         </div>
       );
+    case "HoverCard":
+      return <HoverCardExample />;
     case "Popover":
       return (
         <M.Popover
@@ -795,6 +799,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Skeleton style={{ height: 14, width: "75%" }} />
         </div>
       );
+    case "LoadingOverlay":
+      return <LoadingOverlayExample />;
     case "Spinner":
       return (
         <div style={rowStyle}>

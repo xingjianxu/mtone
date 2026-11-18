@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DirectionProvider } from "@base-ui/react/direction-provider";
 import { Menubar } from "../packages/mtone/src/interactive";
@@ -63,6 +63,21 @@ describe("Menubar", () => {
     );
     await user.keyboard("{Enter}");
     expect(select).toHaveBeenCalledExactlyOnceWith("project", "file");
+  });
+  it("ignores a delayed trigger blur while focus is in its portaled submenu", async () => {
+    const user = userEvent.setup();
+    render(<><Menubar menus={menus} /><button>Outside</button></>);
+    await user.tab();
+    await user.keyboard("{ArrowDown}{ArrowDown}{ArrowRight}");
+    const project = await screen.findByRole("menuitem", { name: "Project" });
+    await waitFor(() => expect(project).toHaveFocus());
+    // Replay the root trigger's delayed blur after focus crossed the portal.
+    fireEvent.blur(screen.getByRole("menuitem", { name: "File" }), { relatedTarget: project });
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(project).toBeVisible();
+    expect(project).toHaveFocus();
+    await user.click(screen.getByRole("button", { name: "Outside" }));
+    await waitFor(() => expect(screen.queryByRole("menuitem", { name: "Project" })).not.toBeInTheDocument());
   });
   it("supports controlled open keys without changing them internally", async () => {
     const change = vi.fn();

@@ -646,6 +646,18 @@ export function Menubar({
             open={!disabled && !menu.disabled && activeKey === menu.key}
             onOpenChange={(open, details) => {
               if (details.reason === "sibling-open") return;
+              // A delayed trigger blur can run after keyboard focus has already
+              // reached a portaled submenu. It still belongs to this active menu.
+              const focused = barRef.current?.ownerDocument.activeElement;
+              if (
+                !open && details.reason === "trigger-focus" &&
+                activeRef.current === menu.key &&
+                focused?.closest("[data-dropdown-owner]")
+                  ?.getAttribute("data-dropdown-owner") === ownerId
+              ) {
+                details.cancel();
+                return;
+              }
               if (open) changeOpen(menu.key);
               else if (activeRef.current === menu.key) changeOpen(null);
             }}

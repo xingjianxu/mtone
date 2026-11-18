@@ -71,7 +71,7 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
 assert(renderToStaticMarkup(createElement(Image, {src:'/image.png',alt:'Image package check',preview:false})).includes('Image package check'));
@@ -81,6 +81,9 @@ assert(renderToStaticMarkup(createElement(Tabs, {items:[{value:'one',label:'Pack
 assert(renderToStaticMarkup(createElement(Divider, {titlePlacement:'start',variant:'dashed'}, 'Section')).includes('Section'));
 assert(renderToStaticMarkup(createElement(TableOfContents, {initialItems:[{id:'intro',label:'SSR contents check',level:2}]})).includes('SSR contents check'));
 assert(renderToStaticMarkup(createElement(Dropdown,{trigger:createElement(Button,null,'Dropdown trigger'),content:'Details',width:240,align:'right'})).includes('Dropdown trigger'));
+assert(renderToStaticMarkup(createElement(LoadingOverlay,{visible:true,label:'Package loading'})).includes('Package loading'));
+assert.equal(renderToStaticMarkup(createElement(LoadingOverlay,{})), '');
+assert(renderToStaticMarkup(createElement(HoverCard,{trigger:createElement(Button,null,'Hover preview'),content:'Preview'})).includes('Hover preview'));
 assert.equal(Menu, DropdownMenu);
 assert(renderToStaticMarkup(createElement(Menubar,{menus:[{key:'file',label:'File',items:[]}]})).includes('menubar'));
 assert(renderToStaticMarkup(createElement(Menu,{trigger:createElement(Button,null,'Menu trigger'),items:[]})).includes('Menu trigger'));
@@ -124,7 +127,9 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+const overlayProps: LoadingOverlayProps = {visible:true,label:'Saving',opacity:0.8,blur:2,radius:4,zIndex:20,loader:null};
+const overlay = <LoadingOverlay {...overlayProps}/>;
 const menubarProps: MenubarProps = {menus:[{key:'file',label:'File',items:[]}],openKey:null};
 const menubar = <Menubar {...menubarProps}/>;
 const menuEntries: MenuEntry[] = [{type:'group',key:'g',label:'Group',children:[{key:'s',label:'Sub',children:[{key:'leaf',label:'Leaf'}]}]},{type:'divider',key:'d'}];

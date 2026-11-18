@@ -1,3 +1,4 @@
+import { FloatingOwnerContext } from "./floating-owner";
 import { Card } from "./card";
 import * as React from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
@@ -35,11 +36,13 @@ export function MtoneScope({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   const c = useMtone();
+  const floatingOwners = React.useContext(FloatingOwnerContext);
   return (
     <div
       {...props}
       className={cn("mt-scope", className)}
       data-density={c.density}
+      data-mt-floating-owners={floatingOwners.length ? floatingOwners.join(" ") : undefined}
       style={{ ...c.tokens, ...style }}
     >
       {children}

@@ -1,0 +1,43 @@
+.mt-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  pointer-events: auto;
+  color: var(--mt-muted, #787774);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  box-sizing: border-box;
+}
+.mt-loading-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backdrop-filter: blur(var(--mt-loading-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--mt-loading-overlay-blur));
+}
+.mt-loading-overlay-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--mt-loading-overlay-color);
+  opacity: var(--mt-loading-overlay-opacity);
+}
+.mt-loading-overlay-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.mt-loading-overlay-label {
+  min-width: 0;
+}

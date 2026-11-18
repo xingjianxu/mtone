@@ -26,6 +26,104 @@ export type ComponentDoc = {
   notes: string[];
 };
 export const componentDocs: ComponentDoc[] = [
+{
+  "name": "LoadingOverlay",
+  "category": "状态反馈",
+  "description": "覆盖局部区域的紧凑加载遮罩，支持模糊、圆角和自定义加载内容。",
+  "importNames": [
+    "LoadingOverlay"
+  ],
+  "code": "import { useState } from \"react\";\nimport { Button, Input, LoadingOverlay } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [loading, setLoading] = useState(false);\n  return <>\n    <div style={{ position: \"relative\", borderRadius: 6 }}>\n      <div aria-busy={loading} style={{ padding: 16 }}>\n        <Input aria-label=\"项目名称\" disabled={loading} />\n      </div>\n      <LoadingOverlay visible={loading} label=\"正在保存\" blur={1} />\n    </div>\n    <Button onClick={() => setLoading(value => !value)}>切换加载</Button>\n  </>;\n}",
+  "props": [
+    {
+      "name": "visible",
+      "type": "boolean",
+      "description": "控制显示；隐藏时卸载整个遮罩，无退出延迟。",
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "可选的可见提示文字，同时用作状态名称；省略或空白时可访问名称为 Loading。"
+    },
+    {
+      "name": "loader",
+      "type": "ReactNode",
+      "description": "替换加载图标；null 隐藏图标。自定义内容由 status 容器承载，请勿重复添加 status/live 语义。",
+      "default": "Spinner"
+    },
+    {
+      "name": "overlayColor",
+      "type": "string",
+      "description": "遮罩背景颜色，不改变加载内容颜色。",
+      "default": "var(--mt-bg, #fff)"
+    },
+    {
+      "name": "opacity",
+      "type": "number",
+      "description": "仅背景透明度，限制在 0–1；非有限数字回退为 0.75。",
+      "default": "0.75"
+    },
+    {
+      "name": "blur",
+      "type": "number",
+      "description": "背景模糊像素数；负数和非有限数字回退为 0。",
+      "default": "0"
+    },
+    {
+      "name": "radius",
+      "type": "CSSProperties[\"borderRadius\"]",
+      "description": "遮罩圆角；数字为 px，也支持 CSS 值。",
+      "default": "inherit"
+    },
+    {
+      "name": "zIndex",
+      "type": "number",
+      "description": "局部堆叠层级，非有限数字回退为 10；不会逃离父堆叠上下文。",
+      "default": "10"
+    },
+    {
+      "name": "className / style",
+      "type": "string / CSSProperties",
+      "description": "根元素样式；style 可覆盖默认设置，修改 pointerEvents 或定位可能影响遮罩行为。"
+    },
+    {
+      "name": "ref / div attributes",
+      "type": "Ref<HTMLDivElement> / HTMLAttributes<HTMLDivElement>",
+      "description": "透传到根 div；children 不受支持，使用 loader 自定义内容。"
+    }
+  ],
+  "notes": [
+    "父容器必须设置 position: relative（或其他定位方式）并具有实际尺寸。遮罩绝对定位，不占据布局空间；默认圆角继承父容器。",
+    "遮罩拦截鼠标/触摸，但不会禁用下层键盘焦点，也不管理焦点、修改父 DOM 或提供模态语义。请在内容区域设置 aria-busy，并按需禁用表单或为独立的内容容器设置 inert；不要把遮罩或取消按钮放进 inert 容器。",
+    "默认复用 Spinner，遵循 reduced-motion 设置；自定义加载动画由调用方处理。没有自动请求、计时器、全屏 Portal、延迟或过渡动画。",
+    "高级定位元素或更高层级的后代可能显示在遮罩之上；按布局设置 zIndex。状态提示名称默认 Loading，可通过 label 本地化。"
+  ]
+},
+  {
+    name: "HoverCard",
+    category: "浮层对话",
+    description: "悬停或键盘聚焦显示的富内容预览卡片。",
+    importNames: ["HoverCard", "Button"],
+    code: '<HoverCard trigger={<Button>作者</Button>} title="mtone" withArrow content="简约紧凑的 React 组件库" />',
+    props: [
+      { name: "trigger", type: "ReactElement", description: "必填，可聚焦触发元素；自定义组件需要传递 ref 和事件属性" },
+      { name: "content / title", type: "ReactNode", description: "卡片内容（content 必填）和可选标题" },
+      { name: "open / defaultOpen", type: "boolean", default: "false", description: "受控开关 / 非受控初始开关" },
+      { name: "onOpenChange", type: "(open: boolean) => void", description: "交互请求开关时触发" },
+      { name: "openDelay / closeDelay", type: "number", default: "300 / 150", description: "打开和关闭延迟，毫秒" },
+      { name: "side", type: '"top" | "bottom" | "left" | "right"', default: '"bottom"', description: "首选方向，空间不足时自动避让" },
+      { name: "align", type: '"start" | "center" | "end"', default: '"center"', description: "相对触发元素的逻辑对齐方式" },
+      { name: "sideOffset", type: "number", default: "6", description: "浮层与触发元素的间距，像素" },
+      { name: "width", type: "CSSProperties[width]", default: "280", description: "卡片宽度，受可用视口宽度限制，不强制匹配触发宽度" },
+      { name: "withArrow / disabled", type: "boolean", default: "false", description: "显示箭头 / 禁用预览但保留触发元素原本行为" },
+    ],
+    notes: [
+      "复用 Base UI PreviewCard 的悬停安全区域、延迟与键盘聚焦行为。鼠标从触发元素移动到卡片时保持显示；Escape 或点击外部关闭。不会自动把焦点移入卡片。",
+      "HoverCard 用于补充预览，不替代点击式 Popover 或 Dropdown；表单和必须完成的操作应使用后者。触摸设备不依赖悬停打开，也不拦截触发链接原本点击。",
+      "提供可聚焦 trigger 以支持键盘；预览信息不应是完成任务的唯一入口。API 不兼容 Mantine，不提供复合子组件、delay group 或触摸开关。",
+    ],
+  },
   {
     name: "Cascader",
     category: "数据录入",

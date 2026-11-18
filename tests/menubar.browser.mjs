@@ -19,7 +19,16 @@ try { for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['we
   await edit.hover(); await expect(page.getByRole('menuitem',{name:'Copy',exact:true})).toBeVisible();
   await expect(page.getByRole('menuitem',{name:'New',exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:'Outside'}).click(); await expect(page.getByRole('menu')).toHaveCount(0);
-  await file.focus(); await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown'); await page.keyboard.press(rtl?'ArrowLeft':'ArrowRight');
+  await file.focus(); await expect(file).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menuitem',{name:'New',exact:true})).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menuitem',{name:'Recent',exact:true})).toBeFocused();
+  await page.keyboard.press(rtl?'ArrowLeft':'ArrowRight');
+  await expect(page.getByRole('menuitem',{name:'Project',exact:true})).toBeFocused();
+  // Replay a root-trigger blur after focus crossed into the submenu portal.
+  await file.evaluate(el => el.dispatchEvent(new FocusEvent('focusout', {bubbles:true,relatedTarget:document.activeElement})));
+  await page.waitForTimeout(50);
   await expect(page.getByRole('menuitem',{name:'Project',exact:true})).toBeFocused();
   await page.keyboard.press('Enter'); await expect(page.getByRole('status')).toHaveText('project');
   await page.getByRole('menuitem',{name:'View',exact:true}).click();

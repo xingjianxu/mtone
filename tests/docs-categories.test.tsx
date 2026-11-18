@@ -84,7 +84,7 @@ const expected: Record<string, string[]> = {
     "PropertyList",
     "PropertyItem",
   ],
-  浮层对话: [
+  浮层对话: ["HoverCard",
     "Popconfirm",
     "Dropdown", "Popover",
     "Tooltip",
@@ -100,6 +100,7 @@ const expected: Record<string, string[]> = {
     "Empty",
     "Skeleton",
     "Spinner",
+    "LoadingOverlay",
     "Toast",
     "ToastProvider",
   ],
