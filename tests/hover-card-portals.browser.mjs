@@ -23,6 +23,8 @@ try { for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['we
   await expect(page.getByText('Parent preview content')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByText('Parent preview content')).toHaveCount(0);
+  // Escape leaves focus on the trigger; leave and return to start a new focus session.
+  await page.getByRole('button',{name:'Outside nested preview'}).focus();
   await trigger.focus();
   await expect(page.getByText('Parent preview content')).toBeVisible();
   await expect(nested).toBeVisible();
