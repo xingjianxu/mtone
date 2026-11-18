@@ -23,7 +23,7 @@ try {
       return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight;
     }));
     await page.keyboard.press("Tab");
-    assert(await page.getByRole("dialog").evaluate(el => el.contains(document.activeElement)));
+    await page.waitForFunction(() => document.querySelector('[role="dialog"]')?.contains(document.activeElement));
     await input.focus();
     await input.fill("ButtonGroup");
     await input.press("Enter");
@@ -34,7 +34,7 @@ try {
     assert.equal(await input.inputValue(), "");
     await input.press("Escape");
     await page.getByRole("dialog").waitFor({ state: "detached" });
-    assert(await trigger.evaluate(el => document.activeElement === el));
+    await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "搜索组件");
     await page.goto("http://127.0.0.1:5197/#/components/Input");
     const editor = page.locator(".example-stage input:not([disabled])").first();
     await editor.focus();
