@@ -36,6 +36,7 @@ jobs:
       - run: node tests/dropdown.browser.mjs
       - run: node tests/menubar.browser.mjs
       - run: node tests/loading-overlay.browser.mjs
+      - run: node tests/hover-card-arrow.browser.mjs
       - run: node tests/hover-card.browser.mjs
       - run: node tests/hover-card-portals.browser.mjs
       - run: node tests/card.browser.mjs

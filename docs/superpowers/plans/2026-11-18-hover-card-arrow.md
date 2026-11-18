@@ -8,3 +8,9 @@
 - Local Chromium launch is blocked by environment socket permissions; browser pass must be confirmed by integration CI, not inferred from DOM tests.
 
 - CI caught the containing-block detail: Base UI's borderless Positioner owns the absolute arrow, not the popup padding box. Correct offset is -6px, so the 7px path baseline lands at the popup's 1px inner border edge.
+
+## Verified result
+- Local: 60 test files / 639 tests, typecheck, docs build, package smoke, llms equality and diff checks passed.
+- Existing branch CI run 44266064595 passed its complete suite, including the new arrow regression in Chromium, Firefox and WebKit.
+- Downloaded the 12 arrow screenshots and inspected representative light/dark, 1x/2x results across all three engines: all four arrow bases join their card edges cleanly without the original stepped gap.
+- Temporary feature-branch workflow trigger removed. Added the regression to existing docs/verification workflows only; no new permanent workflow or deployment.
