@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import React, { useId, useState } from "react";
 import { Check, ChevronDown, ChevronRight, Minus, X } from "lucide-react";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
@@ -44,6 +45,19 @@ export interface OpenProps {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
+// Keep Base UI consistently controlled when fieldset disabling closes a popup.
+function useFieldsetOpen(props: OpenProps & { disabled?: boolean }) {
+  const [localOpen, setLocalOpen] = React.useState(props.defaultOpen ?? false);
+  React.useEffect(() => { if (props.disabled) setLocalOpen(false); }, [props.disabled]);
+  return {
+    open: !props.disabled && (props.open ?? localOpen),
+    onOpenChange: (next: boolean) => {
+      if (next && props.disabled) return;
+      if (props.open === undefined) setLocalOpen(next);
+      props.onOpenChange?.(next);
+    },
+  };
+}
 export interface CheckboxProps extends Common {
   checked?: boolean;
   defaultChecked?: boolean;
@@ -57,6 +71,7 @@ export function Checkbox({
   className,
   ...props
 }: CheckboxProps) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   return (
     <label className={cn("mt-check-label", className)}>
       <BCheckbox.Root className="mt-checkbox" {...props}>
@@ -78,6 +93,7 @@ export function Switch({
   className,
   ...props
 }: Omit<CheckboxProps, "indeterminate">) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   return (
     <label className={cn("mt-check-label", className)}>
       <BSwitch.Root className="mt-switch" {...props}>
@@ -98,6 +114,7 @@ export function RadioGroup({
   orientation = "vertical",
   ...props
 }: RadioGroupProps) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   return (
     <BRadioGroup
       aria-label={label}
@@ -145,9 +162,11 @@ export function Select({
   "aria-busy": busy,
   ...props
 }: SelectProps) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
+  const popup = useFieldsetOpen(props);
   const { locale } = useMtone();
   return (
-    <BSelect.Root items={options} {...props}>
+    <BSelect.Root items={options} {...props} {...popup}>
       <BSelect.Trigger
         id={id}
         onBlur={onBlur}
@@ -219,6 +238,8 @@ export function MultiSelect({
   "aria-busy": busy,
   ...props
 }: MultiSelectProps) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
+  const popup = useFieldsetOpen(props);
   const { locale } = useMtone();
   const values = options.map((o) => o.value);
   const labelFor = (v: string) =>
@@ -229,6 +250,7 @@ export function MultiSelect({
       items={values}
       itemToStringLabel={labelFor}
       {...props}
+      {...popup}
     >
       <Combobox.Chips
         aria-invalid={invalid}
@@ -309,6 +331,7 @@ export interface SliderProps extends Common, ValueProps<number> {
   step?: number;
 }
 export function Slider({ label, className, ...props }: SliderProps) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   return (
     <BSlider.Root className={cn("mt-slider", className)} {...props}>
       <BSlider.Control className="mt-slider-control">
@@ -328,6 +351,7 @@ export interface NumberInputProps
   step?: number;
 }
 export function NumberInput({ label, className, ...props }: NumberInputProps) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   const { locale } = useMtone();
   return (
     <NumberField.Root className={cn("mt-number", className)} {...props}>
@@ -357,6 +381,7 @@ export function Segmented({
   className,
   ...props
 }: RadioGroupProps) {
+  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   return (
     <BRadioGroup
       className={cn("mt-segmented", className)}

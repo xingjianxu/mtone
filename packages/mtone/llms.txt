@@ -34,6 +34,35 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### Fieldset
+
+- [Fieldset](https://xingjianxu.github.io/mtone/#/components/Fieldset): 用原生 fieldset 与 legend 为相关表单控件分组，支持统一禁用。
+- Import: Fieldset from @bixlab/mtone
+- legend: ReactNode. 分组标题，渲染为原生 legend；省略时可使用 aria-label 命名。
+- variant: "default" | "filled" | "unstyled" (default: "default"). 默认细边框、浅灰填充或无边框。
+- radius: CSSProperties["borderRadius"] (default: 6px). 自定义圆角，数字按像素处理。
+- disabled: boolean (default: false). 统一禁用内部表单控件；嵌套分组无法覆盖祖先禁用。
+- 原生属性 / ref: FieldsetHTMLAttributes<HTMLFieldSetElement> / Ref<HTMLFieldSetElement>. 支持 name、form、className、style、aria-* 等原生属性。
+- Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 FormField 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。
+- disabled 保留原生 fieldset 语义：本组第一个 legend 内的控件不受本组禁用影响，仍继承祖先禁用。
+- mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Segmented、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。
+- 原生 input/button/select/textarea 使用浏览器禁用语义；自定义第三方控件、链接、Menu 等非表单动作需应用自行传递 disabled。受控值仍由应用管理，Fieldset 不清空已有值。
+
+```tsx
+import { Fieldset, FormField, Input, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <Fieldset legend="个人信息">
+    <div style={{ display: "grid", gap: 10 }}>
+      <FormField label="姓名"><Input /></FormField>
+      <FormField label="邮箱"><Input type="email" /></FormField>
+      <Button>保存</Button>
+    </div>
+  </Fieldset>;
+}
+```
+
 ### LoadingOverlay
 
 - [LoadingOverlay](https://xingjianxu.github.io/mtone/#/components/LoadingOverlay): 覆盖局部区域的紧凑加载遮罩，支持模糊、圆角和自定义加载内容。
@@ -2249,11 +2278,33 @@ export default function Demo() {
 
 ### Progress
 
-- [Progress](https://xingjianxu.github.io/mtone/#/components/Progress): 显示 0 到 100 的任务进度。
+- [Progress](https://xingjianxu.github.io/mtone/#/components/Progress): 紧凑的线性、圆形与仪表盘进度，支持状态、步骤、成功分段、渐变和自定义信息。
 - Import: Progress from @bixlab/mtone
-- value: number. 必填；进度百分比，超出范围会被限制。
-- label: string (default: Progress). 进度条可访问名称。
-- 非有限值按 0 处理。组件不自行显示百分比文字。
+- value: number. 必填；总进度百分比，限制在 0–100，NaN 和无穷大按 0 处理。
+- label: string (default: Progress). 进度条的可访问名称，不是可见标题；aria-label 可覆盖。
+- type: "line" | "circle" | "dashboard" (default: line). 线性、圆形或带缺口的仪表盘。
+- status: "normal" | "active" | "success" | "exception" (default: normal). 状态颜色及图标；active 只为连续线性条添加动画。不会修改 value，也不会因 value=100 自动切换。
+- showInfo: boolean (default: false). 显示百分比、状态图标或 format 内容；各类型默认隐藏以保留旧用法。
+- format: (value: number, successValue: number) => ReactNode. 自定义视觉信息，优先于状态图标；参数是归一化后的总进度和成功进度。配合 showInfo 使用。
+- size: "small" | "medium" | number (default: medium). small / medium：线性高度 3 / 5px，圆环直径 64 / 100px。数字表示线性高度或圆环直径（px）。
+- strokeWidth: number (default: 线性由 size 决定；圆环 6). 覆盖线宽；线性为 px（限制 1–100），圆形/仪表盘为 100×100 画布单位（限制 1–30）。
+- strokeLinecap: "round" | "butt" | "square" (default: round). 圆环采用对应 SVG 端点；线性 round 为圆角，其余为直角。
+- color: string | { from: string; to: string } (default: 普通为 #7d9c84；异常为 #b6403b). 填充颜色，或从左到右的线性渐变；显式颜色优先于状态色。圆环渐变沿画布方向而非圆周方向。
+- trackColor: string. 未填充轨道的 CSS 颜色；默认 #efefed，可通过 --mt-progress-track 主题变量覆盖。
+- success: { value: number; color?: string }. 成功分段；value 是总量的百分比，限制在 0 到当前进度之间。color 默认 #548164。
+- steps: number | { count: number; gap?: number }. 将进度显示为完整步骤，填充数量为 Math.round(value / 100 * count)。count 向下取整并限制到 0–1000，0 或非有限值关闭步骤。gap 单位为 px，默认 2、限制 0–100；圆环会按直径换算，间隔过大时会收窄以保留步骤。
+- gapDegree: number (default: 75). 仅 dashboard：缺口角度，限制 0–295；0 为完整圆环，非有限值回退到 75。
+- gapPosition: "top" | "bottom" | "left" | "right" (default: bottom). 仅 dashboard：缺口方向。
+- className / style: string / CSSProperties. 应用到根元素；线性宽度默认 100%，圆形可通过 size 设置直径。
+- HTML div attributes: React.HTMLAttributes<HTMLDivElement>（不含 children / color）. 支持 id、data-*、aria-label、aria-labelledby 和 aria-valuetext 等属性。组件固定提供 progressbar 角色及归一化后的 0–100 数值。
+- 保留原有 <Progress value={68} label="上传进度" /> 用法：5px 细线、低饱和绿色、无可见文字。不要求与 Ant Design 的属性名兼容。
+- 导出 ProgressProps、ProgressType、ProgressStatus、ProgressColor 类型。组件不包含交互或自动计时，更新 value 即可改变进度。
+- 非有限数值安全归一化；圆环直径限制 16–4096px。线性 size 数字同线宽限制 1–100px。
+- format 内容只作视觉显示；自定义单位或业务信息应同时设置 aria-valuetext，label 用于说明进度属于什么任务。
+- 成功分段不是额外加在 value 之外；steps 同样按成功进度四舍五入到整步。
+- 线性条渐变逐步骤应用；圆形步骤共享同一个画布线性渐变。圆环步骤过密时自动改用 butt 端点，避免圆形或方形端帽重叠。
+- active 不应用于步骤、circle 或 dashboard。遵循 prefers-reduced-motion，关闭活动动画及线性宽度过渡。
+- 文档分别展示基础线性、状态、圆形、仪表盘、尺寸/端点、渐变、成功分段、步骤、自定义信息及动态更新。
 
 ```tsx
 import { Progress } from "@bixlab/mtone";
@@ -2261,7 +2312,14 @@ import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <Progress value={68} label="上传进度" />
+    <div style={{ display: "grid", gap: 16, maxWidth: 460 }}>
+      <Progress value={68} label="上传进度" showInfo />
+      <Progress value={80} success={{ value: 35 }} label="处理进度" showInfo />
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+        <Progress type="circle" value={68} label="项目进度" showInfo />
+        <Progress type="dashboard" value={75} label="容量" showInfo />
+      </div>
+    </div>
   );
 }
 ```

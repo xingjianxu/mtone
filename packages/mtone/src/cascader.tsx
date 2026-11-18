@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { Popover } from "@base-ui/react/popover";
 import {
@@ -648,6 +649,7 @@ function CascaderView({
   );
 }
 export function CascaderPanel(props: CascaderPanelProps) {
+    props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   const state = useCascader(props);
   return (
     <div
@@ -660,6 +662,7 @@ export function CascaderPanel(props: CascaderPanelProps) {
 }
 export const Cascader = React.forwardRef<HTMLButtonElement, CascaderProps>(
   function Cascader(props, forwardedRef) {
+    props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
     const state = useCascader(props);
     const { locale } = useMtone();
     const zh = locale === "zh";

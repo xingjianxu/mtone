@@ -1,3 +1,4 @@
+@import "./fieldset.css";
 @import "./loading-overlay.css";
 @import "./hover-card.css";
 @import "./typography.css";
@@ -21,6 +22,7 @@
 @import "tailwindcss/utilities.css" prefix(mt);
 @source "./**/*.{ts,tsx}";
 .mt-scope,
+.mt-fieldset,
 .mt-btn,
 .mt-input,
 .mt-card,
@@ -285,19 +287,22 @@
   background: currentColor;
   border-radius: 50%;
 }
-.mt-progress {
-  height: 5px;
-  background: #efefed;
-  border-radius: 9px;
-  overflow: hidden;
-  width: 100%;
-}
-.mt-progress > span {
-  display: block;
-  height: 100%;
-  background: #7d9c84;
-  border-radius: inherit;
-}
+/* Progress keeps the original muted green and compact 5px default track. */
+.mt-progress { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; color: var(--mt-fg, #37352f); }
+.mt-progress-track { position: relative; flex: 1; min-width: 0; overflow: hidden; background: var(--mt-progress-track, #efefed); }
+.mt-progress-fill, .mt-progress-success { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: inherit; transition: width .2s ease; }
+.mt-progress-fill { overflow: hidden; }
+.mt-progress-info { display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0; font-size: 12px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.mt-progress-steps { display: flex; overflow: hidden; background: transparent; }
+.mt-progress-steps > span { flex: 1; min-width: 0; background: var(--mt-progress-track, #efefed); }
+.mt-progress-circle, .mt-progress-dashboard { position: relative; display: inline-flex; flex-shrink: 0; max-width: 100%; }
+.mt-progress-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.mt-progress-circle .mt-progress-info, .mt-progress-dashboard .mt-progress-info { position: absolute; inset: 20%; overflow-wrap: anywhere; }
+.mt-progress[data-status="exception"] .mt-progress-info { color: #b6403b; }
+.mt-progress[data-status="success"] .mt-progress-info { color: #548164; }
+.mt-progress-line[data-status="active"] .mt-progress-fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #ffffff70, transparent); animation: mt-progress-active 1.6s linear infinite; }
+@keyframes mt-progress-active { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .mt-progress-fill, .mt-progress-success { transition: none; } .mt-progress-line[data-status="active"] .mt-progress-fill::after { animation: none; } }
 .mt-divider {
   --mt-divider-spacing: 12px;
   --mt-divider-line-style: solid;

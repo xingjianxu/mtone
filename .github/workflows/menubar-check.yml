@@ -1,7 +1,7 @@
 name: Menubar verification
 on:
   push:
-    branches: [feat-menubar]
+    branches: [feat-menubar, integrate-progress-fieldset]
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,6 +29,9 @@ jobs:
           for browser in chromium firefox webkit; do
             BROWSER=$browser node tests/docs-search.browser.mjs
           done
+      - run: node tests/progress.browser.mjs
+      - run: node tests/fieldset.browser.mjs
+      - run: node tests/breadcrumb.browser.mjs
       - run: node tests/hover-card-arrow.browser.mjs
       - run: node tests/date-picker.browser.mjs
       - run: node tests/select-layout.browser.mjs

@@ -44,6 +44,7 @@ const expected: Record<string, string[]> = {
     "SearchInput",
     "Textarea",
     "Mentions",
+    "Fieldset",
     "Form",
     "FormField",
     "Checkbox",

@@ -1,0 +1,34 @@
+.mt-fieldset {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: 6px;
+  background: var(--mt-bg, #fff);
+  color: var(--mt-fg, #37352f);
+  font: inherit;
+  box-sizing: border-box;
+}
+.mt-fieldset-legend {
+  padding: 0 5px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.mt-fieldset-filled {
+  background: var(--mt-subtle, #f7f7f5);
+}
+.mt-fieldset-unstyled {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.mt-fieldset-unstyled > .mt-fieldset-legend {
+  padding: 0;
+  margin-bottom: 8px;
+}
+.mt-fieldset:disabled > .mt-fieldset-legend {
+  color: var(--mt-muted, #787774);
+}

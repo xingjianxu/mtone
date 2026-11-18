@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { Star } from "lucide-react";
 import { Tooltip as BTooltip } from "@base-ui/react/tooltip";
@@ -71,6 +72,7 @@ export const Rate = React.forwardRef<HTMLSpanElement, RateProps>(function Rate(
   },
   forwardedRef,
 ) {
+  disabled = useFieldsetDisabled(disabled);
   if (!Number.isInteger(count) || count < 1)
     throw new RangeError("Rate count must be a positive integer");
   const { locale } = useMtone();

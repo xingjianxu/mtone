@@ -1,3 +1,4 @@
+import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { Autocomplete as A } from "@base-ui/react/autocomplete";
 import { LoaderCircle, X } from "lucide-react";
@@ -90,6 +91,7 @@ export const AutoComplete = React.forwardRef<
   },
   ref,
 ) {
+  disabled = useFieldsetDisabled(disabled);
   const { locale } = useMtone();
   const zh = locale === "zh";
   const composing = React.useRef(false);
