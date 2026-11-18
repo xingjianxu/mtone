@@ -17,7 +17,10 @@ await expect(popup).toBeVisible();
 await page.getByRole('link',{name:'Details'}).click();
 assert(page.url().endsWith('#details'));
 await page.getByRole('button',{name:'Outside'}).hover(); await expect(popup).toHaveCount(0);
-await page.reload(); await page.keyboard.press('Tab'); await expect(trigger).toBeFocused(); await expect(popup).toBeVisible();
+// Start keyboard checks without the link hash/focus history, after React mounts.
+await page.goto('http://127.0.0.1:5205/tests/fixtures/hover-card.html');
+await expect(trigger).toBeVisible();
+await page.keyboard.press('Tab'); await expect(trigger).toBeFocused(); await expect(popup).toBeVisible();
 await page.keyboard.press('Escape'); await expect(popup).toHaveCount(0); await expect(trigger).toBeFocused();
 await page.setViewportSize({width:240,height:600}); await page.getByRole('button',{name:'Outside'}).hover(); await trigger.hover(); await expect(popup).toBeVisible();
 const box=await popup.boundingBox(); assert(box.x>=0 && box.x+box.width<=240);
