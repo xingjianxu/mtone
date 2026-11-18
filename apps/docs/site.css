@@ -631,3 +631,37 @@ section > p {
     font-size: 11px;
   }
 }
+
+/* Typography is a single documentation destination, with local subcomponent navigation. */
+.typography-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--mt-border, #e4e4e7);
+  border-radius: 6px;
+}
+.typography-subnav a,
+.typography-outline a {
+  display: block;
+  padding: 5px 8px;
+  color: inherit;
+  font-size: 12px;
+  border-radius: 3px;
+  text-decoration: none;
+}
+.typography-subnav a:hover,
+.typography-outline a:hover,
+.typography-outline a[aria-current="location"] {
+  background: var(--mt-hover, #f4f4f5);
+}
+.typography-subnav a:focus-visible,
+.typography-outline a:focus-visible {
+  outline: 1px solid var(--mt-focus, #5378aa);
+  outline-offset: 1px;
+}
+.typography-outline {
+  margin: 2px 0 8px 8px;
+  border-left: 1px solid var(--mt-border, #e4e4e7);
+  padding-left: 4px;
+}

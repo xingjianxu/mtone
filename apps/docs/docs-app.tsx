@@ -15,11 +15,18 @@ import {
 import * as M from "../../packages/mtone/src";
 import { componentCategories, componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
+import { typographySections, focusTypographySection, isTypographySection, componentDocHref, handleTypographyNavigation } from "./typography-navigation";
 import { ShowcasePage } from "./showcase-page";
 export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
-  | { kind: "component"; name: string };
+  | { kind: "component"; name: string; section?: string };
 export function parseRoute(hash: string): Route {
+  const typography = hash.match(/^#\/components\/Typography\?section=([A-Za-z]+)$/);
+  if (typography && isTypographySection(typography[1]))
+    return { kind: "component", name: "Typography", section: typography[1] };
+  const legacyTypography = hash.match(/^#\/components\/([A-Za-z]+)$/);
+  if (legacyTypography && isTypographySection(legacyTypography[1]))
+    return { kind: "component", name: "Typography", section: legacyTypography[1] };
   if (hash === "#/components/Mention") return { kind: "component", name: "Mentions" };
   if (hash === "#/components/DropdownMenu") return { kind: "component", name: "Menu" };
   if (hash === "#/components/Modal") return { kind: "component", name: "Dialog" };
@@ -145,6 +152,25 @@ function ComponentPage({ doc }: { doc: ComponentDoc }) {
         </div>
         {doc.props.length === 0 && <p>此组件无额外配置属性。</p>}
       </section>
+      {doc.name === "Typography" && typographySections.map(({ name, label }) => {
+        const child = componentDocs.find((item) => item.name === name)!;
+        return (
+          <section key={name} aria-label={`${name} 属性与接口`}>
+            <h3>{label} · 属性与接口</h3>
+            <div className="props-scroll">
+              <table className="props-table">
+                <thead><tr><th>属性</th><th>类型 / 默认值</th><th>说明</th></tr></thead>
+                <tbody>{child.props.map((prop) => <tr key={prop.name}>
+                  <td><code>{prop.name}</code></td>
+                  <td><code>{prop.type}</code>{prop.default && <small>默认：{prop.default}</small>}</td>
+                  <td>{prop.description}</td>
+                </tr>)}</tbody>
+              </table>
+            </div>
+            <ul className="notes">{child.notes.map((note, index) => <li key={index}>{note}</li>)}</ul>
+          </section>
+        );
+      })}
       <section id="notes">
         <h2>使用建议与边界</h2>
         <ul className="notes">
@@ -298,16 +324,22 @@ export function DocsApp() {
   }, []);
   useEffect(() => {
     const change = () => {
-      setRoute(parseRoute(window.location.hash));
+      const nextRoute = parseRoute(window.location.hash);
+      setRoute(nextRoute);
       setMobile(false);
       setQuery("");
-      window.scrollTo?.(0, 0);
+      if (nextRoute.kind !== "component" || !nextRoute.section) window.scrollTo?.(0, 0);
     };
     window.addEventListener("hashchange", change);
     return () => window.removeEventListener("hashchange", change);
   }, []);
   useEffect(() => {
     document.title = `${route.kind === "component" ? route.name : route.kind === "gallery" ? "组件总览" : route.kind === "showcase" ? "应用示例" : route.kind === "start" ? "快速开始" : route.kind === "theme" ? "主题与样式" : "页面未找到"} · mtone`;
+  }, [route]);
+  useEffect(() => {
+    if (route.kind === "component" && route.section) {
+      focusTypographySection(route.section);
+    }
   }, [route]);
   if (route.kind === "showcase") return <ShowcasePage />;
   const doc =
@@ -346,7 +378,7 @@ export function DocsApp() {
                   group,
                   onSelect: () => {
                     setMobile(false);
-                    window.location.hash = `/components/${item.name}`;
+                    window.location.hash = componentDocHref(item.name);
                   },
                 })),
               )}
@@ -427,7 +459,7 @@ export function DocsApp() {
             {groups.map((group) => {
                 // Preserve semantic group order, but make each component easy to find by name.
                 const members = componentDocs
-                  .filter((d) => d.category === group)
+                  .filter((d) => d.category === group && !isTypographySection(d.name))
                   .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
                 return (
                   members.length > 0 && (
@@ -436,7 +468,7 @@ export function DocsApp() {
                       {members.map((d) => (
                         <a
                           key={d.name}
-                          href={`#/components/${d.name}`}
+                          href={componentDocHref(d.name)}
                           aria-current={
                             doc?.name === d.name ? "page" : undefined
                           }
@@ -504,7 +536,7 @@ export function DocsApp() {
                               </div>
                               <a
                                 className="gallery-card-title"
-                                href={`#/components/${d.name}`}
+                                href={componentDocHref(d.name)}
                               >
                                 <strong>{d.name}</strong>
                                 <ArrowUpRight size={15} />
@@ -547,6 +579,7 @@ export function DocsApp() {
                 ["props", "属性与接口"],
                 ["notes", "使用建议"],
               ].map(([id, title]) => (
+                <React.Fragment key={id}>
                 <button
                   key={id}
                   onClick={() =>
@@ -557,6 +590,17 @@ export function DocsApp() {
                 >
                   {title}
                 </button>
+                {id === "usage" && doc.name === "Typography" && (
+                  <nav className="typography-outline" aria-label="Typography 示例导航">
+                    {typographySections.map(({ name }) => (
+                      <a key={name} href={componentDocHref(name)} onClick={(event) => handleTypographyNavigation(event, name)}
+                        aria-current={route.kind === "component" && route.section === name ? "location" : undefined}>
+                        {name}
+                      </a>
+                    ))}
+                  </nav>
+                )}
+                </React.Fragment>
               ))}
             </aside>
           )}

@@ -1,5 +1,11 @@
 import React, { useId, useState } from "react";
 import { Quote } from "lucide-react";
+import {
+  typographySections,
+  typographySectionId,
+  componentDocHref,
+  handleTypographyNavigation,
+} from "./typography-navigation";
 import { Typography, Button } from "../../packages/mtone/src";
 
 function DemoSection({
@@ -13,7 +19,12 @@ function DemoSection({
 }) {
   const id = useId();
   return (
-    <section aria-labelledby={id} style={{ margin: 0, minWidth: 0 }}>
+    <section
+      id={typographySectionId(name.split(" ")[0])}
+      tabIndex={-1}
+      aria-labelledby={id}
+      style={{ margin: 0, minWidth: 0, scrollMarginTop: 72 }}
+    >
       <h3 id={id} style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 600 }}>
         {name}
       </h3>
@@ -49,6 +60,17 @@ export function TypographyExample() {
         Typography 包含 Title、Text、Paragraph、Link 和
         Blockquote。下方按子组件分别演示；均可单独导入。
       </p>
+      <nav className="typography-subnav" aria-label="Typography 子组件">
+        {typographySections.map(({ name }) => (
+          <a
+            key={name}
+            href={componentDocHref(name)}
+            onClick={(event) => handleTypographyNavigation(event, name)}
+          >
+            {name}
+          </a>
+        ))}
+      </nav>
       <DemoSection
         name="Title 标题"
         code={"<Typography.Title level={2}>工作笔记</Typography.Title>"}

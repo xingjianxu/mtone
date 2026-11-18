@@ -586,6 +586,13 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "Title":
     case "Paragraph":
     case "Link":
+      if (compact) {
+        if (name === "Title") return <M.Typography.Title level={3}>清晰的标题</M.Typography.Title>;
+        if (name === "Text") return <M.Typography.Text muted>简洁的辅助文字</M.Typography.Text>;
+        if (name === "Paragraph") return <M.Typography.Paragraph>让内容清晰、有层次，用一致的间距组织正文。</M.Typography.Paragraph>;
+        if (name === "Link") return <M.Typography.Link href="#/components/Typography?section=Link">阅读文档</M.Typography.Link>;
+        return <div><M.Typography.Title level={3}>内容与层次</M.Typography.Title><M.Typography.Text muted>标题、文本、段落、链接与引用</M.Typography.Text></div>;
+      }
       return <TypographyExample />;
     case "Divider":
       return (
