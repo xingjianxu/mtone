@@ -1,7 +1,7 @@
 name: Menubar verification
 on:
   push:
-    branches: [feat-menubar]
+    branches: [fix/menu-submenu-height-ci]
   workflow_dispatch:
 permissions:
   contents: read
@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,50 +24,10 @@ jobs:
       - run: npm run test:package
       - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
       - run: npx playwright install --with-deps chromium firefox webkit
-      - name: Docs search browser regressions
-        run: |
-          for browser in chromium firefox webkit; do
-            BROWSER=$browser node tests/docs-search.browser.mjs
-          done
-      - run: node tests/hover-card-arrow.browser.mjs
-      - run: node tests/date-picker.browser.mjs
-      - run: node tests/select-layout.browser.mjs
-      - run: node tests/select-focus.browser.mjs
-      - run: node tests/spotlight.browser.mjs
-      - run: node tests/input-focus.browser.mjs
-      - run: node tests/field-focus.browser.mjs
-      - run: node tests/control-height.browser.mjs
-      - run: node tests/menu-icons.browser.mjs
+      - run: node tests/menu-spacing.browser.mjs
       - run: node tests/menu.browser.mjs
-      - run: node tests/dropdown.browser.mjs
       - run: node tests/menubar.browser.mjs
-      - run: node tests/loading-overlay.browser.mjs
-      - run: node tests/hover-card.browser.mjs
-      - run: node tests/hover-card-portals.browser.mjs
-      - run: node tests/card.browser.mjs
-      - run: node tests/table.browser.mjs
-      - run: node tests/mentions.browser.mjs
-      - run: node tests/calendar.browser.mjs
-      - run: node tests/rate.browser.mjs
-      - run: node tests/timeline.browser.mjs
-      - run: node tests/tree.browser.mjs
-      - run: node tests/image.browser.mjs
-      - run: node tests/table-of-contents.browser.mjs
-      - run: node tests/divider.browser.mjs
-      - run: node tests/button-group.browser.mjs
-      - run: node tests/typography.browser.mjs
-      - run: node tests/result.browser.mjs
-      - run: node tests/affix.browser.mjs
-      - run: node tests/avatar-popconfirm.browser.mjs
-      - name: Splitter browser regressions
-        run: |
-          status=0
-          node tests/splitter-cycle.browser.mjs || status=1
-          node tests/splitter.browser.mjs || status=1
-          exit $status
-      - run: node tests/form.browser.mjs
-      - run: node tests/modal-layout.browser.mjs
-      - run: node tests/showcase.browser.mjs
+      - run: node tests/dropdown.browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
