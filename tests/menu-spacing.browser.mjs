@@ -13,6 +13,7 @@ try {
       const page = await browser.newPage({ viewport: { width: 1000, height: 650 } });
       for (const kind of ['menu', 'menubar', 'context']) {
         await page.goto(`http://127.0.0.1:5197/tests/fixtures/menu-spacing.html?kind=${kind}`);
+        const outside = await page.getByRole('button', { name: 'Outside' }).boundingBox();
         const row = label => page.getByRole('menuitem', { name: label, exact: true });
         const geometry = async (label, role = 'menuitem') => page.getByRole(role, { name: label, exact: true }).evaluate(el => {
           const r = el.getBoundingClientRect();
@@ -45,7 +46,6 @@ try {
           await page.screenshot({ path: `artifacts/menu-spacing/${name}-${kind}.png` });
           // Modal Menu deliberately intercepts outside clicks with its backdrop.
           // Click the actual outside point instead of requiring the button to receive it.
-          const outside = await page.getByRole('button', { name: 'Outside' }).boundingBox();
           await page.mouse.click(outside.x + outside.width / 2, outside.y + outside.height / 2);
           await expect(row('Before')).toHaveCount(0);
         }
