@@ -13,7 +13,7 @@
 
 ### Compatibility
 - Tree IDs now accept numeric keys, default ancestor expansion is enabled, and Tabs skips disabled items and recovers uncontrolled selection. See [migration notes](docs/MIGRATION.md).
-- React/ReactDOM ^19.2.0 and ESM remain required. These are mtone APIs, not drop-in Ant Design replacements. See each component reference for supported features and limitations.
+- React/ReactDOM ^19.2.0 and ESM remain required. See each component reference for supported features and limitations.
 
 ## 0.3.0
 
@@ -32,7 +32,7 @@
 - Documentation groups, API reference and package-version labels synchronized.
 
 ### Compatibility
-- React/ReactDOM ^19.2.0; ESM only. Not a drop-in implementation of all Ant Design props. Editing/dragging are application compositions; column resizing is not built in.
+- React/ReactDOM ^19.2.0; ESM only. Editing/dragging are application compositions; column resizing is not built in.
 - See [Table API and limitations](docs/API.md#table).
 
 ## 0.2.0

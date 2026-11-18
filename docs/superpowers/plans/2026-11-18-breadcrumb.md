@@ -1,7 +1,7 @@
 # Breadcrumb Implementation Plan
 
 **Goal:** Extend the existing compact Breadcrumb with icons, menus and configurable separators without breaking existing items.
-**Architecture:** Keep label/href and last-item current-page behavior. Reuse Menu for keyboard navigation, nested items and Dropdown positioning. A linked item with a menu has separate link and menu button, avoiding nested interactive elements. No routing dependency or Ant Design API compatibility is introduced.
+**Architecture:** Keep label/href and last-item current-page behavior. Reuse Menu for keyboard navigation, nested items and Dropdown positioning. A linked item with a menu has separate link and menu button, avoiding nested interactive elements. No routing dependency is introduced.
 **Tech Stack:** React, TypeScript, Base UI through mtone Menu, existing CSS tokens.
 
 - [x] Add failing tests for icons/accessibility, global and per-item separators, disabled items, keyboard menu dismissal and split navigation/menu triggers.

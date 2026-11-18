@@ -31,7 +31,7 @@ export interface TimelineProps extends Omit<
   orientation?: "vertical" | "horizontal";
   reverse?: boolean;
   variant?: "outlined" | "filled";
-  /** Title column width. A number is pixels, not Ant Design's 24-column span. */
+  /** Title column width. A number is pixels, not a grid-column span. */
   titleSpan?: number | string;
   /** Compatibility ghost item. Prefer an explicit item with loading=true. */
   pending?: React.ReactNode;

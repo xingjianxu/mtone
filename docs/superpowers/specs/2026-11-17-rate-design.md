@@ -1,10 +1,10 @@
 # Rate design
 
-Implement the requested Ant Design-like rating behavior without importing Ant Design or adding dependencies. Follow mtone's compact neutral palette, existing locale context, CSS tokens and source exports. This is a native React implementation rather than an API-identical wrapper.
+Implement full and half-point rating behavior without adding dependencies. Follow mtone's compact neutral palette, existing locale context, CSS tokens and source exports. This is a native React implementation.
 
 ## Approach
 
-Use a single focusable ARIA slider with decorative character layers. This models zero and half-point values directly, avoids ten tab stops for five stars, and supports native ref focus/blur. An alternative radio-per-half-star model adds duplicate items and more complex labels; an Ant Design wrapper would add a second styling/dependency system. Chosen engineering approach: native slider semantics.
+Use a single focusable ARIA slider with decorative character layers. This models zero and half-point values directly, avoids ten tab stops for five stars, and supports native ref focus/blur. An alternative radio-per-half-star model adds duplicate items and more complex labels. Chosen engineering approach: native slider semantics.
 
 ## Scope
 

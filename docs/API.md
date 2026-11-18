@@ -116,9 +116,9 @@ This section describes the Table API introduced in **0.3.0**. Version 0.2.0 cont
 
 ### Events and compatibility
 
-The legacy `onChange(state)` remains unchanged: it receives `{ sort, filters, page, pageSize }`, with legacy sort directions `"asc"` / `"desc"`. Explicit `sort={null}` clears the controlled legacy sort. Use the new `onTableChange(pagination, filters, sorter, extra)` for modern array-valued filters, single/multiple sorter results and `extra.action` (`"paginate"`, `"sort"`, `"filter"`). Do not replace a legacy callback with an Ant Design four-argument handler under the same prop name.
+The legacy `onChange(state)` remains unchanged: it receives `{ sort, filters, page, pageSize }`, with legacy sort directions `"asc"` / `"desc"`. Explicit `sort={null}` clears the controlled legacy sort. Use the new `onTableChange(pagination, filters, sorter, extra)` for modern array-valued filters, single/multiple sorter results and `extra.action` (`"paginate"`, `"sort"`, `"filter"`). Do not assign a four-argument handler to the legacy single-argument `onChange` prop.
 
-This is **not a drop-in replacement for every Ant Design Table prop**. `filterDropdownProps` supports only `open`, `onOpenChange`, `className` and `style`; sorter tooltip options support `title` and `target`; loading supports the fields listed above. Arbitrary Ant Design Dropdown, Tooltip or Spin props are not forwarded. Editing and row/column dragging are application compositions demonstrated in the live documentation, not automatic persistence or a spreadsheet engine. Column-width resizing is not built in. Exact current types are in `packages/mtone/src/table-types.ts` and the built declarations; use your installed package's declarations for a released version.
+`filterDropdownProps` supports only `open`, `onOpenChange`, `className` and `style`; sorter tooltip options support `title` and `target`; loading supports the fields listed above. Other popup, tooltip or loading-indicator props are not forwarded. Editing and row/column dragging are application compositions demonstrated in the live documentation, not automatic persistence or a spreadsheet engine. Column-width resizing is not built in. Exact current types are in `packages/mtone/src/table-types.ts` and the built declarations; use your installed package's declarations for a released version.
 
 ## Upload
 
@@ -192,9 +192,9 @@ validation or membership checks. Values containing spaces need an application-sp
 parsing strategy. Bind `Mentions` directly to `FormField` using its string change
 contract; enforce membership and authorization on your server.
 
-This is **not a drop-in Ant Design Mentions replacement**: no `Mentions.Option`
-children, Ant variants, ConfigProvider design tokens, function-style semantic
-customization or virtual suggestions. See the component catalog for the full
+Use `options` for suggestions and MtoneProvider for theme configuration.
+`Mentions.Option` children, variants, function-style semantic customization and
+virtual suggestions are not supported. See the component catalog for the full
 current declaration-backed API.
 
 ## Calendar
@@ -230,7 +230,7 @@ const [date, setDate] = useState("2026-11-16");
 - `classNames` and `styles` accept objects for `root`, `header`, `body`, `cell`.
 - Direction keys, Home/End and Page Up/Down move focus; Shift + Page Up/Down moves by year. Enter/Space selects; Tab leaves the grid normally. Keyboard navigation skips disabled dates/months in its target direction, bounded to 366 probes; if no enabled cell is found, focus stays put.
 
-This is not a drop-in Ant Calendar replacement: no Dayjs, Ant locale object/design tokens,
+The supported API does not include Dayjs values or locale objects,
 legacy date/month render callbacks, lunar conversion, time/range selection or event drag-and-drop.
 Use render callbacks for calculated lunar labels or event text and show interactive details outside
 the calendar. No network request or data persistence is performed. Available starting in 0.4.0.

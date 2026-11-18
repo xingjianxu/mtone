@@ -1,6 +1,6 @@
 # Layout 设计
 
-用户已批准桌面设计图并要求 Ant Design 风格组合 API，复用已有组件。
+按已批准的桌面设计图实现组合式布局 API，复用已有组件。
 采用 Layout + Layout.Sider/Header/Content/Footer；不采用固定业务 AppShell，因为需要自由嵌套与配置。
 
 - 左列顶部 logo 与收起按钮，下方复用 Sidebar/NavGroup/NavItem；右列 Header 左 Breadcrumb、右 actions，下方 Content。

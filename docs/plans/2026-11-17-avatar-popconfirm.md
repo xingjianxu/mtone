@@ -5,7 +5,7 @@ Base: feat-rate, retaining Calendar and Rate changes. No publication authorized.
 ## Design
 - Keep Avatar's name/src/numeric size and AvatarGroup items/numeric max compatible. Add shape, icon/text/image options, fitted text, responsive sizes and keyboard-operable overflow disclosure. Keep neutral mtone appearance.
 - Add a compact anchored confirmation using existing Base UI Popover and mtone Button. Cover controlled/uncontrolled visibility, placement, keyboard/focus, dismissal, customization and async confirmation. A rejected confirmation stays open; repeated requests and stale promises must not affect a newer session.
-- Update catalog, examples, generated llms, exports and package validation. Ant Design is a capability reference, not a drop-in API guarantee.
+- Update catalog, examples, generated llms, exports and package validation. Document only the supported mtone API.
 
 ## Steps
 1. Implement and test Avatar independently.

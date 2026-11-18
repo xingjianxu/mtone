@@ -33,14 +33,14 @@ is an intentional API change. Migrate existing tooltips explicitly:
 <Card title="Project notes" htmlTitle="Project overview">Content</Card>
 ```
 
-This is not a drop-in Ant Design implementation. The supported API is documented
+The supported mtone API is documented
 in the mtone catalog and its TypeScript declarations. In particular:
 
-- `size` is `medium | small`; it does not accept the old AntD `default` size.
+- `size` is `medium | small`; `default` is not a supported size.
 - Use `variant="outlined" | "borderless"`, not `bordered`.
 - Use semantic `styles`/`classNames`, not `bodyStyle`/`headStyle`.
 - `tabProps` currently accepts only `className`, the existing mtone Tabs styling
-  hook. It does not accept Ant Design's complete TabsProps.
+  hook. Other Tabs props are not forwarded.
 - Meta and Grid are `Card.Meta` and `Card.Grid`, not standalone named exports.
 
 ## Structure and presentation

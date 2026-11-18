@@ -26,7 +26,7 @@ const lines = [
 "## AI coding guidance",
 "",
 "- Read the installed dist/index.d.ts for the complete authoritative signatures. This reference lists curated public props, not every inherited HTML/Base UI prop.",
-"- Use documented mtone wrapper APIs, not guessed Ant Design, shadcn, Mantine or raw Base UI props. Do not import private src paths.",
+"- Use documented mtone APIs rather than inferring props from other libraries or underlying engines. Do not import private src paths.",
 "- Pair controlled values/open state with the documented change callbacks; defaultValue/defaultOpen are for uncontrolled initial state.",
 "- Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact.",
 "- Prefer Dialog. Modal/ModalProps are deprecated aliases. Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.",

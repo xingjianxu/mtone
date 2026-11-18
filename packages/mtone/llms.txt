@@ -17,7 +17,7 @@ This file describes this package checkout, not necessarily the latest published 
 ## AI coding guidance
 
 - Read the installed dist/index.d.ts for the complete authoritative signatures. This reference lists curated public props, not every inherited HTML/Base UI prop.
-- Use documented mtone wrapper APIs, not guessed Ant Design, shadcn, Mantine or raw Base UI props. Do not import private src paths.
+- Use documented mtone APIs rather than inferring props from other libraries or underlying engines. Do not import private src paths.
 - Pair controlled values/open state with the documented change callbacks; defaultValue/defaultOpen are for uncontrolled initial state.
 - Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact.
 - Prefer Dialog. Modal/ModalProps are deprecated aliases. Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.
@@ -159,7 +159,7 @@ export default function Demo() {
 - 搜索只处理当前已加载的路径，不触发递归远程加载。自定义远程检索需调用方更新 options。多选父级联动仅包括当前已加载的可用叶节点，不自动选择后来加载的数据。
 - options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。
 - 上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。
-- 这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
+- 不提供 fieldNames、任意触发器、variant、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
 - name 提交 JSON 字符串，不自动接入 FormField 的 onChange 协议，也不实现原生表单 reset；需受控值时请响应 onValueChange。
 - 自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。
 
@@ -193,7 +193,7 @@ export default function Demo() {
 - 搜索只处理当前已加载的路径，不触发递归远程加载。自定义远程检索需调用方更新 options。多选父级联动仅包括当前已加载的可用叶节点，不自动选择后来加载的数据。
 - options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。
 - 上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。
-- 这是 mtone API，不要求与 Ant Design 兼容。不提供 fieldNames、任意触发器、Ant variant/主题 API、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
+- 不提供 fieldNames、任意触发器、variant、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。
 - 自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。
 
 ```tsx
@@ -221,7 +221,7 @@ export default function Demo() {
 - renderItem: (item,direction)=>ReactNode. 自定义项目内容；不要嵌套交互控件到复选标签内。
 - renderList / footer: (context: TransferListContext)=>ReactNode. 自定义列表或页脚；context含direction、过滤items、该侧selectedKeys、disabled、select(keys,boolean) 与 remove(keys)，过滤未知/禁用/异侧项；remove 只对目标侧生效。
 - ref / ...divProps: HTMLDivElement / HTMLAttributes. 根节点 ref、className、style、aria 属性。
-- 与 Ant Design API 不兼容；支持受控和非受控，未内置 Tree/Table 适配器，可通过 renderList 自行连接。
+- 支持受控和非受控，未内置 Tree/Table 适配器，可通过 renderList 自行连接。
 - key 必须唯一且稳定。items 应包含两侧完整记录；未知 targetKeys 保留以支持外部数据更新。
 - 搜索和分页不会清除隐藏选择，移动按钮移动该侧所有选中可用项，不仅当前页。分页全选仅当前页；不提供反选菜单或虚拟化。
 - 键盘使用原生/本库复选框 Tab 与空格，操作按钮 Enter/空格；不使用伪 listbox 组合键。
@@ -259,7 +259,7 @@ export default function Demo() {
 - onSearch 只在用户输入（包括 IME 完成）时触发，选择和清除不触发；onChange 包含输入、选择及清除。
 - 默认无结果显示空状态。open 受控时仍由调用方响应 onOpenChange；disabled/readOnly 始终关闭弹层。
 - 原生 input ref 支持 focus/blur；FormField 绑定字符串 value/onChange。非受控原生表单 reset 恢复 defaultValue。
-- 这是 mtone API，不兼容 Ant Design 全部属性；不支持 textarea/任意输入替换、虚拟滚动、多选、完整 Ant 主题/variant API。大数据建议服务端筛选。
+- 不支持 textarea/任意输入替换、虚拟滚动、多选或 variant。大数据建议服务端筛选。
 - 自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。
 
 ```tsx
@@ -333,7 +333,7 @@ export default function Demo() {
 - onOpenChange: (open: boolean) => void. 请求打开或关闭时调用；受控模式需由使用方更新 open。
 - wrapperClassName: string. 外层样式类。
 - className / style / 原生 img 属性: ImgHTMLAttributes<HTMLImageElement>. 传给内部 img；支持 loading、srcSet、onLoad、onError 等。
-- 此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。
+- 图片展示与预览使用 mtone 自身的属性和交互，支持范围以此处文档和类型声明为准。
 - 预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。
 - 预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。
 - 不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。
@@ -359,7 +359,7 @@ export default function Demo() {
 - onCurrentChange: (index: number) => void. 点击缩略图或请求切换时调用；受控模式需更新 current。
 - thumbnailWidth / thumbnailHeight: number | string (default: 120 / 90). 缩略图尺寸。
 - className / style / 原生 div 属性: HTMLAttributes<HTMLDivElement>. 传给外层缩略图容器。
-- 此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。
+- 图片展示与预览使用 mtone 自身的属性和交互，支持范围以此处文档和类型声明为准。
 - 预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。
 - 预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。
 - 不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。
@@ -386,7 +386,7 @@ export default function Demo() {
 - returnFocus: RefObject<HTMLElement | null>. 关闭后的焦点目标；缺省由底层对话框恢复先前焦点。
 - closeOnBackdrop: boolean (default: true). 是否允许点击外侧遮罩或画布空白关闭；点击图片或拖动不会关闭。
 - className: string. 传给预览对话框。
-- 此组件借鉴图片预览功能，但不是 Ant Design API 的兼容替代。
+- 图片展示与预览使用 mtone 自身的属性和交互，支持范围以此处文档和类型声明为准。
 - 预览提供 100%–500% 缩放（每次 50%）、90° 旋转、水平/垂直翻转和重置；放大后可通过指针拖动。
 - 预览支持 Escape 关闭、左右方向键切换、焦点约束及关闭后焦点返回；切换图片或重新打开会重置变换。
 - 不提供下载、双指捏合、自动轮播、任意工具栏/预览内容替换或网络加载百分比。图组以显式 items 定义，不收集嵌套子 Image。
@@ -412,11 +412,11 @@ export default function Demo() {
 - orientation: "vertical" | "horizontal" (default: vertical). 水平布局在窄容器内部滚动。
 - reverse: boolean (default: false). 倒序展示，不修改输入数组。
 - variant: "outlined" | "filled" (default: outlined). 默认节点的描边/实心样式。
-- titleSpan: number | string (default: 120px（窄屏72px）). 纵向 start 布局标题宽度，上限40%；数字表示px，不是 Ant Design 的栅格份数。
+- titleSpan: number | string (default: 120px（窄屏72px）). 纵向 start 布局标题宽度，上限40%；数字表示px，不是栅格份数。
 - pending / pendingDot: ReactNode. 兼容末尾待办节点和图标；推荐显式 item.loading。倒序时待办节点位于开头。
 - classNames / styles: Partial<Record<TimelineSemantic, string / CSSProperties>>. 对象形式的 root/item/tail/icon/title/content 样式。
 - 原生属性 / ref: HTMLAttributes<HTMLOListElement> / Ref<HTMLOListElement>. 支持 ol 属性；节点支持 li 属性。
-- 不依赖 Ant Design；使用 mtone 中性灰节点，可用 blue/red/green/gray 或 CSS 颜色。
+- 使用 mtone 中性灰节点，可用 blue/red/green/gray 或 CSS 颜色。
 - 节点支持 content/title/icon/placement，并兼容 children/label/dot/position；新属性优先。自定义 icon 是装饰内容，不应放交互控件。
 - 通过 aria-busy 标记加载项，读屏顺序与显示顺序一致。无自动播报、事件编辑或拖拽调度。
 - titleSpan 仅控制纵向 start 布局；end/alternate 居中。styles/classNames 仅支持对象，不支持回调。
@@ -444,7 +444,7 @@ export default function Demo() {
 - 使用 position: fixed，不是 position: sticky；内容可能超出滚动容器，不做容器裁剪。不要用于 transform/filter/perspective 或 contain 创建固定包含块的祖先中。
 - 仅支持垂直滚动；子元素不要使用 absolute/fixed 脱离文档流，外层避免 padding/border、显式高度及高度依赖百分比的子元素。
 - 自定义 --mt-affix-z-index 可调整固定层叠级别（默认 10）；小屏时确保不遮挡关键内容。
-- SSR 输出普通文档流，挂载测量后才固定。target 引用改变后需触发渲染；不提供 Ant Design 内部实例方法。
+- SSR 输出普通文档流，挂载测量后才固定。target 引用改变后需触发渲染；不提供命令式实例方法。
 
 ```tsx
 import { Affix, Button } from "@bixlab/mtone";
@@ -465,7 +465,7 @@ export default function Demo() { return <Affix offsetTop={16}><Button>保存</Bu
 - ref / 原生 div 属性: Ref<HTMLDivElement> / HTMLAttributes<HTMLDivElement>. 转发 ref、id、aria-*、role 等；原生 title 属性由 ReactNode 标题取代。className 与 root 类合并，style 覆盖 styles.root。
 - Result 是静态反馈布局，不会自动抢焦点或宣读。动态状态可显式设置 role="status" 或 aria-live；错误详情需由业务提供。
 - title 默认是 div，不假定页面标题层级；可传入合适的 h1/h2。
-- 没有 Ant Design 的 ConfigProvider/设计令牌依赖；状态色可用 --mt-result-success/error/info/warning 覆盖。
+- 状态色可用 --mt-result-success/error/info/warning 覆盖。
 - 默认图标为装饰性 SVG；自定义图标的无障碍标签由调用者负责。
 
 ```tsx
@@ -496,7 +496,7 @@ export default function Demo() {
 - onPopupClick / className / style: MouseEventHandler<HTMLDivElement> / string / CSSProperties. 浮层点击事件及样式。
 - 异步操作期间禁用按钮、外部点击和 Escape 关闭，防止重复请求。父组件仍可通过 open 强制关闭；旧 Promise 不会影响重新打开的确认。
 - 弹层使用 portal 和本库主题上下文，关闭后恢复触发焦点；默认聚焦安全的取消按钮。
-- 这是 mtone 风格的独立 API，并非 Ant Design 即插即用替代：使用 trigger 元素而非 children，不支持 hover/contextMenu、多种触发数组或 Ant Design 主题令牌。
+- 使用 trigger 元素而非 children；不支持 hover/contextMenu 或多种触发数组，外观使用 mtone 主题变量。
 - 拒绝结果显示通用本地化错误而不直接暴露异常内容，业务可通过 errorText 与 onConfirmError 提供反馈。
 
 ```tsx
@@ -529,7 +529,7 @@ export default function Demo() {
 - className / style: string / React.CSSProperties. 根元素样式。可设置 --mt-rate-color、--mt-rate-empty-color、--mt-rate-size、--mt-rate-gap；默认填充为 mtone 中性主色，焦点为单层细线。
 - 单个 slider Tab 停靠点支持 0 和半星；读屏值描述使用已提交分数，不播报未确认的鼠标预览。未提供标签时按 MtoneProvider locale 使用“评分”或“Rating”；推荐给多个实例设置不同 aria-label。
 - 字符绘制两层以裁剪半星。自定义字符是固定方形中的纯展示内容，长文本会裁剪；请勿包含交互元素、有副作用组件或重复 DOM id。没有拖拽评分或表单隐藏字段；需要表单时通过 value/onChange 绑定。
-- 该组件不是 Ant Design 的即插即用包装：tooltips 只接收字符串数组，不接收 Ant Design TooltipProps；character 函数接收明确的 RateCharacterInfo，不接收完整 RateProps；不提供 Ant Design ConfigProvider 或设计令牌 API。
+- tooltips 只接收字符串数组；character 函数接收明确的 RateCharacterInfo，不接收完整 RateProps。外观使用 mtone 主题变量。
 - 数值按配置步长归一化（关闭半星时 2.5 显示为 3）；动态 count/allowHalf/value 变化会重算显示并清除旧预览，不触发 onChange。非受控初始值仅首次挂载读取。
 - 自 0.4.0 提供；文档站跟随 master，使用前请检查所安装版本的导出与类型。
 
@@ -565,12 +565,12 @@ export default function Demo() {
 - headerRender: (info: CalendarHeaderInfo) => React.ReactNode. 自定义头部，参数包含 value、type、onChange(date)、onTypeChange(mode)。
 - classNames / styles: Partial<Record<CalendarSemanticSlot, string>> / Partial<Record<CalendarSemanticSlot, React.CSSProperties>>. 语义部位 root、header、body、cell 的样式覆盖。
 - 原生 div 属性: React.HTMLAttributes<HTMLDivElement>. 支持 aria-label、className、style 等；onChange/onSelect 改用上述日期回调。
-- 日期值和所有日期回调均使用 YYYY-MM-DD 字符串，与 DatePicker 一致；无效 value/defaultValue 或无效、倒置 validRange 会抛出 RangeError。默认初始值会收敛到范围内；自定义头部 onChange 的越界值先收敛再检查 disabledDate，无效字符串忽略。可用年份为 0001–9999；边缘网格越出此范围的日期显示空单元格。不接收 Dayjs 或 Date 对象，不是 Ant Design Calendar 的即插即用 API 替代品。此组件自 0.4.0 提供；请以已安装版本声明为准。
+- 日期值和所有日期回调均使用 YYYY-MM-DD 字符串，与 DatePicker 一致；无效 value/defaultValue 或无效、倒置 validRange 会抛出 RangeError。默认初始值会收敛到范围内；自定义头部 onChange 的越界值先收敛再检查 disabledDate，无效字符串忽略。可用年份为 0001–9999；边缘网格越出此范围的日期显示空单元格。不接收 Dayjs 或 Date 对象。此组件自 0.4.0 提供；请以已安装版本声明为准。
 - 默认头部使用本库 Select 和 Button，保留紧凑样式与 Provider 主题。导航对应日不可选时改选目标月首个可用日；该月全禁用时不改变值。month 展示日期，year 展示月份；选择月份不会自动切换模式。受控 value 必须由调用方接受回调并更新；拒绝更新则保留已选日期及选择前面板（键盘仍可独立移动焦点）。
 - 方向键移动焦点，Home / End 定位行边缘，Page Up / Page Down 翻页，Enter / Space 选择。Shift + Page Up / Page Down 按年翻页。Tab 正常离开网格。禁用日期不可选择。键盘沿目标方向跳过禁用日期或月份，最多探测 366 步；没有可用项则保持原焦点。
 - cellRender 在日期或月份数字后追加内容；fullCellRender 替换单元格内部内容并优先于 cellRender，组件保留可访问按钮。不要在渲染内容内嵌套按钮、链接或输入框。
 - 仅单日期公历展示和选择；不内置日期范围多选、时间选择、农历换算、拖拽日程、网络请求或日程持久化。农历文字、事件列表等可通过单元格回调自行计算展示。
-- 不实现 Ant ConfigProvider、Dayjs locale、旧 dateCellRender/monthCellRender API 或函数式 semantic styles。使用 MtoneProvider、locale、cellRender/fullCellRender 及对象形式 classNames/styles。
+- 不支持 Dayjs locale、dateCellRender/monthCellRender 或函数式 semantic styles。使用 MtoneProvider、locale、cellRender/fullCellRender 及对象形式 classNames/styles。
 
 ```tsx
 import { useState } from "react";
@@ -607,13 +607,13 @@ export default function Demo() {
 - allowClear: boolean | { clearIcon?: ReactNode; label?: string; tabIndex?: number } (default: false). 显示有可访问名称的清空按钮；禁用或只读时隐藏。
 - onClear: () => void. 清空按钮点击后通知，同时触发 onChange("")。
 - className / style: string / React.CSSProperties. 根包装元素样式；textarea 样式使用 classNames.textarea / styles.textarea。
-- classNames / styles: Partial<Record<MentionsSemantic, string>> / Partial<Record<MentionsSemantic, React.CSSProperties>>. 静态语义样式对象，键为 root、textarea、popup、option、clear；不支持 Ant 的回调形式。
+- classNames / styles: Partial<Record<MentionsSemantic, string>> / Partial<Record<MentionsSemantic, React.CSSProperties>>. 静态语义样式对象，键为 root、textarea、popup、option、clear；不支持回调形式。
 - ref: React.Ref<MentionsRef>. 提供 nativeElement: HTMLTextAreaElement | null、focus(options?: FocusOptions)、blur()。
 - native textarea attributes: Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "defaultValue" | "onChange" | "onSelect" | "prefix" | "children"> (default: rows: 3). 支持 id、name、rows、placeholder、disabled、readOnly、maxLength、required、onFocus/onBlur、aria-label 等。务必提供 label 或 aria-label。
 - getMentions(value, config?): (value: string, config?: { prefix?: string | string[]; split?: string }) => { prefix: string; value: string }[]. 单独导出的解析函数，不是静态方法；使用相同边界规则，不检查候选成员资格或服务端权限。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - Mention 是 Mentions 的同一组件别名；推荐使用 Mentions。相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件自 0.4.0 提供；请以已安装版本声明为准。
-- 这是原生 textarea 上的纯文本补全，不是富文本 token 编辑器，也不是 Ant Design Mentions 的完整 API 替代品。不支持 Mentions.Option、children 选项、Ant variant、ConfigProvider/design tokens 或函数式语义样式；尺寸使用 sm/md/lg。
+- 这是原生 textarea 上的纯文本补全，不是富文本 token 编辑器。选项使用 options；不支持 Mentions.Option、children 选项、variant 或函数式语义样式；尺寸使用 sm/md/lg，主题通过 MtoneProvider 配置。
 - ↑ / ↓ 在可用候选间循环，Enter 插入当前项，Escape 关闭，Tab 关闭并正常切换焦点；输入法组合期间不会选择候选。Home/End 保留文本编辑行为。选中一段文本时不弹出建议。
 - 插入替换光标之前的当前触发符和查询，保留光标之后的文本；超出 maxLength 时不插入，不截断候选。不会把已有提及变成不可分割的标签。默认查询禁止空白，含空格的实体值不适合默认解析规则。
 - 异步示例只模拟本地延迟，不发送网络请求。业务端须自行请求、处理错误、取消或忽略旧响应；loading 时不会选中旧候选，filterOption={false} 可保留服务端排序。
@@ -670,11 +670,11 @@ export default function Demo() {
 - 初始比例来自首次布局稳定后相邻两个面板的实际尺寸；恢复将此比例应用到当前两者总尺寸，其他面板不变。手动拖动/方向键调整会重启循环，但不改写初始比例；面板标识/顺序变化重新记录。受控父组件不接受请求时不推进循环。
 - 折叠和恢复仍受其他面板的 min/max 约束。若希望任意一侧完全收起，另一侧必须允许占满剩余空间；例如不要给另一侧设置 55% 的 max。
 - 所有大小数值均为 px；字符串必须带 % 或 px，如 240、'240px'、'30%'。不接受裸数字字符串、负数、NaN 或其他单位。回调返回像素，不是百分比。
-- sizes 为整个布局受控数组，不是 AntD 的 Panel.size。父组件需要在 onResize 中接受请求并更新；动态面板变化时同时更新数组长度与顺序。
+- sizes 为整个布局受控数组，不支持 Panel.size。父组件需要在 onResize 中接受请求并更新；动态面板变化时同时更新数组长度与顺序。
 - 受控 sizes 先换算为像素，再按总和归一化填满可用面板空间（不含分隔条）。因此 [100,100] 表示等分，不保证各为 100px；总和应匹配实际空间才能精确表达像素请求。所有值为 0 无效。受控值会优先于容器变化的自动策略。
 - 显式提供稳定唯一 id 可在动态增删/重排中识别面板。只支持直接 Splitter.Panel（含 Fragment）；不要在 Panel 外另包 div 或自定义包装组件。
 - min/max、容器可用尺寸与总布局必须协调。无效单位和同单位 min 大于 max 会报错；空间不足或相互冲突时引擎会调整布局以填满可用区域，不保证所有不可能同时满足的约束。
-- 这是基于 react-resizable-panels 的 mtone 封装，不是完整 Ant Design API。没有 Panel.size、layout/vertical 别名、动画配置、destroyOnHidden 或 AntD 的完整 classNames/styles API。
+- 这是基于 react-resizable-panels 的 mtone 封装。没有 Panel.size、layout/vertical 别名、动画配置或 destroyOnHidden；样式通过根节点和面板的 className/style 设置。
 - Esc 或 pointercancel 撤销本次拖动并请求回到开始大小；窗口失焦提交最后有效大小。lazy 模式在释放时发出大小请求，取消时发回滚请求。0 大小面板保留挂载内容，但会 inert/aria-hidden，不参与交互。
 - 按需保存布局由宿主负责；示例只保留当前页面状态，不做服务器或浏览器持久化。库已包含所需依赖，使用者无需单独安装拖拽组件。
 
@@ -777,7 +777,7 @@ export default function Demo() {
 - Layout.Content.as: "main" | "section" | "div" (default: main). 主体语义标签。一个页面通常只使用一个 main；嵌入其他主体时改为 section 或 div。
 - children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes. 各区域均可嵌套内容和覆盖样式；默认不生成主体 Footer，显式组合 Layout.Footer 时显示，默认高度 42px。
 - 主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <Layout.Footer>内容</Layout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。
-- 使用 Layout.Sider、Layout.Header、Layout.Content、Layout.Footer 组合，不需要单独安装子组件。API 采用 Ant Design 的组合习惯，但不是 Ant Design Layout 的全量兼容实现。
+- 使用 Layout.Sider、Layout.Header、Layout.Content、Layout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。
 - Layout.Sider 复用本库 Sidebar 的状态、NavItem 图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、IconButton 等已有组件。
 - 默认头部 48px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌、侧栏底部版本/折叠行与顶部操作保持可见。
 - 响应式收起为图标窄栏，不是弹出式抽屉。breakpoint 按浏览器视口判断，不按示例容器宽度判断；希望自定义手机抽屉时可组合已有 Drawer。
@@ -1009,7 +1009,7 @@ export default function Demo() {
 - form.isFieldValidating: (name: string) => boolean. 读取字段是否正在校验。
 - form.validateFields: (names?: string[]) => Promise<FormValues>. 校验全部注册字段或指定字段；失败或过期时拒绝，必须处理 Promise。
 - form.resetFields: (names?: string[]) => void. 恢复全部或指定字段的初始值，清除错误与校验中状态。
-- 这是 mtone 的轻量表单 API，不是 Ant Design Form 的完整兼容实现；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。
+- 这是 mtone 的轻量表单 API；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。
 - 字段 name 是扁平字符串 key；例如 "user.email" 只是一个完整 key，不会生成嵌套对象。控件以 Form 接管的值为准，不要同时传 value/defaultValue。
 - initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，MultiSelect 的初始值建议在 initialValues 中设为 []。
 - 无 name 的 FormField 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。
@@ -1071,7 +1071,7 @@ export default function Demo() {
 - rule.pattern: RegExp. 字符串正则检查。
 - rule.message: string. 覆盖规则失败的错误文案。
 - rule.validator: (rule: FormRule, value: unknown, values: FormValues) => void | string | Promise<void | string>. 返回 void 表示通过，返回错误字符串或抛错表示失败；支持异步。
-- 这是 mtone 的轻量表单 API，不是 Ant Design Form 的完整兼容实现；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。
+- 这是 mtone 的轻量表单 API；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。
 - 字段 name 是扁平字符串 key；例如 "user.email" 只是一个完整 key，不会生成嵌套对象。控件以 Form 接管的值为准，不要同时传 value/defaultValue。
 - initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，MultiSelect 的初始值建议在 initialValues 中设为 []。
 - 无 name 的 FormField 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。
@@ -1512,8 +1512,8 @@ export default function Demo() {
 - loadData 只管理异步状态，不负责请求协议或合并数据；叶节点需 isLeaf=true。defaultExpandAll 仅初始化有效，加载后展开由 expandedKeys 控制。
 - 虚拟化要求标题单行、固定行高；不支持自动测量变高行。长标题省略显示。scrollTo 自动展开只适用于已存在的数据，不能自动加载未知后代。
 - 拖放使用桌面原生 HTML 拖放事件，不包含触摸拖放或键盘拖动。onDrop 不自动修改树，应用负责不可变移动和持久化数据。
-- DirectoryTree 为独立具名导出，并非 Tree.DirectoryTree；未实现 Ant Design 的 JSX TreeNode、Tree.useTree、motion、语义 classNames / styles，以及 showLine / draggable 的对象配置。接口不是 Ant Design 的直接替换。
-- 保持 mtone 主题变量与本库复选框视觉风格，不引入 Ant Design 运行时依赖。
+- DirectoryTree 为独立具名导出，并非 Tree.DirectoryTree；未实现 JSX TreeNode、Tree.useTree、motion、语义 classNames / styles，以及 showLine / draggable 的对象配置。
+- 使用 mtone 主题变量与本库复选框视觉风格。
 
 ```tsx
 import { useState } from "react";
@@ -1575,13 +1575,13 @@ export default function Demo() {
 - reorderable / onOrderChange: boolean / (values: string[]) => void. 默认关闭；请求重排后的完整键列表，禁用标签不可作为拖动源/目标。
 - ref / 原生属性: Ref<HTMLDivElement> / HTMLAttributes<HTMLDivElement>. 根节点ref、className、style、dir和ARIA等。
 - 溢出菜单中相邻选项保留 3px 间距；横向标签栏间距不变。
-- 保留旧 items/value/defaultValue/onValueChange；value 必须唯一。不是 Ant Design Tabs API 的兼容替代。
+- 保留旧 items/value/defaultValue/onValueChange；value 必须唯一。
 - 默认 destroyOnHidden=true 延续旧版隐藏面板卸载行为；false 时仅保留访问过的面板。forceRender 让该面板始终挂载；项目级 destroyOnHidden 可覆盖全局值。
 - 非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。
 - editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。
 - 溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。
 - 默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。
-- 未实现自定义 tabBar 渲染器、指示线动画引擎或 Ant Design 更多菜单搜索。标签 label 请勿嵌入交互控件。
+- 未实现自定义 tabBar 渲染器、指示线动画引擎或更多菜单搜索。标签 label 请勿嵌入交互控件。
 
 ```tsx
 import { Tabs } from "@bixlab/mtone";
@@ -1838,13 +1838,13 @@ export default function Demo() {
 - activeTabKey / defaultActiveTabKey: string. 分别为受控值与非受控初始值；默认选中第一个可用标签。
 - onTabChange: (key: string) => void. 标签切换回调；受控模式下需由父组件更新 activeTabKey。
 - tabBarExtraContent: ReactNode. 标签页区域的附加内容，和顶部 extra 独立。
-- tabProps: { className?: string }. 传给复用的 mtone Tabs 的样式类；不是 Ant Design TabsProps，值与回调通过 Card 的标签属性控制。
+- tabProps: { className?: string }. 传给复用的 mtone Tabs 的样式类；值与回调通过 Card 的标签属性控制。
 - classNames / styles: object | ({ props: CardProps }) => object. 分区 className / CSSProperties；键为 root、header、title、extra、cover、body、actions、tabs。
 - tokens: CardTokens. 单张卡片主题 token：bodyPadding、bodyPaddingSM、headerPadding、headerPaddingSM、headerHeight、headerHeightSM、headerFontSize、headerFontSizeSM、headerBg、actionsBg、actionsPadding、borderRadius、gridMinWidth。尺寸数字按 px 处理，也支持 CSS 长度字符串。
 - Card.Meta: avatar?: ReactNode; title?: ReactNode; description?: ReactNode; htmlTitle?: string. 元信息布局；支持原生 div 属性，以及 root、section、avatar、title、description 分区 classNames/styles（对象或 ({props}) => 对象）。
 - Card.Grid: hoverable?: boolean + HTMLAttributes<HTMLDivElement>. 卡片网格项，hoverable 默认 true；作为 Card 的直接子元素使用以启用响应式网格布局。
 - 原生属性: Omit<HTMLAttributes<HTMLDivElement>, "title">. 支持根节点 className、style、aria-* 与适用 DOM 事件。title 已改为可见标题；原生提示使用 htmlTitle。
-- 不声明与 Ant Design 完全兼容：未提供旧 bordered/bodyStyle/headStyle；使用 variant 与分区 styles。size 使用 medium/small，tabProps 只支持现有 mtone Tabs 的 className。
+- 未提供 bordered/bodyStyle/headStyle；使用 variant 与分区 styles。size 使用 medium/small，tabProps 只支持现有 mtone Tabs 的 className。
 - 迁移提醒：旧 <Card title="提示"> 会改为显示标题栏；原生悬浮提示请改为 <Card htmlTitle="提示">。只有 children、没有新增结构属性的 Card 维持原来的默认视觉。
 - Card.Meta 与 Card.Grid 是 Card 的静态子组件，不是单独安装或单独命名导出的组件。
 - 不要用 hoverable 或 onClick 把普通 div 当作按钮；可交互入口优先用内部 Button 或链接，图标按钮必须有可访问名称。
@@ -1891,7 +1891,7 @@ export default function Demo() {
 - 编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。
 - 复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。
 - 省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。
-- 不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。
+- 不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 actions/classNames 配置。文字样式与交互优先遵循 mtone。
 
 ```tsx
 import { Typography } from "@bixlab/mtone";
@@ -1948,7 +1948,7 @@ export default function Demo() {
 - 编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。
 - 复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。
 - 省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。
-- 不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。
+- 不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 actions/classNames 配置。文字样式与交互优先遵循 mtone。
 
 ```tsx
 import { Text } from "@bixlab/mtone";
@@ -1975,7 +1975,7 @@ export default function Demo() {
 - 编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。
 - 复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。
 - 省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。
-- 不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。
+- 不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 actions/classNames 配置。文字样式与交互优先遵循 mtone。
 
 ```tsx
 import { Title } from "@bixlab/mtone";
@@ -2001,7 +2001,7 @@ export default function Demo() {
 - 编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。
 - 复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。
 - 省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。
-- 不声明 Ant Design API 兼容；不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 Ant 的 actions/classNames 配置。文字样式与交互优先遵循 mtone。
+- 不支持富节点中间/后缀截断、自动溢出提示、shimmer 或 actions/classNames 配置。文字样式与交互优先遵循 mtone。
 
 ```tsx
 import { Paragraph } from "@bixlab/mtone";
@@ -2046,7 +2046,7 @@ export default function Demo() {
 - 保留原无参数 Divider 的水平细线及 12px 间距。
 - 分隔线不参与键盘焦点；请勿在标题中放交互控件。长标题可换行。
 - 使用 mtone 边框和文字 token；垂直高度默认 1em、左右间距 8px，可用 style 覆盖。
-- 不提供 Ant Design 的旧属性别名或 API 兼容。
+- 属性以此处文档和 mtone 类型声明为准。
 
 ```tsx
 import { Divider } from "@bixlab/mtone";
@@ -2166,16 +2166,16 @@ export default function Demo() {
 - ref: TableRef. nativeElement 与 scrollTo({key?, index?, top?, offset?, align?})。虚拟模式不支持 center 对齐。
 - onTableChange: (pagination, filters, sorter, extra) => void. 新详细回调。extra 包含 action 和 currentDataSource；多列排序返回 sorter 数组。
 - manual: boolean (default: false). 禁用本地排序、筛选和分页。远程请求由应用处理，并传受控分页和 total。
-- onChange: (state: TableState) => void. 保留旧回调，不替换成 Ant Design 四参数签名。state 包含 sort、文本 filters、page、pageSize；高级筛选请用 onTableChange。
+- onChange: (state: TableState) => void. 保留旧单参数回调。state 包含 sort、文本 filters、page、pageSize；高级筛选请用 onTableChange。
 - sort / filters: {key, direction: asc | desc} | null / Record<string,string>. 旧受控单排序与文本筛选；sort=null 显式清空。旧列 sortable/filterable 继续有效。
 - selectable / selectedKeys / onSelectionChange: boolean / React.Key[] / (keys) => void. 旧选择接口继续可用；复杂选择推荐 rowSelection。
-- 能力参照 Ant Design Table，但不是可直接替换的 Ant Design API。旧 onChange(state)、pagination=false 默认值和文本筛选继续保留；高级事件使用 onTableChange。
+- 旧 onChange(state)、pagination=false 默认值和文本筛选继续保留；高级事件使用 onTableChange。
 - Table.EXPAND_COLUMN / Table.SELECTION_COLUMN 控制特殊列顺序；Table.SELECTION_ALL / SELECTION_INVERT / SELECTION_NONE 可用于选择菜单。
 - 列 onCell 返回 rowSpan/colSpan 可合并单元格，0 隐藏被合并的单元格；固定列需要合理宽度和足够的横向滚动空间。
 - 菜单筛选需提供 onFilter 才执行本地匹配；旧 filterable 为不区分大小写的文本包含匹配。多列 sorter.multiple 值较大者优先。
 - 编辑单元格、整行编辑、行列拖拽和自定义提示通过 render/onCell/onRow/onHeaderCell/components 组合；示例使用本地状态，不包含网络请求、自动保存、校验框架或拖拽库。列宽调整不是内置能力。
 - 虚拟滚动应提供数字视口尺寸。自定义 body 需要遵守底层 ref 契约；树、展开、合并、固定列与虚拟化的复杂组合应按业务数据验证，不能将单项支持等同于所有组合都已验收。
-- filterDropdownProps 是公开类型列出的精简配置，不透传 Ant Design Dropdown 的全部属性。loading 与 sorter tooltip 也不是完整 Spin/Tooltip 属性集合。
+- filterDropdownProps、loading 与 sorter tooltip 只接受公开类型列出的配置，不透传其他弹层、加载指示器或提示组件属性。
 - 行键必须稳定唯一；服务端数据使用 manual，并由应用管理请求、分页 total、受控状态和失效选择键。
 - 组件结构使用无样式 @rc-component/table 引擎，交互、状态与视觉由 mtone 提供。文档站可能领先 npm，使用前核对已安装版本。
 
@@ -2243,7 +2243,7 @@ export default function Demo() {
 - ref / className / style / ...: HTMLSpanElement / 原生 span 属性. 支持 ref 与根元素样式、事件和无障碍属性。
 - 保留 name/src/数字 size 的旧用法和 24px 默认尺寸；src 或 srcSet 改变后会重新尝试图片。
 - 响应式断点：xs 0、sm 576、md 768、lg 992、xl 1200、xxl 1600px。
-- 采用 mtone 的中性灰样式，不是 Ant Design 的包装；复杂自定义图片元素需自行正确转发属性，建议使用字符串 src。
+- 采用 mtone 的中性灰样式；复杂自定义图片元素需自行正确转发属性，建议使用字符串 src。
 
 ```tsx
 import { Avatar } from "@bixlab/mtone";
@@ -2265,7 +2265,7 @@ export default function Demo() {
 - side: "top" | "bottom" | "left" | "right" (default: top). 溢出成员浮层方向，自动避让边界。
 - className / style / ...: 原生 span 属性. 组容器属性。
 - 保留 items 和数值 max 旧接口。溢出名单点击或键盘打开，Escape 关闭。
-- 不照搬 Ant Design 的任意 popover 配置；使用明确的 side 和 max.style。
+- 弹层位置与样式使用 side 和 max.style 配置。
 
 ```tsx
 import { AvatarGroup } from "@bixlab/mtone";
@@ -2297,7 +2297,7 @@ export default function Demo() {
 - gapPosition: "top" | "bottom" | "left" | "right" (default: bottom). 仅 dashboard：缺口方向。
 - className / style: string / CSSProperties. 应用到根元素；线性宽度默认 100%，圆形可通过 size 设置直径。
 - HTML div attributes: React.HTMLAttributes<HTMLDivElement>（不含 children / color）. 支持 id、data-*、aria-label、aria-labelledby 和 aria-valuetext 等属性。组件固定提供 progressbar 角色及归一化后的 0–100 数值。
-- 保留原有 <Progress value={68} label="上传进度" /> 用法：5px 细线、低饱和绿色、无可见文字。不要求与 Ant Design 的属性名兼容。
+- 保留原有 <Progress value={68} label="上传进度" /> 用法：5px 细线、低饱和绿色、无可见文字。
 - 导出 ProgressProps、ProgressType、ProgressStatus、ProgressColor 类型。组件不包含交互或自动计时，更新 value 即可改变进度。
 - 非有限数值安全归一化；圆环直径限制 16–4096px。线性 size 数字同线宽限制 1–100px。
 - format 内容只作视觉显示；自定义单位或业务信息应同时设置 aria-valuetext，label 用于说明进度属于什么任务。

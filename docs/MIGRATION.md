@@ -9,9 +9,10 @@
 ## Additions
 
 `Mentions` (`Mention` alias) is a new, opt-in plain-text mention component, available starting in 0.4.0. No existing input API changes. It uses `onChange(text: string)`, unlike
-`Textarea`'s native change event. Size values are `sm` / `md` / `lg`. Ant Design
-`Mentions.Option`, variants, ConfigProvider tokens and static `Mentions.getMentions`
-are not provided; use `options` and the standalone `getMentions` export. See the
+`Textarea`'s native change event. Size values are `sm` / `md` / `lg`.
+Use `options` for suggestions, MtoneProvider for theme configuration, and the
+standalone `getMentions` export for parsing. `Mentions.Option`, variants and
+static `Mentions.getMentions` are not provided. See the
 [API guide](API.md#mentions) for the supported API.
 
 # Breaking changes in 0.3.0
@@ -42,8 +43,8 @@ classes remain unchanged. Drawer and ConfirmDialog do not receive this option.
 ## Table compatibility
 
 Legacy `data`, `sort`, textual filters and `onChange(state)` remain supported.
-Use `onTableChange` for the new four-argument callback; do not assign an Ant
-Design callback to legacy `onChange`. See [API guide](API.md#table) for limits.
+Use `onTableChange` for the new four-argument callback; legacy `onChange`
+continues to receive a single state argument. See [API guide](API.md#table) for limits.
 
 # Breaking changes in 0.2.0
 

@@ -33,12 +33,9 @@ an interaction, using its own storage and validation policy.
 
 ## Scope
 
-The API is inspired by Ant Design Splitter but is not a drop-in compatibility
-layer. Only the props listed in the mtone reference and TypeScript declarations
-are supported. In particular, do not assume AntD's deprecated aliases or all of
-its visual customization and lazy-rendering options are available.
-
-Reference: [Ant Design Splitter](https://ant.design/components/splitter/).
+Only the props listed in the mtone reference and TypeScript declarations
+are supported. See the API boundaries below for sizing, styling and panel
+lifecycle behavior.
 
 ## Sizes and limits
 
@@ -120,19 +117,19 @@ To combine axes, render another Splitter **inside** a Panel. The nested instance
 has its own container, panel IDs, sizing constraints and callbacks. It does not
 share layout state with its parent automatically.
 
-## Differences from Ant Design
+## API boundaries
 
 The chosen wrapper keeps the useful common layout behavior and a smaller API:
 
 - Root `sizes` controls the whole layout instead of per-Panel `size`.
-- `orientation` is the supported direction API. Deprecated aliases such as
-  `layout` are not provided, nor is the boolean `vertical` shorthand.
-- `collapsible` is a boolean on each panel. AntD's per-side icon and motion
-  configuration is not implemented.
+- `orientation` is the supported direction API; `layout` and the boolean
+  `vertical` shorthand are not provided.
+- `collapsible` is a boolean on each panel; per-side icon and motion
+  configuration is not supported.
 - `destroyOnHidden` is not provided. Collapsing is a layout operation, not an
   instruction to erase or unmount application state.
-- Root and Panel `className`/`style` are supported; AntD's full semantic style
-  object/function APIs are not copied.
+- Root and Panel `className`/`style` are supported; semantic style
+  object/function APIs are not provided.
 
 The mature resizing engine is
 [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels).

@@ -1,6 +1,6 @@
 # Calendar design
 
-Add a data-display Calendar inspired by Ant Design's monthly/yearly calendar. Preserve mtone styling and DatePicker's ISO `YYYY-MM-DD` date-only values, without a runtime date dependency. Native date arithmetic is internal only. Ant wrapping would introduce styling/dependency coupling; a native browser date input would not support event cells. These are implementation choices, not a claim of Ant API compatibility.
+Add a data-display Calendar with monthly and yearly panels. Preserve mtone styling and DatePicker's ISO `YYYY-MM-DD` date-only values, without a runtime date dependency. Native date arithmetic is internal only. A native browser date input would not support event cells, so this component uses its own display grid.
 
 Support month/day and year/month panels, full and card layouts, controlled/default value and mode, selection/change/panel callbacks, valid range, disabled dates, week numbers, English/Chinese Provider locale with overrides, custom cell and header content, semantic styles/classes. Default header uses mtone Select. Calendar represents dates, not time zones, scheduling persistence, drag/drop events, range selection or a lunar date engine. Custom content can show events or lunar annotations.
 
