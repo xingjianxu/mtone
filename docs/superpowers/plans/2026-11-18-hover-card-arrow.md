@@ -6,3 +6,5 @@
 - Popconfirm has independent SVG arrow markup/styles. No shared selectors, APIs, defaults, or generated reference changes are needed.
 - Regression: SVG/ARIA unit assertion fails on the old square and passes after the change. Browser fixture covers top/bottom/left/right in light/dark surfaces at DPR 1/2, checks transformed baseline against the popup border, and saves screenshots for visual inspection.
 - Local Chromium launch is blocked by environment socket permissions; browser pass must be confirmed by integration CI, not inferred from DOM tests.
+
+- CI caught the containing-block detail: Base UI's borderless Positioner owns the absolute arrow, not the popup padding box. Correct offset is -6px, so the 7px path baseline lands at the popup's 1px inner border edge.

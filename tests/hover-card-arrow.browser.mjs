@@ -24,6 +24,8 @@ try {for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['web
      const box=el.closest('.mt-hover-card').getBoundingClientRect();
      return {base:{x:base.x,y:base.y},tip:{x:tip.x,y:tip.y},box:{left:box.left,right:box.right,top:box.top,bottom:box.bottom},border:getComputedStyle(el.closest('.mt-hover-card')).borderTopWidth,fill:getComputedStyle(svg).fill,bg:getComputedStyle(el.closest('.mt-hover-card')).backgroundColor};
     });
+    console.log(name, scale, dark, side, JSON.stringify(geometry));
+    await page.screenshot({path:`artifacts/hover-card-arrow/${name}-${scale}x-${dark?'dark':'light'}.png`});
     const {base,tip,box}=geometry;
     const expected=side==='bottom'?box.top+1:side==='top'?box.bottom-1:side==='left'?box.right-1:box.left+1;
     assert(Math.abs((side==='top'||side==='bottom'?base.y:base.x)-expected)<0.25,`${name} ${side}: baseline must cover inner border edge`);
