@@ -43,7 +43,10 @@ try {
           assert.deepEqual(await geometry('Nested after'), nested, `${kind}: following nested row moved`);
           assert.deepEqual(await geometry('After'), root);
           await page.screenshot({ path: `artifacts/menu-spacing/${name}-${kind}.png` });
-          await page.getByRole('button', { name: 'Outside' }).click();
+          // Modal Menu deliberately intercepts outside clicks with its backdrop.
+          // Click the actual outside point instead of requiring the button to receive it.
+          const outside = await page.getByRole('button', { name: 'Outside' }).boundingBox();
+          await page.mouse.click(outside.x + outside.width / 2, outside.y + outside.height / 2);
           await expect(row('Before')).toHaveCount(0);
         }
         await open();
