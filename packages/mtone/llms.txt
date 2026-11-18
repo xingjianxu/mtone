@@ -123,6 +123,7 @@ export default function Demo() {
 - prefix / name / id: ReactNode / string / string. 仅 Cascader：前缀、JSON 序列化值的隐藏表单字段名、触发按钮 ID
 - ref: Ref<HTMLButtonElement>. 仅 Cascader：触发按钮的原生引用
 - className / style / aria-label / aria-labelledby: string / CSSProperties / string / string. 外层样式与可访问名称
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - CascaderPath = (string | number)[]。单选如 ["zhejiang","hangzhou"]，多选如 [["zhejiang","hangzhou"]]；数字 1 和字符串 "1" 是不同值。
 - CascaderOption 支持 value、label、textValue、children、disabled、isLeaf。富文本 label 应提供 textValue，用于搜索、路径文字和可访问名称。禁用分支的后代也不可选。
 - CascaderPanel 使用同一选项、选择、搜索与加载 API，但常驻页面，不支持触发器、标签展示、清除按钮、尺寸、定位及隐藏表单字段属性。
@@ -222,6 +223,7 @@ export default function Demo() {
 - popupClassName / popupStyle: string / CSSProperties (default: —). 浮层样式
 - ref: Ref<HTMLInputElement> (default: —). 原生输入引用
 - 原生 input 属性: InputHTMLAttributes (default: —). name/form/id/required/disabled/readOnly/aria 等；className/style 属于输入容器
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 自由输入不限定为选项值；选择后填入 value 而不是富文本 label。值必须在整个列表唯一。键盘可聚焦禁用项以朗读，但不能选中。
 - options 支持 {label:string,options:AutoCompleteOption[]} 分组；选项支持 value、label、disabled、keywords。
 - 默认按 value、字符串 label 和 keywords 忽略大小写包含匹配；远程数据请使用 filterOption={false}，应用自行处理防抖、取消及过期响应。
@@ -257,6 +259,7 @@ export default function Demo() {
 - onItemClick: (item: TableOfContentsItem, event: MouseEvent<HTMLAnchorElement>) => void. 点击目录项时触发；event.preventDefault() 取消内置导航，便于自行接入路由。
 - ref: Ref<TableOfContentsHandle>. 暴露 refresh() 手动重新采集标题；不是 nav DOM ref。
 - className / style / aria-label: HTMLAttributes<HTMLElement>. 其余属性传给 nav；aria-label 默认“目录”，可按页面语言设置。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 功能参考 Mantine，API 独立设计，不是其直接替代。组件只负责页内目录，不自动提供 sticky 固定定位、折叠导航或全文检索。
 - 默认跳转不修改 location.hash，适合 hash 路由；Ctrl/Cmd 等修饰点击保留原生链接行为。需要分享固定锚点时应自行给标题指定稳定、唯一的 id。
 - 没有 id 的匹配元素会被分配唯一 id，并保留在 DOM 上。自动 id 不保证跨页面重新挂载稳定；已有 id 不改写。重复 authored id 仅保留第一个匹配标题，请保证全页面唯一。
@@ -579,6 +582,7 @@ export default function Demo() {
 - ref: React.Ref<MentionsRef>. 提供 nativeElement: HTMLTextAreaElement | null、focus(options?: FocusOptions)、blur()。
 - native textarea attributes: Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "defaultValue" | "onChange" | "onSelect" | "prefix" | "children"> (default: rows: 3). 支持 id、name、rows、placeholder、disabled、readOnly、maxLength、required、onFocus/onBlur、aria-label 等。务必提供 label 或 aria-label。
 - getMentions(value, config?): (value: string, config?: { prefix?: string | string[]; split?: string }) => { prefix: string; value: string }[]. 单独导出的解析函数，不是静态方法；使用相同边界规则，不检查候选成员资格或服务端权限。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - Mention 是 Mentions 的同一组件别名；推荐使用 Mentions。相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件自 0.4.0 提供；请以已安装版本声明为准。
 - 这是原生 textarea 上的纯文本补全，不是富文本 token 编辑器，也不是 Ant Design Mentions 的完整 API 替代品。不支持 Mentions.Option、children 选项、Ant variant、ConfigProvider/design tokens 或函数式语义样式；尺寸使用 sm/md/lg。
 - ↑ / ↓ 在可用候选间循环，Enter 插入当前项，Escape 关闭，Tab 关闭并正常切换焦点；输入法组合期间不会选择候选。Home/End 保留文本编辑行为。选中一段文本时不弹出建议。
@@ -687,6 +691,7 @@ export default function Demo() {
 - resetQueryOnClose: boolean (default: true). 组件请求关闭时将查询重置为空字符串。
 - className: string. 附加到面板的类名。
 - action.onSelect: () => void. 动作选择回调；与 id、label 一起定义在 actions 中。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 这是 mtone 自己的组件 API，不是 Mantine Spotlight API 的兼容实现；不提供全局 singleton、spotlight.open() 或命令注册中心。每个实例独立管理状态。
 - 默认 Ctrl/Cmd+K 切换面板；默认不拦截 input、textarea、select 和可编辑内容中的按键，忽略组合输入、重复按键及 Alt/Shift 组合。文档演示使用 shortcut={false}，避免 Gallery 多实例争抢快捷键。应用中建议只挂载一个启用相同全局快捷键的实例。
 - 默认搜索 label、description 和 keywords，不区分大小写，并去除查询首尾空白；group 不参与默认搜索。filter 接收未经裁剪的原始查询。
@@ -1191,6 +1196,7 @@ export default function Demo() {
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 默认单行外框高度为 28px（含边框）；长选中标签在行内省略，comfortable 密度保留 34px。可用 className 覆盖尺寸。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 支持键盘选择、禁用选项和焦点恢复。
@@ -1223,6 +1229,7 @@ export default function Demo() {
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 默认单行外框最小高度为 28px（含边框）；多个标签换行时自动增高，不强制裁剪为 28px。comfortable 密度下仍以 28px 为最小高度；可用 className 定制。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。
@@ -1338,6 +1345,7 @@ export default function Demo() {
 - collapseLabel / expandLabel: string (default: 收起侧边栏 / 展开侧边栏). 切换按钮的可访问名称和提示，可本地化。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题并保留分组分隔。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。
 - 收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。
 - 受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。
@@ -1382,6 +1390,7 @@ export default function Demo() {
 - Import: NavGroup, NavItem from @bixlab/mtone
 - label: ReactNode. 可选分组标题。
 - children: ReactNode. 组件内容。
+- 同组相邻 NavItem 之间保留 3px 间距，与侧边栏菜单一致；分组标题和组间距保持不变。
 
 ```tsx
 import { NavGroup, NavItem } from "@bixlab/mtone";
@@ -1523,6 +1532,7 @@ export default function Demo() {
 - onTabClick: (value: string, event: MouseEvent<HTMLButtonElement>) => void. 点击标签回调。
 - reorderable / onOrderChange: boolean / (values: string[]) => void. 默认关闭；请求重排后的完整键列表，禁用标签不可作为拖动源/目标。
 - ref / 原生属性: Ref<HTMLDivElement> / HTMLAttributes<HTMLDivElement>. 根节点ref、className、style、dir和ARIA等。
+- 溢出菜单中相邻选项保留 3px 间距；横向标签栏间距不变。
 - 保留旧 items/value/defaultValue/onValueChange；value 必须唯一。不是 Ant Design Tabs API 的兼容替代。
 - 默认 destroyOnHidden=true 延续旧版隐藏面板卸载行为；false 时仅保留访问过的面板。forceRender 让该面板始终挂载；项目级 destroyOnHidden 可覆盖全局值。
 - 非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。
@@ -1646,6 +1656,7 @@ export default function Demo() {
 - width: CSSProperties['width']. 顶层浮层默认按内容宽度（最小 160px），不跟随标签；可指定 px 或 CSS 宽度。单个菜单 width 优先，子菜单独立按内容宽度。
 - align: 'start' | 'end' | 'left' | 'right' (default: start). 顶层浮层首选对齐边；单个菜单 align 优先。start/end 随 RTL 变化，left/right 是物理左右，受视口碰撞处理约束。
 - HTML div attributes: HTMLAttributes<HTMLDivElement>. 支持 aria-label、className、style 等根元素属性；不接受 children，通过 menus 定义菜单。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一操作入口用 Menu，任意自定义浮层内容用 Dropdown。三者共享浮层样式，Menubar 与 Menu 保留菜单语义，不嵌套额外 dialog。
 - 菜单栏作为一个 Tab 停靠点，左右方向键移动顶层焦点；Enter、Space 或向下键进入菜单，Escape 退出并返回触发项。键盘逻辑由 Base UI 管理。快捷键文字仅展示，不注册全局快捷键。
 - RTL 同时提供 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 与 DOM dir=rtl；start/end 和左右方向键按方向上下文工作。
@@ -1674,6 +1685,7 @@ export default function Demo() {
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
+- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - Menu 复用 Dropdown 的浮层布局，但仍使用菜单语义、方向键与选择关闭。通用自定义内容使用 Dropdown。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。
 - 同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。
 - 快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。

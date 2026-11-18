@@ -95,3 +95,7 @@
     opacity: 1;
   }
 }
+
+.mt-mentions-option + .mt-mentions-option {
+  margin-top: 3px;
+}

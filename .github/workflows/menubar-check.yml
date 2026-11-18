@@ -1,7 +1,7 @@
 name: Menubar verification
 on:
   push:
-    branches: [feat-menubar]
+    branches: [feat-menubar, integrate-menu-spacing]
   workflow_dispatch:
 permissions:
   contents: read

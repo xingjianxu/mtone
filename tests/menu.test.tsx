@@ -177,3 +177,26 @@ it('positions RTL submenus on the logical end side', async () => {
   const child=await screen.findByRole('menuitem',{name:'Child'});
   await waitFor(()=>expect(child.closest('[role="menu"]')).toHaveAttribute('data-side','inline-end')); // Base UI exposes the logical side; jsdom cannot verify physical geometry.
 });
+
+it('matches spacing only between sibling menu rows, including submenu rows', async () => {
+  render(<Menu defaultOpen trigger={<button>Spacing</button>} items={[
+    { type: "group", key: "group", label: "Files", children: [
+      { key: "new", label: "New" },
+      { key: "export", label: "Export", children: [{ key: "pdf", label: "PDF" }, { key: "doc", label: "DOC" }] },
+      { key: "after", label: "After" },
+    ] }, items[1], items[2],
+    { type: "radio-group", key: "radio", label: "Sort", children: [{ key: "a", label: "Ascending" }, { key: "d", label: "Descending" }] },
+  ]} />);
+  const selector = '.mt-menu-item + .mt-menu-item';
+  expect((await screen.findByRole('menuitem', { name: 'New' })).matches(selector)).toBe(false);
+  const exporter = screen.getByRole('menuitem', { name: 'Export' });
+  expect(exporter.matches(selector)).toBe(true);
+  expect(screen.getByRole('menuitem', { name: 'After' }).matches(selector)).toBe(true);
+  expect(screen.getByRole('menuitemradio', { name: 'Ascending' }).matches(selector)).toBe(false);
+  expect(screen.getByRole('menuitemradio', { name: 'Descending' }).matches(selector)).toBe(true);
+  expect(screen.getByRole('menuitem', { name: 'Locked' }).matches(selector)).toBe(false);
+  await userEvent.hover(exporter);
+  const pdf = await screen.findByRole('menuitem', { name: 'PDF' });
+  expect(pdf.matches(selector)).toBe(false);
+  expect(screen.getByRole('menuitem', { name: 'DOC' }).matches(selector)).toBe(true);
+});

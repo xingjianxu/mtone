@@ -72,3 +72,25 @@ it('retains item focus when controlled collapsed state changes', () => {
   rerender(<Sidebar collapsible collapsed><NavItem>Inbox</NavItem></Sidebar>);
   expect(screen.getByRole('button', {name:'Inbox'})).toHaveFocus();
 });
+
+it('keeps grouped items as adjacent siblings in nested and collapsed navigation', () => {
+  const { container, rerender } = render(
+    <Sidebar collapsible collapsed={false}>
+      <NavGroup label="Workspace">
+        <NavItem>Inbox</NavItem><NavItem>Archive</NavItem>
+        <NavGroup label="Projects"><NavItem>Alpha</NavItem><NavItem>Beta</NavItem></NavGroup>
+      </NavGroup>
+    </Sidebar>,
+  );
+  expect(container.querySelectorAll('.mt-nav-group > .mt-nav-item + .mt-nav-item')).toHaveLength(2);
+  rerender(<Sidebar collapsible collapsed><NavGroup label="Workspace"><NavItem>Inbox</NavItem><NavItem>Archive</NavItem></NavGroup></Sidebar>);
+  expect(container.querySelectorAll('.mt-nav-group > .mt-nav-item + .mt-nav-item')).toHaveLength(1);
+  expect(screen.getByRole('button', { name: 'Archive' })).toBeInTheDocument();
+});
+
+it.each([false, true])('spaces plain Sidebar siblings with collapsible=%s', (collapsible) => {
+  const { container } = render(<Sidebar collapsible={collapsible}><NavItem>First</NavItem><NavItem>Second</NavItem><NavGroup label="Group"><NavItem>Nested</NavItem></NavGroup></Sidebar>);
+  const selector = '.mt-sidebar > .mt-nav-item + .mt-nav-item, .mt-sidebar-content > .mt-nav-item + .mt-nav-item';
+  expect(container.querySelectorAll(selector)).toHaveLength(1);
+  expect(screen.getByRole('button', { name: 'Second' }).matches(selector)).toBe(true);
+});
