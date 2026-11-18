@@ -11,6 +11,9 @@ try {for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['web
  const trigger=page.getByRole('button',{name:'Projects',exact:true});
  await trigger.focus(); await page.keyboard.press('ArrowDown');
  await expect(page.getByRole('menuitem',{name:'One',exact:true})).toBeFocused();
+ // Menu intentionally keeps disabled items focusable for discoverability.
+ await page.keyboard.press('ArrowDown'); await expect(page.getByRole('menuitem',{name:'Disabled',exact:true})).toBeFocused();
+ await page.keyboard.press('Enter'); await expect(page.getByRole('status')).toHaveText('none');
  await page.keyboard.press('ArrowDown'); await expect(page.getByRole('menuitem',{name:'Nested',exact:true})).toBeFocused();
  await page.keyboard.press('ArrowRight'); await expect(page.getByRole('menuitem',{name:'Child',exact:true})).toBeFocused();
  await page.keyboard.press('Enter'); await expect(page.getByRole('status')).toHaveText('child');
