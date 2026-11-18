@@ -34,6 +34,66 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### TreeSelect
+
+- [TreeSelect](https://xingjianxu.github.io/mtone/#/components/TreeSelect): 在紧凑输入框中选择树形数据，支持单选、多选勾选、搜索和异步展开。
+- Import: TreeSelect from @bixlab/mtone
+- items: TreeItem[]. 树形选项；每个节点的 id 在整棵树中唯一。
+- multiple: boolean (default: false). 开启复选框多选；默认单选。
+- value / defaultValue: TreeKey | null | TreeKey[]. 受控值或初始值；单选为空时用 null，多选用数组。
+- onValueChange: (value: TreeKey | null, nodes: TreeItem[]) => void | (value: TreeKey[], nodes: TreeItem[]) => void. 按 multiple 使用对应签名；nodes 是当前已选且能在 items 中找到的节点。
+- checkStrictly: boolean (default: false). 多选时独立勾选；默认父子联动。
+- showCheckedStrategy: "all" | "parent" | "leaf" (default: "all"). 仅控制联动多选标签展示；独立勾选不合并标签，回调始终返回全部勾选键。
+- maxTagCount: number. 最大可见标签数，其余显示计数；默认全部显示。
+- renderValue: (node: TreeItem) => ReactNode. 自定义单选值和多选标签内容；未知键回退显示键文本。
+- searchable: boolean (default: false). 显示弹层搜索输入框。
+- searchValue / defaultSearchValue / onSearchChange: string / string / (value: string) => void. 受控或非受控搜索词；关闭时请求清空搜索。
+- filterNode: (query: string, node: TreeItem) => boolean. 自定义节点匹配；默认匹配 textValue 或文本 label，保留祖先。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void (default: false). 受控或非受控弹层状态。
+- placeholder / searchPlaceholder / emptyContent: string / string / ReactNode. 未选择提示、搜索提示与空结果内容；默认跟随语言设置。
+- allowClear / onClear: boolean / () => void (default: false). 显示清空按钮及清空回调。
+- disabled / readOnly: boolean / boolean (default: false). 禁用或只读均不打开弹层、不允许修改；继承 Fieldset 禁用。
+- expandedKeys / defaultExpandedKeys: TreeKey[]. 受控或初始展开键；搜索时自动展开匹配路径。
+- defaultExpandAll: boolean (default: false). 初始展开全部已提供节点。
+- onExpand: (keys: TreeKey[], info: { expanded: boolean; node: TreeItem }) => void. 非搜索状态下的展开变化。
+- loadData: (node: TreeItem) => Promise<unknown>. 异步加载分支，应用需更新 items；搜索时不触发。
+- loadedKeys / onLoad: TreeKey[] / (keys: TreeKey[], info: { node: TreeItem }) => void. 受控已加载键和加载完成通知。
+- onLoadError: (error: unknown, node: TreeItem) => void. 异步加载失败通知。
+- showLine / showIcon: boolean / boolean (default: false). 树连接线和节点图标；图标来自节点 icon。
+- titleRender: (node: TreeItem) => ReactNode. 自定义树节点标题。
+- height / virtual: number / boolean. 树面板高度和窗口化渲染开关；高度默认 256px，virtual 默认 true。
+- size: "sm" | "md" | "lg" (default: "md"). 触发器高度为 24 / 28 / 34px。
+- status: "error" | "warning". 校验边框状态。
+- placement: "bottom-start" | "bottom-end" | "top-start" | "top-end" (default: "bottom-start"). 弹层的方向与逻辑对齐。
+- dropdownWidth: CSSProperties["width"]. 指定弹层宽度；默认跟随触发器，最小 180px 且受视口约束。
+- prefix: ReactNode. 触发器前缀内容。
+- name / id: string / string. 隐藏表单字段名与触发按钮 ID。
+- className / style: string / CSSProperties. 外层容器样式。
+- aria-label / aria-labelledby: string / string. 控件可访问名称。
+- ref: Ref<HTMLButtonElement>. 触发按钮引用，可调用 focus()。
+- TreeKey 为 string | number。单选 value 是键或 null；多选 value 是键数组，不是路径数组。数字 1 与字符串 "1" 不同。
+- TreeItem 支持 id、label、children、disabled、disableCheckbox、checkable、selectable、isLeaf、icon。非文本 label 可补充 textValue 供搜索与标签移除按钮命名。
+- 多选默认父子联动并返回全部勾选键；disabled、disableCheckbox 和 checkable=false 的节点阻断勾选传播。单选遵循 disabled 和 selectable；多选遵循勾选限制。
+- 搜索只处理已提供的 items，保留匹配节点和祖先。筛选时勾选父节点仍以完整数据计算，不限于可见结果。
+- 异步分支设 isLeaf=false，在 loadData 中获取数据并不可变更新 items；组件不存储服务端结果；非受控加载完成键会保留到组件卸载，关闭弹层不清空。搜索期间不会触发 loadData。
+- 受控 value、open、searchValue、expandedKeys 和 loadedKeys 需由应用响应回调更新。默认值仅在初始化时使用。
+- name 对单选提交键文本，多选提交全部勾选键的 JSON 数组；禁用时不参与表单提交。与 Form 集成时使用 value / onValueChange。
+- 尚未出现在 items 的选中键保留并显示键文本，支持异步数据更新；onValueChange 第二参数 nodes 仅包含已存在的节点。
+- 上下键移动焦点，左右键展开、折叠或进入子级，Enter / 空格选择，Escape 关闭并回到触发器。搜索框按下箭头进入树。
+- 不提供自动远程搜索或动态测量行高；虚拟树适合固定行高的单行节点。数据中的 id 必须全局唯一。
+
+```tsx
+import { TreeSelect } from "@bixlab/mtone";
+
+const items = [{ id: "resources", label: "资源", children: [
+  { id: "design", label: "设计规范" },
+  { id: "notes", label: "研究笔记" },
+] }];
+
+<TreeSelect items={items} aria-label="选择资源" searchable allowClear
+  onValueChange={(value, nodes) => console.log(value, nodes)} />
+```
+
 ### Fieldset
 
 - [Fieldset](https://xingjianxu.github.io/mtone/#/components/Fieldset): 用原生 fieldset 与 legend 为相关表单控件分组，支持统一禁用。
@@ -45,7 +105,7 @@ This file describes this package checkout, not necessarily the latest published 
 - 原生属性 / ref: FieldsetHTMLAttributes<HTMLFieldSetElement> / Ref<HTMLFieldSetElement>. 支持 name、form、className、style、aria-* 等原生属性。
 - Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 FormField 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。
 - disabled 保留原生 fieldset 语义：本组第一个 legend 内的控件不受本组禁用影响，仍继承祖先禁用。
-- mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Segmented、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。
+- mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Segmented、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。
 - 原生 input/button/select/textarea 使用浏览器禁用语义；自定义第三方控件、链接、Menu 等非表单动作需应用自行传递 disabled。受控值仍由应用管理，Fieldset 不清空已有值。
 
 ```tsx

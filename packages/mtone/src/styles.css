@@ -697,3 +697,5 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 @import "./cascader.css";
 
 @import "./transfer.css";
+
+@import "./tree-select.css";

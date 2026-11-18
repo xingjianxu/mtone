@@ -1,7 +1,7 @@
 name: Tree verification
 on:
   push:
-    branches: [feat-tree]
+    branches: [feat-tree, feat/tree-select]
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,6 +24,7 @@ jobs:
       - run: npm run test:package
       - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
       - run: npx playwright install --with-deps chromium firefox webkit
+      - run: node tests/tree-select.browser.mjs
       - run: node tests/date-picker.browser.mjs
       - run: node tests/select-layout.browser.mjs
       - run: node tests/select-focus.browser.mjs

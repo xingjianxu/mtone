@@ -27,6 +27,205 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "TreeSelect",
+  "category": "数据录入",
+  "description": "在紧凑输入框中选择树形数据，支持单选、多选勾选、搜索和异步展开。",
+  "importNames": [
+    "TreeSelect"
+  ],
+  "code": "import { TreeSelect } from \"@bixlab/mtone\";\n\nconst items = [{ id: \"resources\", label: \"资源\", children: [\n  { id: \"design\", label: \"设计规范\" },\n  { id: \"notes\", label: \"研究笔记\" },\n] }];\n\n<TreeSelect items={items} aria-label=\"选择资源\" searchable allowClear\n  onValueChange={(value, nodes) => console.log(value, nodes)} />",
+  "props": [
+    {
+      "name": "items",
+      "type": "TreeItem[]",
+      "description": "树形选项；每个节点的 id 在整棵树中唯一。"
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "description": "开启复选框多选；默认单选。",
+      "default": "false"
+    },
+    {
+      "name": "value / defaultValue",
+      "type": "TreeKey | null | TreeKey[]",
+      "description": "受控值或初始值；单选为空时用 null，多选用数组。"
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: TreeKey | null, nodes: TreeItem[]) => void | (value: TreeKey[], nodes: TreeItem[]) => void",
+      "description": "按 multiple 使用对应签名；nodes 是当前已选且能在 items 中找到的节点。"
+    },
+    {
+      "name": "checkStrictly",
+      "type": "boolean",
+      "description": "多选时独立勾选；默认父子联动。",
+      "default": "false"
+    },
+    {
+      "name": "showCheckedStrategy",
+      "type": "\"all\" | \"parent\" | \"leaf\"",
+      "description": "仅控制联动多选标签展示；独立勾选不合并标签，回调始终返回全部勾选键。",
+      "default": "\"all\""
+    },
+    {
+      "name": "maxTagCount",
+      "type": "number",
+      "description": "最大可见标签数，其余显示计数；默认全部显示。"
+    },
+    {
+      "name": "renderValue",
+      "type": "(node: TreeItem) => ReactNode",
+      "description": "自定义单选值和多选标签内容；未知键回退显示键文本。"
+    },
+    {
+      "name": "searchable",
+      "type": "boolean",
+      "description": "显示弹层搜索输入框。",
+      "default": "false"
+    },
+    {
+      "name": "searchValue / defaultSearchValue / onSearchChange",
+      "type": "string / string / (value: string) => void",
+      "description": "受控或非受控搜索词；关闭时请求清空搜索。"
+    },
+    {
+      "name": "filterNode",
+      "type": "(query: string, node: TreeItem) => boolean",
+      "description": "自定义节点匹配；默认匹配 textValue 或文本 label，保留祖先。"
+    },
+    {
+      "name": "open / defaultOpen / onOpenChange",
+      "type": "boolean / boolean / (open: boolean) => void",
+      "description": "受控或非受控弹层状态。",
+      "default": "false"
+    },
+    {
+      "name": "placeholder / searchPlaceholder / emptyContent",
+      "type": "string / string / ReactNode",
+      "description": "未选择提示、搜索提示与空结果内容；默认跟随语言设置。"
+    },
+    {
+      "name": "allowClear / onClear",
+      "type": "boolean / () => void",
+      "description": "显示清空按钮及清空回调。",
+      "default": "false"
+    },
+    {
+      "name": "disabled / readOnly",
+      "type": "boolean / boolean",
+      "description": "禁用或只读均不打开弹层、不允许修改；继承 Fieldset 禁用。",
+      "default": "false"
+    },
+    {
+      "name": "expandedKeys / defaultExpandedKeys",
+      "type": "TreeKey[]",
+      "description": "受控或初始展开键；搜索时自动展开匹配路径。"
+    },
+    {
+      "name": "defaultExpandAll",
+      "type": "boolean",
+      "description": "初始展开全部已提供节点。",
+      "default": "false"
+    },
+    {
+      "name": "onExpand",
+      "type": "(keys: TreeKey[], info: { expanded: boolean; node: TreeItem }) => void",
+      "description": "非搜索状态下的展开变化。"
+    },
+    {
+      "name": "loadData",
+      "type": "(node: TreeItem) => Promise<unknown>",
+      "description": "异步加载分支，应用需更新 items；搜索时不触发。"
+    },
+    {
+      "name": "loadedKeys / onLoad",
+      "type": "TreeKey[] / (keys: TreeKey[], info: { node: TreeItem }) => void",
+      "description": "受控已加载键和加载完成通知。"
+    },
+    {
+      "name": "onLoadError",
+      "type": "(error: unknown, node: TreeItem) => void",
+      "description": "异步加载失败通知。"
+    },
+    {
+      "name": "showLine / showIcon",
+      "type": "boolean / boolean",
+      "description": "树连接线和节点图标；图标来自节点 icon。",
+      "default": "false"
+    },
+    {
+      "name": "titleRender",
+      "type": "(node: TreeItem) => ReactNode",
+      "description": "自定义树节点标题。"
+    },
+    {
+      "name": "height / virtual",
+      "type": "number / boolean",
+      "description": "树面板高度和窗口化渲染开关；高度默认 256px，virtual 默认 true。"
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\" | \"lg\"",
+      "description": "触发器高度为 24 / 28 / 34px。",
+      "default": "\"md\""
+    },
+    {
+      "name": "status",
+      "type": "\"error\" | \"warning\"",
+      "description": "校验边框状态。"
+    },
+    {
+      "name": "placement",
+      "type": "\"bottom-start\" | \"bottom-end\" | \"top-start\" | \"top-end\"",
+      "description": "弹层的方向与逻辑对齐。",
+      "default": "\"bottom-start\""
+    },
+    {
+      "name": "dropdownWidth",
+      "type": "CSSProperties[\"width\"]",
+      "description": "指定弹层宽度；默认跟随触发器，最小 180px 且受视口约束。"
+    },
+    {
+      "name": "prefix",
+      "type": "ReactNode",
+      "description": "触发器前缀内容。"
+    },
+    {
+      "name": "name / id",
+      "type": "string / string",
+      "description": "隐藏表单字段名与触发按钮 ID。"
+    },
+    {
+      "name": "className / style",
+      "type": "string / CSSProperties",
+      "description": "外层容器样式。"
+    },
+    {
+      "name": "aria-label / aria-labelledby",
+      "type": "string / string",
+      "description": "控件可访问名称。"
+    },
+    {
+      "name": "ref",
+      "type": "Ref<HTMLButtonElement>",
+      "description": "触发按钮引用，可调用 focus()。"
+    }
+  ],
+  "notes": [
+    "TreeKey 为 string | number。单选 value 是键或 null；多选 value 是键数组，不是路径数组。数字 1 与字符串 \"1\" 不同。",
+    "TreeItem 支持 id、label、children、disabled、disableCheckbox、checkable、selectable、isLeaf、icon。非文本 label 可补充 textValue 供搜索与标签移除按钮命名。",
+    "多选默认父子联动并返回全部勾选键；disabled、disableCheckbox 和 checkable=false 的节点阻断勾选传播。单选遵循 disabled 和 selectable；多选遵循勾选限制。",
+    "搜索只处理已提供的 items，保留匹配节点和祖先。筛选时勾选父节点仍以完整数据计算，不限于可见结果。",
+    "异步分支设 isLeaf=false，在 loadData 中获取数据并不可变更新 items；组件不存储服务端结果；非受控加载完成键会保留到组件卸载，关闭弹层不清空。搜索期间不会触发 loadData。",
+    "受控 value、open、searchValue、expandedKeys 和 loadedKeys 需由应用响应回调更新。默认值仅在初始化时使用。",
+    "name 对单选提交键文本，多选提交全部勾选键的 JSON 数组；禁用时不参与表单提交。与 Form 集成时使用 value / onValueChange。",
+    "尚未出现在 items 的选中键保留并显示键文本，支持异步数据更新；onValueChange 第二参数 nodes 仅包含已存在的节点。",
+    "上下键移动焦点，左右键展开、折叠或进入子级，Enter / 空格选择，Escape 关闭并回到触发器。搜索框按下箭头进入树。",
+    "不提供自动远程搜索或动态测量行高；虚拟树适合固定行高的单行节点。数据中的 id 必须全局唯一。"
+  ]
+},
+{
   "name": "Fieldset",
   "category": "数据录入",
   "description": "用原生 fieldset 与 legend 为相关表单控件分组，支持统一禁用。",
@@ -67,7 +266,7 @@ export const componentDocs: ComponentDoc[] = [
   "notes": [
     "Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 FormField 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。",
     "disabled 保留原生 fieldset 语义：本组第一个 legend 内的控件不受本组禁用影响，仍继承祖先禁用。",
-    "mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Segmented、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
+    "mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Segmented、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
     "原生 input/button/select/textarea 使用浏览器禁用语义；自定义第三方控件、链接、Menu 等非表单动作需应用自行传递 disabled。受控值仍由应用管理，Fieldset 不清空已有值。"
   ]
 },
