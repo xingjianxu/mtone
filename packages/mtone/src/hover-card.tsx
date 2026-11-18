@@ -107,7 +107,16 @@ export function HoverCard({
                 style={{ width }}
               >
                 {withArrow && (
-                  <PreviewCard.Arrow className="mt-hover-card-arrow" />
+                  <PreviewCard.Arrow className="mt-hover-card-arrow">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                      aria-hidden="true"
+                    >
+                      <path d="M0 7 6 1 12 7" />
+                    </svg>
+                  </PreviewCard.Arrow>
                 )}
                 <div className="mt-hover-card-content">
                   {title && <div className="mt-popup-title">{title}</div>}
