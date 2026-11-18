@@ -1,3 +1,4 @@
+import { ListExample } from "./list-example";
 import { BreadcrumbExample } from "./breadcrumb-example";
 import { ProgressExamples } from "./ProgressExamples";
 import { FieldsetExample } from "./fieldset-example";
@@ -612,6 +613,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     case "List":
+      return <ListExample compact={compact} />;
     case "ListItem":
       return (
         <M.List>

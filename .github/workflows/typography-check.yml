@@ -1,7 +1,7 @@
 name: Typography verification
 on:
   push:
-    branches: [feat-typography, docs/typography-nav, fix/focus-unify]
+    branches: [feat-typography, docs/typography-nav, fix/focus-unify, feat/list-upgrade]
   workflow_dispatch:
 permissions:
   contents: read
@@ -45,6 +45,11 @@ jobs:
       - run: node tests/divider.browser.mjs
       - run: node tests/button-group.browser.mjs
       - run: node tests/typography.browser.mjs
+      - name: List browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/list.browser.mjs
+          done
       - name: Typography navigation browser regressions
         run: |
           for browser in chromium firefox webkit; do

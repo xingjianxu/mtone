@@ -1,3 +1,4 @@
+import { List, ListItem } from "./list";
 import { useFieldsetDisabled } from "./fieldset-context";
 import { FloatingOwnerContext } from "./floating-owner";
 import { Card } from "./card";
@@ -206,34 +207,8 @@ export { Divider } from "./divider";
 export type { DividerProps } from "./divider";
 export { Card } from "./card";
 export type { CardProps, CardTokens, CardSemantic, CardTabItem, CardMetaProps, CardMetaSemantic, CardGridProps } from "./card";
-export const List = ({
-  className,
-  ...p
-}: React.HTMLAttributes<HTMLUListElement>) => (
-  <ul {...p} className={cn("mt-list", className)} />
-);
-export function ListItem({
-  children,
-  icon,
-  description,
-  actions,
-  ...p
-}: React.LiHTMLAttributes<HTMLLIElement> & {
-  icon?: React.ReactNode;
-  description?: React.ReactNode;
-  actions?: React.ReactNode;
-}) {
-  return (
-    <li {...p} className={cn("mt-list-item", p.className)}>
-      {icon}
-      <div className="mt-list-content">
-        <div>{children}</div>
-        {description && <small>{description}</small>}
-      </div>
-      {actions}
-    </li>
-  );
-}
+export { List, ListItem } from "./list";
+export type { ListProps, ListItemProps, ListHandle, ListScrollTarget } from "./list";
 export type DocumentItem = {
   id: string;
   title: string;

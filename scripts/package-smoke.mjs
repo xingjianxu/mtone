@@ -71,12 +71,14 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
 assert(renderToStaticMarkup(createElement(Image, {src:'/image.png',alt:'Image package check',preview:false})).includes('Image package check'));
 assert(renderToStaticMarkup(createElement(ImageGroup, {items:[{src:'/group.png',alt:'Group package check'}]})).includes('Group package check'));
 assert.equal(typeof ImagePreview, 'function');
+assert(renderToStaticMarkup(createElement(List,{items:['List package item'],renderItem:item=>item})).includes('List package item'));
+assert(renderToStaticMarkup(createElement(List,null,createElement(ListItem,null,'Legacy list'))).includes('Legacy list'));
 assert(renderToStaticMarkup(createElement(Progress, {value:60,type:'dashboard',showInfo:true,steps:8,color:{from:'#7d9c84',to:'#5378aa'}})).includes('60%'));
 assert(renderToStaticMarkup(createElement(Tabs, {items:[{value:'one',label:'Package tab',content:'Panel'}],variant:'card',placement:'start'})).includes('Package tab'));
 assert(renderToStaticMarkup(createElement(Divider, {titlePlacement:'start',variant:'dashed'}, 'Section')).includes('Section'));
@@ -128,7 +130,7 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { List, ListItem, type ListHandle, type ListProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
 const progressProps: ProgressProps = {value:40,type:'dashboard',showInfo:true,steps:{count:8,gap:3},success:{value:20},gapPosition:'right'};
 const progress = <Progress {...progressProps}/>;
 const overlayProps: LoadingOverlayProps = {visible:true,label:'Saving',opacity:0.8,blur:2,radius:4,zIndex:20,loader:null};
@@ -148,6 +150,11 @@ export function FormDemo() { const [form] = Form.useForm(); return <Form form={f
 export const cardDemo = <Card title="Title" htmlTitle="Tooltip" size="small" variant="outlined" styles={{body:{padding:12}}} classNames={({props})=>({root:props.size==='small'?'compact':''})} tabList={[{key:'one',label:'One'}]}><Card.Meta title="Metadata" description="Details"/><Card.Grid hoverable={false}>Grid</Card.Grid></Card>;
 export const splitterDemo = <Splitter orientation="horizontal" sizes={["40%","60%"]} onResize={sizes=>console.log(sizes)} style={{height:240}}><Splitter.Panel id="a" min="20%" collapsible>A</Splitter.Panel><Splitter.Panel id="b">B</Splitter.Panel></Splitter>;
 import {createRef} from 'react';
+const listRef=createRef<ListHandle>();
+const listProps: ListProps<{id:number;title:string}>={items:[{id:1,title:'One'}],getKey:item=>item.id,renderItem:item=>item.title,height:160,virtual:true};
+const list=<List {...listProps} ref={listRef}/>;
+listRef.current?.scrollTo({key:1,align:'center'});
+const legacyList=<List><ListItem description='Description'>Old content</ListItem></List>;
 const tabsProps: TabsProps = {items:[{value:'one',label:'One',content:'Panel',icon:'x',forceRender:true}],placement:'end',variant:'editable-card',onEdit:(action,key)=>console.log(action,key),reorderable:true,onOrderChange:keys=>console.log(keys)};
 export const tabsDemo = <Tabs {...tabsProps}/>;
 const dividerProps: DividerProps = {orientation:"horizontal",variant:"dotted",size:"small",titlePlacement:"end",plain:true};

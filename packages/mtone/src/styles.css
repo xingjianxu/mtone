@@ -372,6 +372,16 @@
   flex: 1;
   min-width: 0;
 }
+/* Data lists keep the original children/ListItem presentation intact. */
+.mt-list-data { position: relative; isolation: isolate; }
+.mt-list-row { box-sizing: border-box; padding: 8px; border-bottom: 1px solid var(--mt-border, #e9e9e7); overflow-wrap: anywhere; }
+.mt-list-hoverable .mt-list-row:hover { background: var(--mt-hover, #f1f1ef); }
+.mt-list-group { box-sizing: border-box; padding: 6px 8px; background: var(--mt-bg, #fff); color: var(--mt-muted, #787774); font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--mt-border, #e9e9e7); }
+.mt-list-group-sticky { position: sticky; top: 0; z-index: 1; }
+.mt-list-state { padding: 12px 8px; color: var(--mt-muted, #787774); text-align: center; }
+.mt-list-data:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
+.mt-list-virtual { overflow-anchor: none; }
+
 .mt-link {
   border: 0;
   background: none;
