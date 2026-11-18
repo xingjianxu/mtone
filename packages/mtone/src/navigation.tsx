@@ -1,13 +1,14 @@
 import * as React from "react";
 import {
   ChevronRight,
+  ChevronDown,
   X,
   PanelLeftClose,
   PanelLeftOpen,
   Circle,
 } from "lucide-react";
 import { cn, IconButton, useMtone } from "./basic";
-import { Tooltip } from "./interactive";
+import { Menu, type MenuProps, Tooltip } from "./interactive";
 const SidebarContext = React.createContext(false);
 export type SidebarProps = React.HTMLAttributes<HTMLElement> & {
   header?: React.ReactNode | ((collapsed: boolean) => React.ReactNode);
@@ -164,26 +165,124 @@ export function NavGroup({
     </div>
   );
 }
+export interface BreadcrumbItem {
+  key?: React.Key;
+  label: React.ReactNode;
+  icon?: React.ReactNode;
+  href?: string;
+  target?: React.HTMLAttributeAnchorTarget;
+  rel?: string;
+  disabled?: boolean;
+  "aria-label"?: string;
+  /** Separator after this item; null hides it. */
+  separator?: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
+  menu?: Omit<MenuProps, "trigger">;
+}
+export interface BreadcrumbProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "children"
+> {
+  items: BreadcrumbItem[];
+  separator?: React.ReactNode;
+}
 export function Breadcrumb({
   items,
+  separator = <ChevronRight size={12} />,
   "aria-label": label = "Breadcrumb",
-}: {
-  items: { label: React.ReactNode; href?: string }[];
-  "aria-label"?: string;
-}) {
+  ...props
+}: BreadcrumbProps) {
+  const id = React.useId();
   return (
-    <nav aria-label={label}>
+    <nav aria-label={label} {...props}>
       <ol className="mt-breadcrumb">
-        {items.map((x, i) => (
-          <li key={i}>
-            {i > 0 && <ChevronRight size={12} />}
-            {i === items.length - 1 ? (
-              <span aria-current="page">{x.label}</span>
-            ) : (
-              <a href={x.href}>{x.label}</a>
-            )}
-          </li>
-        ))}
+        {items.map((item, i) => {
+          const current = i === items.length - 1;
+          const hasMenu = !item.disabled && !!item.menu?.items.length;
+          const content = (
+            <>
+              {item.icon != null && (
+                <span className="mt-breadcrumb-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
+              )}
+              {item.label}
+            </>
+          );
+          const common = {
+            id: `${id}-${i}`,
+            className: "mt-breadcrumb-content",
+            "aria-label": item["aria-label"],
+            "aria-current": current ? ("page" as const) : undefined,
+            "aria-disabled": item.disabled || undefined,
+          };
+          const link = !current && !item.disabled && item.href !== undefined;
+          const action = !current && !item.disabled && !!item.onClick;
+          const separateTrigger = link || action || current;
+          const previous = items[i - 1];
+          const divider =
+            previous?.separator === undefined ? separator : previous.separator;
+          return (
+            <li key={item.key ?? i}>
+              {i > 0 &&
+                divider != null &&
+                divider !== false &&
+                divider !== "" && (
+                  <span className="mt-breadcrumb-separator" aria-hidden="true">
+                    {divider}
+                  </span>
+                )}
+              <span className="mt-breadcrumb-item">
+                {(!hasMenu || separateTrigger) &&
+                  (link ? (
+                    <a
+                      {...common}
+                      href={item.href}
+                      target={item.target}
+                      rel={
+                        item.rel ??
+                        (item.target === "_blank"
+                          ? "noopener noreferrer"
+                          : undefined)
+                      }
+                      onClick={item.onClick}
+                    >
+                      {content}
+                    </a>
+                  ) : action ? (
+                    <button {...common} type="button" onClick={item.onClick}>
+                      {content}
+                    </button>
+                  ) : (
+                    <span {...common}>{content}</span>
+                  ))}
+                {hasMenu && (
+                  <Menu
+                    {...item.menu!}
+                    trigger={
+                      <button
+                        type="button"
+                        className={cn(
+                          "mt-breadcrumb-content mt-breadcrumb-menu-trigger",
+                          separateTrigger && "mt-breadcrumb-menu-arrow",
+                        )}
+                        aria-label={item["aria-label"]}
+                        aria-labelledby={
+                          separateTrigger && !item["aria-label"]
+                            ? `${id}-${i}`
+                            : undefined
+                        }
+                      >
+                        {!separateTrigger && content}
+                        <ChevronDown size={12} aria-hidden="true" />
+                      </button>
+                    }
+                  />
+                )}
+              </span>
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

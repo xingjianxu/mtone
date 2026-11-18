@@ -3057,25 +3057,59 @@ export const componentDocs: ComponentDoc[] = [
     notes: ["同组相邻 NavItem 之间保留 3px 间距，与侧边栏菜单一致；分组标题和组间距保持不变。"],
   },
   {
-    name: "Breadcrumb",
-    category: "导航切换",
-    description: "显示层级路径，最后一项为当前位置。",
-    importNames: ["Breadcrumb"],
-    code: 'import { Breadcrumb } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Breadcrumb items={[{label:"首页",href:"#"},{label:"知识库",href:"#"},{label:"组件规范"}]} />\n  );\n}',
-    props: [
-      {
-        name: "items",
-        type: "{ label: ReactNode; href?: string }[]",
-        description: "必填；按层级排列。",
-      },
-      {
-        name: "aria-label",
-        type: "string",
-        description: "导航区域名称。",
-        default: "Breadcrumb",
-      },
-    ],
-    notes: ['最后一项使用 aria-current="page"，不渲染链接。', '链接悬停采用中性灰底与正文色，不显示下划线；键盘焦点保留可见轮廓。'],
+      "name": "Breadcrumb",
+      "category": "导航切换",
+      "description": "紧凑的层级路径，支持图标、下拉菜单与自定义分隔符。",
+      "importNames": [
+        "Breadcrumb"
+      ],
+      "code": "import { Home } from \"lucide-react\";\nimport { Breadcrumb } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Breadcrumb separator=\"/\" items={[\n    { label: \"首页\", icon: <Home size={14} />, href: \"#/\" },\n    { label: \"组件\", href: \"#/components\", menu: {\n      items: [{ key: \"menu\", label: \"Menu\", onSelect: () => { window.location.hash = \"/components/Menu\"; } }],\n      align: \"left\"\n    } },\n    { label: \"Breadcrumb\" }\n  ]} />;\n}",
+      "props": [
+        {
+          "name": "items",
+          "type": "BreadcrumbItem[]",
+          "description": "必填。保留 label/href 用法；可指定 key、icon、aria-label、disabled、onClick、target、rel、separator 和 menu。"
+        },
+        {
+          "name": "separator",
+          "type": "ReactNode",
+          "default": "ChevronRight 图标",
+          "description": "全局分隔符；每项 separator 覆盖其后的分隔符，null/false/空字符串隐藏。最后一项不显示后置分隔符。"
+        },
+        {
+          "name": "items[].icon / aria-label",
+          "type": "ReactNode / string",
+          "description": "icon 显示在文字前并对辅助技术隐藏。纯图标请传 label={null} 和可访问 aria-label；复杂图文菜单也建议提供 aria-label。"
+        },
+        {
+          "name": "items[].menu",
+          "type": "Omit<MenuProps, 'trigger'>",
+          "description": "复用本库 Menu：items、onSelect、open/defaultOpen/onOpenChange、width、align。支持分组、禁用及二级菜单；默认内容自适应宽度。空菜单不渲染按钮。"
+        },
+        {
+          "name": "items[].onClick",
+          "type": "MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>",
+          "description": "非末项有 href 时绑定链接；否则渲染操作按钮，可由应用路由处理。末项保持当前位置的非交互文本。"
+        },
+        {
+          "name": "items[].disabled",
+          "type": "boolean",
+          "default": "false",
+          "description": "禁用该项的链接、操作和菜单。"
+        },
+        {
+          "name": "aria-label / className / style",
+          "type": "原生 nav 属性",
+          "default": "aria-label=\"Breadcrumb\"",
+          "description": "导航可访问名称和外层样式；其余原生 nav 属性透传。"
+        }
+      ],
+      "notes": [
+        "保持 label/href API 与最后一项 aria-current=\"page\" 的行为；无 href/onClick/menu 的祖先项是普通文本，不创建无目标链接。",
+        "链接或操作同时带 menu 时文字与箭头按钮独立；末项带菜单时仍单独保留当前页文本。不要在 label 内嵌入链接或按钮。",
+        "菜单通过点击、Enter/Space 或 ArrowDown 展开，复用 Menu 的方向键、Esc 和焦点返回。菜单项导航通过 onSelect 交给应用路由；本组件不拼接路由参数。",
+        "灰色 hover、无下划线，保留可见键盘焦点。紧凑图标与正文居中，窄容器自动换行。"
+      ]
   },
   {
     name: "Tree",
