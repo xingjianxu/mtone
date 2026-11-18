@@ -499,7 +499,9 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
           );
         if (item.children?.length)
           return (
-            <BMenu.SubmenuRoot key={item.key}>
+            <BMenu.SubmenuRoot key={item.key} onOpenChange={(open, details) => {
+              if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("debugFocus")) console.log("MT_SUBMENU", performance.now(), item.key, open, details.reason, details.event?.type, document.activeElement?.textContent);
+            }}>
               <BMenu.SubmenuTrigger
                 className={className}
                 disabled={item.disabled}
@@ -645,6 +647,7 @@ export function Menubar({
             key={menu.key}
             open={!disabled && !menu.disabled && activeKey === menu.key}
             onOpenChange={(open, details) => {
+              if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("debugFocus")) console.log("MT_MENUBAR", performance.now(), menu.key, open, details.reason, details.event?.type, activeRef.current, document.activeElement?.textContent);
               if (details.reason === "sibling-open") return;
               if (open) changeOpen(menu.key);
               else if (activeRef.current === menu.key) changeOpen(null);
