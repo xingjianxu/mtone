@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { Search } from "lucide-react";
 import { Input, useMtone } from "./basic";
+import { useFieldsetDisabled } from "./fieldset-context";
 import { Dialog } from "./interactive";
 
 export interface SpotlightAction {
@@ -44,6 +44,7 @@ export function Spotlight({ actions, trigger, open, defaultOpen = false, onOpenC
   title, placeholder, nothingFound, limit = 20, filter, onActionSelect,
   closeOnSelect = true, resetQueryOnClose = true, className }: SpotlightProps) {
   const { locale } = useMtone();
+  const disabled = useFieldsetDisabled();
   const zh = locale === "zh";
   const [localOpen, setLocalOpen] = React.useState(defaultOpen);
   const [localQuery, setLocalQuery] = React.useState(defaultQuery);
@@ -103,8 +104,8 @@ export function Spotlight({ actions, trigger, open, defaultOpen = false, onOpenC
   }
   return <Dialog title={title ?? (zh ? "快捷操作" : "Command palette")} trigger={trigger}
     open={shown} onOpenChange={changeOpen} modal={false} className={["mt-spotlight", className].filter(Boolean).join(" ")}>
-    <div className="mt-spotlight-search"><Search size={18} aria-hidden="true" />
-      <Input ref={input} value={search} onChange={event => changeQuery(event.target.value)}
+    <div className="mt-spotlight-search">
+      <Input.Search disabled={disabled} ref={input} value={search} onChange={event => changeQuery(event.target.value)}
         placeholder={placeholder ?? (zh ? "搜索操作或页面…" : "Search actions or pages…")}
         aria-label={placeholder ?? (zh ? "搜索操作" : "Search actions")} role="combobox"
         aria-autocomplete="list" aria-expanded={shown} aria-controls={`${id}-list`}

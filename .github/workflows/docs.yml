@@ -29,6 +29,7 @@ jobs:
       - run: node tests/select-layout.browser.mjs
       - run: node tests/select-focus.browser.mjs
       - run: node tests/spotlight.browser.mjs
+      - run: node tests/input-family.browser.mjs
       - run: node tests/input-focus.browser.mjs
       - run: node tests/field-focus.browser.mjs
       - run: node tests/focus-unify.browser.mjs

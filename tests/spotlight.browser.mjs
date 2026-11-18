@@ -14,6 +14,12 @@ try {
   const search = page.getByRole("combobox");
   await search.waitFor();
   await page.waitForFunction(() => document.activeElement?.getAttribute("role") === "combobox");
+  assert.equal(await page.locator(".mt-spotlight-search .mt-search").count(), 1);
+  assert.equal(await page.locator(".mt-spotlight-search svg").count(), 1);
+  const inputBox = await page.locator(".mt-spotlight-search .mt-search").boundingBox();
+  const wrapperBox = await page.locator(".mt-spotlight-search").boundingBox();
+  assert.equal(inputBox.height, 28);
+  assert(Math.abs(inputBox.width - wrapperBox.width) < 1);
   const geometry = await page.getByRole("dialog").evaluate(el => {
    const r=el.getBoundingClientRect();
    const list=el.querySelector('[role="listbox"]');

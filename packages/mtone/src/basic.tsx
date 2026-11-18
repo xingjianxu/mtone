@@ -4,10 +4,8 @@ import { FloatingOwnerContext } from "./floating-owner";
 import { Card } from "./card";
 import * as React from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
-import { Input as BaseInput } from "@base-ui/react/input";
 import {
   LoaderCircle,
-  Search,
   X,
   FileText,
   Inbox,
@@ -126,37 +124,8 @@ export const ButtonGroup = ({
 }: ButtonGroupProps) => (
   <div role="group" {...p} className={cn("mt-button-group", connected && "mt-button-group-connected", className)} />
 );
-export const Input = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(function Input({ className, ...p }, r) {
-  p = { ...p, disabled: useFieldsetDisabled(p.disabled) };
-  return <BaseInput {...p} ref={r} className={cn("mt-input mt-input-control", className)} />;
-});
-export const Textarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>
->(function Textarea({ className, ...p }, r) {
-  p = { ...p, disabled: useFieldsetDisabled(p.disabled) };
-  return (
-    <textarea
-      {...p}
-      ref={r}
-      className={cn("mt-input mt-textarea", className)}
-    />
-  );
-});
-export const SearchInput = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(function SearchInput({ className, ...p }, r) {
-  return (
-    <span className="mt-search">
-      <Search size={15} />
-      <BaseInput {...p} ref={r} className={cn("mt-input", className)} />
-    </span>
-  );
-});
+export { Input, SearchInput, Textarea } from "./input";
+export type { InputProps, InputSearchProps, InputPasswordProps, InputTextAreaProps, InputOTPProps, InputVariant, InputControlSize } from "./input";
 export { Form, FormField } from "./form";
 export type { FormProps, FormFieldProps, FormRule, FormInstance, FormValues, FormValidationError, FormValidateTrigger } from "./form";
 export type Tone = "neutral" | "blue" | "green" | "orange" | "red" | "purple";

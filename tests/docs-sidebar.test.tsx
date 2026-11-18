@@ -14,12 +14,12 @@ test("sidebar preserves semantic groups and guide order while sorting component 
   for (const heading of headings) {
     const names = Array.from(heading.parentElement!.querySelectorAll("a"), (link) => link.textContent);
     const expected = componentDocs
-      .filter((doc) => doc.category === heading.textContent && !["Title", "Text", "Paragraph", "Link", "Blockquote"].includes(doc.name))
+      .filter((doc) => doc.category === heading.textContent && !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"].includes(doc.name))
       .map((doc) => doc.name)
       .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
     expect(names).toEqual(expected);
   }
   expect(Array.from(sidebar.querySelectorAll('a:not([href^="#/components/"])'), (link) => link.getAttribute("href")))
     .toEqual(["#/start", "#/gallery", "./showcase.html", "#/theme"]);
-  expect(sidebar.querySelectorAll('a[href^="#/components/"]')).toHaveLength(componentDocs.length - 5);
+  expect(sidebar.querySelectorAll('a[href^="#/components/"]')).toHaveLength(componentDocs.length - 7);
 });

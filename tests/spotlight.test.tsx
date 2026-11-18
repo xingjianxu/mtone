@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import { Button, Spotlight } from "../packages/mtone/src";
+import { Button, Fieldset, Spotlight } from "../packages/mtone/src";
 const actions = [
   { id: "home", label: "首页", group: "页面", keywords: ["home"], description: "查看工作台" },
   { id: "locked", label: "禁用", disabled: true, group: "页面" },
@@ -70,4 +70,22 @@ test("disabled pointer actions and IME Enter do not execute", async () => {
   fireEvent.click(screen.getByRole("option", { name: "禁用" }));
   fireEvent.keyDown(input, { key: "Enter", isComposing: true });
   expect(selected).not.toHaveBeenCalled();
+});
+test("uses SearchInput with one embedded icon and keeps its input focused after clearing", async () => {
+  render(<Spotlight defaultOpen actions={actions} defaultQuery="home" />);
+  const input = await screen.findByRole("combobox");
+  expect(input.parentElement).toHaveClass("mt-search");
+  expect(input.closest(".mt-spotlight-search")?.querySelectorAll("svg")).toHaveLength(1);
+  await waitFor(() => expect(input).toHaveFocus());
+  fireEvent.change(input, { target: { value: "" } });
+  expect(input).toHaveValue("");
+  expect(screen.getAllByRole("option")).toHaveLength(3);
+  expect(input).toHaveFocus();
+});
+
+test("search respects disabled Fieldset across the dialog portal", async () => {
+  const { rerender } = render(<Fieldset disabled><Spotlight defaultOpen actions={actions} /></Fieldset>);
+  expect(await screen.findByRole("combobox")).toBeDisabled();
+  rerender(<Fieldset><Spotlight defaultOpen actions={actions} /></Fieldset>);
+  expect(screen.getByRole("combobox")).toBeEnabled();
 });

@@ -2016,7 +2016,7 @@ export const componentDocs: ComponentDoc[] = [
     "方向键上下循环选择可用项，Home/End 到首尾，Enter 执行，Esc 关闭。禁用项显示但不会执行。焦点保持在搜索框，关闭与焦点恢复由 Dialog 处理。",
     "默认选择后先关闭并请求清空查询，然后调用 action.onSelect 和 onActionSelect。回调不自动导航、等待异步任务、捕获业务错误或保存数据，业务逻辑由应用负责。",
     "open/query 受控时，父组件必须响应对应回调更新状态。resetQueryOnClose 作用于组件发出的关闭请求；外部直接改变 open 不应被视为自动重置 query 的保证。",
-    "面板复用 mtone Dialog 和 Input。示例动作只修改本地演示状态，不发送网络请求。"
+    "面板复用 mtone Dialog 和 Input.Search，搜索框沿用 Input.Search 的紧凑尺寸及内嵌搜索图标。示例动作只修改本地演示状态，不发送网络请求。"
   ]
 },
   {
@@ -2272,50 +2272,120 @@ export const componentDocs: ComponentDoc[] = [
     notes: ['Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
   },
   {
-    name: "Input",
-    category: "数据录入",
-    description: "单行文本输入，保留标准 HTML 输入接口。",
-    importNames: ["Input"],
-    code: 'import { Input } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Input aria-label="标题" placeholder="输入标题" />\n  );\n}',
-    props: [
-      {
-        name: "value / defaultValue",
-        type: "string",
-        description: "受控值或非受控初始值。",
-      },
-      {
-        name: "onChange",
-        type: "ChangeEventHandler",
-        description: "接收原生 React change 事件。",
-      },
-      {
-        name: "placeholder",
-        type: "string",
-        description: "输入提示。",
-      },
-      {
-        name: "disabled / readOnly",
-        type: "boolean",
-        description: "禁用或只读。",
-      },
-      {
-        name: "aria-label / id",
-        type: "string",
-        description: "可访问名称或与 label 关联的标识。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
-    ],
-    notes: ["默认单行外框高度为 28px（含边框）；comfortable 密度保留 36px。可使用 style 或 --mt-height 定制，不影响 Textarea 的多行高度。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "全库焦点颜色统一使用 --mt-focus（默认浅蓝 #93B4DC）；非输入控件保留 1px 内嵌键盘焦点细线，不加粗、不改变布局。Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea、Select、MultiSelect、NumberInput、DatePicker 及 Table 筛选输入采用相同边框聚焦效果。"],
-  },
+  "name": "Input",
+  "category": "数据录入",
+  "description": "紧凑输入家族：基础、搜索、密码、多行文本与分格验证码。",
+  "importNames": [
+    "Input"
+  ],
+  "code": "import { Input } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <div style={{ display: \"grid\", gap: 12 }}>\n    <Input placeholder=\"标题\" aria-label=\"标题\" allowClear showCount maxLength={40} />\n    <Input.Search placeholder=\"搜索\" aria-label=\"搜索\" searchButton=\"搜索\" onSearch={value => console.log(value)} />\n    <Input.Password aria-label=\"密码\" autoComplete=\"new-password\" />\n    <Input.TextArea aria-label=\"备注\" autoSize={{ minRows: 2, maxRows: 5 }} />\n    <Input.OTP aria-label=\"验证码\" length={6} />\n  </div>;\n}",
+  "props": [
+    {
+      "name": "value / defaultValue",
+      "type": "string | number | readonly string[]",
+      "description": "原生受控值或初始值；不要在生命周期内切换受控模式。"
+    },
+    {
+      "name": "onChange",
+      "type": "React.ChangeEventHandler<HTMLInputElement>",
+      "description": "接收原生输入事件，清除按钮也触发值为空的 change。"
+    },
+    {
+      "name": "prefix / suffix",
+      "type": "ReactNode",
+      "description": "输入框内前后缀；切换内容不会重建输入节点。"
+    },
+    {
+      "name": "allowClear / onClear / clearLabel",
+      "type": "boolean / () => void / string",
+      "description": "显示清除按钮、清除通知与按钮可访问名称；禁用或只读时不显示。"
+    },
+    {
+      "name": "controlSize",
+      "type": "'sm' | 'md' | 'lg'",
+      "description": "视觉尺寸。原生数字 size 属性仍保持原义。",
+      "default": "md"
+    },
+    {
+      "name": "variant",
+      "type": "'outlined' | 'filled' | 'borderless' | 'underlined'",
+      "description": "外观变体。",
+      "default": "outlined"
+    },
+    {
+      "name": "status",
+      "type": "'error' | 'warning'",
+      "description": "校验状态；错误会设置 aria-invalid。"
+    },
+    {
+      "name": "showCount / countCharacters",
+      "type": "boolean / (value: string) => number",
+      "description": "显示字符数，默认按 JS 字符串长度计数；自定义计数不改变原生 maxLength 截断规则。"
+    },
+    {
+      "name": "className / style / wrapperClassName",
+      "type": "string / CSSProperties / string",
+      "description": "className/style 保留在原生 input；wrapperClassName 设置外层容器。"
+    },
+    {
+      "name": "disabled / readOnly / ref / 原生属性",
+      "type": "HTMLInputElement attributes",
+      "description": "继承 Fieldset 禁用；ref 指向原生 input，可调用 focus/select/setSelectionRange。"
+    },
+    {
+      "name": "Input.Search: onSearch / searchButton / loading",
+      "type": "(value: string) => void / ReactNode / boolean",
+      "description": "Enter 或可选搜索按钮触发搜索；loading/disabled 阻止提交，输入法组合期间不提交。输入变化和清除只触发 onChange，不自动搜索。"
+    },
+    {
+      "name": "Input.Password: visible / defaultVisible / onVisibleChange",
+      "type": "boolean / boolean / (visible: boolean) => void",
+      "description": "受控或非受控的密码显示状态；默认隐藏。"
+    },
+    {
+      "name": "Input.TextArea: autoSize",
+      "type": "boolean | { minRows?: number; maxRows?: number }",
+      "description": "内容与容器宽度变化时自动调整高度，默认关闭；启用时默认至少2行，达到最大行数后滚动。"
+    },
+    {
+      "name": "Input.TextArea: 通用属性",
+      "type": "TextareaHTMLAttributes + InputAppearance",
+      "description": "支持 variant/status/controlSize/showCount/countCharacters 和原生 textarea 属性；ref 为 HTMLTextAreaElement，不支持 prefix/suffix/allowClear。"
+    },
+    {
+      "name": "Input.OTP: value / defaultValue / onValueChange / onComplete",
+      "type": "string / string / (value: string) => void / (value: string) => void",
+      "description": "连续字符串模型；值变化通知 onValueChange，填满时通知 onComplete，不发送或验证验证码。"
+    },
+    {
+      "name": "Input.OTP: length / mask / separator",
+      "type": "number / boolean / ReactNode",
+      "description": "默认6格，限制1–32；mask 使用原生密码显示，separator 在格间显示装饰。"
+    },
+    {
+      "name": "Input.OTP: inputMode / name / form / disabled / readOnly",
+      "type": "native attributes",
+      "description": "inputMode 默认 numeric，仅作为键盘提示，不限制内容；name 通过隐藏字段提交整串值。"
+    },
+    {
+      "name": "Input.OTP: controlSize / ref / aria-label",
+      "type": "'sm' | 'md' | 'lg' / Ref<HTMLInputElement> / string",
+      "description": "ref 指向第一格；为验证码组提供可访问名称。"
+    }
+  ],
+  "notes": [
+    "默认单行28px，comfortable密度36px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。",
+    "Input.Search 是搜索子组件；SearchInput 是同一组件的兼容导出。Input.TextArea 与 Textarea 也是同一组件；新代码推荐子组件写法。",
+    "原生 size、type、name、form、aria-* 和原生 ref 保留。className/style 面向原生输入，不代表外层容器。",
+    "Input.OTP 支持粘贴、组合输入、方向键与删除；删除会将后续字符前移，不保留空格占位。空白字符会移除。mask 不提供任意字符替换。",
+    "Search/Password 支持基础输入通用属性；TextArea/OTP 使用各自的原生属性，不能假定所有基础输入属性可通用。",
+    "本页示例仅演示界面交互，不执行真实搜索、登录或验证码验证。"
+  ]
+},
   {
     name: "SearchInput",
     category: "数据录入",
-    description: "带搜索图标的输入框，不注册全局快捷键。",
+    description: "Input.Search 的兼容导出；新代码推荐 Input.Search。",
     importNames: ["SearchInput"],
     code: 'import { SearchInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <SearchInput aria-label="搜索文档" placeholder="搜索文档…" />\n  );\n}',
     props: [
@@ -2356,7 +2426,7 @@ export const componentDocs: ComponentDoc[] = [
   {
     name: "Textarea",
     category: "数据录入",
-    description: "用于多行说明和长文本的输入框。",
+    description: "Input.TextArea 的兼容导出，用于多行说明和长文本。",
     importNames: ["Textarea"],
     code: 'import { Textarea } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Textarea aria-label="说明" rows={4} placeholder="记录你的想法" />\n  );\n}',
     props: [

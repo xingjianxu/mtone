@@ -1,3 +1,4 @@
+import { InputExample } from "./input-example";
 import { ListExample } from "./list-example";
 import { BreadcrumbExample } from "./breadcrumb-example";
 import { ProgressExamples } from "./ProgressExamples";
@@ -236,17 +237,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     case "Input":
-      return (
-        <div style={stackStyle}>
-          <M.Input
-            aria-label="文档标题"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <M.Text muted>当前值：{text || "（空）"}</M.Text>
-          <M.Input aria-label="禁用输入框" disabled placeholder="不可编辑" />
-        </div>
-      );
+      return <InputExample compact={compact} />;
     case "SearchInput":
       return (
         <div style={stackStyle}>

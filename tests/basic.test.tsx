@@ -80,9 +80,9 @@ it.each(["neutral", "blue", "green", "orange", "red", "purple"] as const)("prese
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
 
-test("Input retains its specific class marker while SearchInput and Textarea use shared input styling", () => {
+test("Input and Input.Search share single-line styling while Textarea remains multiline", () => {
   const { container } = render(<><Input aria-label="plain" /><SearchInput aria-label="search" /><Textarea aria-label="multiline" /></>);
   expect(container.querySelector('[aria-label="plain"]')).toHaveClass("mt-input-control");
-  expect(container.querySelector('[aria-label="search"]')).not.toHaveClass("mt-input-control");
+  expect(container.querySelector('[aria-label="search"]')).toHaveClass("mt-input-control");
   expect(container.querySelector('[aria-label="multiline"]')).not.toHaveClass("mt-input-control");
 });

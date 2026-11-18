@@ -1,0 +1,226 @@
+.mt-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  vertical-align: middle;
+  box-sizing: border-box;
+  color: var(--mt-fg, #37352f);
+  font: inherit;
+}
+.mt-input-wrap.mt-input-size-sm {
+  --mt-input-height: 24px;
+}
+.mt-input-wrap.mt-input-size-md {
+  --mt-input-height: var(--mt-height, 28px);
+}
+.mt-input-wrap.mt-input-size-lg {
+  --mt-input-height: 36px;
+}
+.mt-input-wrap > .mt-input-control {
+  height: var(--mt-input-height);
+}
+.mt-input-decorated {
+  min-height: var(--mt-input-height);
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: 4px;
+  background: var(--mt-bg, #fff);
+  gap: 6px;
+  padding: 0 8px;
+}
+.mt-input-decorated > .mt-input-control {
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  height: calc(var(--mt-input-height) - 2px);
+  padding: 3px 0;
+  flex: 1 1 0%;
+}
+.mt-input-decorated:focus-within:not([data-disabled]):not(
+    [data-status="error"]
+  ):not([data-status="warning"]) {
+  border-color: var(--mt-focus, #93b4dc);
+}
+.mt-input-prefix,
+.mt-input-suffix {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  color: var(--mt-muted, #787774);
+}
+.mt-input-prefix > svg,
+.mt-input-suffix > svg {
+  flex: none;
+}
+.mt-input-wrap .mt-input-action {
+  display: inline-flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--mt-muted, #787774);
+  cursor: pointer;
+  padding: 0;
+}
+.mt-input-wrap .mt-input-action:hover:not(:disabled) {
+  background: var(--mt-hover, #efefed);
+}
+.mt-input-wrap .mt-input-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.mt-input-wrap .mt-input-action:focus-visible,
+.mt-input-search-button:focus-visible {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
+}
+.mt-input-count {
+  flex: none;
+  color: var(--mt-muted, #787774);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.mt-input-wrap[data-disabled] {
+  opacity: 0.6;
+}
+.mt-input-wrap[data-disabled] > .mt-input {
+  opacity: 1;
+}
+.mt-input-decorated[data-disabled] {
+  background: #f7f7f5;
+}
+.mt-input-variant-filled {
+  background: var(--mt-hover, #f4f4f2);
+}
+.mt-input-variant-filled > .mt-input {
+  background: var(--mt-hover, #f4f4f2);
+}
+.mt-input-variant-borderless,
+.mt-input-variant-borderless > .mt-input {
+  border-color: transparent;
+  background: transparent;
+}
+.mt-input-variant-underlined,
+.mt-input-variant-underlined > .mt-input {
+  border-radius: 0;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.mt-input-wrap[data-status="error"],
+.mt-input-wrap[data-status="error"] > .mt-input {
+  border-color: #c66660;
+}
+.mt-input-wrap[data-status="warning"],
+.mt-input-wrap[data-status="warning"] > .mt-input {
+  border-color: #b68b46;
+}
+.mt-search.mt-input-search {
+  position: relative;
+}
+.mt-search.mt-input-search > .mt-input {
+  padding-left: 0;
+}
+.mt-input-search-button {
+  border: 0;
+  border-left: 1px solid var(--mt-border, #e9e9e7);
+  padding: 0 9px;
+  height: calc(var(--mt-input-height) - 2px);
+  margin-right: -8px;
+  border-radius: 0 3px 3px 0;
+  background: var(--mt-hover, #f4f4f2);
+  color: var(--mt-fg, #37352f);
+  font: inherit;
+  cursor: pointer;
+}
+.mt-input-search-button:hover:not(:disabled) {
+  background: #e9e9e7;
+}
+.mt-input-search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.mt-textarea-wrap {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+.mt-textarea-wrap > .mt-input-count {
+  align-self: flex-end;
+}
+.mt-input-otp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mt-input-otp > .mt-input {
+  width: 32px;
+  flex: none;
+  text-align: center;
+  padding: 4px;
+}
+.mt-input-otp-sm > .mt-input {
+  width: 28px;
+  height: 24px;
+}
+.mt-input-otp-lg > .mt-input {
+  width: 38px;
+  height: 36px;
+}
+@media (forced-colors: active) {
+  .mt-input-decorated:focus-within {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
+  .mt-input-wrap .mt-input-action:focus-visible,
+  .mt-input-search-button:focus-visible {
+    outline-color: Highlight;
+  }
+}
+/* Preserve variant/status meaning against the global native-input focus rule. */
+.mt-input-variant-underlined:not(.mt-input-decorated):focus-within > .mt-input,
+.mt-input-variant-underlined.mt-input-decorated:focus-within {
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+.mt-input-variant-borderless:focus-within > .mt-input,
+.mt-input-variant-borderless.mt-input-decorated:focus-within {
+  border-color: transparent !important;
+}
+.mt-input-variant-borderless:not(.mt-input-decorated):focus-within > .mt-input,
+.mt-input-variant-borderless.mt-input-decorated:focus-within {
+  box-shadow: inset 0 -1px var(--mt-focus, #93b4dc);
+}
+.mt-input-wrap[data-status="warning"] > .mt-input:focus {
+  border-color: #b68b46 !important;
+}
+.mt-input-variant-underlined[data-status="warning"] > .mt-input:focus {
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+.mt-input-variant-borderless[data-status="warning"] > .mt-input:focus {
+  border-color: transparent !important;
+  box-shadow: inset 0 -1px #b68b46;
+}
+.mt-input-variant-borderless[data-status="error"]:focus-within > .mt-input,
+.mt-input-variant-borderless.mt-input-decorated[data-status="error"]:focus-within { box-shadow: inset 0 -1px #c66660; }
+.mt-input-variant-borderless.mt-input-decorated[data-status="warning"]:focus-within { box-shadow: inset 0 -1px #b68b46; }
+/* The decorated surface owns the indicator, never its inner input too. */
+.mt-input-variant-borderless.mt-input-decorated > .mt-input:focus { box-shadow: none; }
+.mt-input-variant-underlined > .mt-input,
+.mt-input-variant-underlined.mt-input-decorated {
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+.mt-input-variant-borderless > .mt-input,
+.mt-input-variant-borderless.mt-input-decorated { border-color: transparent !important; }

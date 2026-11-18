@@ -71,8 +71,12 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { TreeSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { Input, SearchInput, Textarea, TreeSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
+assert.equal(Input.Search, SearchInput);
+assert.equal(Input.TextArea, Textarea);
+assert(renderToStaticMarkup(createElement(Input.Password, {'aria-label':'Password package'})).includes('type="password"'));
+assert(renderToStaticMarkup(createElement(Input.OTP, {length:4})).includes('mt-input-otp'));
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
 assert(renderToStaticMarkup(createElement(TreeSelect,{items:[{id:'one',label:'Package node'}],defaultValue:'one'})).includes('Package node'));
 assert(renderToStaticMarkup(createElement(Image, {src:'/image.png',alt:'Image package check',preview:false})).includes('Image package check'));
@@ -147,6 +151,7 @@ const legacyMenuProps: DropdownMenuProps = menuProps;
 const menu = <><Menu {...menuProps}/><DropdownMenu {...legacyMenuProps}/></>;
 import '@bixlab/mtone/styles.css';
 export const demo = <Layout><Layout.Sider version="v1" collapsible /><Layout><Layout.Header /><Layout.Content><Toast><Button variant="blue">OK</Button></Toast></Layout.Content></Layout></Layout>;
+export const inputFamily = <><Input prefix="@" allowClear showCount controlSize="sm" variant="filled"/><Input.Search searchButton="Find" onSearch={value=>console.log(value)}/><Input.Password visible={false} onVisibleChange={visible=>console.log(visible)}/><Input.TextArea autoSize={{minRows:2,maxRows:5}}/><Input.OTP length={4} onValueChange={value=>console.log(value)}/></>;
 export function FormDemo() { const [form] = Form.useForm(); return <Form form={form} onFinish={values => console.log(values)}><Form.Item name='email' label='Email' rules={[{type:'email',required:true}]}><Input /></Form.Item></Form>; }
 export const cardDemo = <Card title="Title" htmlTitle="Tooltip" size="small" variant="outlined" styles={{body:{padding:12}}} classNames={({props})=>({root:props.size==='small'?'compact':''})} tabList={[{key:'one',label:'One'}]}><Card.Meta title="Metadata" description="Details"/><Card.Grid hoverable={false}>Grid</Card.Grid></Card>;
 export const splitterDemo = <Splitter orientation="horizontal" sizes={["40%","60%"]} onResize={sizes=>console.log(sizes)} style={{height:240}}><Splitter.Panel id="a" min="20%" collapsible>A</Splitter.Panel><Splitter.Panel id="b">B</Splitter.Panel></Splitter>;

@@ -21,6 +21,7 @@ export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
   | { kind: "component"; name: string; section?: string };
 export function parseRoute(hash: string): Route {
+  if (hash === "#/components/SearchInput" || hash === "#/components/Textarea") return { kind: "component", name: "Input" };
   const typography = hash.match(/^#\/components\/Typography\?section=([A-Za-z]+)$/);
   if (typography && isTypographySection(typography[1]))
     return { kind: "component", name: "Typography", section: typography[1] };
@@ -459,7 +460,7 @@ export function DocsApp() {
             {groups.map((group) => {
                 // Preserve semantic group order, but make each component easy to find by name.
                 const members = componentDocs
-                  .filter((d) => d.category === group && !isTypographySection(d.name))
+                  .filter((d) => d.category === group && !isTypographySection(d.name) && d.name !== "SearchInput" && d.name !== "Textarea")
                   .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
                 return (
                   members.length > 0 && (

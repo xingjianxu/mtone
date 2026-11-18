@@ -136,7 +136,7 @@ describe("documentation taxonomy", () => {
         (e) => e.textContent,
       ),
     ).toEqual(["开始使用", ...categories]);
-    for (const doc of catalog.componentDocs.filter((doc) => !["Title", "Text", "Paragraph", "Link", "Blockquote"].includes(doc.name))) {
+    for (const doc of catalog.componentDocs.filter((doc) => !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"].includes(doc.name))) {
       expect(
         within(nav as HTMLElement).getAllByRole("link", { name: doc.name }),
       ).toHaveLength(1);
