@@ -1,3 +1,4 @@
+import { BreadcrumbExample } from "./breadcrumb-example";
 import { LoadingOverlayExample } from "./loading-overlay-example";
 import { HoverCardExample } from "./hover-card-example";
 import { MenubarExample } from "./menubar-example";
@@ -446,15 +447,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     case "Breadcrumb":
-      return (
-        <M.Breadcrumb
-          items={[
-            { label: "组件库", href: "#/gallery" },
-            { label: "导航", href: "#/components/Sidebar" },
-            { label: "当前页面" },
-          ]}
-        />
-      );
+      return <BreadcrumbExample />;
     case "DirectoryTree":
     case "Tree":
       return <TreeExample compact={compact} />;
