@@ -38,3 +38,6 @@ export * from "./typography";
 
 export { Dropdown } from "./dropdown";
 export type { DropdownProps, DropdownAlign, DropdownLayoutProps } from "./dropdown";
+
+export * from "./loading-overlay";
+export * from "./hover-card";

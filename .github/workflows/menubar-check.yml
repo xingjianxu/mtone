@@ -1,7 +1,7 @@
 name: Menubar verification
 on:
   push:
-    branches: [feat-menubar]
+    branches: [feat-menubar, integrate-overlays]
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,6 +35,8 @@ jobs:
       - run: node tests/menu.browser.mjs
       - run: node tests/dropdown.browser.mjs
       - run: node tests/menubar.browser.mjs
+      - run: node tests/loading-overlay.browser.mjs
+      - run: node tests/hover-card.browser.mjs
       - run: node tests/card.browser.mjs
       - run: node tests/table.browser.mjs
       - run: node tests/mentions.browser.mjs

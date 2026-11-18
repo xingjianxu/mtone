@@ -34,6 +34,66 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### LoadingOverlay
+
+- [LoadingOverlay](https://xingjianxu.github.io/mtone/#/components/LoadingOverlay): 覆盖局部区域的紧凑加载遮罩，支持模糊、圆角和自定义加载内容。
+- Import: LoadingOverlay from @bixlab/mtone
+- visible: boolean (default: false). 控制显示；隐藏时卸载整个遮罩，无退出延迟。
+- label: string. 可选的可见提示文字，同时用作状态名称；省略或空白时可访问名称为 Loading。
+- loader: ReactNode (default: Spinner). 替换加载图标；null 隐藏图标。自定义内容由 status 容器承载，请勿重复添加 status/live 语义。
+- overlayColor: string (default: var(--mt-bg, #fff)). 遮罩背景颜色，不改变加载内容颜色。
+- opacity: number (default: 0.75). 仅背景透明度，限制在 0–1；非有限数字回退为 0.75。
+- blur: number (default: 0). 背景模糊像素数；负数和非有限数字回退为 0。
+- radius: CSSProperties["borderRadius"] (default: inherit). 遮罩圆角；数字为 px，也支持 CSS 值。
+- zIndex: number (default: 10). 局部堆叠层级，非有限数字回退为 10；不会逃离父堆叠上下文。
+- className / style: string / CSSProperties. 根元素样式；style 可覆盖默认设置，修改 pointerEvents 或定位可能影响遮罩行为。
+- ref / div attributes: Ref<HTMLDivElement> / HTMLAttributes<HTMLDivElement>. 透传到根 div；children 不受支持，使用 loader 自定义内容。
+- 父容器必须设置 position: relative（或其他定位方式）并具有实际尺寸。遮罩绝对定位，不占据布局空间；默认圆角继承父容器。
+- 遮罩拦截鼠标/触摸，但不会禁用下层键盘焦点，也不管理焦点、修改父 DOM 或提供模态语义。请在内容区域设置 aria-busy，并按需禁用表单或为独立的内容容器设置 inert；不要把遮罩或取消按钮放进 inert 容器。
+- 默认复用 Spinner，遵循 reduced-motion 设置；自定义加载动画由调用方处理。没有自动请求、计时器、全屏 Portal、延迟或过渡动画。
+- 高级定位元素或更高层级的后代可能显示在遮罩之上；按布局设置 zIndex。状态提示名称默认 Loading，可通过 label 本地化。
+
+```tsx
+import { useState } from "react";
+import { Button, Input, LoadingOverlay } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [loading, setLoading] = useState(false);
+  return <>
+    <div style={{ position: "relative", borderRadius: 6 }}>
+      <div aria-busy={loading} style={{ padding: 16 }}>
+        <Input aria-label="项目名称" disabled={loading} />
+      </div>
+      <LoadingOverlay visible={loading} label="正在保存" blur={1} />
+    </div>
+    <Button onClick={() => setLoading(value => !value)}>切换加载</Button>
+  </>;
+}
+```
+
+### HoverCard
+
+- [HoverCard](https://xingjianxu.github.io/mtone/#/components/HoverCard): 悬停或键盘聚焦显示的富内容预览卡片。
+- Import: HoverCard, Button from @bixlab/mtone
+- trigger: ReactElement. 必填，可聚焦触发元素；自定义组件需要传递 ref 和事件属性
+- content / title: ReactNode. 卡片内容（content 必填）和可选标题
+- open / defaultOpen: boolean (default: false). 受控开关 / 非受控初始开关
+- onOpenChange: (open: boolean) => void. 交互请求开关时触发
+- openDelay / closeDelay: number (default: 300 / 150). 打开和关闭延迟，毫秒
+- side: "top" | "bottom" | "left" | "right" (default: "bottom"). 首选方向，空间不足时自动避让
+- align: "start" | "center" | "end" (default: "center"). 相对触发元素的逻辑对齐方式
+- sideOffset: number (default: 6). 浮层与触发元素的间距，像素
+- width: CSSProperties[width] (default: 280). 卡片宽度，受可用视口宽度限制，不强制匹配触发宽度
+- withArrow / disabled: boolean (default: false). 显示箭头 / 禁用预览但保留触发元素原本行为
+- 复用 Base UI PreviewCard 的悬停安全区域、延迟与键盘聚焦行为。鼠标从触发元素移动到卡片时保持显示；Escape 或点击外部关闭。不会自动把焦点移入卡片。
+- HoverCard 用于补充预览，不替代点击式 Popover 或 Dropdown；表单和必须完成的操作应使用后者。触摸设备不依赖悬停打开，也不拦截触发链接原本点击。
+- 提供可聚焦 trigger 以支持键盘；预览信息不应是完成任务的唯一入口。API 不兼容 Mantine，不提供复合子组件、delay group 或触摸开关。
+
+```tsx
+<HoverCard trigger={<Button>作者</Button>} title="mtone" withArrow content="简约紧凑的 React 组件库" />
+```
+
 ### Cascader
 
 - [Cascader](https://xingjianxu.github.io/mtone/#/components/Cascader): 路径式级联选择，支持单选、多选联动、搜索、异步加载与独立面板。
