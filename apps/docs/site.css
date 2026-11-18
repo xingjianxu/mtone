@@ -105,9 +105,6 @@ a:hover {
   padding: 4px 10px;
   border-radius: 5px;
 }
-.top-tag {
-  color: #96958f;
-}
 .docs-sidebar {
   position: fixed;
   top: 68px;
@@ -120,32 +117,18 @@ a:hover {
   border-right: 1px solid #e9e9e7;
   z-index: 90;
 }
-.search {
+/* The global search uses mtone Spotlight; the gallery keeps its local filter. */
+.top-actions .docs-search-trigger {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: white;
-  border: 1px solid #e3e3e0;
-  border-radius: 6px;
-  padding: 7px 9px;
-  margin-bottom: 18px;
-  color: #99988f;
-}
-.search input {
-  min-width: 0;
-  width: 100%;
-  border: 0;
-  background: none;
-  font-size: 12px;
-  outline-offset: 5px;
-}
-.search button {
-  border: 0;
-  background: none;
-  display: flex;
-  padding: 0;
+  min-height: 28px;
   color: #787774;
+  font: inherit;
 }
+.docs-search-trigger:hover { background: #efefed; }
+.docs-search-trigger:focus-visible { outline: 2px solid #5378aa; outline-offset: 2px; }
+.docs-search-trigger kbd { font: 10px ui-monospace, monospace; color: #96958f; }
 .docs-sidebar nav > a,
 .docs-sidebar nav > div > a {
   display: flex;
@@ -554,9 +537,11 @@ footer {
   .top-actions {
     gap: 12px;
   }
-  .top-tag {
+  .docs-search-trigger .docs-search-label,
+  .docs-search-trigger kbd {
     display: none;
   }
+  .top-actions .docs-search-trigger { padding: 5px; }
   .top-actions .mobile-menu {
     display: flex;
     padding: 4px;
@@ -632,6 +617,7 @@ footer {
   }
 }
 @media (max-width: 420px) {
+  .topbar { padding: 0 12px; }
   .gallery-grid {
     grid-template-columns: minmax(0, 1fr);
   }
