@@ -437,7 +437,7 @@ function MenuItemLabel({ item }: { item: Pick<MenuItem, "label" | "icon"> }) {
 function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
   return (
     <>
-      {items.map((item) => {
+      {items.map((item, index) => {
         if (item.type === "divider")
           return <BMenu.Separator key={item.key} className="mt-menu-divider" />;
         if (item.type === "group")
@@ -478,7 +478,19 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
               </BMenu.RadioGroup>
             </BMenu.Group>
           );
-        const className = cn("mt-menu-item", item.danger && "mt-danger");
+        // Submenu portals insert focus guards between DOM siblings. Determine
+        // row spacing from entries, not that transient DOM adjacency.
+        const previous = items[index - 1];
+        const spaced =
+          previous != null &&
+          previous.type !== "divider" &&
+          previous.type !== "group" &&
+          previous.type !== "radio-group";
+        const className = cn(
+          "mt-menu-item",
+          spaced && "mt-menu-item-spaced",
+          item.danger && "mt-danger",
+        );
         if (item.type === "checkbox")
           return (
             <BMenu.CheckboxItem

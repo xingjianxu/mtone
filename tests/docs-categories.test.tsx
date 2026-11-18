@@ -67,6 +67,7 @@ const expected: Record<string, string[]> = {
     "Card",
     "Text",
     "Typography",
+    "Blockquote",
     "Title",
     "Paragraph",
     "Link",

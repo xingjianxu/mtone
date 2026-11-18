@@ -178,16 +178,18 @@ it('positions RTL submenus on the logical end side', async () => {
   await waitFor(()=>expect(child.closest('[role="menu"]')).toHaveAttribute('data-side','inline-end')); // Base UI exposes the logical side; jsdom cannot verify physical geometry.
 });
 
-it('matches spacing only between sibling menu rows, including submenu rows', async () => {
+it.each(['pointer', 'keyboard'])('keeps logical row spacing when %s opens and closes nested submenus', async (input) => {
   render(<Menu defaultOpen trigger={<button>Spacing</button>} items={[
     { type: "group", key: "group", label: "Files", children: [
       { key: "new", label: "New" },
-      { key: "export", label: "Export", children: [{ key: "pdf", label: "PDF" }, { key: "doc", label: "DOC" }] },
+      { key: "export", label: "Export", children: [{ key: "pdf", label: "PDF", children: [{ key: 'leaf', label: 'Leaf' }] }, { key: "doc", label: "DOC" }] },
       { key: "after", label: "After" },
     ] }, items[1], items[2],
     { type: "radio-group", key: "radio", label: "Sort", children: [{ key: "a", label: "Ascending" }, { key: "d", label: "Descending" }] },
   ]} />);
-  const selector = '.mt-menu-item + .mt-menu-item';
+  const { readFileSync } = await import('node:fs');
+  const css = readFileSync('packages/mtone/src/interactive.css', 'utf8');
+  const selector = css.match(/([^{}]*\.mt-menu-item[^{}]*)\{\s*margin-top: 3px;\s*\}/)![1].trim();
   expect((await screen.findByRole('menuitem', { name: 'New' })).matches(selector)).toBe(false);
   const exporter = screen.getByRole('menuitem', { name: 'Export' });
   expect(exporter.matches(selector)).toBe(true);
@@ -195,8 +197,27 @@ it('matches spacing only between sibling menu rows, including submenu rows', asy
   expect(screen.getByRole('menuitemradio', { name: 'Ascending' }).matches(selector)).toBe(false);
   expect(screen.getByRole('menuitemradio', { name: 'Descending' }).matches(selector)).toBe(true);
   expect(screen.getByRole('menuitem', { name: 'Locked' }).matches(selector)).toBe(false);
-  await userEvent.hover(exporter);
-  const pdf = await screen.findByRole('menuitem', { name: 'PDF' });
-  expect(pdf.matches(selector)).toBe(false);
-  expect(screen.getByRole('menuitem', { name: 'DOC' }).matches(selector)).toBe(true);
+  for (let cycle = 0; cycle < 2; cycle++) {
+    if (input === 'pointer') await userEvent.hover(exporter);
+    else { exporter.focus(); await userEvent.keyboard('{ArrowRight}'); }
+    const pdf = await screen.findByRole('menuitem', { name: 'PDF' });
+    expect(screen.getByRole('menuitem', { name: 'After' }).matches(selector)).toBe(true);
+    expect(pdf.matches(selector)).toBe(false);
+    const doc = screen.getByRole('menuitem', { name: 'DOC' });
+    expect(doc.matches(selector)).toBe(true);
+    if (input === 'pointer') await userEvent.hover(pdf);
+    else { pdf.focus(); await userEvent.keyboard('{ArrowRight}'); }
+    const leaf = await screen.findByRole('menuitem', { name: 'Leaf' });
+    expect(leaf.matches(selector)).toBe(false);
+    expect(doc.matches(selector)).toBe(true);
+    leaf.focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await waitFor(() => expect(screen.queryByRole('menuitem', { name: 'Leaf' })).not.toBeInTheDocument());
+    expect(doc.matches(selector)).toBe(true);
+    pdf.focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await waitFor(() => expect(screen.queryByRole('menuitem', { name: 'PDF' })).not.toBeInTheDocument());
+    expect(screen.getByRole('menuitem', { name: 'After' }).matches(selector)).toBe(true);
+    await userEvent.unhover(exporter);
+  }
 });
