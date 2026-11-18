@@ -1,7 +1,7 @@
 import React from "react";
 import {createRoot} from "react-dom/client";
 import {TreeSelect,MtoneProvider,Fieldset} from "../../packages/mtone/src";
-import "../../packages/mtone/src/styles.css";
+import "../../packages/mtone/dist/styles.css";
 const items=[{id:"p",label:"Team",children:[{id:"a",label:"Alice"},{id:"b",label:"Bob"},{id:"x",label:"Disabled",disabled:true}]}];
 function App(){const [value,setValue]=React.useState<string|number|null>(null);return <MtoneProvider locale="en"><main style={{padding:30,width:320,display:"grid",gap:24}}>
 <TreeSelect aria-label="Single" items={items} defaultExpandAll value={value} onValueChange={setValue} allowClear/>
