@@ -2,6 +2,14 @@
 
 Import all components by name from `@bixlab/mtone` and import `@bixlab/mtone/styles.css` once. Package includes TypeScript declarations. Below are the public contracts; detailed exact types are in the distributed `index.d.ts`.
 
+## Version scope
+
+This guide describes the repository's current `master` API, not a promise that every
+feature is present in the latest published npm package. The live documentation also
+follows `master`. Check the `index.d.ts` and `llms.txt` bundled with your installed
+`@bixlab/mtone` version before using newer features. Merging code or updating the
+website does not publish a new npm version.
+
 ## Provider and styling
 
 `MtoneProvider` accepts `locale="zh" | "en"`, `density="compact" | "comfortable"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, compact and default colors. `MtoneScope` applies the current provider context to a wrapper; popups do this automatically.
@@ -22,7 +30,7 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 - `Button`: `variant` solid/outline/soft/ghost, `size` sm/md/lg, `danger`, `loading`, `icon`, native/Base UI button props and ref. Loading disables actions.
 - `IconButton`: Button props plus required `aria-label`.
 - `ButtonGroup`: group wrapper.
-- `Input`, `Textarea`, `SearchInput`: native input attributes, ref and onChange. SearchInput is an input with search icon, no global keyboard interception.
+- `Input`: native input attributes, native ref and `onChange(event)`, with `prefix`, `suffix`, `allowClear`, character counts and appearance options. `Input.Search`, `Input.Password`, `Input.TextArea` and `Input.OTP` are subcomponents; `SearchInput` and `Textarea` remain compatibility exports. See [Input family](#input-family).
 - `Form`: native form wrapper; no custom validation engine.
 - `FormField`: `label`, `error`, `description`, `required`, one input child. Associates label/error with cloned child's id and ARIA attributes. Use direct label props for compound selectors rather than wrapping them as a native input.
 
@@ -62,13 +70,115 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 
 ## Content and status
 
-- Card, Text(muted), Divider, List, ListItem(icon,description,actions): styled semantic wrappers.
+- Card, Text(muted), Divider and ListItem(icon,description,actions): styled semantic wrappers. `List` retains children-based use and also supports grouped/virtual data rendering; see [List](#list).
 - DocumentList: items `{id,title,description?,updatedAt?,icon?,onClick?}`. DocumentCard accepts one item.
 - Badge: tone neutral/blue/green/orange/red/purple, onRemove optional.
 - Status: tone, children. Avatar: name, src, size; falls back to initials on image error. AvatarGroup: items, max.
-- Progress: value clamped0–100, label. PropertyList and PropertyItem(label): definition-list display.
+- `Progress`: line, circle or dashboard progress, status, success segments, steps and custom information; see [Progress](#progress). PropertyList and PropertyItem(label): definition-list display.
 - Alert: tone info/success/warning/error, title, children, onClose.
 - Empty(title,description,action), Skeleton(native div props), Spinner(label).
+
+## Input family
+
+`Input` keeps native `value` / `defaultValue`, `onChange(event)`, form attributes and
+an `HTMLInputElement` ref. `className` / `style` target that native input;
+`wrapperClassName` targets its stable wrapper. `controlSize="sm" | "md" | "lg"`
+controls appearance (default md, compact 28px); native `size` still means character
+width. `variant` is `outlined` (default), `filled`, `borderless` or `underlined`;
+`status` is `error` or `warning`. Focus uses mtone's thin light-blue treatment.
+
+- `prefix` / `suffix` render adornments. `allowClear`, `clearLabel` and `onClear`
+  configure clearing; controlled callers must accept the resulting change event.
+- `showCount` displays a count; `countCharacters(text)` customizes counting only,
+  not native `maxLength` enforcement.
+- `Input.Search` adds a search icon, optional `searchButton`, `loading` and
+  `onSearch(text)`. Enter submits outside IME composition; a search button also
+  submits. It does not fetch results or install a global shortcut. Spotlight
+  reuses this component.
+- `Input.Password` adds `visible` / `defaultVisible` / `onVisibleChange` for the
+  visibility toggle while retaining the native input contract.
+- `Input.TextArea` keeps native textarea events and an `HTMLTextAreaElement` ref,
+  plus appearance/count options and `autoSize` (boolean or `{ minRows?, maxRows? }`).
+- `Input.OTP` uses a string `value` / `defaultValue`, `onValueChange(text)` and
+  `onComplete(text)`, not a native change event. `length` defaults to 6 and is
+  clamped to 1–32. It supports paste, arrows, Backspace/Delete, `mask`, `separator`,
+  `controlSize`, `disabled`, `readOnly`, `name` / `form` and a ref to the first cell.
+  Whitespace is removed; `inputMode` is only a keyboard hint, not digit validation.
+  This component collects a code; it does not authenticate or verify it.
+
+`SearchInput` is the same component as `Input.Search`; `Textarea` is the same as
+`Input.TextArea`. See [Input examples and full API](https://xingjianxu.github.io/mtone/#/components/Input).
+
+## TreeSelect
+
+`TreeSelect` accepts `items: TreeItem[]`, using the tree node shape
+`{ id, label, children?, ... }` and stable unique string or finite-number IDs.
+Provide `textValue` for searching non-text labels.
+
+- Single selection: `value` / `defaultValue` is a key or `null`;
+  `onValueChange(value, nodes)` reports selection. With `multiple`, values are
+  key arrays and parent/child checkbox association is enabled by default.
+- `checkStrictly` makes multiple selection independent. `showCheckedStrategy`
+  (`all`, `parent`, `leaf`) changes displayed tags only; associated selection
+  callbacks still return all checked keys. `maxTagCount` limits visible tags.
+- `searchable`, `searchValue` / `defaultSearchValue` / `onSearchChange` and
+  `filterNode(query, node)` configure search. Matches retain their ancestor path;
+  checking while filtered still uses the full tree. Closing clears search.
+- `expandedKeys`, defaults, `onExpand`, `loadData`, `loadedKeys`, `onLoad` and
+  `onLoadError` reuse Tree's expansion/loading contracts. The application updates
+  `items` with loaded children; the component does not fetch data itself.
+- `open` / `defaultOpen` / `onOpenChange`, `allowClear`, `onClear`, `renderValue`,
+  `titleRender`, `showLine`, `showIcon`, `virtual` and `height` configure interaction
+  and rendering. The popup tree height defaults to 256px.
+- `placement`, `dropdownWidth`, `prefix`, `size`, `status`, `disabled` and `readOnly`
+  configure presentation. The ref targets the trigger button. Give it an accessible
+  name with `aria-label` or `aria-labelledby`.
+- `name` adds a hidden form field: one key for single selection, a JSON key array
+  for multiple selection. Disabled fields are not submitted. Unknown selected keys
+  remain retained, but the callback's `nodes` includes only currently known nodes.
+
+See [TreeSelect examples and full API](https://xingjianxu.github.io/mtone/#/components/TreeSelect).
+
+## List
+
+Existing `<List><ListItem ... /></List>` usage remains supported. Data mode uses
+`items`, stable `getKey(item, index)` and `renderItem(item, index)`. Return row
+**content**, not another `li` or `ListItem`: List owns the row element.
+
+- `groupBy(item)` and `renderGroup(key, items)` add groups; `stickyGroups` enables
+  sticky headers. `height` sets a scroll viewport and `contentWidth` allows wider,
+  horizontally scrollable content.
+- `virtual` requires data mode and a numeric `height`. Measured row heights support
+  rich content; `estimatedItemHeight` (36), `estimatedGroupHeight` (30) and `overscan`
+  (3) tune initial estimates/windowing. Estimates can make initial positioning
+  approximate until measurement; use stable keys when changing data.
+- The `ListHandle` ref exposes `element` (the native `ul`) and `scrollTo(target)`.
+  Targets are an offset number, `{ top?, left? }`, or `{ key | index | group,
+  align?, offset? }`, where align is `start`, `center`, `end` or `auto`.
+- `emptyContent`, `loading`, `loadingContent` and `hoverable` configure states.
+  `onEndReached` and `endThreshold` (80px) support loading more in data mode with
+  a height. The application owns requests, loading state, errors and appended data.
+- Sorting is application-controlled, illustrated with drag and keyboard-accessible
+  buttons; the component does not persist ordering or fetch data.
+
+See [List examples and full API](https://xingjianxu.github.io/mtone/#/components/List).
+
+## Progress
+
+`value` is normalized to 0–100. `type` is `line` (default), `circle` or `dashboard`;
+`status` is `normal`, `active`, `success` or `exception`. `label` supplies the
+accessible label. `showInfo` defaults to false; enable it to display the percentage
+or `format(value, successValue)` result.
+
+- `size` accepts `small`, `medium` (default) or a number: numeric size means line
+  height or circular diameter in pixels. `strokeWidth` overrides thickness;
+  `strokeLinecap` is `round`, `butt` or `square`.
+- `color` accepts a CSS color or `{ from, to }` gradient; `trackColor` changes the
+  track. `success={{ value, color? }}` adds a completed segment capped at `value`.
+- `steps` accepts a count or `{ count, gap? }`. Dashboard `gapDegree` defaults to 75,
+  and `gapPosition` to `bottom` (`top`, `left` and `right` are also supported).
+
+See [Progress examples and full API](https://xingjianxu.github.io/mtone/#/components/Progress).
 
 ## Table
 
