@@ -41,8 +41,8 @@
 }
 .mt-image-trigger:focus-visible,
 .mt-image-group-trigger:focus-visible {
-  outline: 2px solid #87b8ec;
-  outline-offset: 2px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-image-placeholder,
 .mt-image-error {
@@ -145,8 +145,8 @@
   background: #ffffff24;
 }
 .mt-image-preview button:focus-visible {
-  outline: 2px solid #87b8ec;
-  outline-offset: -2px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-image-preview button:disabled {
   opacity: 0.3;

@@ -44,8 +44,8 @@
   background: var(--mt-hover, #f1f1ef);
 }
 .mt-mentions-clear:focus-visible {
-  outline: 1px solid var(--mt-focus, #5378aa);
-  outline-offset: 2px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-mentions-popup {
   z-index: 1100;

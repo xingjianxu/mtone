@@ -38,7 +38,7 @@ button {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-  outline: 2px solid var(--mt-focus, #5378aa);
+  outline: 1px solid var(--mt-focus, #93b4dc);
 }
 a:hover {
   color: #537260;
@@ -127,7 +127,7 @@ a:hover {
   font: inherit;
 }
 .docs-search-trigger:hover { background: #efefed; }
-.docs-search-trigger:focus-visible { outline: 2px solid #5378aa; outline-offset: 2px; }
+.docs-search-trigger:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
 .docs-search-trigger kbd { font: 10px ui-monospace, monospace; color: #96958f; }
 .docs-sidebar nav > a,
 .docs-sidebar nav > div > a {
@@ -657,8 +657,8 @@ section > p {
 }
 .typography-subnav a:focus-visible,
 .typography-outline a:focus-visible {
-  outline: 1px solid var(--mt-focus, #5378aa);
-  outline-offset: 1px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .typography-outline {
   margin: 2px 0 8px 8px;

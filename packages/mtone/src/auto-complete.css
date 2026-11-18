@@ -13,7 +13,7 @@
   box-sizing: border-box;
 }
 .mt-auto-complete:focus-within {
-  border-color: #93b4dc;
+  border-color: var(--mt-focus, #93b4dc);
   outline: none;
 }
 .mt-auto-complete[data-size="sm"] {
@@ -68,8 +68,8 @@
   color: var(--mt-fg, #37352f);
 }
 .mt-auto-complete-clear:focus-visible {
-  outline: 2px solid var(--mt-focus, #93c5fd);
-  outline-offset: 1px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-auto-complete-popup {
   max-width: calc(100vw - 16px);
@@ -127,7 +127,7 @@
 }
 @media (forced-colors: active) {
   .mt-auto-complete:focus-within {
-    outline: 2px solid Highlight;
+    outline: 1px solid Highlight;
   }
   .mt-auto-complete-option[data-highlighted] {
     background: Highlight;

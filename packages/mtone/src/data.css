@@ -3,7 +3,7 @@
   --mt-table-cell-padding: 8px 12px;
   --mt-table-selected: var(
     --mt-selected,
-    color-mix(in srgb, var(--mt-focus, #5378aa) 10%, var(--mt-bg, #fff))
+    color-mix(in srgb, var(--mt-indicator, #5378aa) 10%, var(--mt-bg, #fff))
   );
   min-width: 0;
   border: 1px solid var(--mt-border, #e9e9e7);
@@ -218,7 +218,7 @@
   color: var(--mt-muted, #787774);
 }
 .mt-table [aria-sort] .mt-table-sort-icon {
-  color: var(--mt-focus, #5378aa);
+  color: var(--mt-indicator, #5378aa);
 }
 .mt-table-filter {
   display: block;
@@ -414,7 +414,7 @@
   background: var(--mt-hover, #f1f1ef);
 }
 .mt-table-filter-trigger.mt-table-filter-active {
-  color: var(--mt-focus, #5378aa);
+  color: var(--mt-indicator, #5378aa);
   background: var(--mt-table-selected, var(--mt-subtle, #f7f7f5));
 }
 .mt-table-filter-popup {
@@ -538,8 +538,8 @@
   .mt-table-selection-actions
 ):focus-visible,
 .mt-table-filter-label input:focus-visible {
-  outline: 2px solid var(--mt-focus, #5378aa);
-  outline-offset: 2px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 @media (prefers-reduced-motion: reduce) {
   .mt-table-cell-fix-start-shadow::after,
@@ -600,8 +600,8 @@
   cursor: not-allowed;
 }
 .mt-tree-item:focus-visible {
-  outline: 2px solid var(--mt-focus, #5378aa);
-  outline-offset: -2px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-tree-toggle {
   display: inline-flex;
@@ -634,7 +634,7 @@
 }
 .mt-dropzone[data-dragging] {
   background: var(--mt-selected, #edf3fa);
-  border-color: var(--mt-focus, #5378aa);
+  border-color: var(--mt-indicator, #5378aa);
 }
 .mt-dropzone input {
   max-width: 100%;

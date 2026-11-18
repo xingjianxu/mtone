@@ -33,7 +33,7 @@ it('keeps shared focus tokens and allows the Input forced-colors fallback', () =
         if (rule[2].includes('Highlight')) {
           expect(rule[2]).toContain('outline: 1px solid Highlight');
         } else {
-          expect(rule[2]).toContain('var(--mt-focus, #5378aa)');
+          expect(rule[2]).toContain('var(--mt-focus, #93b4dc)');
         }
         expect(rule[2]).not.toContain('--mt-primary');
       }
@@ -46,13 +46,13 @@ it('keeps shared focus tokens and allows the Input forced-colors fallback', () =
   expect(css).toContain('.mt-multiselect .mt-combobox-input:focus-visible');
   const docs = readFileSync('apps/docs/site.css', 'utf8');
   expect(docs).not.toContain('outline: 2px solid #779482');
-  expect(docs).toContain('outline: 2px solid var(--mt-focus, #5378aa)');
+  expect(docs).toContain('outline: 1px solid var(--mt-focus, #93b4dc)');
 });
 it('keeps semantic error borders separate from the blue focus ring', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const errorRule = css.slice(css.indexOf('.mt-input[aria-invalid="true"]')).split('}')[0];
   expect(errorRule).toContain('border-color: #c66660');
-  expect(css).toContain('--mt-focus: #5378aa');
+  expect(css).toContain('--mt-focus: #93b4dc');
 });
 it('keeps toast icons centered on the first text row with compact spacing', () => {
   const css = readFileSync('packages/mtone/src/toast.css', 'utf8');
@@ -76,7 +76,7 @@ it('keeps the topbar at 48px and both layout footers at 42px',()=>{
 it('uses border color only for all bordered input focus surfaces', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const rules = css.slice(css.indexOf('/* Bordered input surfaces:'));
-  expect(rules).toContain('border-color: #93b4dc');
+  expect(rules).toContain('border-color: var(--mt-focus, #93b4dc)');
   expect(rules).toContain('outline: none');
   expect(rules).not.toMatch(/border-width|padding|height|box-shadow/);
   expect(rules).toContain(':not([aria-invalid="true"])');

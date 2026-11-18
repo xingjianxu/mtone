@@ -116,7 +116,7 @@ it("reserves a thin highlight border and removes the legacy thick outline", asyn
   const shared = readFileSync("packages/mtone/src/styles.css", "utf8");
   expect(css).toMatch(/\.mt-menu-item\s*\{[^}]*border: 1px solid transparent/s);
   expect(css).toMatch(
-    /\.mt-menu-item\[data-highlighted\]:not\(\[data-disabled\]\)\s*\{[^}]*border-color: #93b4dc/s,
+    /\.mt-menu-item\[data-highlighted\]:not\(\[data-disabled\]\)\s*\{[^}]*border-color: var\(--mt-focus, #93b4dc\)/s,
   );
   expect(shared).not.toMatch(
     /\.mt-menu-item\[data-highlighted\][^{]*\{[^}]*outline: 2px/s,

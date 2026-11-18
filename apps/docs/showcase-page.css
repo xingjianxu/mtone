@@ -6,5 +6,5 @@
 .showcase-topbar-actions { display: flex; align-items: center; gap: 12px; }
 .showcase-docs-link { color: #555; font-size: 12px; text-decoration: none; white-space: nowrap; }
 .showcase-docs-link:hover { text-decoration: underline; }
-.showcase-docs-link:focus-visible { outline: 2px solid #5378aa; outline-offset: 4px; }
+.showcase-docs-link:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
 .showcase-page .showcase-bottom > span:first-child { min-width: 0; line-height: 1.6; }

@@ -125,6 +125,6 @@
   display: none;
 }
 .mt-toast:focus-visible {
-  outline: 2px solid var(--mt-focus, #5378aa);
-  outline-offset: -2px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }

@@ -93,7 +93,7 @@
 }
 .mt-calendar-day:focus-visible {
   outline: none;
-  border-color: #93b4dc;
+  border-color: var(--mt-focus, #93b4dc);
 }
 .mt-calendar-content {
   font-size: 12px;

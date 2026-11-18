@@ -53,13 +53,13 @@
   border-bottom: 1px solid var(--mt-border, #ddd);
 }
 .mt-tree-item.mt-tree-drop-0 {
-  box-shadow: inset 0 0 0 1px var(--mt-focus, #5378aa);
+  box-shadow: inset 0 0 0 1px var(--mt-indicator, #5378aa);
 }
 .mt-tree-item.mt-tree-drop--1 {
-  border-top: 2px solid var(--mt-focus, #5378aa);
+  border-top: 2px solid var(--mt-indicator, #5378aa);
 }
 .mt-tree-item.mt-tree-drop-1 {
-  border-bottom: 2px solid var(--mt-focus, #5378aa);
+  border-bottom: 2px solid var(--mt-indicator, #5378aa);
 }
 .mt-tree-load-error {
   font-size: 11px;

@@ -18,7 +18,7 @@
   height: 34px;
 }
 .mt-cascader:focus-within {
-  border-color: #93b4dc;
+  border-color: var(--mt-focus, #93b4dc);
 }
 .mt-cascader[data-status="error"] {
   border-color: var(--mt-danger, #dc2626);
@@ -50,8 +50,7 @@
   cursor: not-allowed;
 }
 .mt-cascader-trigger:focus-visible {
-  outline: 1px solid #93b4dc;
-  outline-offset: 2px;
+  outline: none; /* The enclosing field already draws the focus border. */
   border-radius: 3px;
 }
 .mt-cascader-trigger > svg,
@@ -98,8 +97,8 @@
 .mt-cascader-clear:focus-visible,
 .mt-cascader-tag button:focus-visible,
 .mt-cascader-retry:focus-visible {
-  outline: 1px solid #93b4dc;
-  outline-offset: 1px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-cascader-popup.mt-popup {
   padding: 4px;
@@ -243,6 +242,10 @@
   }
 }
 @media (forced-colors: active) {
+  .mt-cascader:focus-within {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
   .mt-cascader-option:focus-visible {
     outline: 1px solid Highlight;
   }

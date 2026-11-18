@@ -2111,7 +2111,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["默认单行外框高度为 28px（含边框）；comfortable 密度保留 36px。可使用 style 或 --mt-height 定制，不影响 Textarea 的多行高度。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea、Select、MultiSelect、NumberInput、DatePicker 及 Table 筛选输入采用相同边框聚焦效果。"],
+    notes: ["默认单行外框高度为 28px（含边框）；comfortable 密度保留 36px。可使用 style 或 --mt-height 定制，不影响 Textarea 的多行高度。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。", "全库焦点颜色统一使用 --mt-focus（默认浅蓝 #93B4DC）；非输入控件保留 1px 内嵌键盘焦点细线，不加粗、不改变布局。Input 聚焦时只将原有 1px 边框改为浅蓝 #93B4DC，不显示外部 outline，也不改变尺寸。错误态保留红色边框；强制颜色模式恢复系统焦点提示。SearchInput、Textarea、Select、MultiSelect、NumberInput、DatePicker 及 Table 筛选输入采用相同边框聚焦效果。"],
   },
   {
     name: "SearchInput",

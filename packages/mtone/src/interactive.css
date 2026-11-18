@@ -438,8 +438,8 @@
 .mt-segment:focus-visible,
 .mt-action:focus-visible,
 .mt-tab:focus-visible {
-  outline: 2px solid var(--mt-focus, #5378aa);
-  outline-offset: 2px;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-check-label:has([data-disabled]) {
   opacity: 0.45;
@@ -540,7 +540,7 @@
   padding: 3px 7px;
 }
 .mt-menu-item[data-highlighted]:not([data-disabled]) {
-  border-color: #93b4dc;
+  border-color: var(--mt-focus, #93b4dc);
 }
 .mt-menu-group-label {
   padding: 6px 8px 4px;
@@ -606,10 +606,10 @@
 .mt-menubar-trigger:hover:not([data-disabled]),
 .mt-menubar-trigger[data-popup-open] {
   background: var(--mt-hover, #f1f1ef);
-  border-color: #93b4dc;
+  border-color: var(--mt-focus, #93b4dc);
 }
 .mt-menubar-trigger:focus-visible {
-  outline: 1px solid var(--mt-focus, #5378aa);
+  outline: 1px solid var(--mt-focus, #93b4dc);
   outline-offset: -1px;
 }
 .mt-menubar-trigger[data-disabled] { opacity: .45; cursor: not-allowed; }

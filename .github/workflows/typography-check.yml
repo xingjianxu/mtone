@@ -1,7 +1,7 @@
 name: Typography verification
 on:
   push:
-    branches: [feat-typography, docs/typography-nav]
+    branches: [feat-typography, docs/typography-nav, fix/focus-unify]
   workflow_dispatch:
 permissions:
   contents: read
@@ -30,6 +30,7 @@ jobs:
       - run: node tests/spotlight.browser.mjs
       - run: node tests/input-focus.browser.mjs
       - run: node tests/field-focus.browser.mjs
+      - run: node tests/focus-unify.browser.mjs
       - run: node tests/control-height.browser.mjs
       - run: node tests/menu-icons.browser.mjs
       - run: node tests/card.browser.mjs
