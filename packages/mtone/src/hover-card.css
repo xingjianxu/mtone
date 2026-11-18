@@ -13,29 +13,38 @@
   overflow-wrap: anywhere;
 }
 .mt-hover-card-arrow {
-  width: 8px;
-  height: 8px;
-  background: var(--mt-bg, #fff);
-  border: 1px solid var(--mt-border, #e9e9e7);
-  transform: rotate(45deg);
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
 }
+.mt-hover-card-arrow svg {
+  display: block;
+  overflow: visible;
+  fill: var(--mt-bg, #fff);
+  stroke: var(--mt-border, #e9e9e7);
+  stroke-width: 1;
+}
+/* The open path's baseline is at 7px. Absolute positioning starts inside
+   the popup's 1px border: -7 + 7 + 1 = 1px, covering that border's inner
+   edge without drawing a second horizontal line through the triangle. */
 .mt-hover-card-arrow[data-side="bottom"] {
-  top: -5px;
-  border-right: 0;
-  border-bottom: 0;
+  top: -7px;
 }
 .mt-hover-card-arrow[data-side="top"] {
-  bottom: -5px;
-  border-left: 0;
-  border-top: 0;
+  bottom: -7px;
+}
+.mt-hover-card-arrow[data-side="top"] svg {
+  transform: rotate(180deg);
 }
 .mt-hover-card-arrow[data-side="left"] {
-  right: -5px;
-  border-left: 0;
-  border-bottom: 0;
+  right: -7px;
+}
+.mt-hover-card-arrow[data-side="left"] svg {
+  transform: rotate(90deg);
 }
 .mt-hover-card-arrow[data-side="right"] {
-  left: -5px;
-  border-right: 0;
-  border-top: 0;
+  left: -7px;
+}
+.mt-hover-card-arrow[data-side="right"] svg {
+  transform: rotate(-90deg);
 }
