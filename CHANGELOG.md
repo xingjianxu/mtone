@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0
+
+### Added and enhanced
+- Typography with editing, copying, ellipsis and block quotes; connected ButtonGroup.
+- Menu, Dropdown and Menubar composition; LoadingOverlay, HoverCard and Fieldset.
+- TreeSelect; expanded List grouping/virtual scrolling and Progress line/circle/dashboard/steps.
+- Input family with Search, Password, TextArea and OTP, variants, clear controls and composed decorations; Spotlight reuses SearchInput.
+- Breadcrumb icons, menus and separators; unified compact menu spacing and thin focus styling.
+- Synchronized API guides, component examples and packaged AI reference.
+
+### Compatibility
+- See [migration notes](docs/MIGRATION.md) for DOM/styling and API behavior details. React/ReactDOM ^19.2.0 and ESM remain required.
+
 ## 0.4.0
 
 ### Added

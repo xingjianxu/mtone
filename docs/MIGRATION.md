@@ -1,3 +1,11 @@
+# Upgrade notes for 0.5.0
+
+- Input/Textarea now have a stable wrapper. Native refs, `onChange(event)`, `className` and `style` still target the actual input. Review direct-child selectors and flex/grid layouts; use `wrapperClassName` for the wrapper. Input `prefix` now means decorative content, not the native RDFa attribute.
+- `Menu` is the preferred name; `DropdownMenu` remains compatible. Menu entries now include groups, separators and submenus. Narrow by `type` before reading action-only fields. Popup content sizing and mounted-but-hidden overlays may affect custom CSS and DOM queries; query visible popups.
+- Progress retains `value`, `label` and its default compact line, but adds a track wrapper. Replace `.mt-progress > span` overrides with `.mt-progress-fill`, or prefer `color`, `trackColor` and `strokeWidth`.
+- List/ListItem children usage remains supported. In the new data mode, `renderItem` returns row content, not `li` or ListItem. The new ref is a `ListHandle`; use `ref.current.element` for its native list element.
+- TreeSelect is new. Its single-selection value is nullable; multiple selection uses arrays. Follow the `multiple` discriminator and installed declarations.
+
 # Upgrade notes for 0.4.0
 
 - `TreeItem.id` now accepts `string | number`. Narrow the type or use `String(id)` when passing it to string-only code. Numeric keys use `selectedKeys` / `onSelect`; legacy `value` / `onValueChange` remain string-only.
