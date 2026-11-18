@@ -344,7 +344,179 @@ export function NumberInput({ label, className, ...props }: NumberInputProps) {
           className="mt-number-step"
         >
           +
-        </NumberFi…1434 tokens truncated… item={item} />
+        </NumberField.Increment>
+      </NumberField.Group>
+    </NumberField.Root>
+  );
+}
+export { Tabs } from "./tabs";
+export type { TabItem, TabsProps } from "./tabs";
+export function Segmented({
+  options,
+  label,
+  className,
+  ...props
+}: RadioGroupProps) {
+  return (
+    <BRadioGroup
+      className={cn("mt-segmented", className)}
+      aria-label={label}
+      {...props}
+    >
+      {options.map((o) => (
+        <BRadio.Root
+          key={o.value}
+          value={o.value}
+          disabled={o.disabled}
+          className="mt-segment"
+        >
+          {o.label}
+        </BRadio.Root>
+      ))}
+    </BRadioGroup>
+  );
+}
+export interface MenuItem {
+  type?: "item";
+  icon?: React.ReactNode;
+  key: string;
+  label: React.ReactNode;
+  disabled?: boolean;
+  danger?: boolean;
+  shortcut?: string;
+  onSelect?: () => void;
+  /** Nonempty children open a submenu; parent callbacks are not invoked. */
+  children?: MenuEntry[];
+}
+export interface MenuGroup {
+  type: "group";
+  key: string;
+  label: React.ReactNode;
+  children: MenuEntry[];
+}
+export interface MenuDivider {
+  type: "divider";
+  key: string;
+}
+export interface MenuCheckboxItem extends Omit<
+  MenuItem,
+  "type" | "children" | "onSelect"
+> {
+  type: "checkbox";
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  closeOnClick?: boolean;
+}
+export interface MenuRadioGroup {
+  type: "radio-group";
+  key: string;
+  label: React.ReactNode;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  children: Omit<MenuItem, "type" | "children" | "onSelect">[];
+}
+export type MenuEntry =
+  MenuItem | MenuGroup | MenuDivider | MenuCheckboxItem | MenuRadioGroup;
+export interface MenuProps extends OpenProps, DropdownLayoutProps {
+  trigger: React.ReactElement;
+  items: MenuEntry[];
+  onSelect?: (key: string) => void;
+}
+function MenuItemLabel({ item }: { item: Pick<MenuItem, "label" | "icon"> }) {
+  return (
+    <span className="mt-menu-label">
+      <span aria-hidden="true" className="mt-menu-icon">
+        {item.icon}
+      </span>
+      <span className="mt-menu-text">{item.label}</span>
+    </span>
+  );
+}
+function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
+  return (
+    <>
+      {items.map((item, index) => {
+        if (item.type === "divider")
+          return <BMenu.Separator key={item.key} className="mt-menu-divider" />;
+        if (item.type === "group")
+          return (
+            <BMenu.Group key={item.key} className="mt-menu-group">
+              <BMenu.GroupLabel className="mt-menu-group-label">
+                {item.label}
+              </BMenu.GroupLabel>
+              <MenuItems items={item.children} onSelect={onSelect} />
+            </BMenu.Group>
+          );
+        if (item.type === "radio-group")
+          return (
+            <BMenu.Group key={item.key} className="mt-menu-group">
+              <BMenu.GroupLabel className="mt-menu-group-label">
+                {item.label}
+              </BMenu.GroupLabel>
+              <BMenu.RadioGroup
+                value={item.value}
+                defaultValue={item.defaultValue}
+                onValueChange={(value) => item.onValueChange?.(value)}
+              >
+                {item.children.map((option) => (
+                  <BMenu.RadioItem
+                    key={option.key}
+                    value={option.key}
+                    disabled={option.disabled}
+                    className={cn("mt-menu-item", option.danger && "mt-danger")}
+                    closeOnClick={false}
+                  >
+                    <MenuItemLabel item={option} />
+                    {option.shortcut && (
+                      <span className="mt-shortcut">{option.shortcut}</span>
+                    )}
+                    <BMenu.RadioItemIndicator>●</BMenu.RadioItemIndicator>
+                  </BMenu.RadioItem>
+                ))}
+              </BMenu.RadioGroup>
+            </BMenu.Group>
+          );
+        // Submenu portals insert focus guards between DOM siblings. Determine
+        // row spacing from entries, not that transient DOM adjacency.
+        const previous = items[index - 1];
+        const spaced =
+          previous != null &&
+          previous.type !== "divider" &&
+          previous.type !== "group" &&
+          previous.type !== "radio-group";
+        const className = cn(
+          "mt-menu-item",
+          spaced && "mt-menu-item-spaced",
+          item.danger && "mt-danger",
+        );
+        if (item.type === "checkbox")
+          return (
+            <BMenu.CheckboxItem
+              key={item.key}
+              className={className}
+              disabled={item.disabled}
+              checked={item.checked}
+              defaultChecked={item.defaultChecked}
+              closeOnClick={item.closeOnClick ?? false}
+              onCheckedChange={(checked) => item.onCheckedChange?.(checked)}
+            >
+              <MenuItemLabel item={item} />
+              {item.shortcut && (
+                <span className="mt-shortcut">{item.shortcut}</span>
+              )}
+              <BMenu.CheckboxItemIndicator>✓</BMenu.CheckboxItemIndicator>
+            </BMenu.CheckboxItem>
+          );
+        if (item.children?.length)
+          return (
+            <BMenu.SubmenuRoot key={item.key}>
+              <BMenu.SubmenuTrigger
+                className={className}
+                disabled={item.disabled}
+              >
+                <MenuItemLabel item={item} />
                 <ChevronRight
                   aria-hidden="true"
                   className="mt-menu-submenu-arrow"
