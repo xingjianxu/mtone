@@ -1,6 +1,15 @@
-# Unreleased
+# Breaking changes in 0.6.0
 
 - `Layout` has been renamed to `AdminLayout` without a compatibility alias. Update your import and all JSX references (including `Layout.Sider`, `Layout.Header`, `Layout.Content`, and `Layout.Footer`). Rename component-specific types to `AdminLayoutProps`, `AdminLayoutSiderProps`, `AdminLayoutHeaderProps`, and `AdminLayoutContentProps`. Behavior and CSS hooks are unchanged.
+
+```tsx
+import { AdminLayout, type AdminLayoutProps } from "@bixlab/mtone";
+
+const props: AdminLayoutProps = { hasSider: true };
+const page = <AdminLayout {...props}><AdminLayout.Sider /><AdminLayout.Content>Content</AdminLayout.Content></AdminLayout>;
+```
+
+Spotlight now keeps its top edge fixed while results change, rather than centering vertically. Other dialogs retain their existing positioning.
 
 # Upgrade notes for 0.5.0
 

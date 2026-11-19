@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.5.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.6.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 

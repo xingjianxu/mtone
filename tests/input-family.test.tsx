@@ -1,4 +1,5 @@
 import React from "react";
+import { parseRoute } from "../apps/docs/docs-app";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import {
@@ -244,8 +245,7 @@ test("changing external form owner updates reset listener", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Reset B" }));
   await waitFor(() => expect(screen.getByText("1")).toBeInTheDocument());
 });
-test("Input compatibility routes lead to the consolidated page", async () => {
-  const { parseRoute } = await import("../apps/docs/docs-app");
+test("Input compatibility routes lead to the consolidated page", () => {
   expect(parseRoute("#/components/SearchInput")).toEqual({
     kind: "component",
     name: "Input",

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0
+
+### Breaking
+- Rename `Layout` and its component-specific types to `AdminLayout` with no compatibility aliases. Update imports and JSX compound-component references; behavior and CSS hooks remain unchanged. See [migration notes](docs/MIGRATION.md).
+
+### Fixed
+- Anchor Spotlight near the top of the viewport so filtering results no longer moves the search field. Short viewports use a smaller offset and constrained scrolling.
+
+### Documentation
+- Split component examples into focused sections with a sticky page outline and refreshed documentation layout.
+- Synchronize API guides, migration instructions and the packaged AI reference.
+
 ## 0.5.0
 
 ### Added and enhanced
