@@ -1,0 +1,95 @@
+/* Unopted scopes remain light; an explicit nested scope starts a new palette.
+ * Only theme-marked nodes opt the document or a portalled surface into color-scheme. */
+:where(.mt-scope, [data-mt-theme="light"], [data-mt-theme="system"]) {
+  color-scheme: light;
+}
+:where([data-mt-theme="dark"]) {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :where([data-mt-theme="system"]) {
+    color-scheme: dark;
+  }
+}
+
+/* Legacy CSS consumers keep the literal light colors at the use sites.
+ * light-dark() resolves these pairs against the nearest scope's color-scheme. */
+@supports (color: light-dark(white, black)) {
+  :is(.mt-scope, [data-mt-theme]) {
+    --mt-fg: light-dark(#37352f, #eeece8);
+    --mt-bg: light-dark(#fff, #20201f);
+    --mt-primary: light-dark(#37352f, #eeece8);
+    --mt-on-primary: light-dark(white, #20201f);
+    --mt-hover: light-dark(#f1f1ef, #30302e);
+    --mt-muted: light-dark(#787774, #aeaaa4);
+    --mt-border: light-dark(#e9e9e7, #3d3c39);
+    --mt-subtle: light-dark(#f7f7f5, #262624);
+    --mt-focus: light-dark(#93b4dc, #86b5ed);
+    --mt-indicator: light-dark(#5378aa, #8bb7ea);
+    --mt-blue: light-dark(#2383e2, #86b5ed);
+    --mt-avatar-bg: light-dark(#eeede9, #393732);
+    --mt-avatar-color: light-dark(#68645d, #d3cdc4);
+    --mt-progress-track: light-dark(#efefed, #3c3b37);
+    --mt-result-error: light-dark(#b44c4c, #f68f8c);
+    --mt-result-info: light-dark(#5378aa, #91baf0);
+    --mt-result-success: light-dark(#448361, #99d6a7);
+    --mt-result-warning: light-dark(#a47629, #edc078);
+    --mt-solid-hover: light-dark(#53514c, #d7d3cb);
+    --mt-neutral-raised: light-dark(#efefed, #393834);
+    --mt-nav-hover: light-dark(#efefef, #30302e);
+    --mt-nav-selected: light-dark(#e5e5e5, #3d3c39);
+    --mt-nav-current-text: light-dark(#262626, #eeece8);
+    --mt-switch-off: light-dark(#c7c7c3, #615f59);
+    --mt-input-error: light-dark(#c66660, #e28982);
+    --mt-input-warning: light-dark(#b68b46, #d4a963);
+    --mt-warning-border: light-dark(#b7791f, #d4a963);
+    --mt-error-border: light-dark(#dc2626, #f28a85);
+    --mt-error-strong: light-dark(#b42318, #f69e96);
+    --mt-error-tree: light-dark(#b74444, #f68f8c);
+    --mt-error-list: light-dark(#c44e48, #f68f8c);
+    --mt-badge-blue-bg: light-dark(#e7f0f9, #293b51);
+    --mt-badge-blue-fg: light-dark(#32679b, #b2d4fc);
+    --mt-badge-green-bg: light-dark(#e8f1eb, #283b31);
+    --mt-badge-green-fg: light-dark(#3c7152, #a4d7b4);
+    --mt-badge-orange-bg: light-dark(#fbefdf, #423529);
+    --mt-badge-orange-fg: light-dark(#9c6a2d, #efc38a);
+    --mt-badge-red-bg: light-dark(#f9e9e7, #492f2d);
+    --mt-badge-red-fg: light-dark(#ae4d47, #ffaaa4);
+    --mt-badge-purple-bg: light-dark(#efe9f6, #3b3048);
+    --mt-badge-purple-fg: light-dark(#795a9e, #dabbf3);
+    --mt-success-text: light-dark(#548164, #a3d6b1);
+    --mt-alert-info-border: light-dark(#e4e8ed, #3b4f64);
+    --mt-alert-info-bg: light-dark(#f6f8fa, #263341);
+    --mt-alert-success-bg: light-dark(#f2f7f3, #26352c);
+    --mt-alert-success-border: light-dark(#deeadf, #3b5341);
+    --mt-alert-success-fg: light-dark(#466b4c, #a9d6b1);
+    --mt-alert-warning-bg: light-dark(#fcf8ee, #382e23);
+    --mt-alert-warning-border: light-dark(#eee3c9, #574930);
+    --mt-alert-warning-fg: light-dark(#8c6b34, #efcc92);
+    --mt-alert-error-bg: light-dark(#fcf3f2, #3b2927);
+    --mt-alert-error-border: light-dark(#f0dcd9, #593d3a);
+    --mt-alert-error-fg: light-dark(#a24942, #f6aaa3);
+    --mt-toast-success-border: light-dark(#c8dfce, #466651);
+    --mt-toast-success-icon: light-dark(#34834b, #99d6a7);
+    --mt-toast-error-border: light-dark(#edc9c6, #6f4a46);
+    --mt-success: light-dark(#448361, #99d6a7);
+    --mt-warning: light-dark(#9f6b2e, #edc078);
+    --mt-mark-bg: light-dark(#fbf3db, #493a24);
+    --mt-mentions-warning: light-dark(#c28c32, #d4a963);
+    --mt-danger-text: light-dark(#b6403b, #f69e96);
+    --mt-error-text: light-dark(#d44c47, #f69e96);
+    --mt-select-surface: light-dark(#e9eef4, #293746);
+    --mt-select-highlight: light-dark(#edf3fa, #2d4056);
+    --mt-shadow-light: light-dark(#0002, #0008);
+    --mt-card-shadow: light-dark(#00000012, #0007);
+    --mt-overlay-shadow: light-dark(#00000014, #0008);
+    --mt-handle-shadow: light-dark(#0000001a, #0009);
+    --mt-toast-shadow: light-dark(#0000001f, #0009);
+    --mt-modal-shadow: light-dark(#0003, #000a);
+    --mt-action-danger-bg: light-dark(#d44c47, #a33f39);
+    --mt-tooltip-bg: light-dark(#37352f, #353431);
+    --mt-tooltip-fg: light-dark(white, #eeece8);
+    --mt-button-separator: light-dark(rgb(255 255 255 / 30%), rgb(32 32 31 / 24%));
+    --mt-blue-button-separator: light-dark(rgb(255 255 255 / 30%), rgb(255 255 255 / 40%));
+  }
+}

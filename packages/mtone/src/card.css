@@ -99,7 +99,7 @@
   transition: box-shadow 120ms ease;
 }
 .mt-card-hoverable:hover {
-  box-shadow: 0 3px 12px #00000012;
+  box-shadow: 0 3px 12px var(--mt-card-shadow, #00000012);
 }
 .mt-card-inner > .mt-card-header {
   background: var(--mt-card-header-bg, var(--mt-subtle, #f7f7f5));
@@ -191,7 +191,7 @@
 .mt-card-grid-hoverable:hover {
   box-shadow:
     inset -1px -1px 0 var(--mt-border, #e9e9e7),
-    0 2px 8px #00000014;
+    0 2px 8px var(--mt-overlay-shadow, #00000014);
   position: relative;
   z-index: 1;
 }

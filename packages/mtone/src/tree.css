@@ -63,7 +63,7 @@
 }
 .mt-tree-load-error {
   font-size: 11px;
-  color: var(--mt-danger, #b74444);
+  color: var(--mt-danger, var(--mt-error-tree, #b74444));
   white-space: nowrap;
 }
 @keyframes mt-tree-spin {

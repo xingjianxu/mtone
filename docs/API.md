@@ -12,7 +12,7 @@ website does not publish a new npm version.
 
 ## Provider and styling
 
-`MtoneProvider` accepts `locale="zh" | "en"`, `density="compact" | "comfortable"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, compact and default colors. `MtoneScope` applies the current provider context to a wrapper; popups do this automatically.
+`MtoneProvider` accepts `locale="zh" | "en"`, `density="compact" | "comfortable"`, `theme="light" | "dark" | "system"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, compact and light colors. `theme="system"` responds immediately to the operating system color preference. A nested `MtoneScope theme="light"` (or `"dark"` / `"system"`) overrides just that subtree, including its mtone popups. Nested scopes and providers inherit the enclosing theme when omitted. The library does not read or store the selection.
 
 ```tsx
 <MtoneProvider

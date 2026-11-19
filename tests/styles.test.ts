@@ -4,11 +4,15 @@ it('does not ship preflight or unscoped host element rules',()=>{const css=readF
 it('uses neutral gray sidebar states while preserving focus indicators', () => {
   const docs = readFileSync('apps/docs/site.css', 'utf8');
   const library = readFileSync('packages/mtone/src/styles.css', 'utf8');
-  for (const [css, selector] of [[docs, '.docs-sidebar nav a[aria-current="page"]'], [library, '.mt-nav-item.mt-active']]) {
-    const rule = css.slice(css.indexOf(selector)).split('}')[0];
-    expect(rule).toContain('background: #e5e5e5');
-    expect(rule).toContain('color: #262626');
-  }
+  const docsTokens = readFileSync('apps/docs/theme-preference.css', 'utf8');
+  const docsRule = docs.slice(docs.indexOf('.docs-sidebar nav a[aria-current="page"]')).split('}')[0];
+  const libraryRule = library.slice(library.indexOf('.mt-nav-item.mt-active')).split('}')[0];
+  expect(docsRule).toContain('background: var(--docs-nav-active)');
+  expect(docsRule).toContain('color: var(--docs-nav-active-ink)');
+  expect(docsTokens).toContain('--docs-nav-active: #e5e5e5');
+  expect(docsTokens).toContain('--docs-nav-active-ink: #262626');
+  expect(libraryRule).toContain('background: var(--mt-nav-selected, #e5e5e5)');
+  expect(libraryRule).toContain('color: var(--mt-nav-current-text, #262626)');
   expect(library).toContain('.mt-nav-item:focus-visible');
   expect(docs).toContain('a:focus-visible');
 });
@@ -51,7 +55,8 @@ it('keeps shared focus tokens and allows the Input forced-colors fallback', () =
 it('keeps semantic error borders separate from the blue focus ring', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const errorRule = css.slice(css.indexOf('.mt-input[aria-invalid="true"]')).split('}')[0];
-  expect(errorRule).toContain('border-color: #c66660');
+  expect(errorRule).toContain('border-color: var(--mt-input-error, #c66660)');
+  expect(errorRule).not.toContain('--mt-focus');
   expect(css).toContain('--mt-focus: #93b4dc');
 });
 it('keeps toast icons centered on the first text row with compact spacing', () => {

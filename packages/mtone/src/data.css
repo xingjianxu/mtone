@@ -593,7 +593,7 @@
   background: var(--mt-hover, #f1f1ef);
 }
 .mt-tree-item[aria-selected="true"] {
-  background: var(--mt-selected, #e9eef4);
+  background: var(--mt-selected, var(--mt-select-surface, #e9eef4));
 }
 .mt-tree-item[aria-disabled="true"] {
   opacity: 0.45;
@@ -633,7 +633,7 @@
   font-size: 14px;
 }
 .mt-dropzone[data-dragging] {
-  background: var(--mt-selected, #edf3fa);
+  background: var(--mt-selected, var(--mt-select-highlight, #edf3fa));
   border-color: var(--mt-indicator, #5378aa);
 }
 .mt-dropzone input {
@@ -674,7 +674,7 @@
   color: var(--mt-muted, #787774);
 }
 .mt-upload-name small[role="alert"] {
-  color: var(--mt-danger, #c44e48);
+  color: var(--mt-danger, var(--mt-error-list, #c44e48));
 }
 .mt-upload-list progress {
   width: 80px;

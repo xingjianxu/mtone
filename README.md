@@ -43,7 +43,7 @@ Node 24 recommended. The documentation app lives in `apps/docs`; its static buil
 
 Buttons, forms, plain-text mentions, selection controls, navigation, directory tree, tabs, menus, lists, table, status and property displays, dialogs/drawers, feedback and upload. No block editor or backend. See [API](docs/API.md), [coverage](docs/COVERAGE.md) and [verification](docs/VERIFICATION.md).
 
-Default style: text #37352F, muted #787774, border #E9E9E7, subtle surface #F7F7F5, white canvas, 14px text, 28px controls, 4px radius. CSS is precompiled, prefixed and contains no Tailwind Preflight. Dark theme is not included.
+Default style: text #37352F, muted #787774, border #E9E9E7, subtle surface #F7F7F5, white canvas, 14px text, 28px controls, 4px radius. CSS is precompiled, prefixed and contains no Tailwind Preflight. Existing applications remain light by default. In builds with theme support, set `theme="dark"` or `theme="system"` on `MtoneProvider`; system mode follows the operating system without reloading. `MtoneScope` can override the mode locally and mtone popups follow their trigger context. The library leaves preference storage to the application.
 
 ## Documentation website
 

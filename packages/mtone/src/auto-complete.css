@@ -24,10 +24,10 @@
   height: 34px;
 }
 .mt-auto-complete[data-status="error"] {
-  border-color: var(--mt-danger, #dc2626);
+  border-color: var(--mt-danger, var(--mt-error-border, #dc2626));
 }
 .mt-auto-complete[data-status="warning"] {
-  border-color: #b7791f;
+  border-color: var(--mt-warning-border, #b7791f);
 }
 .mt-auto-complete[data-disabled] {
   opacity: 0.5;
@@ -123,7 +123,7 @@
   font-size: 12px;
 }
 .mt-auto-complete:has(input[aria-invalid="true"]) {
-  border-color: #c66660;
+  border-color: var(--mt-input-error, #c66660);
 }
 @media (forced-colors: active) {
   .mt-auto-complete:focus-within {

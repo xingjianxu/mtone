@@ -1,7 +1,7 @@
 name: Documentation
 on:
   push:
-    branches: [master, docs/component-layout, fix/spotlight-anchor, feat/admin-layout, feat/tag-select, feat/tag-select-all, fix/list-sort-handle, fix/list-sticky-groups]
+    branches: [master, docs/component-layout, fix/spotlight-anchor, feat/admin-layout, feat/tag-select, feat/tag-select-all, fix/list-sort-handle, fix/list-sticky-groups, feat/color-theme]
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,6 +24,12 @@ jobs:
       - run: npm run test:package
       - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
       - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Color theme browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/theme-palette.browser.mjs
+            BROWSER=$browser node tests/theme-docs.browser.mjs
+          done
       - run: node tests/tag-select.browser.mjs
       - run: node tests/tree-select.browser.mjs
       - run: node tests/date-picker.browser.mjs

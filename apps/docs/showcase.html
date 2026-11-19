@@ -1,2 +1,29 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="由 mtone 组件构建的独立知识库应用示例。"><title>应用示例 · mtone</title><style>body{margin:0}</style></head><body><div id="root"></div><script type="module" src="/showcase-main.tsx"></script></body></html>
+<html lang="zh-CN" data-mt-theme="system">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="由 mtone 组件构建的独立知识库应用示例。">
+    <title>应用示例 · mtone</title>
+    <style>
+      html { color-scheme: light; background: #fff }
+      html[data-mt-theme="dark"] { color-scheme: dark; background: #20201f }
+      @media (prefers-color-scheme: dark) {
+        html[data-mt-theme="system"] { color-scheme: dark; background: #20201f }
+      }
+      body { margin: 0 }
+    </style>
+    <script>
+      (() => {
+        let mode;
+        try { mode = localStorage.getItem("mtone-docs-theme"); } catch {}
+        document.documentElement.dataset.mtTheme =
+          mode === "light" || mode === "dark" ? mode : "system";
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/showcase-main.tsx"></script>
+  </body>
+</html>

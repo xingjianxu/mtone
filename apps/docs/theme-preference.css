@@ -1,0 +1,171 @@
+/* Preserve the original light swatches while sharing the library color scheme. */
+:root {
+  --docs-fg: #37352f;
+  --docs-text: #292929;
+  --docs-nav-active-ink: #262626;
+  --docs-nav-text: #6c6b65;
+  --docs-strong-muted: #555;
+  --docs-muted: #787774;
+  --docs-component-muted: #686660;
+  --docs-showcase-muted: #6b6b6b;
+  --docs-showcase-overline: #737373;
+  --docs-showcase-active-ink: #444;
+  --docs-faint: #99988f;
+  --docs-eyebrow: #a3a398;
+  --docs-gallery-filter: #9b9b91;
+  --docs-version: #8a8984;
+  --docs-keycap: #96958f;
+  --docs-code-caption: #96968b;
+  --docs-api-column: #8b8b82;
+  --docs-intro-arrow: #b3b4ac;
+  --docs-intro-description: #929189;
+  --docs-accent-muted: #8e978b;
+  --docs-accent-link: #537260;
+  --docs-accent-code: #53634e;
+  --docs-accent-visited: #6c8066;
+  --docs-canvas: #fff;
+  --docs-subtle: #f7f7f5;
+  --docs-sidebar: #fafaf9;
+  --docs-code: #f8f8f6;
+  --docs-hover: #efefed;
+  --docs-inline-hover: #f1f1ef;
+  --docs-nav-hover: #efefef;
+  --docs-nav-active: #e5e5e5;
+  --docs-showcase-tag: #f6f6f5;
+  --docs-showcase-sidebar: #f8f8f7;
+  --docs-showcase-selection: #90978a;
+  --docs-brand: #373a34;
+  --docs-brand-ink: #fff;
+  --docs-primary-hover: #53634e;
+  --docs-border: #e9e9e7;
+  --docs-hairline: #efefec;
+  --docs-accent-border: #a9b4a2;
+  --docs-showcase-shell-border: #dfdfdd;
+  --docs-showcase-sidebar-border: #e5e5e3;
+  --docs-showcase-card-border: #e7e7e4;
+  --docs-showcase-item-hover: #c9c9c5;
+  --docs-showcase-toolbar-border: #ededeb;
+  --docs-showcase-divider: #ececea;
+  --docs-showcase-empty-border: #dededb;
+  --docs-showcase-card-icon-bg: #f7f6f1;
+  --docs-showcase-card-icon: #81806f;
+  --docs-showcase-card-icon-border: #ebeae5;
+  --docs-showcase-product-bg: #f2f4f6;
+  --docs-showcase-product-icon: #6f7c87;
+  --docs-showcase-product-border: #e6eaed;
+  --docs-showcase-research-bg: #f4f2f5;
+  --docs-showcase-research-icon: #82768d;
+  --docs-showcase-research-border: #eae5ed;
+  --docs-showcase-actions: #b1b1ac;
+  --docs-showcase-inactive: #b3b3ae;
+  --docs-showcase-caption: #898371;
+  --docs-backdrop: #0003;
+  --docs-faint-shadow: #00000005;
+  --docs-control-shadow: #00000012;
+}
+
+@supports (color: light-dark(white, black)) {
+  :root {
+    --docs-fg: light-dark(#37352f, var(--mt-fg, #eeece8));
+    --docs-text: light-dark(#292929, var(--mt-fg, #eeece8));
+    --docs-nav-active-ink: light-dark(#262626, #eeece8);
+    --docs-nav-text: light-dark(#6c6b65, #bdb9b1);
+    --docs-strong-muted: light-dark(#555, #d0cdc6);
+    --docs-muted: light-dark(#787774, var(--mt-muted, #aeaaa4));
+    --docs-component-muted: light-dark(#686660, #bab6af);
+    --docs-showcase-muted: light-dark(#6b6b6b, #bdb9b1);
+    --docs-showcase-overline: light-dark(#737373, #b2aea7);
+    --docs-showcase-active-ink: light-dark(#444, #d6d3cc);
+    --docs-faint: light-dark(#99988f, #a8a39b);
+    --docs-eyebrow: light-dark(#a3a398, #aba79d);
+    --docs-gallery-filter: light-dark(#9b9b91, #aeaaa4);
+    --docs-version: light-dark(#8a8984, #aeaaa4);
+    --docs-keycap: light-dark(#96958f, #a9a59e);
+    --docs-code-caption: light-dark(#96968b, #b2aea6);
+    --docs-api-column: light-dark(#8b8b82, #b2aea6);
+    --docs-intro-arrow: light-dark(#b3b4ac, #95958a);
+    --docs-intro-description: light-dark(#929189, #a9a59e);
+    --docs-accent-muted: light-dark(#8e978b, #a7b3a1);
+    --docs-accent-link: light-dark(#537260, #b0cbb5);
+    --docs-accent-code: light-dark(#53634e, #b0c8ac);
+    --docs-accent-visited: light-dark(#6c8066, #adbfaa);
+    --docs-canvas: light-dark(#fff, var(--mt-bg, #20201f));
+    --docs-subtle: light-dark(#f7f7f5, var(--mt-subtle, #262624));
+    --docs-sidebar: light-dark(#fafaf9, #252524);
+    --docs-code: light-dark(#f8f8f6, #262624);
+    --docs-hover: light-dark(#efefed, #30302e);
+    --docs-inline-hover: light-dark(#f1f1ef, #30302e);
+    --docs-nav-hover: light-dark(#efefef, #30302e);
+    --docs-nav-active: light-dark(#e5e5e5, #383834);
+    --docs-showcase-tag: light-dark(#f6f6f5, #2b2b29);
+    --docs-showcase-sidebar: light-dark(#f8f8f7, #252524);
+    --docs-showcase-selection: light-dark(#90978a, #9da898);
+    --docs-brand: light-dark(#373a34, #cfdbc8);
+    --docs-brand-ink: light-dark(#fff, #242a24);
+    --docs-primary-hover: light-dark(#53634e, #e1e9dc);
+    --docs-border: light-dark(#e9e9e7, var(--mt-border, #3d3c39));
+    --docs-hairline: light-dark(#efefec, #3a3836);
+    --docs-accent-border: light-dark(#a9b4a2, #7b8d73);
+    --docs-showcase-shell-border: light-dark(#dfdfdd, #42403d);
+    --docs-showcase-sidebar-border: light-dark(#e5e5e3, #3d3c39);
+    --docs-showcase-card-border: light-dark(#e7e7e4, #3d3c39);
+    --docs-showcase-item-hover: light-dark(#c9c9c5, #585650);
+    --docs-showcase-toolbar-border: light-dark(#ededeb, #3a3836);
+    --docs-showcase-divider: light-dark(#ececea, #3a3836);
+    --docs-showcase-empty-border: light-dark(#dededb, #45443f);
+    --docs-showcase-card-icon-bg: light-dark(#f7f6f1, #322f27);
+    --docs-showcase-card-icon: light-dark(#81806f, #d0c9b2);
+    --docs-showcase-card-icon-border: light-dark(#ebeae5, #484437);
+    --docs-showcase-product-bg: light-dark(#f2f4f6, #29323a);
+    --docs-showcase-product-icon: light-dark(#6f7c87, #b5c7d6);
+    --docs-showcase-product-border: light-dark(#e6eaed, #3d4b56);
+    --docs-showcase-research-bg: light-dark(#f4f2f5, #332b3a);
+    --docs-showcase-research-icon: light-dark(#82768d, #d1bfdc);
+    --docs-showcase-research-border: light-dark(#eae5ed, #4d4057);
+    --docs-showcase-actions: light-dark(#b1b1ac, #b6b3ad);
+    --docs-showcase-inactive: light-dark(#b3b3ae, #9e9b95);
+    --docs-showcase-caption: light-dark(#898371, #bfb59e);
+    --docs-backdrop: light-dark(#0003, #0007);
+    --docs-faint-shadow: light-dark(#00000005, #0004);
+    --docs-control-shadow: light-dark(#00000012, #0006);
+  }
+}
+
+.docs-theme-options {
+  display: inline-flex;
+  flex: none;
+  padding: 2px;
+  gap: 1px;
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: 5px;
+  background: var(--mt-subtle, #f7f7f5);
+}
+
+.docs-theme-options > button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--mt-muted, #787774);
+  cursor: pointer;
+}
+
+.docs-theme-options > button:hover {
+  background: var(--mt-hover, #f1f1ef);
+  color: var(--mt-fg, #37352f);
+}
+
+.docs-theme-options > button[aria-pressed="true"] {
+  background: var(--mt-bg, #fff);
+  color: var(--mt-fg, #37352f);
+  box-shadow: 0 0 0 1px var(--mt-border, #e9e9e7);
+}
+
+.docs-theme-options > button:focus-visible {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
+}

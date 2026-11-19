@@ -12,6 +12,7 @@ This file describes this package checkout, not necessarily the latest published 
 - Import precompiled CSS once: import "@bixlab/mtone/styles.css";
 - Consumers do not need to install/configure Tailwind or copy component source. Base UI and Lucide are package dependencies.
 - Optional provider: <MtoneProvider locale="zh" density="compact"><Button>保存</Button></MtoneProvider>. Locale: zh | en; density: compact | comfortable. Provider tokens are CSS custom properties.
+- Color theme: <MtoneProvider theme="system">…</MtoneProvider> follows the OS in real time. Use light or dark to override. Without an explicit theme, top-level providers remain light; nested MtoneScope can override and floats inherit their React scope. The library does not store the choice.
 - Interactive components need a client boundary in React Server Component frameworks.
 
 ## AI coding guidance
@@ -28,6 +29,7 @@ This file describes this package checkout, not necessarily the latest published 
 ## Documentation
 
 - [Getting started](https://xingjianxu.github.io/mtone/#/start): installation and AI usage
+- [Theme and styling](https://xingjianxu.github.io/mtone/#/theme): color modes and tokens
 - [Component gallery](https://xingjianxu.github.io/mtone/#/gallery): independent component examples
 - [Application showcase](https://xingjianxu.github.io/mtone/showcase.html): interactive in-memory demo, not a backend
 - [Source repository](https://github.com/xingjianxu/mtone): current code and migration notes
@@ -2800,13 +2802,14 @@ export default function Demo() {
 
 ### MtoneProvider
 
-- [MtoneProvider](https://xingjianxu.github.io/mtone/#/components/MtoneProvider): 为组件及其浮层配置语言、密度和主题变量。
+- [MtoneProvider](https://xingjianxu.github.io/mtone/#/components/MtoneProvider): 为组件及其浮层配置颜色模式、语言、密度和主题变量。
 - Import: MtoneProvider, Button from @bixlab/mtone
 - children: ReactNode. 组件内容。
 - locale: "zh" | "en" (default: zh). 内置控件文案语言。
 - density: "compact" | "comfortable" (default: compact). 控件密度。
+- theme: MtoneTheme ("light" | "dark" | "system") (default: 最外层为 light). 浅色、深色或实时跟随设备设置；省略时继承上层主题。
 - tokens: Tokens. CSS 自定义属性与 CSSProperties，常用 --mt-fg、--mt-bg、--mt-primary。
-- 简单组件不使用 Provider 时也可用默认值。
+- 简单组件不使用 Provider 时也可用默认值，保持浅色。
 - 库分发预编译 CSS，不要求宿主安装 Tailwind。浮层继承 Provider 上下文。
 - 主题通过 CSS 变量传播，不是 Shadow DOM 隔离；自定义层级请检查 z-index 1200–1300。
 
@@ -2816,18 +2819,19 @@ import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <MtoneProvider locale="zh" density="comfortable" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>
+    <MtoneProvider locale="zh" density="comfortable" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>
   );
 }
 ```
 
 ### MtoneScope
 
-- [MtoneScope](https://xingjianxu.github.io/mtone/#/components/MtoneScope): 把当前 Provider 的主题变量和密度应用到一个 div。
+- [MtoneScope](https://xingjianxu.github.io/mtone/#/components/MtoneScope): 把当前 Provider 的主题变量和密度应用到一个 div，可局部覆盖颜色模式。
 - Import: MtoneScope, MtoneProvider, Button from @bixlab/mtone
 - children: ReactNode. 组件内容。
+- theme: MtoneTheme ("light" | "dark" | "system") (default: 继承上层主题). 仅覆盖此作用域及其浮层的颜色模式。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 通常无需手动使用；库内部用它让 Portal 浮层继承主题。它读取已有上下文，不创建新的 Provider。
+- 通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言、密度和主题变量。
 
 ```tsx
 import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";
@@ -2835,7 +2839,7 @@ import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>
+    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope theme="dark"><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>
   );
 }
 ```

@@ -98,10 +98,10 @@
   border-top: 1px solid var(--mt-border, #e7e5e4);
 }
 .mt-transfer[data-status="error"] > .mt-transfer-panel {
-  border-color: var(--mt-danger, #dc2626);
+  border-color: var(--mt-danger, var(--mt-error-border, #dc2626));
 }
 .mt-transfer[data-status="warning"] > .mt-transfer-panel {
-  border-color: #b7791f;
+  border-color: var(--mt-warning-border, #b7791f);
 }
 @media (max-width: 480px) {
   .mt-transfer {

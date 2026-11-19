@@ -1,10 +1,26 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-mt-theme="system">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description" content="mtone React 组件库文档：交互式组件总览、示例代码、属性接口与主题配置。" />
     <title>mtone · 内容优先的 React 组件库</title>
+    <style>
+      html { color-scheme: light; background: #fff }
+      html[data-mt-theme="dark"] { color-scheme: dark; background: #20201f }
+      @media (prefers-color-scheme: dark) {
+        html[data-mt-theme="system"] { color-scheme: dark; background: #20201f }
+      }
+      body { margin: 0 }
+    </style>
+    <script>
+      (() => {
+        let mode;
+        try { mode = localStorage.getItem("mtone-docs-theme"); } catch {}
+        document.documentElement.dataset.mtTheme =
+          mode === "light" || mode === "dark" ? mode : "system";
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

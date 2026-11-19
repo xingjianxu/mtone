@@ -5861,9 +5861,9 @@ export default function Demo() {
   {
     name: "MtoneProvider",
     category: "全局配置",
-    description: "为组件及其浮层配置语言、密度和主题变量。",
+    description: "为组件及其浮层配置颜色模式、语言、密度和主题变量。",
     importNames: ["MtoneProvider", "Button"],
-    code: 'import { MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider locale="zh" density="comfortable" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>\n  );\n}',
+    code: 'import { MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider locale="zh" density="comfortable" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>\n  );\n}',
     props: [
       {
         name: "children",
@@ -5883,6 +5883,12 @@ export default function Demo() {
         default: "compact",
       },
       {
+        name: "theme",
+        type: 'MtoneTheme ("light" | "dark" | "system")',
+        description: "浅色、深色或实时跟随设备设置；省略时继承上层主题。",
+        default: "最外层为 light",
+      },
+      {
         name: "tokens",
         type: "Tokens",
         description:
@@ -5890,7 +5896,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "简单组件不使用 Provider 时也可用默认值。",
+      "简单组件不使用 Provider 时也可用默认值，保持浅色。",
       "库分发预编译 CSS，不要求宿主安装 Tailwind。浮层继承 Provider 上下文。",
       "主题通过 CSS 变量传播，不是 Shadow DOM 隔离；自定义层级请检查 z-index 1200–1300。",
     ],
@@ -5898,14 +5904,20 @@ export default function Demo() {
   {
     name: "MtoneScope",
     category: "全局配置",
-    description: "把当前 Provider 的主题变量和密度应用到一个 div。",
+    description: "把当前 Provider 的主题变量和密度应用到一个 div，可局部覆盖颜色模式。",
     importNames: ["MtoneScope", "MtoneProvider", "Button"],
-    code: 'import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>\n  );\n}',
+    code: 'import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope theme="dark"><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>\n  );\n}',
     props: [
       {
         name: "children",
         type: "ReactNode",
         description: "组件内容。",
+      },
+      {
+        name: "theme",
+        type: 'MtoneTheme ("light" | "dark" | "system")',
+        description: "仅覆盖此作用域及其浮层的颜色模式。",
+        default: "继承上层主题",
       },
       {
         name: "原生属性",
@@ -5915,7 +5927,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "通常无需手动使用；库内部用它让 Portal 浮层继承主题。它读取已有上下文，不创建新的 Provider。",
+      "通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言、密度和主题变量。",
     ],
   },
 ];

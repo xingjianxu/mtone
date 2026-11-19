@@ -1,10 +1,14 @@
-.showcase-page { height: 100dvh; overflow: hidden; background: #fff; color: #292929; font: 14px/1.6 Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif; }
+.showcase-page { height: 100dvh; overflow: hidden; background: var(--docs-canvas); color: var(--docs-text); font: 14px/1.6 Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif; }
 .showcase-page *, .showcase-page *::before, .showcase-page *::after { box-sizing: border-box; }
 .showcase-page .showcase-page-main { width: 100%; height: 100%; max-width: none; margin: 0; padding: 0; }
 .showcase-page .showcase { height: 100%; }
 .showcase-page .showcase-shell { width: 100%; height: 100%; min-height: 0; border: 0; border-radius: 0; box-shadow: none; }
 .showcase-topbar-actions { display: flex; align-items: center; gap: 12px; }
-.showcase-docs-link { color: #555; font-size: 12px; text-decoration: none; white-space: nowrap; }
+.showcase-docs-link { color: var(--docs-strong-muted); font-size: 12px; text-decoration: none; white-space: nowrap; }
 .showcase-docs-link:hover { text-decoration: underline; }
 .showcase-docs-link:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
 .showcase-page .showcase-bottom > span:first-child { min-width: 0; line-height: 1.6; }
+@media (max-width: 480px) {
+  .showcase-topbar-actions { gap: 6px; }
+  .showcase-topbar-actions .showcase-docs-link { font-size: 11px; }
+}

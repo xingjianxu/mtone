@@ -119,14 +119,14 @@ const blank = (): Omit<Document, "id" | "updated"> => ({
   favorite: false,
 });
 
-export function AppShowcase() {
+export function AppShowcase({ toolbarExtra }: { toolbarExtra?: React.ReactNode }) {
   return (
     <ToastProvider>
-      <KnowledgeWorkspace />
+      <KnowledgeWorkspace toolbarExtra={toolbarExtra} />
     </ToastProvider>
   );
 }
-function KnowledgeWorkspace() {
+function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [section, setSection] = useState<"all" | "favorites" | "drafts">("all");
   const [category, setCategory] = useState<Category | "全部">("全部");
@@ -271,6 +271,7 @@ function KnowledgeWorkspace() {
             }
             extra={
               <div className="showcase-topbar-actions">
+                {toolbarExtra}
                 <a href="./index.html#/gallery" className="showcase-docs-link">返回组件文档</a>
                 <div className="showcase-member"><Avatar name="林" size={23} /></div>
               </div>

@@ -19,44 +19,71 @@ export const cn = (...v: (string | false | null | undefined)[]) =>
 export type Locale = "zh" | "en";
 export type Tokens = React.CSSProperties &
   Record<`--mt-${string}`, string | number>;
+export type MtoneTheme = "light" | "dark" | "system";
 type Context = {
+  theme: MtoneTheme;
   locale: Locale;
   density: "compact" | "comfortable";
   tokens?: Tokens;
 };
 const MtoneContext = React.createContext<Context>({
   locale: "zh",
+  theme: "light",
   density: "compact",
 });
 export const useMtone = () => React.useContext(MtoneContext);
+export interface MtoneScopeProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Inherits the surrounding mtone theme when omitted. */
+  theme?: MtoneTheme;
+}
 export function MtoneScope({
   children,
   className,
   style,
+  theme,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const c = useMtone();
+}: MtoneScopeProps) {
+  const inherited = useMtone();
+  const c = React.useMemo(
+    () =>
+      theme && theme !== inherited.theme ? { ...inherited, theme } : inherited,
+    [inherited, theme],
+  );
   const floatingOwners = React.useContext(FloatingOwnerContext);
   return (
     <div
       {...props}
       className={cn("mt-scope", className)}
       data-density={c.density}
-      data-mt-floating-owners={floatingOwners.length ? floatingOwners.join(" ") : undefined}
+      data-mt-theme={c.theme}
+      data-mt-floating-owners={
+        floatingOwners.length ? floatingOwners.join(" ") : undefined
+      }
       style={{ ...c.tokens, ...style }}
     >
-      {children}
+      <MtoneContext.Provider value={c}>{children}</MtoneContext.Provider>
     </div>
   );
 }
+export type MtoneProviderProps = Partial<Context> & {
+  children: React.ReactNode;
+};
+
 export function MtoneProvider({
   children,
   locale = "zh",
   density = "compact",
   tokens,
-}: Partial<Context> & { children: React.ReactNode }) {
+  theme,
+}: MtoneProviderProps) {
+  const inherited = useMtone();
+  const resolvedTheme = theme ?? inherited.theme;
+  const value = React.useMemo(
+    () => ({ locale, density, tokens, theme: resolvedTheme }),
+    [locale, density, tokens, resolvedTheme],
+  );
   return (
-    <MtoneContext.Provider value={{ locale, density, tokens }}>
+    <MtoneContext.Provider value={value}>
       <MtoneScope>{children}</MtoneScope>
     </MtoneContext.Provider>
   );

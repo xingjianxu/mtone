@@ -42,7 +42,7 @@
 }
 .mt-splitter-separator:hover .mt-splitter-grip,
 .mt-splitter-separator[data-separator="active"] .mt-splitter-grip {
-  background: #93b4dc;
+  background: var(--mt-focus, #93b4dc);
 }
 .mt-splitter-separator:focus-visible {
   outline: 1px solid var(--mt-focus, #93b4dc);

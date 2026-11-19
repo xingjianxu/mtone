@@ -21,10 +21,10 @@
   border-color: var(--mt-focus, #93b4dc);
 }
 .mt-cascader[data-status="error"] {
-  border-color: var(--mt-danger, #dc2626);
+  border-color: var(--mt-danger, var(--mt-error-border, #dc2626));
 }
 .mt-cascader[data-status="warning"] {
-  border-color: #b7791f;
+  border-color: var(--mt-warning-border, #b7791f);
 }
 .mt-cascader[data-disabled] {
   opacity: 0.5;

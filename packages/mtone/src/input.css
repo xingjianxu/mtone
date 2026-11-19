@@ -94,7 +94,7 @@
   opacity: 1;
 }
 .mt-input-decorated[data-disabled] {
-  background: #f7f7f5;
+  background: var(--mt-subtle, #f7f7f5);
 }
 .mt-input-variant-filled {
   background: var(--mt-hover, #f4f4f2);
@@ -116,11 +116,11 @@
 }
 .mt-input-wrap[data-status="error"],
 .mt-input-wrap[data-status="error"] > .mt-input {
-  border-color: #c66660;
+  border-color: var(--mt-input-error, #c66660);
 }
 .mt-input-wrap[data-status="warning"],
 .mt-input-wrap[data-status="warning"] > .mt-input {
-  border-color: #b68b46;
+  border-color: var(--mt-input-warning, #b68b46);
 }
 .mt-search.mt-input-search {
   position: relative;
@@ -141,7 +141,7 @@
   cursor: pointer;
 }
 .mt-input-search-button:hover:not(:disabled) {
-  background: #e9e9e7;
+  background: var(--mt-border, #e9e9e7);
 }
 .mt-input-search-button:disabled {
   opacity: 0.6;
@@ -200,7 +200,7 @@
   box-shadow: inset 0 -1px var(--mt-focus, #93b4dc);
 }
 .mt-input-wrap[data-status="warning"] > .mt-input:focus {
-  border-color: #b68b46 !important;
+  border-color: var(--mt-input-warning, #b68b46) !important;
 }
 .mt-input-variant-underlined[data-status="warning"] > .mt-input:focus {
   border-top-color: transparent !important;
@@ -209,11 +209,11 @@
 }
 .mt-input-variant-borderless[data-status="warning"] > .mt-input:focus {
   border-color: transparent !important;
-  box-shadow: inset 0 -1px #b68b46;
+  box-shadow: inset 0 -1px var(--mt-input-warning, #b68b46);
 }
 .mt-input-variant-borderless[data-status="error"]:focus-within > .mt-input,
-.mt-input-variant-borderless.mt-input-decorated[data-status="error"]:focus-within { box-shadow: inset 0 -1px #c66660; }
-.mt-input-variant-borderless.mt-input-decorated[data-status="warning"]:focus-within { box-shadow: inset 0 -1px #b68b46; }
+.mt-input-variant-borderless.mt-input-decorated[data-status="error"]:focus-within { box-shadow: inset 0 -1px var(--mt-input-error, #c66660); }
+.mt-input-variant-borderless.mt-input-decorated[data-status="warning"]:focus-within { box-shadow: inset 0 -1px var(--mt-input-warning, #b68b46); }
 /* The decorated surface owns the indicator, never its inner input too. */
 .mt-input-variant-borderless.mt-input-decorated > .mt-input:focus { box-shadow: none; }
 .mt-input-variant-underlined > .mt-input,

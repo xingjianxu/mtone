@@ -23,6 +23,7 @@ import { tableDocSections } from "./table-example";
 import { secondaryDocSections } from "./secondary-demo-registry";
 import { inlineDocSections } from "./inline-demo-registry";
 import { ShowcasePage } from "./showcase-page";
+import { ThemeSelect, useThemePreference } from "./theme-preference";
 export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
   | { kind: "component"; name: string; section?: string };
@@ -224,7 +225,7 @@ function Start() {
         <h2>与 AI 一起编程</h2>
         <p><a href="./llms.txt">打开 llms.txt</a>，将内容提供给支持文件或网页上下文的 AI 编程工具。它包含安装方式、组件入口、重要 API、示例与文档链接。</p>
         <CodeBlock code={'先读取 node_modules/@bixlab/mtone/llms.txt 和 dist/index.d.ts。使用已安装版本的 mtone 组件实现一个设置页，导入 styles.css，复用组件，不猜测其他 UI 库的 API。最后执行类型检查并验证键盘交互。'} />
-        <p>从包含此文件的新版 npm 包安装后，可在 node_modules/@bixlab/mtone/llms.txt 读取。当前改动尚待下一次 npm 发布；已安装的旧版本可能没有该文件。</p>
+        <p>从 npm 安装的 @bixlab/mtone 自 0.6.0 起包含此文件，可在 <code>node_modules/@bixlab/mtone/llms.txt</code> 读取。</p>
         <p>网站文件跟随仓库 master，可能领先 npm。优先使用已安装包中的文件和类型声明；llms.txt 不会被所有 AI 工具自动读取，也不能代替完整类型、测试或后端实现。</p>
       </section>
       <section>
@@ -250,15 +251,41 @@ function Theme() {
       </p>
       <section>
         <h2>主题与密度</h2>
+        <p className="theme-release-note">
+          颜色主题 API 已在文档站预览，尚未包含在 npm 0.6.0。
+        </p>
         <CodeBlock
           code={
-            '<MtoneProvider\n  locale="zh"\n  density="comfortable"\n  tokens={{ "--mt-primary": "#466751", "--mt-radius": "6px" }}\n>\n  <Button>保存</Button>\n</MtoneProvider>'
+            '<MtoneProvider\n  locale="zh"\n  density="comfortable"\n  theme="system"\n  tokens={{ "--mt-primary": "#466751", "--mt-radius": "6px" }}\n>\n  <main style={{ background: "var(--mt-bg)" }}>\n    <Button>保存</Button>\n  </main>\n</MtoneProvider>'
           }
         />
         <p>
-          默认 compact 为紧凑布局；comfortable
-          提供更舒适的控件高度。弹层继承所属 Provider 的主题。
+          <code>theme</code> 支持 <code>light</code>、<code>dark</code> 和 <code>system</code>。
+          应用未指定时保持浅色；<code>system</code> 实时跟随设备设置，不用刷新。
+          下拉菜单、弹窗和通知继承所在作用域的主题，可用 <code>MtoneScope</code> 局部覆盖。
+          Provider 不绘制应用画布，需要时在应用自己的容器上使用 <code>background: var(--mt-bg)</code>。
         </p>
+        <p>
+          文档站和应用示例默认跟随系统，也可在顶部手动切换；所选主题会记住。
+          布局密度可独立选择，默认 <code>compact</code>，<code>comfortable</code> 提供更高的控件。
+        </p>
+      </section>
+      <section>
+        <h2>同页使用不同主题</h2>
+        <div className="theme-samples">
+          {(["light", "dark"] as const).map((theme) => (
+            <M.MtoneScope key={theme} theme={theme} className="theme-sample">
+              <strong>{theme === "light" ? "浅色" : "深色"}</strong>
+              <M.Button variant="solid">保存</M.Button>
+              <M.Select
+                label="显示选项"
+                placeholder="选择一项"
+                options={[{ value: "compact", label: "紧凑" }, { value: "comfortable", label: "舒适" }]}
+              />
+            </M.MtoneScope>
+          ))}
+        </div>
+        <CodeBlock code={'<MtoneScope theme="dark">\n  <Button variant="solid">保存</Button>\n</MtoneScope>'} />
       </section>
       <section>
         <h2>设计变量</h2>
@@ -281,7 +308,7 @@ function Theme() {
                 ["--mt-hover", "悬停背景"],
                 ["--mt-height", "控件高度"],
                 ["--mt-radius", "圆角"],
-                ["--mt-focus", "统一焦点色（默认 #5378AA），独立于 --mt-primary"],
+                ["--mt-focus", "统一焦点色，独立于 --mt-primary"],
               ].map(([k, v]) => (
                 <tr key={k}>
                   <td>
@@ -308,13 +335,13 @@ function Theme() {
           <li>
             图标按钮需要 aria-label；输入应有可访问标签。保留可见焦点样式。
           </li>
-          <li>浅色主题为当前基线；并未提供完整暗色配色。</li>
         </ul>
       </section>
     </>
   );
 }
 export function DocsApp() {
+  const preference = useThemePreference();
   const [route, setRoute] = useState(() => parseRoute(window.location.hash));
   const [query, setQuery] = useState("");
   const [mobile, setMobile] = useState(false);
@@ -347,13 +374,13 @@ export function DocsApp() {
       else focusDocSection(route.section);
     }
   }, [route]);
-  if (route.kind === "showcase") return <ShowcasePage />;
+  if (route.kind === "showcase") return <ShowcasePage preference={preference} />;
   const doc =
     route.kind === "component"
       ? componentDocs.find((d) => d.name === route.name)
       : undefined;
   return (
-    <M.MtoneProvider density={density}>
+    <M.MtoneProvider density={density} theme={preference.theme}>
       <M.ToastProvider>
         <a
           className="skip-link"
@@ -400,7 +427,9 @@ export function DocsApp() {
                 </button>
               }
             />
+            <ThemeSelect {...preference} />
             <button
+              className="docs-density-toggle"
               onClick={() =>
                 setDensity(density === "compact" ? "comfortable" : "compact")
               }
@@ -409,10 +438,12 @@ export function DocsApp() {
             </button>
             <a
               href="https://github.com/xingjianxu/mtone"
+              className="docs-repo-link"
+              aria-label="GitHub"
               target="_blank"
               rel="noreferrer"
             >
-              GitHub <ArrowUpRight size={14} />
+              <span>GitHub</span> <ArrowUpRight size={14} aria-hidden="true" />
             </a>
             <button
               className="mobile-menu"
