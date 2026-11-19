@@ -55,21 +55,23 @@ try {
    const section = [...el.querySelectorAll('[data-list-group]')]
      .find(h => Math.abs(h.getBoundingClientRect().top - el.getBoundingClientRect().top) < 2);
    const group = section.parentElement;
-   const boundary = group.offsetTop + group.offsetHeight;
-   el.scrollTop = boundary - section.offsetHeight * 2;
+   const viewportTop = el.getBoundingClientRect().top + el.clientTop;
+   el.scrollTop += group.getBoundingClientRect().bottom - viewportTop - section.offsetHeight * 2;
+   // Mount and measure the next group before sampling the transition. That
+   // measurement can change the earlier estimated boundary.
    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-   el.scrollTop = boundary - 8;
-   const viewportTop = el.getBoundingClientRect().top;
-   const next = group.nextElementSibling?.matches('.mt-list-group-boundary')
-     ? group.nextElementSibling.firstElementChild
-     : [...el.querySelectorAll('[data-list-group]')].find(h => h !== section && h.parentElement.offsetTop === boundary);
+   const edge = group.getBoundingClientRect().bottom;
+   const next = [...el.querySelectorAll('[data-list-group]')].find(h =>
+     h !== section && Math.abs(h.parentElement.getBoundingClientRect().top - edge) < 1
+   );
+   el.scrollTop += edge - viewportTop - 8;
    return {
      oldBottom: section.getBoundingClientRect().bottom - viewportTop,
      nextTop: next?.getBoundingClientRect().top - viewportTop,
    };
  });
- assert(Math.abs(boundary.oldBottom - 8) < 2, 'next group pushes current header off');
- assert(Math.abs(boundary.nextTop - 8) < 2, 'next group enters without overlap');
+ assert(Math.abs(boundary.oldBottom - 8) < 2, 'next group pushes current header off: ' + JSON.stringify(boundary));
+ assert(Math.abs(boundary.nextTop - 8) < 2, 'next group enters without overlap: ' + JSON.stringify(boundary));
  const horizontal=page.getByRole('list',{name:'横向列表',exact:true});
  assert(await horizontal.evaluate(el=>el.scrollWidth>el.clientWidth));
  await horizontal.evaluate(el=>{el.scrollLeft=100;});
