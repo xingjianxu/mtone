@@ -29,15 +29,19 @@ try {
       1,
     );
     await page.screenshot({ path: `artifacts/typography-navigation/${process.env.BROWSER || "chromium"}-${width}.png` });
+    const outline = page.getByRole("navigation", { name: "本页目录", exact: true });
+    async function openOutline() {
+      if (width < 1111 && !await page.locator(".component-outline-mobile").evaluate(el => el.open)) await page.locator(".component-outline-mobile > summary").click();
+    }
     for (const name of names) {
+      await openOutline();
       assert.equal(
         await page
           .locator(`.docs-sidebar a[href="#/components/${name}"]`)
           .count(),
         0,
       );
-      await page
-        .getByRole("navigation", { name: "Typography 子组件", exact: true })
+      await outline
         .getByRole("link", { name, exact: true })
         .click();
       await page.waitForURL(`**/#/components/Typography?section=${name}`);
@@ -62,8 +66,8 @@ try {
     await page.waitForFunction(
       () => document.activeElement?.id === "typography-blockquote",
     );
-    await page
-      .getByRole("navigation", { name: "Typography 子组件", exact: true })
+    await openOutline();
+    await outline
       .getByRole("link", { name: "Blockquote", exact: true })
       .click();
     assert.equal(

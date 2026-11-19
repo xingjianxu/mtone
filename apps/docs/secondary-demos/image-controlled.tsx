@@ -1,0 +1,43 @@
+import * as React from "react";
+import {
+  Button,
+  ImagePreview,
+  type ImageItem,
+} from "../../../packages/mtone/src";
+
+// Self-contained fixtures: no image requests to third-party hosts.
+function landscape(sky: string, hill: string, title: string) {
+  return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="500" fill="${sky}"/><circle cx="630" cy="100" r="42" fill="#fff7dc"/><path d="M0 430L180 190L350 360L550 150L800 400V500H0Z" fill="${hill}"/><path d="M0 430Q200 370 410 440T800 420V500H0Z" fill="#abc4c4"/><text x="36" y="62" font-family="sans-serif" font-size="26" fill="#37474f">${title}</text></svg>`)}`;
+}
+const items: ImageItem[] = [
+  { src: landscape("#e7edf0", "#9caea3", "Mountain"), alt: "山间湖泊" },
+  { src: landscape("#f1e9df", "#b5a693", "Sunset"), alt: "落日山谷" },
+  { src: landscape("#e4e8ef", "#8e9bae", "Morning"), alt: "晨间远山" },
+];
+
+export default function Demo() {
+  const [open, setOpen] = React.useState(false);
+  const [current, setCurrent] = React.useState(0);
+  const opener = React.useRef<HTMLButtonElement>(null);
+  const external = (
+    <>
+      <Button ref={opener} onClick={() => setOpen(true)}>
+        打开图片预览
+      </Button>
+      <ImagePreview
+        items={items}
+        open={open}
+        onOpenChange={setOpen}
+        current={current}
+        onCurrentChange={setCurrent}
+        returnFocus={opener}
+      />
+    </>
+  );
+  return (
+    <div style={{ display: "grid", gap: 20 }}>
+      <p>无需先渲染缩略图，由业务按钮打开。</p>
+      {external}
+    </div>
+  );
+}

@@ -249,9 +249,11 @@ test("Input compatibility routes lead to the consolidated page", async () => {
   expect(parseRoute("#/components/SearchInput")).toEqual({
     kind: "component",
     name: "Input",
+    section: "input-search",
   });
   expect(parseRoute("#/components/Textarea")).toEqual({
     kind: "component",
     name: "Input",
+    section: "input-textarea",
   });
 });

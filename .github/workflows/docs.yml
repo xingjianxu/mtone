@@ -1,12 +1,12 @@
 name: Documentation
 on:
   push:
-    branches: [master]
+    branches: [master, docs/component-layout]
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: github-pages
+  group: github-pages-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -44,6 +44,11 @@ jobs:
         run: |
           for browser in chromium firefox webkit; do
             BROWSER=$browser node tests/docs-search.browser.mjs
+          done
+      - name: Component detail browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/component-layout.browser.mjs || exit 1
           done
       - run: node tests/hover-card-arrow.browser.mjs
       - run: node tests/hover-card.browser.mjs
@@ -88,9 +93,11 @@ jobs:
       - run: node tests/modal-layout.browser.mjs
       - run: node tests/showcase.browser.mjs
       - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/master'
         with:
           path: dist/docs
   deploy:
+    if: github.ref == 'refs/heads/master'
     needs: build
     permissions:
       pages: write

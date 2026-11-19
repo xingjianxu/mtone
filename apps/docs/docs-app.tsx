@@ -9,22 +9,29 @@ import {
   Copy,
   Check,
   Layers,
-  Code2,
   BookOpen,
 } from "lucide-react";
 import * as M from "../../packages/mtone/src";
 import { componentCategories, componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
 import { typographySections, focusTypographySection, isTypographySection, componentDocHref, handleTypographyNavigation } from "./typography-navigation";
+import { ComponentOutline, focusDocSection } from "./component-outline";
+import type { DocSection } from "./doc-section";
+import { inputDocSections } from "./input-demos";
+import { buttonDocSections } from "./button-demos";
+import { tableDocSections } from "./table-example";
+import { secondaryDocSections } from "./secondary-demo-registry";
+import { inlineDocSections } from "./inline-demo-registry";
 import { ShowcasePage } from "./showcase-page";
 export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
   | { kind: "component"; name: string; section?: string };
 export function parseRoute(hash: string): Route {
-  if (hash === "#/components/SearchInput" || hash === "#/components/Textarea") return { kind: "component", name: "Input" };
+  if (hash === "#/components/SearchInput" || hash === "#/components/Textarea") return { kind: "component", name: "Input", section: hash.endsWith("SearchInput") ? "input-search" : "input-textarea" };
   const typography = hash.match(/^#\/components\/Typography\?section=([A-Za-z]+)$/);
   if (typography && isTypographySection(typography[1]))
     return { kind: "component", name: "Typography", section: typography[1] };
+  if (typography && !isTypographySection(typography[1]) && !/^(usage|props|notes)$/.test(typography[1])) return { kind: "not-found" };
   const legacyTypography = hash.match(/^#\/components\/([A-Za-z]+)$/);
   if (legacyTypography && isTypographySection(legacyTypography[1]))
     return { kind: "component", name: "Typography", section: legacyTypography[1] };
@@ -36,9 +43,9 @@ export function parseRoute(hash: string): Route {
   if (hash === "#/showcase" || hash === "#/apps") return { kind: "showcase" };
   if (hash === "#/start") return { kind: "start" };
   if (hash === "#/theme") return { kind: "theme" };
-  const m = hash.match(/^#\/components\/([A-Za-z]+)$/);
+  const m = hash.match(/^#\/components\/([A-Za-z]+)(?:\?section=([A-Za-z][A-Za-z0-9-]*))?$/);
   return m && componentDocs.some((d) => d.name === m[1])
-    ? { kind: "component", name: m[1] }
+    ? { kind: "component", name: m[1], ...(m[2] ? { section: m[2] } : {}) }
     : { kind: "not-found" };
 }
 export function searchDocs(query: string) {
@@ -78,54 +85,51 @@ function CodeBlock({ code }: { code: string }) {
     </div>
   );
 }
-function Demo({ name }: { name: string }) {
-  return (
-    <div className="example-stage">
-      <ComponentExample name={name} />
-    </div>
-  );
+function ImportLine({ code }: { code: string }) {
+  const [status, setStatus] = useState("");
+  return <div className="component-import">
+    <code>{code}</code>
+    <button type="button" aria-label="复制导入语句" onClick={async () => {
+      try {
+        await navigator.clipboard.writeText(code);
+        setStatus("已复制导入语句");
+      } catch {
+        setStatus("复制失败，请手动选择代码");
+      }
+    }}>{status.startsWith("已") ? <Check size={14} /> : <Copy size={14} />}</button>
+    <span className="sr-only" role="status">{status}</span>
+  </div>;
 }
-function ComponentPage({ doc }: { doc: ComponentDoc }) {
-  const [source, setSource] = useState(true);
+function DocDemo({ item, level }: { item: DocSection; level: number }) {
+  const Heading = level === 2 ? "h2" : level === 3 ? "h3" : "h4";
+  return <section className="component-doc-section">
+    <Heading id={item.id} tabIndex={-1}>{item.title}</Heading>
+    {item.note && <p>{item.note}</p>}
+    {item.Demo && <div className="component-demo-card">
+      <div className="component-demo-stage example-stage"><item.Demo /></div>
+      {item.source && <details className="component-demo-source"><summary>查看代码</summary><CodeBlock code={item.source} /></details>}
+    </div>}
+    {item.children?.map((child) => <DocDemo key={child.id} item={child} level={level + 1} />)}
+  </section>;
+}
+export const docSections: Record<string, readonly DocSection[]> = { ...inlineDocSections, ...secondaryDocSections, Input: inputDocSections, Button: buttonDocSections, Table: tableDocSections };
+
+function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }) {
+  const sections = docSections[doc.name] ?? [];
+  const entries = [
+    ...sections,
+    { id: "props", title: "API" },
+    ...(doc.notes.length ? [{ id: "notes", title: "使用注意" }] : []),
+  ];
+  const importCode = doc.importNames.length ? `import { ${doc.importNames.join(", ")} } from "@bixlab/mtone";` : undefined;
   return (
     <>
-      <div className="eyebrow">{doc.category} / COMPONENT</div>
       <h1>{doc.name}</h1>
-      <p className="lead">{doc.description}</p>
-      <div className="page-meta">
-        <span>mtone {packageInfo.version}</span>
-        <span>React 19.2</span>
-        <a
-          href="https://github.com/xingjianxu/mtone/tree/master/packages/mtone/src"
-          target="_blank"
-          rel="noreferrer"
-        >
-          查看源码 <ArrowUpRight size={13} />
-        </a>
-      </div>
-      <section id="usage">
-        <h2>
-          使用示例{" "}
-          <a
-            href={`#/components/${doc.name}`}
-            aria-label={`${doc.name} 固定链接`}
-          >
-            #
-          </a>
-        </h2>
-        <p>
-          下方运行实际组件，展示多种状态；下方代码提供独立的基础用法，可直接复制。
-        </p>
-        <Demo name={doc.name} />
-        <button className="source-toggle" onClick={() => setSource(!source)}>
-          <Code2 size={14} />
-          {source ? "收起基础用法代码" : "显示基础用法代码"}
-        </button>
-        {source && <CodeBlock code={doc.code} />}
-      </section>
-      <section id="props">
-        <h2>属性与接口</h2>
-        <p>以下列出主要公开属性。完整继承类型可查看包内 TypeScript 声明。</p>
+      {importCode && <ImportLine code={importCode} />}
+      <ComponentOutline name={doc.name} entries={entries} section={section} />
+      {sections.map((item) => <DocDemo key={item.id} item={item} level={2} />)}
+      <section id="props" tabIndex={-1}>
+        <h2>API</h2>
         <div className="props-scroll">
           <table className="props-table">
             <thead>
@@ -172,14 +176,14 @@ function ComponentPage({ doc }: { doc: ComponentDoc }) {
           </section>
         );
       })}
-      <section id="notes">
-        <h2>使用建议与边界</h2>
+      {doc.notes.length > 0 && <section id="notes" tabIndex={-1}>
+        <h2>使用注意</h2>
         <ul className="notes">
           {doc.notes.map((n, i) => (
             <li key={i}>{n}</li>
           ))}
         </ul>
-      </section>
+      </section>}
       <a className="back-gallery" href="#/gallery">
         ← 返回组件总览
       </a>
@@ -339,7 +343,8 @@ export function DocsApp() {
   }, [route]);
   useEffect(() => {
     if (route.kind === "component" && route.section) {
-      focusTypographySection(route.section);
+      if (route.name === "Typography" && isTypographySection(route.section)) focusTypographySection(route.section);
+      else focusDocSection(route.section);
     }
   }, [route]);
   if (route.kind === "showcase") return <ShowcasePage />;
@@ -484,7 +489,7 @@ export function DocsApp() {
           </nav>
           <div className="sidebar-foot">BASE UI · TAILWIND · LUCIDE</div>
         </aside>
-        <div className="content-layout">
+        <div className={`content-layout ${doc ? "component-content-layout" : ""}`}>
           <main id="main-content" tabIndex={-1}>
             {route.kind === "gallery" ? (
               <>
@@ -553,7 +558,7 @@ export function DocsApp() {
               </>
 
             ) : doc ? (
-              <ComponentPage key={doc.name} doc={doc} />
+              <ComponentPage key={doc.name} doc={doc} section={route.kind === "component" ? route.section : undefined} />
             ) : route.kind === "start" ? (
               <Start />
             ) : route.kind === "theme" ? (
@@ -572,39 +577,6 @@ export function DocsApp() {
               </a>
             </footer>
           </main>
-          {doc && (
-            <aside className="page-outline">
-              <span>本页内容</span>
-              {[
-                ["usage", "使用示例"],
-                ["props", "属性与接口"],
-                ["notes", "使用建议"],
-              ].map(([id, title]) => (
-                <React.Fragment key={id}>
-                <button
-                  key={id}
-                  onClick={() =>
-                    document
-                      .getElementById(id)
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                >
-                  {title}
-                </button>
-                {id === "usage" && doc.name === "Typography" && (
-                  <nav className="typography-outline" aria-label="Typography 示例导航">
-                    {typographySections.map(({ name }) => (
-                      <a key={name} href={componentDocHref(name)} onClick={(event) => handleTypographyNavigation(event, name)}
-                        aria-current={route.kind === "component" && route.section === name ? "location" : undefined}>
-                        {name}
-                      </a>
-                    ))}
-                  </nav>
-                )}
-                </React.Fragment>
-              ))}
-            </aside>
-          )}
         </div>
       </M.ToastProvider>
     </M.MtoneProvider>

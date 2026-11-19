@@ -1,3 +1,30 @@
+/// <reference types="vite/client" />
+import TableExample0 from "./table-demos/basic";
+import tableSource0 from "./table-demos/basic.tsx?raw";
+import TableExample1 from "./table-demos/selection";
+import tableSource1 from "./table-demos/selection.tsx?raw";
+import TableExample2 from "./table-demos/selection-menu";
+import tableSource2 from "./table-demos/selection-menu.tsx?raw";
+import TableExample3 from "./table-demos/radio";
+import tableSource3 from "./table-demos/radio.tsx?raw";
+import TableExample4 from "./table-demos/sorting";
+import tableSource4 from "./table-demos/sorting.tsx?raw";
+import TableExample5 from "./table-demos/filters";
+import tableSource5 from "./table-demos/filters.tsx?raw";
+import TableExample6 from "./table-demos/pagination";
+import tableSource6 from "./table-demos/pagination.tsx?raw";
+import TableExample7 from "./table-demos/tree";
+import tableSource7 from "./table-demos/tree.tsx?raw";
+import TableExample8 from "./table-demos/expand";
+import tableSource8 from "./table-demos/expand.tsx?raw";
+import TableExample9 from "./table-demos/fixed";
+import tableSource9 from "./table-demos/fixed.tsx?raw";
+import TableExample10 from "./table-demos/summary";
+import tableSource10 from "./table-demos/summary.tsx?raw";
+import TableExample11 from "./table-demos/virtual";
+import tableSource11 from "./table-demos/virtual.tsx?raw";
+import TableExample12 from "./table-demos/edit";
+import tableSource12 from "./table-demos/edit.tsx?raw";
 import React, { useRef, useState } from "react";
 import { Table, Button, Badge, Text } from "../../packages/mtone/src";
 import type { TableColumn, TableRef } from "../../packages/mtone/src";
@@ -607,3 +634,106 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
     </div>
   );
 }
+
+function displayTableSource(source: string) {
+  return source.replaceAll("../../../packages/mtone/src", "@bixlab/mtone");
+}
+
+export const tableDocSections = [
+  {
+    id: "basic",
+    title: "基础用法",
+    Demo: TableExample0,
+    source: displayTableSource(tableSource0),
+  },
+  {
+    id: "row-selection",
+    title: "行选择",
+    children: [
+      {
+        id: "selection",
+        title: "复选",
+        Demo: TableExample1,
+        source: displayTableSource(tableSource1),
+      },
+      {
+        id: "selection-menu",
+        title: "表头选择菜单",
+        Demo: TableExample2,
+        source: displayTableSource(tableSource2),
+      },
+      {
+        id: "radio",
+        title: "单选",
+        Demo: TableExample3,
+        source: displayTableSource(tableSource3),
+      },
+    ],
+  },
+  {
+    id: "sort-filter",
+    title: "排序与筛选",
+    children: [
+      {
+        id: "sorting",
+        title: "多列排序",
+        Demo: TableExample4,
+        source: displayTableSource(tableSource4),
+      },
+      {
+        id: "filters",
+        title: "自定义与树形筛选",
+        Demo: TableExample5,
+        source: displayTableSource(tableSource5),
+      },
+    ],
+  },
+  {
+    id: "pagination",
+    title: "分页",
+    Demo: TableExample6,
+    source: displayTableSource(tableSource6),
+  },
+  {
+    id: "tree-expand",
+    title: "树形与展开",
+    children: [
+      {
+        id: "tree",
+        title: "树形与关联选择",
+        Demo: TableExample7,
+        source: displayTableSource(tableSource7),
+      },
+      {
+        id: "expand",
+        title: "展开详情",
+        Demo: TableExample8,
+        source: displayTableSource(tableSource8),
+      },
+    ],
+  },
+  {
+    id: "fixed",
+    title: "滚动与固定",
+    Demo: TableExample9,
+    source: displayTableSource(tableSource9),
+  },
+  {
+    id: "summary",
+    title: "合并与汇总",
+    Demo: TableExample10,
+    source: displayTableSource(tableSource10),
+  },
+  {
+    id: "virtual",
+    title: "虚拟列表",
+    Demo: TableExample11,
+    source: displayTableSource(tableSource11),
+  },
+  {
+    id: "edit",
+    title: "编辑与拖拽",
+    Demo: TableExample12,
+    source: displayTableSource(tableSource12),
+  },
+];

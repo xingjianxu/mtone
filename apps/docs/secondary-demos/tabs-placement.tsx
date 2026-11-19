@@ -1,0 +1,41 @@
+import { useState } from "react";
+import { Tabs, type TabItem } from "../../../packages/mtone/src";
+import { FileText, Settings } from "lucide-react";
+
+export default function Demo() {
+  const [items, setItems] = useState<TabItem[]>([
+    {
+      value: "notes",
+      label: "笔记",
+      icon: <FileText />,
+      content: <input className="mt-input" placeholder="切换后保留输入" />,
+    },
+    {
+      value: "settings",
+      label: "设置",
+      icon: <Settings />,
+      content: "设置面板",
+    },
+    { value: "locked", label: "只读", content: "不可关闭", closable: false },
+  ]);
+  const [value, setValue] = useState("notes");
+  const base = [
+    { value: "overview", label: "概览", content: "项目内容概览" },
+    { value: "history", label: "历史", content: "变更记录" },
+    { value: "disabled", label: "未开放", content: "", disabled: true },
+  ];
+  return (
+    <div style={{ display: "grid", gap: 24, minWidth: 0 }}>
+      {(["top", "bottom", "start", "end"] as const).map((placement) => (
+        <div key={placement} style={{ marginBottom: 20 }}>
+          <Tabs
+            label={`${placement} 标签`}
+            items={base}
+            placement={placement}
+            size="small"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
