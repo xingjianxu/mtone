@@ -74,6 +74,9 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { MtoneProvider, MtoneScope, Input, SearchInput, Textarea, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert.equal(Input.Search, SearchInput);
+assert.match(renderToStaticMarkup(createElement(List.SortHandle, {'aria-label':'Sort'})), /mt-list-sort-handle/);
+assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}],defaultValue:['one'],selectAll:true,expandable:false})), /aria-pressed="true"/);
+assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}]})), /Release tag/);
 assert.match(renderToStaticMarkup(createElement(MtoneProvider, {theme:'system'},
   createElement(MtoneScope, {theme:'dark'}, 'Theme package check'))),
   /data-mt-theme="system".*data-mt-theme="dark"/);
@@ -139,9 +142,13 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, List, ListItem, type ListHandle, type ListProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
 // @ts-expect-error The former component and its props are no longer exported.
 import { Layout, type LayoutProps } from '@bixlab/mtone';
+const tagProps: TagSelectProps = {options:[{value:'one',label:'Release tag'}],selectAll:true,value:['one'],onValueChange: value => { const selected: string[] = value; }};
+const tags = <TagSelect {...tagProps} />;
+const handleProps: ListSortHandleProps = {title:'Sort',onDragStart: event => event.dataTransfer.setData('text/plain','one')};
+const handle = <List.SortHandle {...handleProps} />;
 const theme: MtoneTheme = 'system';
 const localTheme: MtoneScopeProps = {theme: 'dark'};
 const provider: MtoneProviderProps = {theme, children: <MtoneScope {...localTheme}>Themed child</MtoneScope>};
@@ -249,6 +256,8 @@ export const action = () => useToast().success({title:'Saved', body:'Ready', pos
       "utf8",
     ).includes(".mt-"),
   );
+  const css = readFileSync(join(dir, "node_modules/@bixlab/mtone/dist/styles.css"), "utf8");
+  for (const token of ['data-mt-theme', 'prefers-color-scheme', '.mt-tag-select', '--mt-bg']) assert(css.includes(token), token);
   console.log(
     `Package smoke passed: ${pack.filename} (${pack.files.length} files)`,
   );

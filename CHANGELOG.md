@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0
+
+### Added
+- Light, dark and system themes through `MtoneProvider` and `MtoneScope`, with inherited scoped themes and theme-aware component styles.
+- TagSelect with controlled/uncontrolled selection, responsive expand/collapse, disabled options and optional select-all.
+- `List.SortHandle` and `ListItem.sortHandle` for application-controlled drag sorting.
+
+### Fixed and refined
+- Native sticky group headings in virtual lists, including stable transitions between groups.
+- Theme-aware documentation and showcase, preserving saved theme preferences and following the system when no preference is saved.
+- Synchronized API guide and packaged AI reference. See [upgrade notes](docs/MIGRATION.md).
+
 ## 0.6.0
 
 ### Breaking

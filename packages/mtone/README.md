@@ -38,7 +38,7 @@ Node 24 recommended. The documentation app lives in `apps/docs`; its static buil
 
 Buttons, forms, selection controls, navigation, directory tree, tabs, menus, lists, table, status and property displays, dialogs/drawers, feedback and upload. No block editor or backend. See [API](https://github.com/xingjianxu/mtone/blob/master/docs/API.md), [coverage](https://github.com/xingjianxu/mtone/blob/master/docs/COVERAGE.md) and [verification](https://github.com/xingjianxu/mtone/blob/master/docs/VERIFICATION.md).
 
-Default style: text #37352F, muted #787774, border #E9E9E7, subtle surface #F7F7F5, white canvas, 14px text, 28px controls, 4px radius. CSS is precompiled, prefixed and contains no Tailwind Preflight. Existing applications remain light by default. In builds with theme support, set `theme="dark"` or `theme="system"` on `MtoneProvider`; system mode follows the operating system without reloading. `MtoneScope` can override the mode locally and mtone popups follow their trigger context. The library leaves preference storage to the application.
+Default style: text #37352F, muted #787774, border #E9E9E7, subtle surface #F7F7F5, white canvas, 14px text, 28px controls, 4px radius. CSS is precompiled, prefixed and contains no Tailwind Preflight. Existing applications remain light by default. Since 0.7.0, set `theme="dark"` or `theme="system"` on `MtoneProvider`; system mode follows the operating system without reloading. `MtoneScope` can override the mode locally and mtone popups follow their trigger context. The library leaves preference storage to the application.
 
 ## License
 

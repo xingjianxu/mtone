@@ -1,3 +1,11 @@
+# Upgrade notes for 0.7.0
+
+- Themes are opt-in for the library: the default remains `light`. Set `theme="dark"` or `theme="system"` on `MtoneProvider`; a nested `MtoneScope` can override the inherited theme. Review custom hard-coded colors when enabling dark mode.
+- TagSelect is a new component with string-array values; select-all only acts on enabled options.
+- List sorting remains application-controlled. `List.SortHandle` and `ListItem.sortHandle` provide a drag grip, not an automatic reorder engine. Supply keyboard reordering separately.
+- Virtual lists with sticky groups now wrap each group heading in `.mt-list-group-boundary`; the inner heading retains `.mt-list-group`. Review custom `li.mt-list-group` or direct-child selectors.
+- AdminLayout has been the published name since 0.6.0; no Layout compatibility alias is provided.
+
 # Breaking changes in 0.6.0
 
 - `Layout` has been renamed to `AdminLayout` without a compatibility alias. Update your import and all JSX references (including `Layout.Sider`, `Layout.Header`, `Layout.Content`, and `Layout.Footer`). Rename component-specific types to `AdminLayoutProps`, `AdminLayoutSiderProps`, `AdminLayoutHeaderProps`, and `AdminLayoutContentProps`. Behavior and CSS hooks are unchanged.
