@@ -2016,7 +2016,7 @@ export const componentDocs: ComponentDoc[] = [
     "方向键上下循环选择可用项，Home/End 到首尾，Enter 执行，Esc 关闭。禁用项显示但不会执行。焦点保持在搜索框，关闭与焦点恢复由 Dialog 处理。",
     "默认选择后先关闭并请求清空查询，然后调用 action.onSelect 和 onActionSelect。回调不自动导航、等待异步任务、捕获业务错误或保存数据，业务逻辑由应用负责。",
     "open/query 受控时，父组件必须响应对应回调更新状态。resetQueryOnClose 作用于组件发出的关闭请求；外部直接改变 open 不应被视为自动重置 query 的保证。",
-    "面板复用 mtone Dialog 和 Input.Search，搜索框沿用 Input.Search 的紧凑尺寸及内嵌搜索图标。示例动作只修改本地演示状态，不发送网络请求。"
+    "面板复用 mtone Dialog 和 Input.Search，上边缘固定在视窗中上方，不随搜索结果数量变化；结果过多时仅列表滚动。"
   ]
 },
   {

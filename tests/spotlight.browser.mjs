@@ -7,8 +7,8 @@ let browser;
 try {
  browser = await chromium.launch({headless:true});
  const page = await browser.newPage();
- for (const width of [1000, 360]) {
-  await page.setViewportSize({width,height:740});
+ for (const {width,height} of [{width:1000,height:740}, {width:360,height:420}]) {
+  await page.setViewportSize({width,height});
   await page.goto("http://127.0.0.1:5191/tests/fixtures/spotlight.html");
   await page.getByRole("button", {name:"Open spotlight"}).click();
   const search = page.getByRole("combobox");
@@ -20,12 +20,23 @@ try {
   const wrapperBox = await page.locator(".mt-spotlight-search").boundingBox();
   assert.equal(inputBox.height, 28);
   assert(Math.abs(inputBox.width - wrapperBox.width) < 1);
-  const geometry = await page.getByRole("dialog").evaluate(el => {
+  const measure = () => page.getByRole("dialog").evaluate(el => {
    const r=el.getBoundingClientRect();
    const list=el.querySelector('[role="listbox"]');
    return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,scroll:list.scrollHeight>list.clientHeight};
   });
-  assert(geometry.left>=0 && geometry.right<=width && geometry.top>=0 && geometry.bottom<=740 && geometry.scroll);
+  const geometry = await measure();
+  assert(geometry.left>=0 && geometry.right<=width && geometry.bottom<=height && geometry.scroll);
+  await search.fill("keyword3");
+  assert.equal(await page.getByRole("option").count(),1);
+  const few = await measure();
+  await search.fill("notfound");
+  const empty = await measure();
+  assert(Math.abs(geometry.top - few.top) < 1 && Math.abs(few.top - empty.top) < 1,
+    `Spotlight top shifted with results: ${geometry.top}, ${few.top}, ${empty.top}`);
+  assert(geometry.top >= height * 0.1 && geometry.top <= height * 0.25);
+  assert(few.bottom - few.top < geometry.bottom - geometry.top);
+  await search.fill("");
   await search.press("ArrowDown");
   assert.equal(await page.getByRole("option",{name:"Document 2 Useful document description 2",exact:true}).getAttribute("aria-selected"),"true");
   await search.press("End");
