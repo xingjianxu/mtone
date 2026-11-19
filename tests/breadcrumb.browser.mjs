@@ -18,7 +18,7 @@ try {for(const [name,engine] of [['chromium',chromium],['firefox',firefox],['web
  await page.keyboard.press('ArrowRight'); await expect(page.getByRole('menuitem',{name:'Child',exact:true})).toBeFocused();
  await page.keyboard.press('Enter'); await expect(page.getByRole('status')).toHaveText('child');
  for(let i=0;i<3;i++) {await trigger.click(); await expect(page.getByRole('menu')).toBeVisible(); await page.keyboard.press('Escape'); await expect(trigger).toBeFocused();}
- await trigger.click(); const outside=await page.getByRole('button',{name:'Outside'}).boundingBox();
+ await trigger.click(); await expect(page.getByRole('menu')).toBeVisible(); const outside=await page.getByRole('button',{name:'Outside'}).boundingBox();
  // Click the actual backdrop at the outside control position; modal Menu intentionally intercepts it.
  await page.mouse.click(outside.x+outside.width/2,outside.y+outside.height/2); await expect(page.getByRole('menu')).toHaveCount(0);
  const link=page.getByRole('link',{name:'Projects'}); await link.hover(); assert.deepEqual(await link.evaluate(el=>{const s=getComputedStyle(el);return {color:s.color,background:s.backgroundColor,decoration:s.textDecorationLine};}),{color:'rgb(55, 53, 47)',background:'rgb(241, 241, 239)',decoration:'none'});
