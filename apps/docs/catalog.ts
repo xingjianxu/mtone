@@ -3012,6 +3012,8 @@ export default function Demo() {
       { name: "value / defaultValue", type: "readonly string[]", description: "受控值或初始选中值。" },
       { name: "onValueChange", type: "(value: string[]) => void", description: "标签切换时返回选中的值。" },
       { name: "disabled", type: "boolean", description: "禁用整个控件，亦继承 Fieldset 禁用。" },
+      { name: "selectAll", type: "boolean", default: "false", description: "在第一位显示全选按钮；选择或取消所有可用选项，包括折叠隐藏的选项，保留禁用选项的选中状态。" },
+      { name: "selectAllLabel", type: "string", default: "全选", description: "全选按钮文字。" },
       { name: "expandable", type: "boolean", default: "true", description: "选项超出一行时折叠；关闭后始终换行展示。" },
       { name: "expanded / defaultExpanded", type: "boolean", description: "受控展开状态或初始展开状态，默认折叠。" },
       { name: "onExpandedChange", type: "(expanded: boolean) => void", description: "请求切换展开状态时触发。" },

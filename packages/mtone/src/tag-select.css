@@ -44,6 +44,7 @@
 .mt-tag-select-trigger:hover:enabled {
   background: var(--mt-hover, #efefed);
 }
+.mt-tag-select-option[aria-pressed="mixed"],
 .mt-tag-select-option[aria-pressed="true"] {
   background: var(--mt-hover, #efefed);
   border-color: var(--mt-border, #e0dfdb);
@@ -69,6 +70,7 @@
   outline-offset: -1px;
 }
 @media (forced-colors: active) {
+  .mt-tag-select-option[aria-pressed="mixed"],
   .mt-tag-select-option[aria-pressed="true"] {
     border-color: Highlight;
   }

@@ -14,7 +14,7 @@ const options = [
 export default function Demo() {
   return (
     <div style={{ width: "100%", maxWidth: 360 }}>
-      <M.TagSelect aria-label="项目主题" options={options} />
+      <M.TagSelect aria-label="项目主题" options={options} selectAll />
     </div>
   );
 }

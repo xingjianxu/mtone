@@ -22,6 +22,16 @@ try {
       await expect(expand).toBeVisible();
       const tag = group.locator("button").filter({ hasText: "版本管理" });
       await expect(tag).toBeHidden();
+      const all = group.getByRole("button", { name: "全选", exact: true });
+      await expect(group.getByRole("button").first()).toHaveAccessibleName(
+        "全选",
+      );
+      await all.focus();
+      await page.keyboard.press("Space");
+      await expect(all).toHaveAttribute("aria-pressed", "true");
+      await expect(tag).toHaveAttribute("aria-pressed", "true");
+      await page.keyboard.press("Space");
+      await expect(tag).toHaveAttribute("aria-pressed", "false");
       await expand.focus();
       await page.keyboard.press("Enter");
       await expect(tag).toBeVisible();

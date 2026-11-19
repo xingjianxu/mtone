@@ -17,6 +17,8 @@ export interface TagSelectProps extends Omit<
   defaultValue?: readonly string[];
   onValueChange?: (value: string[]) => void;
   disabled?: boolean;
+  selectAll?: boolean;
+  selectAllLabel?: string;
   expandable?: boolean;
   expanded?: boolean;
   defaultExpanded?: boolean;
@@ -32,6 +34,8 @@ export function TagSelect({
   defaultValue = [],
   onValueChange,
   disabled,
+  selectAll = false,
+  selectAllLabel = "全选",
   expandable = true,
   expanded,
   defaultExpanded = false,
@@ -45,10 +49,24 @@ export function TagSelect({
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const [internalExpanded, setInternalExpanded] =
     React.useState(defaultExpanded);
-  const [visibleCount, setVisibleCount] = React.useState(options.length);
+  const [visibleCount, setVisibleCount] = React.useState(
+    options.length + Number(selectAll),
+  );
   const [overflow, setOverflow] = React.useState(false);
   const isExpanded = expanded ?? internalExpanded;
   const selected = new Set(value ?? internalValue);
+  const enabledValues = selectAll
+    ? options.filter((option) => !option.disabled).map((option) => option.value)
+    : [];
+  const selectedEnabled = enabledValues.filter((item) =>
+    selected.has(item),
+  ).length;
+  const allSelected =
+    enabledValues.length > 0 && selectedEnabled === enabledValues.length;
+  const commitSelection = (next: string[]) => {
+    if (value === undefined) setInternalValue(next);
+    onValueChange?.(next);
+  };
   const list = React.useRef<HTMLDivElement>(null);
   const trigger = React.useRef<HTMLButtonElement>(null);
   const id = React.useId();
@@ -103,7 +121,7 @@ export function TagSelect({
     observer.observe(row);
     for (const child of row.children) observer.observe(child);
     return () => observer.disconnect();
-  }, [options, expandable, isExpanded, isDisabled]);
+  }, [options, expandable, isExpanded, isDisabled, selectAll, selectAllLabel]);
 
   const hasOverflow = expandable && overflow;
   return (
@@ -117,9 +135,32 @@ export function TagSelect({
         data-collapsed={hasOverflow && !isExpanded ? "" : undefined}
       >
         <div className="mt-tag-select-options" id={id} ref={list}>
+          {selectAll && (
+            <button
+              type="button"
+              className="mt-tag-select-option"
+              aria-pressed={
+                allSelected ? true : selectedEnabled > 0 ? "mixed" : false
+              }
+              disabled={isDisabled || enabledValues.length === 0}
+              onClick={() => {
+                const enabled = new Set(enabledValues);
+                commitSelection(
+                  allSelected
+                    ? [...selected].filter((item) => !enabled.has(item))
+                    : [...new Set([...selected, ...enabledValues])],
+                );
+              }}
+            >
+              {selectAllLabel}
+            </button>
+          )}
           {options.map((option, index) => {
             const checked = selected.has(option.value);
-            const hidden = hasOverflow && !isExpanded && index >= visibleCount;
+            const hidden =
+              hasOverflow &&
+              !isExpanded &&
+              index + Number(selectAll) >= visibleCount;
             return (
               <button
                 key={option.value}
@@ -135,8 +176,7 @@ export function TagSelect({
                         (item) => item !== option.value,
                       )
                     : [...selected, option.value];
-                  if (value === undefined) setInternalValue(next);
-                  onValueChange?.(next);
+                  commitSelection(next);
                 }}
               >
                 {option.label}

@@ -58,3 +58,55 @@ describe("TagSelect", () => {
       expect(button).toBeDisabled();
   });
 });
+
+describe("TagSelect selectAll", () => {
+  it("exposes a first toggle with mixed selection; excludes disabled options when toggling", async () => {
+    const user = userEvent.setup();
+    const changed = vi.fn();
+    render(
+      <TagSelect
+        options={options}
+        selectAll
+        defaultValue={["a", "c"]}
+        onValueChange={changed}
+      />,
+    );
+    const [all, alpha, beta, gamma] = screen.getAllByRole("button");
+    expect(all).toHaveAccessibleName("全选");
+    expect(all).toHaveAttribute("aria-pressed", "mixed");
+    await user.tab();
+    expect(all).toHaveFocus();
+    await user.keyboard("[Space]");
+    expect(changed).toHaveBeenLastCalledWith(["a", "c", "b"]);
+    expect(all).toHaveAttribute("aria-pressed", "true");
+    await user.keyboard("[Enter]");
+    expect(changed).toHaveBeenLastCalledWith(["c"]);
+    expect(all).toHaveAttribute("aria-pressed", "false");
+    expect(alpha).toHaveAttribute("aria-pressed", "false");
+    expect(beta).toHaveAttribute("aria-pressed", "false");
+    expect(gamma).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("notifies without changing controlled values and supports a custom label", async () => {
+    const user = userEvent.setup();
+    const changed = vi.fn();
+    render(
+      <TagSelect
+        options={options}
+        selectAll
+        selectAllLabel="All tags"
+        value={[]}
+        onValueChange={changed}
+      />,
+    );
+    const all = screen.getByRole("button", { name: "All tags" });
+    await user.click(all);
+    expect(changed).toHaveBeenLastCalledWith(["a", "b"]);
+    expect(all).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("disables the aggregate toggle when no options can be selected", () => {
+    render(<TagSelect options={options.slice(2)} selectAll />);
+    expect(screen.getByRole("button", { name: "全选" })).toBeDisabled();
+  });
+});
