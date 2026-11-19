@@ -45,3 +45,5 @@ export * from "./hover-card";
 export * from "./fieldset";
 
 export * from "./tree-select";
+
+export * from "./tag-select";

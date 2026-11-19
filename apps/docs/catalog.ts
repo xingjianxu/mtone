@@ -2994,6 +2994,32 @@ export const componentDocs: ComponentDoc[] = [
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 28px（含边框）；长选中标签在行内省略，comfortable 密度保留 34px。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
   {
+    name: "TagSelect",
+    category: "数据录入",
+    description: "将多选选项平铺为标签，空间不足时可展开。",
+    importNames: ["TagSelect"],
+    code: `import { TagSelect } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <TagSelect aria-label="主题" defaultValue={["design"]} options={[
+    { value: "design", label: "产品设计" },
+    { value: "research", label: "用户研究" },
+  ]} />;
+}`,
+    props: [
+      { name: "options", type: "readonly TagSelectOption[]", description: "每项包含唯一 value、可渲染 label 和可选 disabled。" },
+      { name: "value / defaultValue", type: "readonly string[]", description: "受控值或初始选中值。" },
+      { name: "onValueChange", type: "(value: string[]) => void", description: "标签切换时返回选中的值。" },
+      { name: "disabled", type: "boolean", description: "禁用整个控件，亦继承 Fieldset 禁用。" },
+      { name: "expandable", type: "boolean", default: "true", description: "选项超出一行时折叠；关闭后始终换行展示。" },
+      { name: "expanded / defaultExpanded", type: "boolean", description: "受控展开状态或初始展开状态，默认折叠。" },
+      { name: "onExpandedChange", type: "(expanded: boolean) => void", description: "请求切换展开状态时触发。" },
+      { name: "expandLabel / collapseLabel", type: "string", description: "展开与收起按钮文字，默认「展开」与「收起」。" },
+    ],
+    notes: ["建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。"],
+  },
+  {
     name: "MultiSelect",
     category: "数据录入",
     description: "支持搜索与移除标签的多选控件。",

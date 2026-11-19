@@ -50,6 +50,7 @@ const expected: Record<string, string[]> = {
     "FormField",
     "Checkbox",
     "Switch",
+    "TagSelect",
     "RadioGroup",
     "Select",
     "MultiSelect",

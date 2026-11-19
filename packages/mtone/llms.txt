@@ -1321,6 +1321,32 @@ export default function Demo() {
 }
 ```
 
+### TagSelect
+
+- [TagSelect](https://xingjianxu.github.io/mtone/#/components/TagSelect): 将多选选项平铺为标签，空间不足时可展开。
+- Import: TagSelect from @bixlab/mtone
+- options: readonly TagSelectOption[]. 每项包含唯一 value、可渲染 label 和可选 disabled。
+- value / defaultValue: readonly string[]. 受控值或初始选中值。
+- onValueChange: (value: string[]) => void. 标签切换时返回选中的值。
+- disabled: boolean. 禁用整个控件，亦继承 Fieldset 禁用。
+- expandable: boolean (default: true). 选项超出一行时折叠；关闭后始终换行展示。
+- expanded / defaultExpanded: boolean. 受控展开状态或初始展开状态，默认折叠。
+- onExpandedChange: (expanded: boolean) => void. 请求切换展开状态时触发。
+- expandLabel / collapseLabel: string. 展开与收起按钮文字，默认「展开」与「收起」。
+- 建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。
+
+```tsx
+import { TagSelect } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <TagSelect aria-label="主题" defaultValue={["design"]} options={[
+    { value: "design", label: "产品设计" },
+    { value: "research", label: "用户研究" },
+  ]} />;
+}
+```
+
 ### MultiSelect
 
 - [MultiSelect](https://xingjianxu.github.io/mtone/#/components/MultiSelect): 支持搜索与移除标签的多选控件。

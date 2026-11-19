@@ -136,6 +136,11 @@ const toastSections: readonly DocSection[] = [
     source: source(Toast2Raw),
   },
 ];
+import TagChoice from "./inline-demos/tag-select-usage";
+import TagChoiceRaw from "./inline-demos/tag-select-usage.tsx?raw";
+import TagDisclosure from "./inline-demos/tag-select-disclosure";
+import TagDisclosureRaw from "./inline-demos/tag-select-disclosure.tsx?raw";
+
 export const inlineDocSections: Readonly<
   Record<string, readonly DocSection[]>
 > = {
@@ -224,6 +229,10 @@ export const inlineDocSections: Readonly<
       Demo: SelectExtra,
       source: source(SelectExtraRaw),
     },
+  ],
+  TagSelect: [
+    { id: "usage", title: "基础用法", Demo: TagChoice, source: source(TagChoiceRaw) },
+    { id: "expandable", title: "展开与收起", Demo: TagDisclosure, source: source(TagDisclosureRaw) },
   ],
   MultiSelect: [
     {

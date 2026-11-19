@@ -337,6 +337,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>选中值：{value ?? "无"}</M.Text>
         </div>
       );
+    case "TagSelect":
+      return <M.TagSelect aria-label="主题" defaultValue={["design"]} options={[{value:"design",label:"设计"},{value:"research",label:"研究"},{value:"development",label:"开发"}]} />;
     case "MultiSelect":
       return (
         <div style={stackStyle}>
