@@ -1,7 +1,7 @@
 name: Documentation
 on:
   push:
-    branches: [master, docs/component-layout, fix/spotlight-anchor]
+    branches: [master, docs/component-layout, fix/spotlight-anchor, feat/admin-layout]
   workflow_dispatch:
 permissions:
   contents: read

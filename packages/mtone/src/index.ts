@@ -4,7 +4,7 @@ export * from "./navigation";
 export * from "./interactive";
 export * from "./data";
 
-export * from "./layout";
+export * from "./admin-layout";
 
 export * from "./spotlight";
 

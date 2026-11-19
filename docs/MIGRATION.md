@@ -1,3 +1,7 @@
+# Unreleased
+
+- `Layout` has been renamed to `AdminLayout` without a compatibility alias. Update your import and all JSX references (including `Layout.Sider`, `Layout.Header`, `Layout.Content`, and `Layout.Footer`). Rename component-specific types to `AdminLayoutProps`, `AdminLayoutSiderProps`, `AdminLayoutHeaderProps`, and `AdminLayoutContentProps`. Behavior and CSS hooks are unchanged.
+
 # Upgrade notes for 0.5.0
 
 - Input/Textarea now have a stable wrapper. Native refs, `onChange(event)`, `className` and `style` still target the actual input. Review direct-child selectors and flex/grid layouts; use `wrapperClassName` for the wrapper. Input `prefix` now means decorative content, not the native RDFa attribute.

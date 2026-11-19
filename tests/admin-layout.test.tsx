@@ -2,22 +2,22 @@ import userEvent from "@testing-library/user-event";
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { it, expect, vi } from "vitest";
-import { Layout, NavItem } from "../packages/mtone/src";
+import { AdminLayout, NavItem } from "../packages/mtone/src";
 it("composes semantic layout regions and detects a direct sider", () => {
   render(
-    <Layout data-testid="layout">
-      <Layout.Sider logo="mtone" aria-label="Navigation">
+    <AdminLayout data-testid="layout">
+      <AdminLayout.Sider logo="mtone" aria-label="Navigation">
         <NavItem>Home</NavItem>
-      </Layout.Sider>
-      <Layout>
-        <Layout.Header
+      </AdminLayout.Sider>
+      <AdminLayout>
+        <AdminLayout.Header
           breadcrumb="Breadcrumb"
           extra={<button>Account</button>}
         />
-        <Layout.Content>Content</Layout.Content>
-        <Layout.Footer>Footer</Layout.Footer>
-      </Layout>
-    </Layout>,
+        <AdminLayout.Content>Content</AdminLayout.Content>
+        <AdminLayout.Footer>Footer</AdminLayout.Footer>
+      </AdminLayout>
+    </AdminLayout>,
   );
   expect(screen.getByTestId("layout")).toHaveClass("mt-layout-has-sider");
   expect(
@@ -29,11 +29,11 @@ it("composes semantic layout regions and detects a direct sider", () => {
 });
 it("reuses Sidebar collapse behavior and swaps the logo", () => {
   render(
-    <Layout>
-      <Layout.Sider collapsible logo="mtone" collapsedLogo="m">
+    <AdminLayout>
+      <AdminLayout.Sider collapsible logo="mtone" collapsedLogo="m">
         <NavItem>Home</NavItem>
-      </Layout.Sider>
-    </Layout>,
+      </AdminLayout.Sider>
+    </AdminLayout>,
   );
   fireEvent.click(screen.getByRole("button", { name: "收起侧边栏" }));
   expect(screen.getByRole("complementary")).toHaveAttribute(
@@ -48,9 +48,9 @@ it("reuses Sidebar collapse behavior and swaps the logo", () => {
 it("does not override controlled collapse state", () => {
   const change = vi.fn();
   render(
-    <Layout.Sider collapsible collapsed={false} onCollapsedChange={change}>
+    <AdminLayout.Sider collapsible collapsed={false} onCollapsedChange={change}>
       <NavItem>Home</NavItem>
-    </Layout.Sider>,
+    </AdminLayout.Sider>,
   );
   fireEvent.click(screen.getByRole("button", { name: "收起侧边栏" }));
   expect(change).toHaveBeenCalledWith(true);
@@ -74,9 +74,9 @@ it("responds to breakpoint changes and removes its listener", () => {
   );
   const breakpoint = vi.fn();
   const { unmount } = render(
-    <Layout.Sider collapsible breakpoint={768} onBreakpoint={breakpoint}>
+    <AdminLayout.Sider collapsible breakpoint={768} onBreakpoint={breakpoint}>
       Navigation
-    </Layout.Sider>,
+    </AdminLayout.Sider>,
   );
   expect(screen.getByRole("complementary")).toHaveAttribute(
     "data-collapsed",
@@ -94,11 +94,11 @@ it("responds to breakpoint changes and removes its listener", () => {
 });
 it("supports finite height, explicit row layout, and custom content semantics", () => {
   render(
-    <Layout fullHeight hasSider style={{ height: 400 }} data-testid="frame">
-      <Layout.Content as="section" aria-label="Preview">
+    <AdminLayout fullHeight hasSider style={{ height: 400 }} data-testid="frame">
+      <AdminLayout.Content as="section" aria-label="Preview">
         Body
-      </Layout.Content>
-    </Layout>,
+      </AdminLayout.Content>
+    </AdminLayout>,
   );
   expect(screen.getByTestId("frame")).toHaveClass(
     "mt-layout-full-height",
@@ -119,7 +119,7 @@ it("retains default collapsed state on a wide initial breakpoint and supports cu
     })),
   );
   render(
-    <Layout.Sider
+    <AdminLayout.Sider
       collapsible
       defaultCollapsed
       breakpoint={768}
@@ -128,7 +128,7 @@ it("retains default collapsed state on a wide initial breakpoint and supports cu
       logo="brand"
     >
       Menu
-    </Layout.Sider>,
+    </AdminLayout.Sider>,
   );
   const sider = screen.getByRole("complementary");
   expect(sider).toHaveAttribute("data-collapsed", "true");
@@ -140,7 +140,7 @@ it("retains default collapsed state on a wide initial breakpoint and supports cu
   vi.unstubAllGlobals();
 });
 it("gives non-collapsible sider content its own scroll container", () => {
-  render(<Layout.Sider>Menu</Layout.Sider>);
+  render(<AdminLayout.Sider>Menu</AdminLayout.Sider>);
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
   expect(
     screen.getByRole("complementary").querySelector(".mt-sidebar-content"),
@@ -156,18 +156,18 @@ it("re-evaluates collapse when the configured breakpoint changes", () => {
     })),
   );
   const { rerender } = render(
-    <Layout.Sider collapsible breakpoint={768}>
+    <AdminLayout.Sider collapsible breakpoint={768}>
       Menu
-    </Layout.Sider>,
+    </AdminLayout.Sider>,
   );
   expect(screen.getByRole("complementary")).toHaveAttribute(
     "data-collapsed",
     "true",
   );
   rerender(
-    <Layout.Sider collapsible breakpoint={480}>
+    <AdminLayout.Sider collapsible breakpoint={480}>
       Menu
-    </Layout.Sider>,
+    </AdminLayout.Sider>,
   );
   expect(screen.getByRole("complementary")).toHaveAttribute(
     "data-collapsed",
@@ -177,9 +177,9 @@ it("re-evaluates collapse when the configured breakpoint changes", () => {
 });
 it("places version and collapse control in a persistent bottom row", () => {
   render(
-    <Layout.Sider collapsible version="v2.4.0" logo="brand">
+    <AdminLayout.Sider collapsible version="v2.4.0" logo="brand">
       <NavItem>Home</NavItem>
-    </Layout.Sider>,
+    </AdminLayout.Sider>,
   );
   const sider = screen.getByRole("complementary");
   const footer = sider.querySelector(".mt-sidebar-footer");
@@ -199,7 +199,7 @@ it("places version and collapse control in a persistent bottom row", () => {
   expect(screen.getByText("v2.4.0")).toBeInTheDocument();
 });
 it("does not hardcode a host application version", () => {
-  render(<Layout.Sider collapsible>Menu</Layout.Sider>);
+  render(<AdminLayout.Sider collapsible>Menu</AdminLayout.Sider>);
   expect(
     screen
       .getByRole("complementary")
@@ -208,23 +208,23 @@ it("does not hardcode a host application version", () => {
 });
 it("does not create a main footer unless explicitly composed", () => {
   const { rerender } = render(
-    <Layout>
-      <Layout.Header>Header</Layout.Header>
-      <Layout.Content>Body</Layout.Content>
-    </Layout>,
+    <AdminLayout>
+      <AdminLayout.Header>Header</AdminLayout.Header>
+      <AdminLayout.Content>Body</AdminLayout.Content>
+    </AdminLayout>,
   );
   expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
   rerender(
-    <Layout>
-      <Layout.Content>Body</Layout.Content>
-      <Layout.Footer style={{ height: 64 }}>Footer</Layout.Footer>
-    </Layout>,
+    <AdminLayout>
+      <AdminLayout.Content>Body</AdminLayout.Content>
+      <AdminLayout.Footer style={{ height: 64 }}>Footer</AdminLayout.Footer>
+    </AdminLayout>,
   );
   expect(screen.getByRole("contentinfo")).toHaveStyle({ height: "64px" });
 });
 it('keeps the example main footer hidden until opted in',async()=>{
- const {LayoutExample}=await import('../apps/docs/layout-example');
- render(<LayoutExample/>);
+ const {AdminLayoutExample}=await import('../apps/docs/admin-layout-example');
+ render(<AdminLayoutExample/>);
  expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
  await userEvent.click(screen.getByRole('button',{name:/主体 Footer/}));
  expect(screen.getByRole('contentinfo')).toBeInTheDocument();

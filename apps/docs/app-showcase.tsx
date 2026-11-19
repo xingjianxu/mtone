@@ -26,7 +26,7 @@ import {
   FormField,
   IconButton,
   Input,
-  Layout,
+  AdminLayout,
   NavItem,
   SearchInput,
   Select,
@@ -207,8 +207,8 @@ function KnowledgeWorkspace() {
         : "全部文档";
   return (
     <div className="showcase">
-      <Layout hasSider className="showcase-shell" aria-label="知识库应用示例">
-        <Layout.Sider
+      <AdminLayout hasSider className="showcase-shell" aria-label="知识库应用示例">
+        <AdminLayout.Sider
           className="showcase-sidebar"
           width={174}
           collapsedWidth={48}
@@ -260,9 +260,9 @@ function KnowledgeWorkspace() {
               写一篇文档
             </Button>
           </div>
-        </Layout.Sider>
-        <Layout>
-          <Layout.Header
+        </AdminLayout.Sider>
+        <AdminLayout>
+          <AdminLayout.Header
             className="showcase-topbar"
             breadcrumb={
               <Breadcrumb
@@ -276,7 +276,7 @@ function KnowledgeWorkspace() {
               </div>
             }
           />
-          <Layout.Content
+          <AdminLayout.Content
             as="section"
             className="showcase-content"
             aria-label="知识库文档"
@@ -447,9 +447,9 @@ function KnowledgeWorkspace() {
               </span>
               <span>由 mtone 组件构建</span>
             </div>
-          </Layout.Content>
-        </Layout>
-      </Layout>
+          </AdminLayout.Content>
+        </AdminLayout>
+      </AdminLayout>
       <Dialog
         open={editorOpen}
         onOpenChange={setEditorOpen}

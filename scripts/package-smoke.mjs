@@ -71,7 +71,7 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Input, SearchInput, Textarea, TreeSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, Layout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { Input, SearchInput, Textarea, TreeSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert.equal(Input.Search, SearchInput);
 assert.equal(Input.TextArea, Textarea);
@@ -128,14 +128,21 @@ for (const virtual of [false, true]) {
   assert(tableHtml.includes('Summary'), 'Summary should render for virtual=' + virtual);
 }
 assert(renderToStaticMarkup(createElement(Card, {title:"Card title",htmlTitle:"Tooltip"}, "Body")).includes("Card title"));
-assert(Layout.Sider && Toast && NumberInput && MultiSelect && Spotlight && Form.useForm && Form.Item);
+assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Layout'));
+assert(AdminLayout.Sider && Toast && NumberInput && MultiSelect && Spotlight && Form.useForm && Form.Item);
 assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.css'));
 `,
   );
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { List, ListItem, type ListHandle, type ListProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, Layout, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { List, ListItem, type ListHandle, type ListProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+// @ts-expect-error The former component and its props are no longer exported.
+import { Layout, type LayoutProps } from '@bixlab/mtone';
+const adminLayoutProps: AdminLayoutProps = {hasSider: true};
+const adminSiderProps: AdminLayoutSiderProps = {collapsible: true};
+const adminHeaderProps: AdminLayoutHeaderProps = {extra: 'Actions'};
+const adminContentProps: AdminLayoutContentProps = {as: 'section'};
 const progressProps: ProgressProps = {value:40,type:'dashboard',showInfo:true,steps:{count:8,gap:3},success:{value:20},gapPosition:'right'};
 const progress = <Progress {...progressProps}/>;
 const overlayProps: LoadingOverlayProps = {visible:true,label:'Saving',opacity:0.8,blur:2,radius:4,zIndex:20,loader:null};
@@ -150,7 +157,7 @@ const menuProps: MenuProps = {trigger:<button>Actions</button>,items:menuEntries
 const legacyMenuProps: DropdownMenuProps = menuProps;
 const menu = <><Menu {...menuProps}/><DropdownMenu {...legacyMenuProps}/></>;
 import '@bixlab/mtone/styles.css';
-export const demo = <Layout><Layout.Sider version="v1" collapsible /><Layout><Layout.Header /><Layout.Content><Toast><Button variant="blue">OK</Button></Toast></Layout.Content></Layout></Layout>;
+export const demo = <AdminLayout {...adminLayoutProps}><AdminLayout.Sider version="v1" {...adminSiderProps} /><AdminLayout><AdminLayout.Header {...adminHeaderProps} /><AdminLayout.Content {...adminContentProps}><Toast><Button variant="blue">OK</Button></Toast></AdminLayout.Content></AdminLayout></AdminLayout>;
 export const inputFamily = <><Input prefix="@" allowClear showCount controlSize="sm" variant="filled"/><Input.Search searchButton="Find" onSearch={value=>console.log(value)}/><Input.Password visible={false} onVisibleChange={visible=>console.log(visible)}/><Input.TextArea autoSize={{minRows:2,maxRows:5}}/><Input.OTP length={4} onValueChange={value=>console.log(value)}/></>;
 export function FormDemo() { const [form] = Form.useForm(); return <Form form={form} onFinish={values => console.log(values)}><Form.Item name='email' label='Email' rules={[{type:'email',required:true}]}><Input /></Form.Item></Form>; }
 export const cardDemo = <Card title="Title" htmlTitle="Tooltip" size="small" variant="outlined" styles={{body:{padding:12}}} classNames={({props})=>({root:props.size==='small'?'compact':''})} tabList={[{key:'one',label:'One'}]}><Card.Meta title="Metadata" description="Details"/><Card.Grid hoverable={false}>Grid</Card.Grid></Card>;

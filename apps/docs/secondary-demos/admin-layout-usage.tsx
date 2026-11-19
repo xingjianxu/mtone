@@ -17,7 +17,7 @@ import {
   Breadcrumb,
   Card,
   IconButton,
-  Layout,
+  AdminLayout,
   NavItem,
   Text,
   Button,
@@ -72,7 +72,7 @@ export default function Demo() {
         fontSize: compact ? 11 : 13,
       }}
     >
-      <Layout
+      <AdminLayout
         hasSider
         aria-label="布局交互示例"
         style={{
@@ -84,7 +84,7 @@ export default function Demo() {
           fontSize: compact ? 11 : 13,
         }}
       >
-        <Layout.Sider
+        <AdminLayout.Sider
           aria-label="示例导航"
           collapsible
           collapsed={collapsed}
@@ -109,9 +109,9 @@ export default function Demo() {
               {name}
             </NavItem>
           ))}
-        </Layout.Sider>
-        <Layout>
-          <Layout.Header
+        </AdminLayout.Sider>
+        <AdminLayout>
+          <AdminLayout.Header
             style={compact ? { padding: "6px 10px" } : undefined}
             breadcrumb={
               <Breadcrumb items={[{ label: "知识库" }, { label: title }]} />
@@ -152,7 +152,7 @@ export default function Demo() {
               )
             }
           />
-          <Layout.Content
+          <AdminLayout.Content
             as="section"
             aria-label="示例内容"
             style={{ padding: compact ? 10 : 24 }}
@@ -227,12 +227,12 @@ export default function Demo() {
                 {showFooter ? "隐藏主体 Footer" : "显示主体 Footer（42px）"}
               </Button>
             )}
-          </Layout.Content>
+          </AdminLayout.Content>
           {!compact && showFooter && (
-            <Layout.Footer>mtone · 内容优先的 React 组件库</Layout.Footer>
+            <AdminLayout.Footer>mtone · 内容优先的 React 组件库</AdminLayout.Footer>
           )}
-        </Layout>
-      </Layout>
+        </AdminLayout>
+      </AdminLayout>
     </div>
   );
 }

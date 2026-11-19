@@ -30,7 +30,7 @@ import { CardExample } from "./card-example";
 import { FormExample, FormFieldExample } from "./form-example";
 import { SpotlightExample } from "./spotlight-example";
 import { ToastAction } from "./toast-example";
-import { LayoutExample } from "./layout-example";
+import { AdminLayoutExample } from "./admin-layout-example";
 import React, { useState } from "react";
 import * as M from "../../packages/mtone/src";
 import { ChevronDown, BookOpen, FileText, Folder, Plus, Search, Star } from "lucide-react";
@@ -150,8 +150,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <SplitterExample />;
     case "Spotlight":
       return <SpotlightExample />;
-    case "Layout":
-      return <LayoutExample compact={compact} />;
+    case "AdminLayout":
+      return <AdminLayoutExample compact={compact} />;
     case "Button":
       return (
         <div style={stackStyle}>

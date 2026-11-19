@@ -25,8 +25,8 @@ import Card1 from "./secondary-demos/card-grid";
 import Card1Source from "./secondary-demos/card-grid.tsx?raw";
 import Card2 from "./secondary-demos/card-inner";
 import Card2Source from "./secondary-demos/card-inner.tsx?raw";
-import Layout0 from "./secondary-demos/layout-usage";
-import Layout0Source from "./secondary-demos/layout-usage.tsx?raw";
+import AdminLayout0 from "./secondary-demos/admin-layout-usage";
+import AdminLayout0Source from "./secondary-demos/admin-layout-usage.tsx?raw";
 import Spotlight0 from "./secondary-demos/spotlight-usage";
 import Spotlight0Source from "./secondary-demos/spotlight-usage.tsx?raw";
 import Splitter0 from "./secondary-demos/splitter-usage";
@@ -334,12 +334,12 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       source: source(Card2Source),
     },
   ],
-  Layout: [
+  AdminLayout: [
     {
       id: "usage",
       title: "基础用法",
-      Demo: Layout0,
-      source: source(Layout0Source),
+      Demo: AdminLayout0,
+      source: source(AdminLayout0Source),
     },
   ],
   Spotlight: [

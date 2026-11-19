@@ -2,11 +2,11 @@ import * as React from "react";
 import { cn } from "./basic";
 import { Sidebar, type SidebarProps } from "./navigation";
 
-export type LayoutProps = React.HTMLAttributes<HTMLDivElement> & {
+export type AdminLayoutProps = React.HTMLAttributes<HTMLDivElement> & {
   hasSider?: boolean;
   fullHeight?: boolean;
 };
-export type LayoutSiderProps = Omit<
+export type AdminLayoutSiderProps = Omit<
   SidebarProps,
   "header" | "footer" | "collapsePlacement"
 > & {
@@ -18,7 +18,7 @@ export type LayoutSiderProps = Omit<
   breakpoint?: number;
   onBreakpoint?: (broken: boolean) => void;
 };
-function LayoutSider({
+function AdminLayoutSider({
   logo,
   version,
   collapsedLogo,
@@ -33,7 +33,7 @@ function LayoutSider({
   className,
   style,
   ...props
-}: LayoutSiderProps) {
+}: AdminLayoutSiderProps) {
   const [internal, setInternal] = React.useState(defaultCollapsed);
   const previousBreakpoint = React.useRef<number | undefined>(undefined);
   const callbacks = React.useRef({
@@ -91,17 +91,17 @@ function LayoutSider({
     />
   );
 }
-export type LayoutHeaderProps = React.HTMLAttributes<HTMLElement> & {
+export type AdminLayoutHeaderProps = React.HTMLAttributes<HTMLElement> & {
   breadcrumb?: React.ReactNode;
   extra?: React.ReactNode;
 };
-function LayoutHeader({
+function AdminLayoutHeader({
   breadcrumb,
   extra,
   children,
   className,
   ...props
-}: LayoutHeaderProps) {
+}: AdminLayoutHeaderProps) {
   return (
     <header {...props} className={cn("mt-layout-header", className)}>
       <div className="mt-layout-header-main">
@@ -112,17 +112,17 @@ function LayoutHeader({
     </header>
   );
 }
-export type LayoutContentProps = React.HTMLAttributes<HTMLElement> & {
+export type AdminLayoutContentProps = React.HTMLAttributes<HTMLElement> & {
   as?: "main" | "section" | "div";
 };
-function LayoutContent({
+function AdminLayoutContent({
   as: Element = "main",
   className,
   ...props
-}: LayoutContentProps) {
+}: AdminLayoutContentProps) {
   return <Element {...props} className={cn("mt-layout-content", className)} />;
 }
-function LayoutFooter({
+function AdminLayoutFooter({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
@@ -132,20 +132,20 @@ function containsSider(children: React.ReactNode): boolean {
   return React.Children.toArray(children).some(
     (child) =>
       React.isValidElement(child) &&
-      (child.type === LayoutSider ||
+      (child.type === AdminLayoutSider ||
         (child.type === React.Fragment &&
           containsSider(
             (child.props as { children?: React.ReactNode }).children,
           ))),
   );
 }
-function LayoutRoot({
+function AdminLayoutRoot({
   hasSider,
   fullHeight = false,
   className,
   children,
   ...props
-}: LayoutProps) {
+}: AdminLayoutProps) {
   return (
     <div
       {...props}
@@ -160,10 +160,10 @@ function LayoutRoot({
     </div>
   );
 }
-/** Compose nested layouts with the familiar Layout.Sider/Header/Content/Footer API. */
-export const Layout = Object.assign(LayoutRoot, {
-  Sider: LayoutSider,
-  Header: LayoutHeader,
-  Content: LayoutContent,
-  Footer: LayoutFooter,
+/** Compose nested layouts with the familiar AdminLayout.Sider/Header/Content/Footer API. */
+export const AdminLayout = Object.assign(AdminLayoutRoot, {
+  Sider: AdminLayoutSider,
+  Header: AdminLayoutHeader,
+  Content: AdminLayoutContent,
+  Footer: AdminLayoutFooter,
 });
