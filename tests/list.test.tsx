@@ -314,3 +314,18 @@ it('anchors a batch of measurements against the original viewport',()=>{
  expect(ref.current.element.scrollTop).toBe(110);
  } finally {bounds.mockRestore();globalThis.ResizeObserver=previous;}
 });
+
+it("opts into a leading grip without making the rest of the item draggable", () => {
+  const onDragStart = vi.fn();
+  render(<List><ListItem sortHandle={{ onDragStart }} icon={<span>Icon</span>}>Sortable</ListItem><ListItem>Plain</ListItem></List>);
+  const [sortable, plain] = screen.getAllByRole("listitem");
+  const handle = sortable.querySelector("[draggable=true]")!;
+  expect(handle).toBe(sortable.firstElementChild);
+  expect(handle.querySelector("svg.lucide-grip-vertical")).toBeInTheDocument();
+  expect(sortable).not.toHaveAttribute("draggable");
+  expect(plain.querySelector("[draggable]")).toBeNull();
+  fireEvent.dragStart(screen.getByText("Sortable"));
+  expect(onDragStart).not.toHaveBeenCalled();
+  fireEvent.dragStart(handle);
+  expect(onDragStart).toHaveBeenCalledOnce();
+});

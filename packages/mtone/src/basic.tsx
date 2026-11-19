@@ -177,7 +177,7 @@ export type { DividerProps } from "./divider";
 export { Card } from "./card";
 export type { CardProps, CardTokens, CardSemantic, CardTabItem, CardMetaProps, CardMetaSemantic, CardGridProps } from "./card";
 export { List, ListItem } from "./list";
-export type { ListProps, ListItemProps, ListHandle, ListScrollTarget } from "./list";
+export type { ListProps, ListItemProps, ListSortHandleProps, ListHandle, ListScrollTarget } from "./list";
 export type DocumentItem = {
   id: string;
   title: string;

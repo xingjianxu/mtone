@@ -162,6 +162,8 @@ Existing `<List><ListItem ... /></List>` usage remains supported. Data mode uses
 - Sorting is application-controlled, illustrated with drag and keyboard-accessible
   buttons; the component does not persist ordering or fetch data.
 
+For controlled drag sorting, render `List.SortHandle` first in each data-row flex layout or use `ListItem.sortHandle` in children mode. Only the six-dot grip starts dragging; handle drop/reordering in the application and provide keyboard-accessible move controls.
+
 See [List examples and full API](https://xingjianxu.github.io/mtone/#/components/List).
 
 ## Progress

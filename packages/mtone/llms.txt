@@ -2181,7 +2181,7 @@ export default function Demo() {
 - 原生属性: HTMLAttributes<HTMLUListElement>. 支持 className、style、aria-label、tabIndex 和 onScroll 等。
 - List 的数据渲染仍使用 ul/li；renderItem 仅返回条目内容。ListItem 和 DocumentList 既有用法保持不变。
 - 虚拟列表通过估算未挂载行和测量可见行支持不等高内容；跳到尚未测量的位置是估算定位，滚动过程中总高度可能修正。需要精确定位时使用固定高度或关闭虚拟滚动。
-- List 不内置网络请求、分页、选择或排序库。加载与排序由外部受控数据组合；文档提供拖放和键盘按钮排序示例。
+- List 不内置网络请求、分页、选择或排序库。加载与排序由外部受控数据组合；数据模式可在 renderItem 的起始位置放置 List.SortHandle（接受 span 拖放事件）；保留上移和下移按钮供键盘操作。
 - 自定义内容的按钮、链接与拖放可访问性由调用方负责；可为滚动容器设置 aria-label 和 tabIndex。
 
 ```tsx
@@ -2198,6 +2198,7 @@ export default function Demo() {
 
 - [ListItem](https://xingjianxu.github.io/mtone/#/components/ListItem): 包含图标、说明与尾部操作的列表项。
 - Import: ListItem, List, Button from @bixlab/mtone
+- sortHandle: ListSortHandleProps. 可选拖拽手柄，默认在条目起始侧显示六点图标；传入 onDragStart、onDragEnd 等事件，排序由应用维护。
 - children: ReactNode. 组件内容。
 - icon: ReactNode. 前置图标。
 - description: ReactNode. 次级描述。

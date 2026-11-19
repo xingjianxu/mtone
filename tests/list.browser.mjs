@@ -46,7 +46,10 @@ try {
  const sorting=page.getByRole('list',{name:'排序列表',exact:true});
  await sorting.getByRole('button',{name:'研究笔记上移'}).click();
  assert((await sorting.locator('[data-list-key]').first().textContent()).startsWith('研究笔记'));
- await sorting.locator('[draggable]').first().dragTo(sorting.locator('[draggable]').last());
+ const handles = sorting.locator('[draggable=true]');
+ assert.equal(await handles.count(), 3);
+ assert(await handles.first().evaluate(el => el.parentElement.firstElementChild === el && !!el.querySelector('svg.lucide-grip-vertical')));
+ await handles.first().dragTo(sorting.locator('[data-list-key]').last());
  assert((await sorting.locator('[data-list-key]').last().textContent()).startsWith('研究笔记'));
  await page.setViewportSize({width:360,height:800});
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

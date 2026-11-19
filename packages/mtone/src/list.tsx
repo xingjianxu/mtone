@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { GripVertical } from "lucide-react";
 import { cn } from "./basic";
 
 export type ListScrollTarget =
@@ -98,7 +99,7 @@ function MeasuredRow({
 }
 
 /** Compact native list, with optional grouped and windowed data rendering. */
-export function List<T = unknown>({
+function ListRoot<T = unknown>({
   children,
   items,
   getKey,
@@ -462,13 +463,26 @@ export function List<T = unknown>({
     </ul>
   );
 }
+/** Drag grip for a controlled sortable list. Supply keyboard reordering separately. */
+export type ListSortHandleProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children" | "draggable">;
+
+function ListSortHandle({ className, title = "拖动排序", ...props }: ListSortHandleProps) {
+  return (
+    <span {...props} title={title} aria-hidden="true" draggable className={cn("mt-list-sort-handle", className)}>
+      <GripVertical size={16} focusable="false" />
+    </span>
+  );
+}
+
 export interface ListItemProps extends React.LiHTMLAttributes<HTMLLIElement> {
+  sortHandle?: ListSortHandleProps;
   icon?: React.ReactNode;
   description?: React.ReactNode;
   actions?: React.ReactNode;
 }
 export function ListItem({
   children,
+  sortHandle,
   icon,
   description,
   actions,
@@ -476,6 +490,7 @@ export function ListItem({
 }: ListItemProps) {
   return (
     <li {...props} className={cn("mt-list-item", props.className)}>
+      {sortHandle && <ListSortHandle {...sortHandle} />}
       {icon}
       <div className="mt-list-content">
         <div>{children}</div>
@@ -485,3 +500,5 @@ export function ListItem({
     </li>
   );
 }
+
+export const List = Object.assign(ListRoot, { SortHandle: ListSortHandle });
