@@ -14,6 +14,6 @@ test("the stylesheet includes a scoped palette with an explicit light fallback",
 
 test("inverted buttons and dark surfaces do not use a fixed light foreground", () => {
   expect(css).toMatch(/\.mt-btn-solid\s*\{[^}]*color:\s*var\(--mt-on-primary, white\)/);
-  expect(theme()).toContain("--mt-on-primary: light-dark(white, #20201f)");
-  expect(theme()).toContain("--mt-bg: light-dark(#fff, #20201f)");
+  expect(theme()).toMatch(/\[data-mt-theme="dark"\]\s*\{[^}]*--mt-on-primary:\s*#20201f/);
+  expect(theme()).toMatch(/\[data-mt-theme="system"\]\s*\{[^}]*--mt-bg:\s*#20201f/);
 });
