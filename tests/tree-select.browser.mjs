@@ -8,7 +8,9 @@ try{for(const [name,engine] of Object.entries({chromium,firefox,webkit})){
  const browser=await engine.launch(name==='chromium' && process.env.CHROMIUM_EXECUTABLE_PATH ? {executablePath:process.env.CHROMIUM_EXECUTABLE_PATH} : {});try{
  const page=await browser.newPage({viewport:{width:900,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:5234/tests/fixtures/tree-select.html');
- const single=page.getByRole('combobox',{name:'Single',exact:true});await page.keyboard.press('Tab');await expect(single).toBeFocused();
+ const single=page.getByRole('combobox',{name:'Single',exact:true});
+ // createRoot commits asynchronously; wait for the keyboard target before Tab.
+ await expect(single).toBeVisible();await expect(single).toBeEnabled();await page.keyboard.press('Tab');await expect(single).toBeFocused();
  await expect(page.locator('.mt-tree-select').first()).toHaveCSS('height','28px');await expect(page.locator('.mt-tree-select').first()).toHaveCSS('border-top-color','rgb(147, 180, 220)');
  await single.press('ArrowDown');await expect(page.getByRole('treeitem',{name:'Team',exact:true})).toBeFocused();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await expect(single).toHaveText('Alice');await expect(single).toBeFocused();
  await page.getByRole('button',{name:'Clear selection',exact:true}).click();await expect(single).toHaveText('Select…');
