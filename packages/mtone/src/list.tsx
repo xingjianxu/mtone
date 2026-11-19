@@ -75,14 +75,16 @@ function MeasuredRow({
   id,
   measure,
   children,
+  measureChild = false,
   ...props
 }: React.LiHTMLAttributes<HTMLLIElement> & {
   id: string;
+  measureChild?: boolean;
   measure: (key: string, size: number) => void;
 }) {
   const ref = useRef<HTMLLIElement>(null);
   useLayoutEffect(() => {
-    const element = ref.current;
+    const element = measureChild ? ref.current?.firstElementChild : ref.current;
     if (!element) return;
     const update = () => measure(id, element.getBoundingClientRect().height);
     update();
@@ -90,7 +92,7 @@ function MeasuredRow({
     const observer = new ResizeObserver(update);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [id, measure]);
+  }, [id, measure, measureChild]);
   return (
     <li {...props} ref={ref}>
       {children}
@@ -258,7 +260,7 @@ function ListRoot<T = unknown>({
         (i) => layout.offsets[i].top <= top,
       );
       if (active !== undefined && !indices.includes(active))
-        indices.push(active);
+        indices.unshift(active);
     }
     return indices;
   }, [
@@ -407,16 +409,32 @@ function ListRoot<T = unknown>({
             const row = rows[index];
             const group = row.kind === "group";
             const nextGroup = group ? nextGroups.get(index) : undefined;
-            const pinnedTop =
-              group && stickyGroups
-                ? Math.min(
-                    Math.max(layout.offsets[index].top, top),
-                    nextGroup === undefined
-                      ? Infinity
-                      : layout.offsets[nextGroup].top -
-                          layout.offsets[index].size,
-                  )
-                : layout.offsets[index].top;
+            if (windowed && stickyGroups && row.kind === "group") {
+              const start = layout.offsets[index].top;
+              const end = nextGroup === undefined
+                ? layout.total
+                : layout.offsets[nextGroup].top;
+              // The absolute section provides a native sticky containing
+              // block. Its child follows scrolling without awaiting React.
+              return (
+                <MeasuredRow
+                  key={row.id}
+                  id={row.id}
+                  measure={measure}
+                  measureChild
+                  role="presentation"
+                  className="mt-list-group-boundary"
+                  style={{ top: start, height: end - start, minWidth: contentWidth }}
+                >
+                  <div
+                    className="mt-list-group mt-list-group-sticky"
+                    data-list-group={String(row.key)}
+                  >
+                    {renderGroup?.(row.key, row.items) ?? String(row.key)}
+                  </div>
+                </MeasuredRow>
+              );
+            }
             return (
               <MeasuredRow
                 key={row.id}
@@ -436,7 +454,7 @@ function ListRoot<T = unknown>({
                 style={{
                   minWidth: contentWidth,
                   ...(windowed
-                    ? { position: "absolute", top: pinnedTop, width: "100%" }
+                    ? { position: "absolute", top: layout.offsets[index].top, width: "100%" }
                     : {}),
                 }}
               >

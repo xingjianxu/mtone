@@ -36,6 +36,40 @@ try {
  await page.waitForTimeout(200);
  const sticky=await grouped.evaluate(el=>[...el.querySelectorAll('[data-list-group]')].some(h=>Math.abs(h.getBoundingClientRect().top-el.getBoundingClientRect().top)<2));
  assert(sticky,'group heading pins at viewport top');
+ const samples = await grouped.evaluate(async el => {
+   const active = [...el.querySelectorAll('[data-list-group]')]
+     .find(h => Math.abs(h.getBoundingClientRect().top - el.getBoundingClientRect().top) < 2);
+   const offsets = [];
+   for (let i = 0; i < 12; i++) {
+     await new Promise(resolve => requestAnimationFrame(() => {
+       el.scrollTop += 13;
+       // Read before the scroll event/React commit, not after settling.
+       offsets.push(active.getBoundingClientRect().top - el.getBoundingClientRect().top);
+       resolve();
+     }));
+   }
+   return offsets;
+ });
+ assert(samples.every(top => Math.abs(top) < 2), 'heading stays pinned on each scroll frame: ' + samples);
+ const boundary = await grouped.evaluate(async el => {
+   const section = [...el.querySelectorAll('[data-list-group]')]
+     .find(h => Math.abs(h.getBoundingClientRect().top - el.getBoundingClientRect().top) < 2);
+   const group = section.parentElement;
+   const boundary = group.offsetTop + group.offsetHeight;
+   el.scrollTop = boundary - section.offsetHeight * 2;
+   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+   el.scrollTop = boundary - 8;
+   const viewportTop = el.getBoundingClientRect().top;
+   const next = group.nextElementSibling?.matches('.mt-list-group-boundary')
+     ? group.nextElementSibling.firstElementChild
+     : [...el.querySelectorAll('[data-list-group]')].find(h => h !== section && h.parentElement.offsetTop === boundary);
+   return {
+     oldBottom: section.getBoundingClientRect().bottom - viewportTop,
+     nextTop: next?.getBoundingClientRect().top - viewportTop,
+   };
+ });
+ assert(Math.abs(boundary.oldBottom - 8) < 2, 'next group pushes current header off');
+ assert(Math.abs(boundary.nextTop - 8) < 2, 'next group enters without overlap');
  const horizontal=page.getByRole('list',{name:'横向列表',exact:true});
  assert(await horizontal.evaluate(el=>el.scrollWidth>el.clientWidth));
  await horizontal.evaluate(el=>{el.scrollLeft=100;});
