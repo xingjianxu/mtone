@@ -10,6 +10,65 @@ follows `master`. Check the `index.d.ts` and `llms.txt` bundled with your instal
 `@bixlab/mtone` version before using newer features. Merging code or updating the
 website does not publish a new npm version.
 
+## AI interface components
+
+The AI interface components are presentation and interaction building blocks.
+The application owns messages, model requests, tool execution, attachments,
+permissions, persistence, and trusted source data. The documentation demos are
+local examples, not a model or platform integration. Localized defaults follow
+the mtone provider locale.
+
+### Conversation and input
+
+| Export | Main contract |
+| --- | --- |
+| `AiChat` | `children`, `empty`, and `footer` compose the conversation. `autoFollow` defaults to true; `bottomThreshold` defaults to 64 px. Give the layout a bounded height for internal scrolling. |
+| `AiMessage` | Required `from` is user, assistant, or system; use `name`, `avatar`, `children`, `actions`, `status`, and `statusLabel` to customize presentation. |
+| `AiPromptInput` | Required `onSubmit({ text, attachments })` may return a promise. Use `value` + `onValueChange` or `defaultValue`, and `status` + `onStop` for generation. Enter submits and Shift+Enter inserts a newline; IME composition does not submit. Use `attachments`, `onFilesSelect`, `onAttachmentRemove`, `accept`, and `multiple` for caller-owned files. Files are never uploaded automatically. Clear text or attachments in the application when appropriate. |
+| `AiSuggestion` | `prompt` and `onSelect(prompt)`; inherits Button props. The application decides how to use the prompt. |
+| `AiModelSelector` | Controlled `models`, `value`, `onValueChange`; optionally present `efforts`, `effort`, and `onEffortChange`. Choices are app-defined and do not grant access. |
+
+[Conversation demos and reference](https://xingjianxu.github.io/mtone/#/components/AiChat)
+
+### Work progress and decisions
+
+The disclosure panels use `title`, `status`, `statusLabel`, `open`,
+`defaultOpen`, and `onOpenChange`. `AiActivityStatus` is `pending`, `running`,
+`completed`, `error`, or `cancelled`; an `AiActivityStep` has a stable
+`id`, `title`, and optional `description` and `status`.
+
+| Export | Main contract |
+| --- | --- |
+| `AiPlan` | Required `items`; shows the number of completed steps and starts open by default. |
+| `AiQueue` | Required `items`; separates completed/cancelled from remaining items and starts open by default. |
+| `AiTask` | Optional `steps` and children for a task's progress. |
+| `AiChainOfThought` | Optional `steps` for **public summaries and observed actions only**; does not obtain or reveal hidden reasoning. |
+| `AiReasoning` | Required `text` for a caller-provided public explanation; does not access hidden reasoning. |
+| `AiSubagent` | Required `name` and optional `description`, `result`; does not launch or control agents. |
+| `AiTool` | Required `name` and optional plain-text `input`, `output`; does not call tools. |
+| `AiCheckpoint` | `label`, `description`, `onRestore`, `restoreLabel`, `disabled`; restoration is an app action, not a component side effect. |
+| `AiConfirmation` | Controlled `state` (pending/approved/rejected), `busy`, `onConfirm`, `onReject`, and custom labels. It displays requests and decisions, not authorization or execution. |
+
+[Activity demos and reference](https://xingjianxu.github.io/mtone/#/components/AiPlan)
+
+### Evidence and developer output
+
+| Export | Main contract |
+| --- | --- |
+| `AiSources` | Required `sources: AiSource[]`, optional `defaultOpen`; shows titles, descriptions, and safe links. |
+| `AiInlineCitation` | Required `source: AiSource`, optional `index`. `AiSource` has `id`, `title`, and optional `url` and `description`. |
+| `AiContext` | Required `usedTokens`, optional `maxTokens`, `inputTokens`, `outputTokens`, and caller-formatted `cost`; does not count tokens or calculate billing. |
+| `AiFileTree` | Required `items: AiFileNode[]`, controlled `selectedId` or `defaultSelectedId`, optional `onSelect` and `defaultExpandedIds`; does not read the filesystem. |
+| `AiStackTrace` | Required `message` and `frames` with file and optional line, column, and function name. |
+| `AiTerminal` | Required plain-text `output` and optional `status` (idle/running/success/error); does not start a process. |
+| `AiTestResults` | Required `results`, optional `defaultOpen`; displays passed, failed, skipped, and running tests without running them. |
+
+Citations link only supported safe HTTP(S), root-relative paths or anchors.
+Other values render as non-link text; the app remains responsible for verifying
+source content and access. Supply stable IDs for evidence lists and file trees.
+
+[Evidence demos and reference](https://xingjianxu.github.io/mtone/#/components/AiSources)
+
 ## Provider and styling
 
 Migration: remove the former `density` prop. Compact/comfortable modes are no longer part of the provider or scope API; single-line controls use a unified 34px default. Independent component `size` variants and CSS token overrides remain supported. Tabs retain their separate size contract.

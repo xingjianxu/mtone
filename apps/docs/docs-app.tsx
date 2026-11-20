@@ -14,7 +14,7 @@ import {
 import * as M from "../../packages/mtone/src";
 import { componentCategories, componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
-import { typographySections, focusTypographySection, isTypographySection, componentDocHref, handleTypographyNavigation } from "./typography-navigation";
+import { typographySections, focusTypographySection, isTypographySection, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
 import { ComponentOutline, focusDocSection } from "./component-outline";
 import type { DocSection } from "./doc-section";
 import { inputDocSections } from "./input-demos";
@@ -22,6 +22,7 @@ import { buttonDocSections } from "./button-demos";
 import { tableDocSections } from "./table-example";
 import { secondaryDocSections } from "./secondary-demo-registry";
 import { inlineDocSections } from "./inline-demo-registry";
+import { aiDocSections, aiSectionHref } from "./ai-demos";
 import { ShowcasePage } from "./showcase-page";
 import { ThemeSelect, useThemePreference } from "./theme-preference";
 export type Route =
@@ -56,6 +57,7 @@ export function searchDocs(query: string) {
   );
 }
 const groups = componentCategories;
+const componentDocHref = (name: string) => aiSectionHref(name) ?? baseComponentDocHref(name);
 function CodeBlock({ code }: { code: string }) {
   const [status, setStatus] = useState("");
   return (
@@ -113,10 +115,15 @@ function DocDemo({ item, level }: { item: DocSection; level: number }) {
     {item.children?.map((child) => <DocDemo key={child.id} item={child} level={level + 1} />)}
   </section>;
 }
-export const docSections: Record<string, readonly DocSection[]> = { ...inlineDocSections, ...secondaryDocSections, Input: inputDocSections, Button: buttonDocSections, Table: tableDocSections };
+export const docSections: Record<string, readonly DocSection[]> = { ...inlineDocSections, ...secondaryDocSections, ...aiDocSections, Input: inputDocSections, Button: buttonDocSections, Table: tableDocSections };
 
 function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }) {
   const sections = docSections[doc.name] ?? [];
+  const apiChildren = doc.name === "Typography"
+    ? typographySections
+    : componentDocs.filter((item) => item.sidebarParent === doc.name)
+        .map((item) => ({ name: item.name, label: item.name }));
+
   const entries = [
     ...sections,
     { id: "props", title: "API" },
@@ -158,7 +165,7 @@ function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }
         </div>
         {doc.props.length === 0 && <p>此组件无额外配置属性。</p>}
       </section>
-      {doc.name === "Typography" && typographySections.map(({ name, label }) => {
+      {apiChildren.map(({ name, label }) => {
         const child = componentDocs.find((item) => item.name === name)!;
         return (
           <section key={name} aria-label={`${name} 属性与接口`}>
@@ -345,7 +352,7 @@ export function DocsApp() {
   const [route, setRoute] = useState(() => parseRoute(window.location.hash));
   const [query, setQuery] = useState("");
   const [mobile, setMobile] = useState(false);
-  const results = searchDocs(query);
+  const results = searchDocs(query).filter((doc) => query.trim() || !doc.sidebarParent);
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobile(false);
@@ -488,7 +495,7 @@ export function DocsApp() {
             {groups.map((group) => {
                 // Preserve semantic group order, but make each component easy to find by name.
                 const members = componentDocs
-                  .filter((d) => d.category === group && !isTypographySection(d.name) && d.name !== "SearchInput" && d.name !== "Textarea")
+                  .filter((d) => d.category === group && !d.sidebarParent && !isTypographySection(d.name) && d.name !== "SearchInput" && d.name !== "Textarea")
                   .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
                 return (
                   members.length > 0 && (
@@ -499,7 +506,7 @@ export function DocsApp() {
                           key={d.name}
                           href={componentDocHref(d.name)}
                           aria-current={
-                            doc?.name === d.name ? "page" : undefined
+                            doc?.name === d.name || doc?.sidebarParent === d.name ? "page" : undefined
                           }
                         >
                           <span className="docs-nav-label">{d.name}</span>

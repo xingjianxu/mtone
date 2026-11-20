@@ -1,3 +1,4 @@
+import { aiExamples } from "./ai-demos/examples";
 import { InputExample } from "./input-example";
 import { ListExample } from "./list-example";
 import { BreadcrumbExample } from "./breadcrumb-example";
@@ -144,6 +145,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       </M.PropertyItem>
     </M.PropertyList>
   );
+
+  const AiExample = aiExamples[name];
+  if (AiExample) return <AiExample />;
 
   switch (name) {
     case "Splitter":

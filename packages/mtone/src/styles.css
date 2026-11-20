@@ -16,6 +16,9 @@
 @import "./mentions.css";
 @import "./splitter.css";
 @import "./card.css";
+@import "./ai-chat.css";
+@import "./ai-activity.css";
+@import "./ai-evidence.css";
 @import "./spotlight.css";
 @import "./toast.css";
 @import "./layout.css";
