@@ -24,7 +24,7 @@ export default function Demo() {
     <div style={stackStyle}>
       <M.MtoneProvider
         locale="en"
-        density="comfortable"
+
         tokens={{ "--mt-primary": "#436653" }}
       >
         <div style={rowStyle}>
@@ -33,7 +33,7 @@ export default function Demo() {
           <M.Empty />
         </div>
       </M.MtoneProvider>
-      <M.Text muted>局部使用英文、舒适密度和自定义主题。</M.Text>
+      <M.Text muted>局部使用英文和自定义主题。</M.Text>
     </div>
   );
 }

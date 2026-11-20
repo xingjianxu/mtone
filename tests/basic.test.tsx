@@ -40,15 +40,15 @@ describe("foundation", () => {
     fireEvent.click(screen.getByRole("button"));
     expect(fn).toHaveBeenCalledOnce();
   });
-  it("applies density and tokens", () => {
+  it("applies tokens without a density mode", () => {
     render(
-      <MtoneProvider density="comfortable" tokens={{ "--mt-fg": "red" }}>
+      <MtoneProvider tokens={{ "--mt-fg": "red" }}>
         <Button>Go</Button>
       </MtoneProvider>,
     );
-    expect(
-      screen.getByRole("button").closest("[data-density]"),
-    ).toHaveAttribute("data-density", "comfortable");
+    const scope = screen.getByRole("button").closest(".mt-scope");
+    expect(scope).toHaveStyle({ "--mt-fg": "red" });
+    expect(scope).not.toHaveAttribute("data-density");
   });
 });
 

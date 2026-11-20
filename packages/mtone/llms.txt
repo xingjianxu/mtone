@@ -11,7 +11,7 @@ This file describes this package checkout, not necessarily the latest published 
 - Named imports: import { Button, MtoneProvider } from "@bixlab/mtone";
 - Import precompiled CSS once: import "@bixlab/mtone/styles.css";
 - Consumers do not need to install/configure Tailwind or copy component source. Base UI and Lucide are package dependencies.
-- Optional provider: <MtoneProvider locale="zh" density="compact"><Button>保存</Button></MtoneProvider>. Locale: zh | en; density: compact | comfortable. Provider tokens are CSS custom properties.
+- Optional provider: <MtoneProvider locale="zh"><Button>保存</Button></MtoneProvider>. Locale: zh | en. Default single-line controls use a unified 34px baseline; density is no longer a provider prop. Independent size variants and CSS token customization remain available. Provider tokens are CSS custom properties.
 - Color theme: <MtoneProvider theme="system">…</MtoneProvider> follows the OS in real time. Use light or dark to override. Without an explicit theme, top-level providers remain light; nested MtoneScope can override and floats inherit their React scope. The library does not store the choice.
 - Interactive components need a client boundary in React Server Component frameworks.
 
@@ -64,7 +64,7 @@ This file describes this package checkout, not necessarily the latest published 
 - showLine / showIcon: boolean / boolean (default: false). 树连接线和节点图标；图标来自节点 icon。
 - titleRender: (node: TreeItem) => ReactNode. 自定义树节点标题。
 - height / virtual: number / boolean. 树面板高度和窗口化渲染开关；高度默认 256px，virtual 默认 true。
-- size: "sm" | "md" | "lg" (default: "md"). 触发器高度为 24 / 28 / 34px。
+- size: "sm" | "md" | "lg" (default: "md"). 触发器高度为 24 / 34 / 34px。
 - status: "error" | "warning". 校验边框状态。
 - placement: "bottom-start" | "bottom-end" | "top-start" | "top-end" (default: "bottom-start"). 弹层的方向与逻辑对齐。
 - dropdownWidth: CSSProperties["width"]. 指定弹层宽度；默认跟随触发器，最小 180px 且受视口约束。
@@ -206,7 +206,7 @@ export default function Demo() {
 - disabled / readOnly: boolean (default: false). 禁用或只读；不允许修改值。弹出式 Cascader 不打开弹层
 - open / defaultOpen / onOpenChange: boolean / boolean / (open:boolean)=>void (default: false). 仅 Cascader：控制弹层
 - placeholder / allowClear / onClear: string / boolean / ()=>void (default: 本地化提示 / false). 仅 Cascader：提示文字、清除按钮及清除回调
-- size / status: "sm" | "md" | "lg" / "error" | "warning" (default: md). 仅 Cascader：高度 24 / 28 / 34px，及校验状态
+- size / status: "sm" | "md" | "lg" / "error" | "warning" (default: md). 仅 Cascader：高度 24 / 34 / 34px，及校验状态
 - placement: "bottom-start" | "bottom-end" | "top-start" | "top-end" (default: bottom-start). 仅 Cascader：弹层位置
 - showCheckedStrategy: "parent" | "leaf" (default: parent). 仅 Cascader：多选标签合并父级或展示叶级，不改变回调的叶路径数组
 - maxTagCount: number (default: 3). 仅 Cascader：最大可见标签数，其余显示计数
@@ -308,7 +308,7 @@ export default function Demo() {
 - autoHighlight / backfill: boolean (default: false). 自动首项高亮 / 键盘临时回填
 - allowClear / onClear: boolean / ()=>void (default: false). 清除按钮及回调
 - loading / notFoundContent: boolean / ReactNode (default: false / 本地化空状态). 加载状态和无结果内容
-- size / status: sm | md | lg / error | warning (default: md). 高度24/28/34px和校验状态
+- size / status: sm | md | lg / error | warning (default: md). 高度24/34/34px和校验状态
 - prefix / suffix: ReactNode (default: —). 输入前后装饰
 - placement / popupWidth: top | bottom / number (default: bottom / 跟随输入). 浮层方向/像素宽度
 - popupClassName / popupStyle: string / CSSProperties (default: —). 浮层样式
@@ -680,7 +680,7 @@ export default function Demo() {
 - 插入替换光标之前的当前触发符和查询，保留光标之后的文本；超出 maxLength 时不插入，不截断候选。不会把已有提及变成不可分割的标签。默认查询禁止空白，含空格的实体值不适合默认解析规则。
 - 异步示例只模拟本地延迟，不发送网络请求。业务端须自行请求、处理错误、取消或忽略旧响应；loading 时不会选中旧候选，filterOption={false} 可保留服务端排序。
 - FormField 可直接绑定字符串 value/onChange。原生表单 reset 会恢复非受控 defaultValue，受控值仍由应用管理。getMentions 只解析文本，不能替代成员校验或权限检查。
-- 候选使用灰色背景高亮，不加蓝色边框。弹层挂到 document.body 时通过 MtoneProvider 继承 tokens/密度；自定义 popupRender 应保留完整 menu 与可访问语义。复杂变换容器、自定义候选内容需在目标布局验证。
+- 候选使用灰色背景高亮，不加蓝色边框。弹层挂到 document.body 时通过 MtoneProvider 继承 tokens/颜色主题；自定义 popupRender 应保留完整 menu 与可访问语义。复杂变换容器、自定义候选内容需在目标布局验证。
 
 ```tsx
 import { useState } from "react";
@@ -998,7 +998,7 @@ export default function Demo() {
 - Input.OTP: length / mask / separator: number / boolean / ReactNode. 默认6格，限制1–32；mask 使用原生密码显示，separator 在格间显示装饰。
 - Input.OTP: inputMode / name / form / disabled / readOnly: native attributes. inputMode 默认 numeric，仅作为键盘提示，不限制内容；name 通过隐藏字段提交整串值。
 - Input.OTP: controlSize / ref / aria-label: 'sm' | 'md' | 'lg' / Ref<HTMLInputElement> / string. ref 指向第一格；为验证码组提供可访问名称。
-- 默认单行28px，comfortable密度36px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。
+- 默认单行34px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。
 - Input.Search 是搜索子组件；SearchInput 是同一组件的兼容导出。Input.TextArea 与 Textarea 也是同一组件；新代码推荐子组件写法。
 - 原生 size、type、name、form、aria-* 和原生 ref 保留。className/style 面向原生输入，不代表外层容器。
 - Input.OTP 支持粘贴、组合输入、方向键与删除；删除会将后续字符前移，不保留空格占位。空白字符会移除。mask 不提供任意字符替换。
@@ -1030,7 +1030,7 @@ export default function Demo() {
 - disabled / readOnly: boolean. 禁用或只读。
 - aria-label / id: string. 可访问名称或与 label 关联的标识。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 默认单行外框高度为 28px（含边框），搜索图标垂直居中；comfortable 密度保留 36px，可通过 --mt-height 定制。
+- 默认单行外框高度为 34px（含边框），搜索图标垂直居中，可通过 --mt-height 定制。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 支持对应原生输入元素属性和 ref。占位提示不能替代标签。
 
@@ -1307,7 +1307,7 @@ export default function Demo() {
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
-- 默认单行外框高度为 28px（含边框）；长选中标签在行内省略，comfortable 密度保留 34px。可用 className 覆盖尺寸。
+- 默认单行外框高度为 34px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 支持键盘选择、禁用选项和焦点恢复。
 - 选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。
@@ -1337,7 +1337,7 @@ export default function Demo() {
 - expanded / defaultExpanded: boolean. 受控展开状态或初始展开状态，默认折叠。
 - onExpandedChange: (expanded: boolean) => void. 请求切换展开状态时触发。
 - expandLabel / collapseLabel: string. 展开与收起按钮文字，默认「展开」与「收起」。
-- 建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。
+- 选项按钮、展开按钮及单行折叠视口统一采用 34px 基准高度。建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。
 
 ```tsx
 import { TagSelect } from "@bixlab/mtone";
@@ -1368,7 +1368,7 @@ export default function Demo() {
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
-- 默认单行外框最小高度为 28px（含边框）；多个标签换行时自动增高，不强制裁剪为 28px。comfortable 密度下仍以 28px 为最小高度；可用 className 定制。
+- 默认单行外框最小高度为 34px（含边框）；多个标签换行时自动增高，不强制裁剪为 34px；可用 className 定制。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。
 
@@ -1422,7 +1422,7 @@ export default function Demo() {
 - onValueChange: (value: number | null) => void. 值变化回调。
 - min / max: number. 数值下限与上限。
 - step: number. 步进大小。
-- 默认整体外框高度为 28px（含边框），增减按钮位于边框内；comfortable 密度保留 36px。可用 className 定制尺寸。
+- 默认整体外框高度为 34px（含边框），增减按钮位于边框内。可用 className 定制尺寸。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 清空时 value 可为 null；defaultValue 应传 number。
 
@@ -1451,7 +1451,7 @@ export default function Demo() {
 - min / max: string. ISO YYYY-MM-DD 日期边界。
 - disabledDate: (date: string) => boolean. 返回 true 的日期在选择后被拒绝。
 - clearable: boolean (default: true). 显示清除按钮。
-- 默认单行输入外框高度为 28px（含边框）；comfortable 密度保留 36px，可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。
+- 默认单行输入外框高度为 34px（含边框），可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。
 - 日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。
@@ -1726,7 +1726,7 @@ export default function Demo() {
 - Import: FilterChip from @bixlab/mtone
 - children: ReactNode. 组件内容。
 - onRemove: () => void. 必填；移除请求，由应用更新条件。
-- 默认单行外框高度为 28px，与输入及选择控件对齐；comfortable 密度下仍为 28px。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。
+- 默认单行外框高度为 34px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。
 - 点击移除不会自行隐藏，应用负责更新状态。
 
 ```tsx
@@ -2802,11 +2802,10 @@ export default function Demo() {
 
 ### MtoneProvider
 
-- [MtoneProvider](https://xingjianxu.github.io/mtone/#/components/MtoneProvider): 为组件及其浮层配置颜色模式、语言、密度和主题变量。
+- [MtoneProvider](https://xingjianxu.github.io/mtone/#/components/MtoneProvider): 为组件及其浮层配置颜色模式、语言和主题变量。
 - Import: MtoneProvider, Button from @bixlab/mtone
 - children: ReactNode. 组件内容。
 - locale: "zh" | "en" (default: zh). 内置控件文案语言。
-- density: "compact" | "comfortable" (default: compact). 控件密度。
 - theme: MtoneTheme ("light" | "dark" | "system") (default: 最外层为 light). 浅色、深色或实时跟随设备设置；省略时继承上层主题。
 - tokens: Tokens. CSS 自定义属性与 CSSProperties，常用 --mt-fg、--mt-bg、--mt-primary。
 - 简单组件不使用 Provider 时也可用默认值，保持浅色。
@@ -2819,19 +2818,19 @@ import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <MtoneProvider locale="zh" density="comfortable" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>
+    <MtoneProvider locale="zh" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>
   );
 }
 ```
 
 ### MtoneScope
 
-- [MtoneScope](https://xingjianxu.github.io/mtone/#/components/MtoneScope): 把当前 Provider 的主题变量和密度应用到一个 div，可局部覆盖颜色模式。
+- [MtoneScope](https://xingjianxu.github.io/mtone/#/components/MtoneScope): 把当前 Provider 的主题变量应用到一个 div，可局部覆盖颜色模式。
 - Import: MtoneScope, MtoneProvider, Button from @bixlab/mtone
 - children: ReactNode. 组件内容。
 - theme: MtoneTheme ("light" | "dark" | "system") (default: 继承上层主题). 仅覆盖此作用域及其浮层的颜色模式。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言、密度和主题变量。
+- 通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言和主题变量。
 
 ```tsx
 import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";

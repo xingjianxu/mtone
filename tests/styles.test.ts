@@ -87,19 +87,19 @@ it('uses border color only for all bordered input focus surfaces', () => {
   expect(rules).toContain(':not([aria-invalid="true"])');
 });
 
-it('uses border-box 28px single-line surfaces without fixing multiline chips', () => {
+it('uses border-box standard single-line surfaces without fixing multiline chips', () => {
  const css=readFileSync('packages/mtone/src/interactive.css','utf8');
  const select=css.slice(css.indexOf('.mt-select {')).split('}')[0];
- expect(select).toContain('height: 28px');
+ expect(select).toContain('height: var(--mt-height, 34px)');
  const group=css.slice(css.indexOf('.mt-number-group {')).split('}')[0];
- expect(group).toContain('height: 28px');
+ expect(group).toContain('height: var(--mt-height, 34px)');
  const step=css.slice(css.indexOf('.mt-number-step {')).split('}')[0];
- expect(step).toContain('height: 26px');
+ expect(step).toContain('height: calc(var(--mt-height, 34px) - 2px)');
  const multi=css.slice(css.indexOf('.mt-multiselect {')).split('}')[0];
  expect(multi).toContain('flex-wrap: wrap');expect(multi).not.toContain('height:');
  const base=readFileSync('packages/mtone/src/styles.css','utf8');
  const filter=base.slice(base.indexOf('.mt-filter-chip {')).split('}')[0];
- expect(filter).toContain('height: 28px');expect(filter).toContain('box-sizing: border-box');
+ expect(filter).toContain('height: var(--mt-height, 34px)');expect(filter).toContain('box-sizing: border-box');
 });
 
 it('reserves menu icon columns for all grouped rows of a panel with rendered icons',()=>{

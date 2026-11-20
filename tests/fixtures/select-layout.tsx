@@ -9,8 +9,8 @@ const text =
 createRoot(document.getElementById("root")!).render(
   <>
     <style>{`.case .mt-select { width: var(--width); min-width: 0; box-sizing: border-box; } .case { margin: 12px; } .case .tall { width: 200px; height: 48px; font-size: 24px; }`}</style>
-    {(["compact", "comfortable"] as const).map((density) => (
-      <MtoneProvider key={density} density={density}>
+    {(["light", "dark"] as const).map((theme) => (
+      <MtoneProvider key={theme} theme={theme}>
         {[100, 160, 320, 640].map((width) => (
           <div
             className="case"
@@ -19,7 +19,7 @@ createRoot(document.getElementById("root")!).render(
           >
             <Select
               className="sample"
-              label={`${density}-${width}`}
+              label={`${theme}-${width}`}
               defaultValue="long"
               options={[
                 { value: "long", label: text },
@@ -31,7 +31,7 @@ createRoot(document.getElementById("root")!).render(
         <div className="case">
           <Select
             className="tall"
-            label={`${density}-tall`}
+            label={`${theme}-tall`}
             options={[
               {
                 value: "zh",
@@ -43,7 +43,7 @@ createRoot(document.getElementById("root")!).render(
         </div>
         <div className="case">
           <Select
-            label={`${density}-disabled`}
+            label={`${theme}-disabled`}
             disabled
             options={[]}
             placeholder="Choose"
@@ -51,19 +51,19 @@ createRoot(document.getElementById("root")!).render(
         </div>
         <div className="case">
           <Select
-            label={`${density}-placeholder`}
+            label={`${theme}-placeholder`}
             options={[{ value: "a", label: "Alpha" }]}
             placeholder={text}
           />
         </div>
-        <div className={`case multi-${density}`} style={{ width: 250 }}>
-          <MultiSelect label={`${density}-multi`} options={[{value:"a",label:"Alpha"},{value:"b",label:"Beta"},{value:"c",label:"Disabled",disabled:true}]} defaultValue={["a"]} />
-          <Checkbox label={`${density}-check`} defaultChecked />
-          <Checkbox label={`${density}-mixed`} indeterminate />
+        <div className={`case multi-${theme}`} style={{ width: 250 }}>
+          <MultiSelect label={`${theme}-multi`} options={[{value:"a",label:"Alpha"},{value:"b",label:"Beta"},{value:"c",label:"Disabled",disabled:true}]} defaultValue={["a"]} />
+          <Checkbox label={`${theme}-check`} defaultChecked />
+          <Checkbox label={`${theme}-mixed`} indeterminate />
         </div>
-        <div className="case"><MultiSelect label={`${density}-multi-disabled`} options={[]} disabled /></div>
-        <div className={`case date-${density}`} style={{ width: 250 }}><DatePicker label={`${density}-date`} min="2026-01-01" max="2026-12-31" defaultValue="2026-02-01" /></div>
-        <div className={`case date-disabled-${density}`} style={{ width: 180 }}><DatePicker label={`${density}-date-disabled`} disabled /></div>
+        <div className="case"><MultiSelect label={`${theme}-multi-disabled`} options={[]} disabled /></div>
+        <div className={`case date-${theme}`} style={{ width: 250 }}><DatePicker label={`${theme}-date`} min="2026-01-01" max="2026-12-31" defaultValue="2026-02-01" /></div>
+        <div className={`case date-disabled-${theme}`} style={{ width: 180 }}><DatePicker label={`${theme}-date-disabled`} disabled /></div>
       </MtoneProvider>
     ))}
   </>,

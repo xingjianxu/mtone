@@ -823,7 +823,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         <div style={stackStyle}>
           <M.MtoneProvider
             locale="en"
-            density="comfortable"
+
             tokens={{ "--mt-primary": "#436653" }}
           >
             <div style={rowStyle}>
@@ -832,7 +832,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
               <M.Empty />
             </div>
           </M.MtoneProvider>
-          <M.Text muted>局部使用英文、舒适密度和自定义主题。</M.Text>
+          <M.Text muted>局部使用英文和自定义主题。</M.Text>
         </div>
       );
     case "MtoneScope":
@@ -844,7 +844,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
             borderRadius: 4,
           }}
         >
-          <M.Text>此区域继承当前 Provider 的主题与密度。</M.Text>
+          <M.Text>此区域继承当前 Provider 的主题。</M.Text>
           <M.Divider />
           <M.Button>局部区域按钮</M.Button>
         </M.MtoneScope>

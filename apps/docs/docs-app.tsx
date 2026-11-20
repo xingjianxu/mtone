@@ -216,10 +216,10 @@ function Start() {
         <h2>导入样式与组件</h2>
         <CodeBlock
           code={
-            'import { Button, MtoneProvider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function App() {\n  return (\n    <MtoneProvider locale="zh" density="compact">\n      <Button onClick={() => console.log("create")}>新建文档</Button>\n    </MtoneProvider>\n  );\n}'
+            'import { Button, MtoneProvider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function App() {\n  return (\n    <MtoneProvider locale="zh">\n      <Button onClick={() => console.log("create")}>新建文档</Button>\n    </MtoneProvider>\n  );\n}'
           }
         />
-        <p>样式只需导入一次。简单组件无需 Provider，使用默认中文与紧凑密度。</p>
+        <p>样式只需导入一次。简单组件无需 Provider，使用默认中文与 34px 控件基准。</p>
       </section>
       <section id="ai-coding">
         <h2>与 AI 一起编程</h2>
@@ -250,13 +250,13 @@ function Theme() {
         通过 Provider 与 CSS 变量调整主题，而不是逐个覆盖组件。
       </p>
       <section>
-        <h2>主题与密度</h2>
+        <h2>主题与控件尺寸</h2>
         <p className="theme-release-note">
-          颜色主题 API 已在文档站预览，尚未包含在 npm 0.6.0。
+          当前文档预览统一 34px 控件基准，移除了密度切换；已安装版本请以包内类型声明为准。
         </p>
         <CodeBlock
           code={
-            '<MtoneProvider\n  locale="zh"\n  density="comfortable"\n  theme="system"\n  tokens={{ "--mt-primary": "#466751", "--mt-radius": "6px" }}\n>\n  <main style={{ background: "var(--mt-bg)" }}>\n    <Button>保存</Button>\n  </main>\n</MtoneProvider>'
+            '<MtoneProvider\n  locale="zh"\n  theme="system"\n  tokens={{ "--mt-primary": "#466751", "--mt-radius": "6px" }}\n>\n  <main style={{ background: "var(--mt-bg)" }}>\n    <Button>保存</Button>\n  </main>\n</MtoneProvider>'
           }
         />
         <p>
@@ -267,7 +267,7 @@ function Theme() {
         </p>
         <p>
           文档站和应用示例默认跟随系统，也可在顶部手动切换；所选主题会记住。
-          布局密度可独立选择，默认 <code>compact</code>，<code>comfortable</code> 提供更高的控件。
+          默认单行控件统一采用 34px 基准高度，不再区分密度。升级时移除 Provider 上的 density 属性；独立 size 变体与 CSS 变量定制仍可使用。
         </p>
       </section>
       <section>
@@ -280,7 +280,7 @@ function Theme() {
               <M.Select
                 label="显示选项"
                 placeholder="选择一项"
-                options={[{ value: "compact", label: "紧凑" }, { value: "comfortable", label: "舒适" }]}
+                options={[{ value: "all", label: "全部内容" }, { value: "starred", label: "仅收藏" }]}
               />
             </M.MtoneScope>
           ))}
@@ -345,7 +345,6 @@ export function DocsApp() {
   const [route, setRoute] = useState(() => parseRoute(window.location.hash));
   const [query, setQuery] = useState("");
   const [mobile, setMobile] = useState(false);
-  const [density, setDensity] = useState<"compact" | "comfortable">("compact");
   const results = searchDocs(query);
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
@@ -380,7 +379,7 @@ export function DocsApp() {
       ? componentDocs.find((d) => d.name === route.name)
       : undefined;
   return (
-    <M.MtoneProvider density={density} theme={preference.theme}>
+    <M.MtoneProvider theme={preference.theme}>
       <M.ToastProvider>
         <a
           className="skip-link"
@@ -428,14 +427,6 @@ export function DocsApp() {
               }
             />
             <ThemeSelect {...preference} />
-            <button
-              className="docs-density-toggle"
-              onClick={() =>
-                setDensity(density === "compact" ? "comfortable" : "compact")
-              }
-            >
-              {density === "compact" ? "紧凑" : "舒适"}
-            </button>
             <a
               href="https://github.com/xingjianxu/mtone"
               className="docs-repo-link"

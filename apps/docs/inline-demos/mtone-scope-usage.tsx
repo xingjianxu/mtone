@@ -10,7 +10,7 @@ export default function Demo() {
         borderRadius: 4,
       }}
     >
-      <M.Text>此区域继承当前 Provider 的主题与密度。</M.Text>
+      <M.Text>此区域继承当前 Provider 的主题。</M.Text>
       <M.Divider />
       <M.Button>局部区域按钮</M.Button>
     </M.MtoneScope>

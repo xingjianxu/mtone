@@ -9,7 +9,7 @@
   min-inline-size: 0;
 }
 .mt-tag-select-viewport[data-collapsed] {
-  block-size: 28px;
+  block-size: var(--mt-height, 34px);
   overflow: hidden;
 }
 .mt-tag-select-options {
@@ -23,7 +23,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 28px;
+  height: var(--mt-height, 34px);
   padding-inline: 8px;
   border: 1px solid transparent;
   border-radius: 5px;

@@ -258,8 +258,8 @@
 }
 .showcase .showcase-filters .mt-input {
   font-size: 11px;
-  min-height: 28px;
-  height: 28px;
+  min-height: 34px;
+  height: 34px;
 }
 .showcase-result-count {
   color: var(--docs-showcase-muted);

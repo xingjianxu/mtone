@@ -154,7 +154,7 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
     forwardedRef,
   ) {
     disabled = useFieldsetDisabled(disabled);
-    const { locale, density, theme, tokens } = useMtone();
+    const { locale, theme, tokens } = useMtone();
     const inputRef = React.useRef<HTMLTextAreaElement>(null),
       popupRef = React.useRef<HTMLDivElement>(null);
     const [internal, setInternal] = React.useState(defaultValue),
@@ -389,7 +389,6 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
       <div
         ref={popupRef}
         className={cn("mt-scope", "mt-mentions-popup", classNames?.popup)}
-        data-density={density}
         data-mt-theme={theme}
         style={{
           ...tokens,

@@ -167,7 +167,7 @@ export const componentDocs: ComponentDoc[] = [
     {
       "name": "size",
       "type": "\"sm\" | \"md\" | \"lg\"",
-      "description": "触发器高度为 24 / 28 / 34px。",
+      "description": "触发器高度为 24 / 34 / 34px。",
       "default": "\"md\""
     },
     {
@@ -478,7 +478,7 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "size / status",
         type: '"sm" | "md" | "lg" / "error" | "warning"',
-        description: "仅 Cascader：高度 24 / 28 / 34px，及校验状态",
+        description: "仅 Cascader：高度 24 / 34 / 34px，及校验状态",
         default: "md",
       },
       {
@@ -833,7 +833,7 @@ export const componentDocs: ComponentDoc[] = [
       "name": "size / status",
       "type": "sm | md | lg / error | warning",
       "default": "md",
-      "description": "高度24/28/34px和校验状态"
+      "description": "高度24/34/34px和校验状态"
     },
     {
       "name": "prefix / suffix",
@@ -1773,7 +1773,7 @@ export const componentDocs: ComponentDoc[] = [
     "插入替换光标之前的当前触发符和查询，保留光标之后的文本；超出 maxLength 时不插入，不截断候选。不会把已有提及变成不可分割的标签。默认查询禁止空白，含空格的实体值不适合默认解析规则。",
     "异步示例只模拟本地延迟，不发送网络请求。业务端须自行请求、处理错误、取消或忽略旧响应；loading 时不会选中旧候选，filterOption={false} 可保留服务端排序。",
     "FormField 可直接绑定字符串 value/onChange。原生表单 reset 会恢复非受控 defaultValue，受控值仍由应用管理。getMentions 只解析文本，不能替代成员校验或权限检查。",
-    "候选使用灰色背景高亮，不加蓝色边框。弹层挂到 document.body 时通过 MtoneProvider 继承 tokens/密度；自定义 popupRender 应保留完整 menu 与可访问语义。复杂变换容器、自定义候选内容需在目标布局验证。"
+    "候选使用灰色背景高亮，不加蓝色边框。弹层挂到 document.body 时通过 MtoneProvider 继承 tokens/颜色主题；自定义 popupRender 应保留完整 menu 与可访问语义。复杂变换容器、自定义候选内容需在目标布局验证。"
   ]
 },
 {
@@ -2374,7 +2374,7 @@ export const componentDocs: ComponentDoc[] = [
     }
   ],
   "notes": [
-    "默认单行28px，comfortable密度36px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。",
+    "默认单行34px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。",
     "Input.Search 是搜索子组件；SearchInput 是同一组件的兼容导出。Input.TextArea 与 Textarea 也是同一组件；新代码推荐子组件写法。",
     "原生 size、type、name、form、aria-* 和原生 ref 保留。className/style 面向原生输入，不代表外层容器。",
     "Input.OTP 支持粘贴、组合输入、方向键与删除；删除会将后续字符前移，不保留空格占位。空白字符会移除。mask 不提供任意字符替换。",
@@ -2421,7 +2421,7 @@ export const componentDocs: ComponentDoc[] = [
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["默认单行外框高度为 28px（含边框），搜索图标垂直居中；comfortable 密度保留 36px，可通过 --mt-height 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
+    notes: ["默认单行外框高度为 34px（含边框），搜索图标垂直居中，可通过 --mt-height 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
   },
   {
     name: "Textarea",
@@ -2991,7 +2991,7 @@ export const componentDocs: ComponentDoc[] = [
       },
     ],
     notes: [
-      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 28px（含边框）；长选中标签在行内省略，comfortable 密度保留 34px。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
+      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 34px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
   {
     name: "TagSelect",
@@ -3019,7 +3019,7 @@ export default function Demo() {
       { name: "onExpandedChange", type: "(expanded: boolean) => void", description: "请求切换展开状态时触发。" },
       { name: "expandLabel / collapseLabel", type: "string", description: "展开与收起按钮文字，默认「展开」与「收起」。" },
     ],
-    notes: ["建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。"],
+    notes: ["选项按钮、展开按钮及单行折叠视口统一采用 34px 基准高度。建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。"],
   },
   {
     name: "MultiSelect",
@@ -3091,7 +3091,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框最小高度为 28px（含边框）；多个标签换行时自动增高，不强制裁剪为 28px。comfortable 密度下仍以 28px 为最小高度；可用 className 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
+      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框最小高度为 34px（含边框）；多个标签换行时自动增高，不强制裁剪为 34px；可用 className 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
   },
   {
     name: "Slider",
@@ -3201,7 +3201,7 @@ export default function Demo() {
         description: "步进大小。",
       },
     ],
-    notes: ["默认整体外框高度为 28px（含边框），增减按钮位于边框内；comfortable 密度保留 36px。可用 className 定制尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "清空时 value 可为 null；defaultValue 应传 number。"],
+    notes: ["默认整体外框高度为 34px（含边框），增减按钮位于边框内。可用 className 定制尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "清空时 value 可为 null；defaultValue 应传 number。"],
   },
   {
     name: "DatePicker",
@@ -3262,7 +3262,7 @@ export default function Demo() {
         default: "true",
       },
     ],
-    notes: ["默认单行输入外框高度为 28px（含边框）；comfortable 密度保留 36px，可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
+    notes: ["默认单行输入外框高度为 34px（含边框），可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
       "值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。",
       "日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。",
       "仅对支持样式的原生日期指示器使用与 Select 一致的 16px 箭头，不叠加第二个图标；其他浏览器和强制颜色模式保留原生日期界面。",
@@ -3875,7 +3875,7 @@ export default function Demo() {
         description: "必填；移除请求，由应用更新条件。",
       },
     ],
-    notes: ["默认单行外框高度为 28px，与输入及选择控件对齐；comfortable 密度下仍为 28px。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。", "点击移除不会自行隐藏，应用负责更新状态。"],
+    notes: ["默认单行外框高度为 34px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。", "点击移除不会自行隐藏，应用负责更新状态。"],
   },
   {
     name: "Pagination",
@@ -5861,9 +5861,9 @@ export default function Demo() {
   {
     name: "MtoneProvider",
     category: "全局配置",
-    description: "为组件及其浮层配置颜色模式、语言、密度和主题变量。",
+    description: "为组件及其浮层配置颜色模式、语言和主题变量。",
     importNames: ["MtoneProvider", "Button"],
-    code: 'import { MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider locale="zh" density="comfortable" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>\n  );\n}',
+    code: 'import { MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider locale="zh" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>\n  );\n}',
     props: [
       {
         name: "children",
@@ -5875,12 +5875,6 @@ export default function Demo() {
         type: '"zh" | "en"',
         description: "内置控件文案语言。",
         default: "zh",
-      },
-      {
-        name: "density",
-        type: '"compact" | "comfortable"',
-        description: "控件密度。",
-        default: "compact",
       },
       {
         name: "theme",
@@ -5904,7 +5898,7 @@ export default function Demo() {
   {
     name: "MtoneScope",
     category: "全局配置",
-    description: "把当前 Provider 的主题变量和密度应用到一个 div，可局部覆盖颜色模式。",
+    description: "把当前 Provider 的主题变量应用到一个 div，可局部覆盖颜色模式。",
     importNames: ["MtoneScope", "MtoneProvider", "Button"],
     code: 'import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope theme="dark"><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>\n  );\n}',
     props: [
@@ -5927,7 +5921,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言、密度和主题变量。",
+      "通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言和主题变量。",
     ],
   },
 ];

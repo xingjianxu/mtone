@@ -13,7 +13,7 @@ import { MtoneProvider, Button, Select } from '@bixlab/mtone';
 import '@bixlab/mtone/styles.css';
 
 export function App() {
-  return <MtoneProvider locale="zh" density="compact">
+  return <MtoneProvider locale="zh">
     <Button variant="solid">新建</Button>
     <Select label="知识库" options={[{value:'notes',label:'研究笔记'}]} />
   </MtoneProvider>;
@@ -43,7 +43,9 @@ Node 24 recommended. The documentation app lives in `apps/docs`; its static buil
 
 Buttons, forms, plain-text mentions, selection controls, navigation, directory tree, tabs, menus, lists, table, status and property displays, dialogs/drawers, feedback and upload. No block editor or backend. See [API](docs/API.md), [coverage](docs/COVERAGE.md) and [verification](docs/VERIFICATION.md).
 
-Default style: text #37352F, muted #787774, border #E9E9E7, subtle surface #F7F7F5, white canvas, 14px text, 28px controls, 4px radius. CSS is precompiled, prefixed and contains no Tailwind Preflight. Existing applications remain light by default. Since 0.7.0, set `theme="dark"` or `theme="system"` on `MtoneProvider`; system mode follows the operating system without reloading. `MtoneScope` can override the mode locally and mtone popups follow their trigger context. The library leaves preference storage to the application.
+The current source removes the `density` prop from `MtoneProvider`; remove it when migrating. Controls share a 34px baseline, while independent size variants and token customization remain available. This source change is not a statement that a new npm version has been published.
+
+Default style: text #37352F, muted #787774, border #E9E9E7, subtle surface #F7F7F5, white canvas, 14px text, 34px default controls, 4px radius. CSS is precompiled, prefixed and contains no Tailwind Preflight. Existing applications remain light by default. Since 0.7.0, set `theme="dark"` or `theme="system"` on `MtoneProvider`; system mode follows the operating system without reloading. `MtoneScope` can override the mode locally and mtone popups follow their trigger context. The library leaves preference storage to the application.
 
 ## Documentation website
 
