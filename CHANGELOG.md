@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.0
+
+### Breaking
+- Remove the `density` prop from `MtoneProvider` and the compact/comfortable modes. Remove the prop when upgrading; explicit component size variants remain available. See [migration notes](docs/MIGRATION.md).
+
+### Changed
+- Use a consistent 34px default outer height for single-line controls, while allowing MultiSelect to grow when chips wrap.
+- Use 34px navigation rows in Sidebar, NavGroup, AdminLayout and the documentation site. Preserve row spacing and collapsed navigation, and truncate long plain-text labels without changing their accessible names.
+
 ## 0.7.0
 
 ### Added
