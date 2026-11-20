@@ -36,6 +36,33 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### Questionnaire
+
+- [Questionnaire](https://xingjianxu.github.io/mtone/#/components/Questionnaire): 逐题填写的多步问卷，支持单选、多选、自由文本、其他答案、必答校验和跳过。
+- Import: Questionnaire from @bixlab/mtone
+- items: readonly QuestionnaireItem[]. 有序问题：id、title、description、required；type 为 single、multiple 或 text。选项题传 choices；单选可传 other。
+- answers / defaultAnswers: QuestionnaireAnswers. 按问题 id 索引的受控或初始答案。
+- onAnswersChange: (answers: QuestionnaireAnswers) => void. 输入、选项变化或显式跳过时收到完整草稿。
+- onSubmit: (answers: QuestionnaireAnswers) => void | Promise<void>. 末题通过校验时收到有效答案；异步失败后可重试。
+- submitLabel: ReactNode. 最终提交按钮内容。
+- 答案为 {type:"choice",value}、{type:"choices",values} 或 {type:"text",value}。提交文本会去除首尾空白，多选按选项顺序返回。
+- 必答题不能跳过；选答题可留空，显式跳过清除本题草稿。上一题不会清除答案。
+- 问题 id 在问卷内必须唯一且稳定，选项 value 在本题内必须唯一。已提交后保留完成提示；开始新问卷时以不同 React key 挂载。
+- 组件不处理保存、传输和条件分支；由调用方在 onSubmit 中处理。
+
+```tsx
+import { Questionnaire } from "@bixlab/mtone";
+
+<Questionnaire
+  items={[
+    { id: "topic", type: "single", title: "选择主题", required: true,
+      choices: [{ value: "docs", label: "文档" }], other: { label: "其他" } },
+    { id: "notes", type: "text", title: "还有什么建议？" },
+  ]}
+  onSubmit={(answers) => console.log(answers)}
+/>
+```
+
 ### TreeSelect
 
 - [TreeSelect](https://xingjianxu.github.io/mtone/#/components/TreeSelect): 在紧凑输入框中选择树形数据，支持单选、多选勾选、搜索和异步展开。
@@ -894,20 +921,40 @@ export default function Demo() {
 - size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
 - danger: boolean. 危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。
 - loading: boolean. 显示加载图标并禁用点击。
-- icon: ReactNode. 前置图标。
+- icon: ReactNode. 旧版前置图标；未传 leftSection 时使用。
+- leftSection: ReactNode. 文字前的内容，可放图标或装饰；优先于 icon，传 null 可隐藏旧图标。
+- rightSection: ReactNode. 文字后的内容，可放图标或装饰；加载期间仍显示。
 - disabled: boolean. 禁用按钮。
 - onClick: MouseEventHandler. 点击回调。
 - children: ReactNode. 组件内容。
-- 支持 ref 和 Base UI Button 的可组合属性。加载中不会重复触发操作。
+- 支持 ref 和 Base UI Button 的可组合属性。加载中显示前置加载图标并禁用按钮，右侧内容不变。
+- 左右内容按阅读方向排列，在 RTL 中自动对调。传入内容的一侧使用更紧凑的内边距；装饰图标可标记 aria-hidden。
 - blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。
 
 ```tsx
+import React from "react";
+import { ArrowRight, Download, Image } from "lucide-react";
 import { Button } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <Button variant="blue">启用两步验证</Button>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <Button leftSection={<Image size={14} aria-hidden="true" />}>图库</Button>
+      <Button
+        variant="solid"
+        rightSection={<Download size={14} aria-hidden="true" />}
+      >
+        下载
+      </Button>
+      <Button
+        variant="soft"
+        leftSection={<Image size={14} aria-hidden="true" />}
+        rightSection={<ArrowRight size={14} aria-hidden="true" />}
+      >
+        查看图库
+      </Button>
+    </div>
   );
 }
 ```
@@ -1930,10 +1977,49 @@ export default function Demo() {
 }
 ```
 
+### CardGroup
+
+- [CardGroup](https://xingjianxu.github.io/mtone/#/components/CardGroup): 排列多个独立卡片，支持响应式列数与间距、跨列、纵向排列和行列分隔线。
+- Import: CardGroup, Card from @bixlab/mtone
+- direction: "horizontal" | "vertical" (default: horizontal). horizontal 使用多列网格；vertical 固定单列并忽略 columns。
+- columns: number | Partial<Record<"xs" | "sm" | "md" | "lg" | "xl" | "xxl", number>> (default: { xs: 1, sm: 2, lg: 3 }). 网格列数。数字应用于全部断点；对象按视口断点逐级继承，未定义的初始值为 1。有效值取整并限制为 1–24。
+- gap: CardGroupResponsive (default: 12). 行列间距（px），支持数字或相同断点对象。有效值必须有限且非负，未定义的初始值为 12。
+- divided: boolean (default: false). 在相邻行列的间距中显示分隔线，跟随当前列数与跨列布局调整。
+- CardGroup.Item.span: CardGroupResponsive (default: 1). 占用列数，可响应式配置；自动限制为当前总列数，不会撑出网格。
+- children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes<HTMLDivElement>. 根节点与 Item 支持原生 div 属性。普通子元素自动包裹为 Item；显式 Item 可设置 span 或 hidden。
+- CardGroup 是多个独立 Card 的外层布局；Card.Grid 是一张 Card 内的内容网格，二者不能混作同一个组件。CardGroup.Item 为静态子组件，不是独立命名导出。
+- 断点按浏览器视口计算：xs 从 0 开始，sm 576px、md 768px、lg 992px、xl 1200px、xxl 1600px；不是容器查询。缩小示例容器不会改变断点。
+- 默认手机单列；如需手机多列，可显式设置 columns={{ xs: 2, md: 3 }}。内容需适应有限列宽，过长的自定义内容仍须自行约束。
+- direction="vertical" 时 Item.span 同样限制为 1；divided 仅显示行间分隔。根 gap=0 时分隔线位于相邻项边缘。
+- 支持 Fragment 展开；隐藏项使用 CardGroup.Item hidden，不应仅用 CSS display:none 隐藏布局项，否则分隔线的行列推算不会同步。示例只演示本地布局，不读写服务器数据。
+
+```tsx
+import { Card, CardGroup } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <CardGroup columns={{ xs: 2, md: 3 }} gap={{ xs: 12, md: 20 }} divided>
+      <CardGroup.Item span={{ xs: 2, md: 3 }}>
+        <Card title="概览">跨满当前整行</Card>
+      </CardGroup.Item>
+      <Card title="资料">待整理 12 项</Card>
+      <Card title="笔记">已阅读 20 项</Card>
+      <Card title="收藏">常用资源</Card>
+    </CardGroup>
+  );
+}
+```
+
 ### Card
 
 - [Card](https://xingjianxu.github.io/mtone/#/components/Card): 紧凑的结构化内容卡片，支持封面、操作、加载、标签页、元信息与网格。
 - Import: Card, Button, Avatar from @bixlab/mtone
+- collapsible: boolean (default: false). 在标题左侧显示收起/展开按钮。默认不折叠。
+- collapsed: boolean. 受控折叠状态；搭配 onCollapsedChange 更新。
+- defaultCollapsed: boolean (default: false). 非受控初始折叠状态，仅 collapsible 启用时生效。
+- onCollapsedChange: (collapsed: boolean) => void. 用户点击折叠按钮时请求切换状态；受控模式由父组件接受更新。
+- collapseLabel: string. 折叠按钮可访问名称；默认按状态与 locale 显示收起卡片/展开卡片（英文对应 Collapse card/Expand card）。
 - children: ReactNode. 卡片主体；tabList 项未指定 content 时也用作该标签页主体。
 - title / extra: ReactNode. 可见标题与标题栏尾部区域；无内容时不生成空标题栏。
 - htmlTitle: string. 原生 HTML title 悬浮提示。旧 Card title 原生提示用法需迁移到此属性。
@@ -1954,6 +2040,8 @@ export default function Demo() {
 - Card.Meta: avatar?: ReactNode; title?: ReactNode; description?: ReactNode; htmlTitle?: string. 元信息布局；支持原生 div 属性，以及 root、section、avatar、title、description 分区 classNames/styles（对象或 ({props}) => 对象）。
 - Card.Grid: hoverable?: boolean + HTMLAttributes<HTMLDivElement>. 卡片网格项，hoverable 默认 true；作为 Card 的直接子元素使用以启用响应式网格布局。
 - 原生属性: Omit<HTMLAttributes<HTMLDivElement>, "title">. 支持根节点 className、style、aria-* 与适用 DOM 事件。title 已改为可见标题；原生提示使用 htmlTitle。
+- 折叠后标题及 extra 操作保持可见，封面、标签、正文与底部 actions 隐藏但不卸载；子组件状态保留。未设置 collapsible 时 collapsed/defaultCollapsed 不会隐藏内容。
+- Card.Grid 是单张 Card 内部的网格项；多个独立 Card 的布局、响应式列数、跨列和分隔线请使用 CardGroup。
 - 未提供 bordered/bodyStyle/headStyle；使用 variant 与分区 styles。size 使用 medium/small，tabProps 只支持现有 mtone Tabs 的 className。
 - 迁移提醒：旧 <Card title="提示"> 会改为显示标题栏；原生悬浮提示请改为 <Card htmlTitle="提示">。只有 children、没有新增结构属性的 Card 维持原来的默认视觉。
 - Card.Meta 与 Card.Grid 是 Card 的静态子组件，不是单独安装或单独命名导出的组件。
@@ -2196,6 +2284,51 @@ import "@bixlab/mtone/styles.css";
 const items = Array.from({length: 10000}, (_, id) => ({id, title: `记录 ${id + 1}`}));
 export default function Demo() {
   return <List items={items} getKey={item => item.id} renderItem={item => item.title} height={240} virtual />;
+}
+```
+
+### DataList
+
+- [DataList](https://xingjianxu.github.io/mtone/#/components/DataList): 用于管理记录的列表，支持搜索筛选、分页、跨页选择、批量操作和行详情。
+- Import: DataList from @bixlab/mtone
+- items / getKey: readonly T[] / (item: T) => string | number. 必填。提供数据与稳定唯一的条目键（字符串或有限数值）；远程模式只传当前页记录。
+- getLabel: (item: T) => string. 为条目选择和展开按钮提供可读名称；省略时使用键的字符串。
+- renderItem: (item: T, index: number) => ReactNode. 必填。仅返回行内容；index 是从 0 开始的当前页索引，不要返回 li 或 ListItem。
+- search: { value?, defaultValue?, onChange?, placeholder?, label?, match? }. 传入后显示搜索框。match(item, query) 用于本地搜索，query 已去掉首尾空白；未传 match 时不自动筛选。
+- filter / filters / toolbar: ((item: T) => boolean) / ReactNode / ReactNode. 本地筛选条件、筛选控件与工具栏内容。远程模式只呈现应用提供的结果，不执行本地条件。
+- pagination: DataListPagination. 省略时不分页。本地配置为 { mode?: 'local', page?, defaultPage?, pageSize?, onPageChange? }，默认第 1 页、每页 10 条；远程配置为 { mode: 'remote', page, pageSize, total, onPageChange }。
+- selection: { selectedKeys?, defaultSelectedKeys?, onChange?, getDisabled? }. 启用选择。使用稳定键保留跨页选择；全选或取消全选只影响当前页的可选条目。
+- expansion: { expandedKeys?, defaultExpandedKeys?, onChange?, isExpandable?, renderDetail }. 启用行详情；renderDetail(item) 返回详情内容。展开不会改变选中状态。
+- renderActions: (item: T) => ReactNode. 行尾操作；业务行为由应用处理，不会触发隐式选中。
+- renderBatchActions: ({ selectedKeys, clearSelection }) => ReactNode. 已选时渲染批量操作；clearSelection() 清除全部选中键，包括其他页。
+- loading / empty: boolean / ReactNode. 加载状态与空内容；请求、错误和记录更新由应用处理。
+- 原生属性: HTMLAttributes<HTMLElement>. 转发 section 根元素属性，例如 aria-label、className、style；行由 renderItem 提供。
+- DataList 用于行内容由应用渲染的数据管理页。仅需基础列表、分组吸顶或虚拟滚动时，使用 List。
+- 本地搜索与筛选先于分页。输入搜索词会请求回到第 1 页；本地结果缩小时限制页码范围。
+- 远程模式不会过滤或再次切分 items。应用提供当前页记录、总数、加载及错误状态，管理请求取消；外部筛选变化时由应用重置页码。
+- 目前不提供卡片网格、内联编辑或虚拟滚动。过滤和翻页后若需批量修改，应按键操作，不以当前页的条目数组为准。
+
+```tsx
+import { DataList, Text } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+const records = [
+  { id: "guide", title: "知识库使用指南" },
+  { id: "notes", title: "研究笔记" },
+];
+
+export default function Demo() {
+  return (
+    <DataList
+      aria-label="文档列表"
+      items={records}
+      getKey={(item) => item.id}
+      getLabel={(item) => item.title}
+      renderItem={(item) => <Text>{item.title}</Text>}
+      search={{ match: (item, query) => item.title.includes(query) }}
+      pagination={{ pageSize: 10 }}
+    />
+  );
 }
 ```
 
@@ -2840,6 +2973,620 @@ import "@bixlab/mtone/styles.css";
 export default function Demo() {
   return (
     <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope theme="dark"><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>
+  );
+}
+```
+
+### AiChat
+
+- [AiChat](https://xingjianxu.github.io/mtone/#/components/AiChat): 容纳滚动消息和固定输入区域，可跟随最新消息。
+- Import: AiChat from @bixlab/mtone
+- children / empty / footer: ReactNode. 消息、空状态和底部区域。
+- autoFollow: boolean (default: true). 在阅读位置靠近底部时自动跟随消息；向上浏览时不强制跳回。
+- bottomThreshold: number (default: 64). 判断靠近底部的距离，单位 px。
+- scrollToBottomLabel: string. 覆盖回到底部按钮的名称。
+- className / style / aria-label: HTMLAttributes<HTMLDivElement>. 设置对话高度、样式和可访问名称等。
+- 给容器设置合适的可用高度，才能在消息区内部滚动。应用负责消息和流式请求；组件不连接模型。
+
+```tsx
+import { AiChat, AiMessage } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiChat style={{ height: 180, width: "100%" }} aria-label="项目讨论">
+      <AiMessage from="user">下一步做什么？</AiMessage>
+      <AiMessage from="assistant">先把待确认事项列出来。</AiMessage>
+    </AiChat>
+  );
+}
+```
+
+### AiMessage
+
+- [AiMessage](https://xingjianxu.github.io/mtone/#/components/AiMessage): 展示用户、助手或系统消息及生成状态、附件内容和可选操作。
+- Import: AiMessage from @bixlab/mtone
+- from: "user" | "assistant" | "system". 必填；决定消息角色及默认显示名称。
+- name / avatar / children / actions: ReactNode. 自定义名称、头像、消息内容和操作。
+- status / statusLabel: "idle" | "streaming" | "error" / string (default: idle). 消息状态与可覆盖的状态文字。
+- 应用提供内容及其渲染策略；不会将字符串自动解析为 Markdown 或执行 HTML。
+
+```tsx
+import { AiMessage, Button } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiMessage
+      from="assistant"
+      status="streaming"
+      actions={<Button size="sm">复制（示例）</Button>}
+    >
+      正在整理记录。
+    </AiMessage>
+  );
+}
+```
+
+### AiPromptInput
+
+- [AiPromptInput](https://xingjianxu.github.io/mtone/#/components/AiPromptInput): 提供消息输入、提交、停止、附件选择和错误展示。
+- Import: AiPromptInput from @bixlab/mtone
+- value / defaultValue / onValueChange: string / string / (value: string) => void. 受控文本、初始文本及变化回调。
+- onSubmit: (submission: AiPromptSubmission) => void | Promise<void>. 必填；收到 text 和附件元数据。提交后的清空需要应用自行处理。
+- status / onStop: AiPromptStatus / () => void (default: ready). 状态为 ready、submitted、streaming、error；忙碌时可发出停止请求。
+- attachments / onFilesSelect / onAttachmentRemove: readonly AiPromptAttachment[] / (files: File[]) => void / (id: string) => void. 附件由应用持有；选择文件和移除操作只回调。
+- accept / multiple / disabled: string / boolean / boolean (default: — / true / false). 文件类型、允许多选及禁用状态。
+- toolbar / error / placeholder: ReactNode / ReactNode / string. 输入区的工具栏、错误提示和占位文本。
+- submitLabel / stopLabel / attachmentLabel: string. 自定义各按钮可访问名称。
+- Enter 发送，Shift+Enter 换行；输入法组合期间不会误发送。文件只交给应用，不自动上传。
+
+```tsx
+import { useState } from "react";
+import { AiPromptInput } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [text, setText] = useState("");
+  const [sent, setSent] = useState("");
+  return (
+    <div style={{ width: "100%" }}>
+      <AiPromptInput
+        aria-label="演示消息"
+        value={text}
+        onValueChange={setText}
+        onSubmit={(submission) => {
+          setSent(submission.text);
+          setText("");
+        }}
+      />
+      <p role="status">{sent}</p>
+    </div>
+  );
+}
+```
+
+### AiSuggestion
+
+- [AiSuggestion](https://xingjianxu.github.io/mtone/#/components/AiSuggestion): 点击后把建议提示词交给应用，用于填入输入框或其他交互。
+- Import: AiSuggestion from @bixlab/mtone
+- prompt / onSelect: string / (prompt: string) => void. 提示词及选中回调。
+- children / ButtonProps: ReactNode / ButtonProps. 可替换显示内容，其余按钮属性照常使用。
+- 不会自动调用模型。应用可在 onClick 阻止默认行为以取消 onSelect。
+
+```tsx
+import { useState } from "react";
+import { AiSuggestion } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [text, setText] = useState("");
+  return (
+    <div>
+      <AiSuggestion prompt="整理项目要点" onSelect={setText}>
+        建议：整理项目
+      </AiSuggestion>
+      <p role="status">{text}</p>
+    </div>
+  );
+}
+```
+
+### AiModelSelector
+
+- [AiModelSelector](https://xingjianxu.github.io/mtone/#/components/AiModelSelector): 用受控选择器展示应用提供的模型和可选推理强度。
+- Import: AiModelSelector from @bixlab/mtone
+- models / value / onValueChange: AiModelOption[] / string / (value: string) => void. 必填；由应用维护模型选项及选择。
+- efforts / effort / onEffortChange: AiModelOption[] / string / (value: string) => void. 可选推理强度；没有变化回调时该选择不可编辑。
+- disabled / modelLabel / effortLabel: boolean / string / string. 禁用选择器，或覆盖模型及推理强度的可访问名称。
+- 显示的选项由应用定义，不代表实际可用模型或服务权限。
+
+```tsx
+import { useState } from "react";
+import { AiModelSelector } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [model, setModel] = useState("fast");
+  const [effort, setEffort] = useState("normal");
+  return (
+    <AiModelSelector
+      models={[
+        { value: "fast", label: "快速（模拟）" },
+        { value: "review", label: "审阅（模拟）" },
+      ]}
+      value={model}
+      onValueChange={setModel}
+      efforts={[
+        { value: "normal", label: "常规" },
+        { value: "deep", label: "深入" },
+      ]}
+      effort={effort}
+      onEffortChange={setEffort}
+    />
+  );
+}
+```
+
+### AiPlan
+
+- [AiPlan](https://xingjianxu.github.io/mtone/#/components/AiPlan): 用步骤列表和完成进度展示应用提供的任务计划。
+- Import: AiPlan from @bixlab/mtone
+- items: AiActivityStep[]. 必填；计划步骤及状态。
+- title / statusLabel: string. 可覆盖折叠标题和状态文字。
+- status: AiActivityStatus (default: pending). 状态为 pending、running、completed、error、cancelled。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 控制展开状态、指定初始展开状态或监听展开变化。
+- children / 原生属性: ReactNode / HTMLAttributes<HTMLDivElement>. 额外内容及根 div 属性。
+- 计划默认展开。进度只计入 completed 步骤；不调度或执行任务。
+
+```tsx
+import { AiPlan } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiPlan
+      title="整理文档"
+      status="running"
+      items={[
+        { id: "read", title: "读取目录", status: "completed" },
+        { id: "write", title: "整理提纲", status: "running" },
+      ]}
+    />
+  );
+}
+```
+
+### AiChainOfThought
+
+- [AiChainOfThought](https://xingjianxu.github.io/mtone/#/components/AiChainOfThought): 展示应用提供的公开摘要或可观察步骤。
+- Import: AiChainOfThought from @bixlab/mtone
+- steps: AiActivityStep[]. 公开摘要步骤；支持说明和状态。
+- title / statusLabel: string. 可覆盖折叠标题和状态文字。
+- status: AiActivityStatus (default: pending). 状态为 pending、running、completed、error、cancelled。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 控制展开状态、指定初始展开状态或监听展开变化。
+- children / 原生属性: ReactNode / HTMLAttributes<HTMLDivElement>. 额外内容及根 div 属性。
+- 不获取、生成或展示模型隐藏思维链。默认收起。
+
+```tsx
+import { AiChainOfThought } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiChainOfThought
+      defaultOpen
+      status="completed"
+      steps={[
+        {
+          id: "find",
+          title: "汇总两份资料",
+          status: "completed",
+          description: "已核对标题及日期。",
+        },
+      ]}
+    />
+  );
+}
+```
+
+### AiReasoning
+
+- [AiReasoning](https://xingjianxu.github.io/mtone/#/components/AiReasoning): 以可折叠区域展示应用提供的公开文字说明。
+- Import: AiReasoning from @bixlab/mtone
+- text: string. 必填；仅从调用方接收公开说明。
+- title / statusLabel: string. 可覆盖折叠标题和状态文字。
+- status: AiActivityStatus (default: pending). 状态为 pending、running、completed、error、cancelled。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 控制展开状态、指定初始展开状态或监听展开变化。
+- children / 原生属性: ReactNode / HTMLAttributes<HTMLDivElement>. 额外内容及根 div 属性。
+- 公开说明按文本呈现；不会获取模型隐含推理。默认收起。
+
+```tsx
+import { AiReasoning } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiReasoning
+      defaultOpen
+      status="completed"
+      text="只比较发布时间和记录编号，结果仍需人工核对。"
+    />
+  );
+}
+```
+
+### AiTask
+
+- [AiTask](https://xingjianxu.github.io/mtone/#/components/AiTask): 展示任务状态及可选步骤列表。
+- Import: AiTask from @bixlab/mtone
+- steps: AiActivityStep[]. 步骤名称、说明及状态。
+- title / statusLabel: string. 可覆盖折叠标题和状态文字。
+- status: AiActivityStatus (default: pending). 状态为 pending、running、completed、error、cancelled。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 控制展开状态、指定初始展开状态或监听展开变化。
+- children / 原生属性: ReactNode / HTMLAttributes<HTMLDivElement>. 额外内容及根 div 属性。
+- 默认收起；不会执行任务。
+
+```tsx
+import { AiTask } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiTask
+      title="核对版本"
+      defaultOpen
+      status="running"
+      steps={[
+        { id: "tag", title: "查看发布标签", status: "completed" },
+        { id: "file", title: "比对内容", status: "running" },
+      ]}
+    />
+  );
+}
+```
+
+### AiQueue
+
+- [AiQueue](https://xingjianxu.github.io/mtone/#/components/AiQueue): 根据状态展示待完成事项与已结束事项。
+- Import: AiQueue from @bixlab/mtone
+- items: AiActivityStep[]. 必填；completed 和 cancelled 分入已结束，其余分入待完成。
+- title / statusLabel: string. 可覆盖折叠标题和状态文字。
+- status: AiActivityStatus (default: pending). 状态为 pending、running、completed、error、cancelled。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 控制展开状态、指定初始展开状态或监听展开变化。
+- children / 原生属性: ReactNode / HTMLAttributes<HTMLDivElement>. 额外内容及根 div 属性。
+- 默认展开；只呈现状态，不负责排队或重试。
+
+```tsx
+import { AiQueue } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiQueue
+      items={[
+        { id: "first", title: "整理目录", status: "completed" },
+        { id: "second", title: "检查引用", status: "pending" },
+      ]}
+    />
+  );
+}
+```
+
+### AiSubagent
+
+- [AiSubagent](https://xingjianxu.github.io/mtone/#/components/AiSubagent): 展示应用提供的代理名称、工作描述及结果。
+- Import: AiSubagent from @bixlab/mtone
+- name / description / result: string / ReactNode / ReactNode. name 必填，未传 title 时用作标题。
+- title / statusLabel: string. 可覆盖折叠标题和状态文字。
+- status: AiActivityStatus (default: pending). 状态为 pending、running、completed、error、cancelled。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 控制展开状态、指定初始展开状态或监听展开变化。
+- children / 原生属性: ReactNode / HTMLAttributes<HTMLDivElement>. 额外内容及根 div 属性。
+- 不创建、联系或控制代理。默认收起。
+
+```tsx
+import { AiSubagent } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiSubagent
+      name="文档校对"
+      status="completed"
+      defaultOpen
+      description="核对目录和页码"
+      result="发现一处需要核实的页码。"
+    />
+  );
+}
+```
+
+### AiTool
+
+- [AiTool](https://xingjianxu.github.io/mtone/#/components/AiTool): 按纯文本展示工具输入、输出及状态。
+- Import: AiTool from @bixlab/mtone
+- name / input / output: string. name 必填；input 和 output 为纯文本，默认标题取 name。
+- title / statusLabel: string. 可覆盖折叠标题和状态文字。
+- status: AiActivityStatus (default: pending). 状态为 pending、running、completed、error、cancelled。
+- open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 控制展开状态、指定初始展开状态或监听展开变化。
+- children / 原生属性: ReactNode / HTMLAttributes<HTMLDivElement>. 额外内容及根 div 属性。
+- 不调用工具或执行输入、输出中的文本。默认收起。
+
+```tsx
+import { AiTool } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiTool
+      name="检索示例"
+      defaultOpen
+      status="completed"
+      input={JSON.stringify({ keyword: "目录" })}
+      output="匹配到 2 条示例记录"
+    />
+  );
+}
+```
+
+### AiCheckpoint
+
+- [AiCheckpoint](https://xingjianxu.github.io/mtone/#/components/AiCheckpoint): 展示检查点信息，并把恢复请求交给应用。
+- Import: AiCheckpoint from @bixlab/mtone
+- label / description / children: string / ReactNode / ReactNode. 标签、说明及补充内容。
+- onRestore / restoreLabel / disabled: () => void / string / boolean. 点击时通知应用；未提供回调时按钮禁用。
+- 不会自行保存或恢复应用状态。
+
+```tsx
+import { useState } from "react";
+import { AiCheckpoint } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [restored, setRestored] = useState(false);
+  return (
+    <div>
+      <AiCheckpoint
+        label="整理前"
+        description="演示检查点"
+        onRestore={() => setRestored(true)}
+      />
+      {restored && <p role="status">已收到恢复请求（模拟）。</p>}
+    </div>
+  );
+}
+```
+
+### AiConfirmation
+
+- [AiConfirmation](https://xingjianxu.github.io/mtone/#/components/AiConfirmation): 展示待确认事项、受控决定和按钮状态。
+- Import: AiConfirmation from @bixlab/mtone
+- title / description / children: string / ReactNode / ReactNode. 操作标题、必要说明及补充内容。
+- state / busy: "pending" | "approved" | "rejected" / boolean (default: pending / false). 决定由调用方维护；busy 时禁用待确认按钮。
+- onConfirm / onReject: () => void. 相应决定的回调；未传的按钮禁用。
+- confirmLabel / rejectLabel: string. 覆盖确认或拒绝的按钮文字。
+- 不替应用授权、执行或保存决定；示例的点击仅改变本地显示。
+
+```tsx
+import { useState } from "react";
+import { AiConfirmation } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [state, setState] = useState<"pending" | "approved" | "rejected">(
+    "pending",
+  );
+  return (
+    <AiConfirmation
+      title="保存示例摘要？"
+      description="仅演示确认界面，不会保存文件。"
+      state={state}
+      onConfirm={() => setState("approved")}
+      onReject={() => setState("rejected")}
+    />
+  );
+}
+```
+
+### AiSources
+
+- [AiSources](https://xingjianxu.github.io/mtone/#/components/AiSources): 集中展示引文来源和说明，可折叠并显示数量。
+- Import: AiSources from @bixlab/mtone
+- sources: AiSource[]. 必填；条目包含 id、title，及可选 url、description。
+- defaultOpen: boolean (default: false). 初始展开来源列表。
+- label / className / style: string / string / CSSProperties. 可覆盖显示名称及局部样式。
+- 仅将有效的 HTTP(S)、站内根路径或锚点显示为可点链接；无效 URL 显示为纯文本。组件不会访问或验证来源内容。
+
+```tsx
+import { AiSources } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiSources
+      defaultOpen
+      sources={[
+        { id: "one", title: "项目准备说明", description: "示例来源一" },
+        { id: "two", title: "当前文档", url: "#/components/AiSources" },
+      ]}
+    />
+  );
+}
+```
+
+### AiInlineCitation
+
+- [AiInlineCitation](https://xingjianxu.github.io/mtone/#/components/AiInlineCitation): 在句子中插入来源编号或标题。
+- Import: AiInlineCitation from @bixlab/mtone
+- source: AiSource. 必填；提供 id、title 及可选的 url、description。
+- index: number. 显示编号；省略时显示标题。
+- className / style: string / CSSProperties. 可覆盖局部样式。
+- 仅有效的 HTTP(S)、站内根路径或锚点会渲染为链接；无效或缺省 URL 显示为文本。
+
+```tsx
+import { AiInlineCitation } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <p>
+      整理前请核对原始记录。{" "}
+      <AiInlineCitation
+        index={1}
+        source={{
+          id: "one",
+          title: "查看来源示例",
+          url: "#/components/AiSources?section=ai-sources",
+        }}
+      />
+    </p>
+  );
+}
+```
+
+### AiContext
+
+- [AiContext](https://xingjianxu.github.io/mtone/#/components/AiContext): 展示调用方报告的词元使用量和预格式化费用。
+- Import: AiContext from @bixlab/mtone
+- usedTokens / maxTokens: number. 用量必填；可选上限，用于显示进度。
+- inputTokens / outputTokens / cost: number / number / string. 可选输入、输出计数及应用已格式化的费用。
+- label / className / style: string / string / CSSProperties. 可覆盖显示名称及局部样式。
+- 不估算词元或价格，不读取计费账户。
+
+```tsx
+import { AiContext } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiContext
+      usedTokens={4200}
+      maxTokens={8000}
+      inputTokens={3200}
+      outputTokens={1000}
+      cost="¥0.08（模拟）"
+    />
+  );
+}
+```
+
+### AiFileTree
+
+- [AiFileTree](https://xingjianxu.github.io/mtone/#/components/AiFileTree): 从应用数据展示文件和目录，并回传选择。
+- Import: AiFileTree from @bixlab/mtone
+- items: AiFileNode[]. 必填；节点含 id、name，及可选 kind、children、disabled。
+- selectedId / defaultSelectedId / onSelect: string | null / string / (id: string, node: AiFileNode) => void. 受控选中键、初始键和选择回调。
+- defaultExpandedIds: string[]. 初始展开节点键。
+- label / className / style: string / string / CSSProperties. 可覆盖显示名称及局部样式。
+- 不读取本地文件、检查权限或自动打开文件。为节点提供稳定唯一的 id。
+
+```tsx
+import { useState } from "react";
+import { AiFileTree } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [selected, setSelected] = useState<string | null>(null);
+  return (
+    <div>
+      <AiFileTree
+        items={[
+          {
+            id: "src",
+            name: "src",
+            kind: "folder",
+            children: [
+              { id: "main", name: "main.tsx" },
+              { id: "test", name: "main.test.tsx" },
+            ],
+          },
+        ]}
+        defaultExpandedIds={["src"]}
+        selectedId={selected}
+        onSelect={setSelected}
+      />
+      <p role="status">{selected ? "已选：" + selected : "请选择文件"}</p>
+    </div>
+  );
+}
+```
+
+### AiStackTrace
+
+- [AiStackTrace](https://xingjianxu.github.io/mtone/#/components/AiStackTrace): 展示错误文本和可折叠的堆栈帧。
+- Import: AiStackTrace from @bixlab/mtone
+- message / frames: string / AiStackFrame[]. 必填；每帧含 file，可附 line、column、functionName。
+- defaultOpen: boolean (default: false). 初始展开。
+- label / className / style: string / string / CSSProperties. 可覆盖显示名称及局部样式。
+- 不捕获错误、不解释异常或打开文件。
+
+```tsx
+import { AiStackTrace } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiStackTrace
+      defaultOpen
+      message="Error: Missing project name"
+      frames={[
+        {
+          file: "src/project.ts",
+          line: 24,
+          column: 8,
+          functionName: "readProject",
+        },
+      ]}
+    />
+  );
+}
+```
+
+### AiTerminal
+
+- [AiTerminal](https://xingjianxu.github.io/mtone/#/components/AiTerminal): 以可聚焦的纯文本区域展示命令输出及状态。
+- Import: AiTerminal from @bixlab/mtone
+- output: string. 必填；显示文本输出。
+- status: AiTerminalStatus (default: idle). idle、running、success 或 error。
+- label / className / style: string / string / CSSProperties. 可覆盖显示名称及局部样式。
+- 不是交互式终端，不接收命令，也不创建进程。
+
+```tsx
+import { AiTerminal } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <AiTerminal status="success" output={"$ npm test\nPASS 3 tests"} />;
+}
+```
+
+### AiTestResults
+
+- [AiTestResults](https://xingjianxu.github.io/mtone/#/components/AiTestResults): 可折叠查看测试结果和状态汇总。
+- Import: AiTestResults from @bixlab/mtone
+- results: AiTestResult[]. 必填；每项含 id、name、status，可附 durationMs、details。
+- defaultOpen: boolean (default: false). 初始展开。
+- label / className / style: string / string / CSSProperties. 可覆盖显示名称及局部样式。
+- 状态为 passed、failed、skipped 或 running；组件不执行测试。
+
+```tsx
+import { AiTestResults } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <AiTestResults
+      defaultOpen
+      results={[
+        { id: "one", name: "保存标题", status: "passed", durationMs: 15 },
+        {
+          id: "two",
+          name: "空记录提示",
+          status: "failed",
+          details: "期望看到空状态提示",
+        },
+      ]}
+    />
   );
 }
 ```

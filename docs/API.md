@@ -10,6 +10,65 @@ follows `master`. Check the `index.d.ts` and `llms.txt` bundled with your instal
 `@bixlab/mtone` version before using newer features. Merging code or updating the
 website does not publish a new npm version.
 
+## AI interface components
+
+The AI interface components are presentation and interaction building blocks.
+The application owns messages, model requests, tool execution, attachments,
+permissions, persistence, and trusted source data. The documentation demos are
+local examples, not a model or platform integration. Localized defaults follow
+the mtone provider locale.
+
+### Conversation and input
+
+| Export | Main contract |
+| --- | --- |
+| `AiChat` | `children`, `empty`, and `footer` compose the conversation. `autoFollow` defaults to true; `bottomThreshold` defaults to 64 px. Give the layout a bounded height for internal scrolling. |
+| `AiMessage` | Required `from` is user, assistant, or system; use `name`, `avatar`, `children`, `actions`, `status`, and `statusLabel` to customize presentation. |
+| `AiPromptInput` | Required `onSubmit({ text, attachments })` may return a promise. Use `value` + `onValueChange` or `defaultValue`, and `status` + `onStop` for generation. Enter submits and Shift+Enter inserts a newline; IME composition does not submit. Use `attachments`, `onFilesSelect`, `onAttachmentRemove`, `accept`, and `multiple` for caller-owned files. Files are never uploaded automatically. Clear text or attachments in the application when appropriate. |
+| `AiSuggestion` | `prompt` and `onSelect(prompt)`; inherits Button props. The application decides how to use the prompt. |
+| `AiModelSelector` | Controlled `models`, `value`, `onValueChange`; optionally present `efforts`, `effort`, and `onEffortChange`. Choices are app-defined and do not grant access. |
+
+[Conversation demos and reference](https://xingjianxu.github.io/mtone/#/components/AiChat)
+
+### Work progress and decisions
+
+The disclosure panels use `title`, `status`, `statusLabel`, `open`,
+`defaultOpen`, and `onOpenChange`. `AiActivityStatus` is `pending`, `running`,
+`completed`, `error`, or `cancelled`; an `AiActivityStep` has a stable
+`id`, `title`, and optional `description` and `status`.
+
+| Export | Main contract |
+| --- | --- |
+| `AiPlan` | Required `items`; shows the number of completed steps and starts open by default. |
+| `AiQueue` | Required `items`; separates completed/cancelled from remaining items and starts open by default. |
+| `AiTask` | Optional `steps` and children for a task's progress. |
+| `AiChainOfThought` | Optional `steps` for **public summaries and observed actions only**; does not obtain or reveal hidden reasoning. |
+| `AiReasoning` | Required `text` for a caller-provided public explanation; does not access hidden reasoning. |
+| `AiSubagent` | Required `name` and optional `description`, `result`; does not launch or control agents. |
+| `AiTool` | Required `name` and optional plain-text `input`, `output`; does not call tools. |
+| `AiCheckpoint` | `label`, `description`, `onRestore`, `restoreLabel`, `disabled`; restoration is an app action, not a component side effect. |
+| `AiConfirmation` | Controlled `state` (pending/approved/rejected), `busy`, `onConfirm`, `onReject`, and custom labels. It displays requests and decisions, not authorization or execution. |
+
+[Activity demos and reference](https://xingjianxu.github.io/mtone/#/components/AiPlan)
+
+### Evidence and developer output
+
+| Export | Main contract |
+| --- | --- |
+| `AiSources` | Required `sources: AiSource[]`, optional `defaultOpen`; shows titles, descriptions, and safe links. |
+| `AiInlineCitation` | Required `source: AiSource`, optional `index`. `AiSource` has `id`, `title`, and optional `url` and `description`. |
+| `AiContext` | Required `usedTokens`, optional `maxTokens`, `inputTokens`, `outputTokens`, and caller-formatted `cost`; does not count tokens or calculate billing. |
+| `AiFileTree` | Required `items: AiFileNode[]`, controlled `selectedId` or `defaultSelectedId`, optional `onSelect` and `defaultExpandedIds`; does not read the filesystem. |
+| `AiStackTrace` | Required `message` and `frames` with file and optional line, column, and function name. |
+| `AiTerminal` | Required plain-text `output` and optional `status` (idle/running/success/error); does not start a process. |
+| `AiTestResults` | Required `results`, optional `defaultOpen`; displays passed, failed, skipped, and running tests without running them. |
+
+Citations link only supported safe HTTP(S), root-relative paths or anchors.
+Other values render as non-link text; the app remains responsible for verifying
+source content and access. Supply stable IDs for evidence lists and file trees.
+
+[Evidence demos and reference](https://xingjianxu.github.io/mtone/#/components/AiSources)
+
 ## Provider and styling
 
 Migration: remove the former `density` prop. Compact/comfortable modes are no longer part of the provider or scope API; single-line controls use a unified 34px default. Independent component `size` variants and CSS token overrides remain supported. Tabs retain their separate size contract.
@@ -29,12 +88,20 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 
 ## Buttons and forms
 
-- `Button`: `variant` solid/outline/soft/ghost, `size` sm/md/lg, `danger`, `loading`, `icon`, native/Base UI button props and ref. Loading disables actions.
+- `Button`: `variant` blue/solid/outline/soft/ghost, `size` sm/md/lg, `danger`, `loading`, `icon`, `leftSection`, `rightSection`, native/Base UI button props and ref. The optional sections accept React nodes and follow logical inline start/end (flipped in RTL); a supplied `leftSection` takes precedence over the legacy `icon`. Loading disables actions, displays a spinner instead of the leading content, and keeps the trailing section.
 - `IconButton`: Button props plus required `aria-label`.
 - `ButtonGroup`: group wrapper.
 - `Input`: native input attributes, native ref and `onChange(event)`, with `prefix`, `suffix`, `allowClear`, character counts and appearance options. `Input.Search`, `Input.Password`, `Input.TextArea` and `Input.OTP` are subcomponents; `SearchInput` and `Textarea` remain compatibility exports. See [Input family](#input-family).
 - `Form`: native form props plus managed values and validation through `Form.useForm()`, `form`, `initialValues`, named `Form.Item` fields and `rules`. Use `onFinish` for valid values and `onFinishFailed` for validation errors; `onSubmit` remains available. See the installed declarations for the supported rule and trigger contracts.
 - `FormField`: `label`, `error`, `description`, `required`, one input child. Associates label/error with cloned child's id and ARIA attributes. Use direct label props for compound selectors rather than wrapping them as a native input.
+
+## Questionnaire
+
+`Questionnaire` receives an ordered `items` array. Every item has a unique, stable `id`, a `title`, and optional `description` and `required`. Item types are `single` and `multiple` (both take unique-value `choices`) or `text` (freeform). Single-choice items can add `other: { label?, placeholder? }` as an exclusive text answer.
+
+Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for controlled drafts. Answers are keyed by item id and use tagged shapes: `{type:"choice",value}`, `{type:"choices",values}`, or `{type:"text",value}`. Back preserves drafts. Explicit Skip clears that optional item's draft and omits it from submission. Unanswered optional items are also omitted; text is trimmed and choices are validated and ordered on submit.
+
+`onSubmit` accepts synchronous or asynchronous handling. Pending submission locks the controls; a rejection allows retry. Success shows a completion message; remount with a new React key to start another questionnaire. The component does not create a native form or persist, transmit, or branch answers itself. `submitLabel` sets the final action's label.
 
 ## Selection
 
@@ -167,6 +234,44 @@ Existing `<List><ListItem ... /></List>` usage remains supported. Data mode uses
 For controlled drag sorting, render `List.SortHandle` first in each data-row flex layout or use `ListItem.sortHandle` in children mode. Only the six-dot grip starts dragging; handle drop/reordering in the application and provide keyboard-accessible move controls.
 
 See [List examples and full API](https://xingjianxu.github.io/mtone/#/components/List).
+
+## DataList
+
+`DataList<T>` composes the existing `List` for managing records without changing
+the base list contract. Provide `items: readonly T[]`, stable unique
+`getKey(item): string | number`, and `renderItem(item, index)` (content only, not
+a `ListItem` or `li`; the index is zero-based within the current page). Use
+`getLabel(item)` for readable selection and disclosure names; it defaults to
+the key as a string. Numeric keys must be finite. The root accepts section attributes such as `aria-label`,
+`className` and `style`.
+
+- `search` enables a search input. Use `value` with `onChange` for controlled
+  search or `defaultValue` for the initial query. Set `placeholder`/`label` and
+  a local `match(item, query)` predicate if needed. The local predicate receives
+  a trimmed query. Without `match`, the input does not filter the records.
+  `filter(item)` applies another local predicate; use `filters` to render filter
+  controls and `toolbar` to supply other controls or context.
+- `pagination` is optional. Local mode applies search and filters before paging;
+  `page`/`defaultPage`, `pageSize` (default 10) and `onPageChange` configure it.
+  Local results clamp to the available page range. Editing the search requests
+  page 1. For `mode: "remote"`, supply controlled `page`, `pageSize`, `total`,
+  `onPageChange` and the current page of `items`. DataList neither slices nor
+  filters those items. The application resets the page when external filters
+  change.
+- `selection` provides row checkboxes and select-all for enabled items on the
+  current page; `selectedKeys`/`defaultSelectedKeys`, `onChange` and
+  `getDisabled(item)` configure it. Selection is keyed across pages.
+  `renderBatchActions({ selectedKeys, clearSelection })` provides an optional
+  bulk-action area; clearing it clears keys on other pages too.
+- `expansion` requires `renderDetail(item)` and optionally accepts
+  `expandedKeys`/`defaultExpandedKeys`, `onChange` and `isExpandable(item)`.
+  `renderActions(item)` provides row-level controls; neither they nor the
+  disclosure button implicitly select the row.
+- `loading` and `empty` customize states. For remote mode, the application owns
+  fetching, cancellation and error handling. This version has no built-in grid,
+  editing or virtualization.
+
+See [local and remote examples](https://xingjianxu.github.io/mtone/#/components/DataList).
 
 ## Progress
 

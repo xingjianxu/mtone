@@ -1,5 +1,9 @@
+import { CardGroupExample } from "./card-group-example";
+import QuestionnaireExample from "./secondary-demos/questionnaire-usage";
+import { aiExamples } from "./ai-demos/examples";
 import { InputExample } from "./input-example";
 import { ListExample } from "./list-example";
+import LocalDataListDemo from "./data-list-demos/local";
 import { BreadcrumbExample } from "./breadcrumb-example";
 import { ProgressExamples } from "./ProgressExamples";
 import { FieldsetExample } from "./fieldset-example";
@@ -145,6 +149,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     </M.PropertyList>
   );
 
+  const AiExample = aiExamples[name];
+  if (AiExample) return <AiExample />;
+
   switch (name) {
     case "Splitter":
       return <SplitterExample />;
@@ -236,6 +243,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           {output}
         </div>
       );
+    case "Questionnaire":
+      return <QuestionnaireExample />;
     case "Input":
       return <InputExample compact={compact} />;
     case "SearchInput":
@@ -573,6 +582,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           </M.IconButton>
         </M.Tooltip>
       );
+    case "CardGroup":
+      return <CardGroupExample />;
     case "Card":
       return <CardExample />;
     case "Blockquote":
@@ -607,6 +618,15 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <span>归档</span>
         </div>
       );
+    case "DataList":
+      return compact ? (
+        <M.DataList
+          aria-label="文档管理预览"
+          items={documents.slice(0, 2)}
+          getKey={(item) => item.id}
+          renderItem={(item) => <M.Text>{item.title}</M.Text>}
+        />
+      ) : <LocalDataListDemo />;
     case "List":
       return <ListExample compact={compact} />;
     case "ListItem":

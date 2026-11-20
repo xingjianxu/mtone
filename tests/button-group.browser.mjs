@@ -8,9 +8,13 @@ await mkdir("artifacts/button-group-browser", { recursive: true });
 let failed = false;
 try {
   for (const [name, engine] of [["chromium", chromium], ["firefox", firefox], ["webkit", webkit]]) {
+    if (process.env.BROWSER && process.env.BROWSER !== name) continue;
     let browser;
     try {
-      browser = await engine.launch({ headless: true });
+      browser = await engine.launch({
+        headless: true,
+        executablePath: name === "chromium" ? process.env.CHROMIUM_PATH : undefined,
+      });
       const page = await browser.newPage({ viewport: { width: 800, height: 650 } });
       await page.goto("http://127.0.0.1:5219/tests/fixtures/button-group.html");
       await expect(page.getByTestId("default")).toHaveCSS("gap", "4px");
@@ -33,6 +37,34 @@ try {
         await buttons.nth(1).focus();
         await expect(buttons.nth(1)).toHaveCSS("z-index", "2");
         await expect(buttons.nth(1)).toHaveCSS("outline-style", "solid");
+      }
+      for (const dir of ["ltr", "rtl"]) {
+        const sections = page.getByTestId("sections-" + dir);
+        const button = label => sections.getByRole("button", { name: label, exact: true });
+        for (const [label, start, end] of [
+          ["Gallery", "7px", "9px"],
+          ["Download", "9px", "7px"],
+          ["View gallery", "7px", "7px"],
+          ["Loading", "7px", "7px"],
+          ["Legacy", "9px", "9px"],
+          ["Only icon", "0px", "0px"],
+        ]) {
+          await expect(button(label)).toHaveCSS("height", "34px");
+          await expect(button(label)).toHaveCSS("padding-inline-start", start);
+          await expect(button(label)).toHaveCSS("padding-inline-end", end);
+        }
+        const both = button("View gallery");
+        const [start, label, end] = await Promise.all(
+          ["start", "label", "end"].map(testId => both.getByTestId(testId).boundingBox()),
+        );
+        const ordered = dir === "ltr" ? [start, label, end] : [end, label, start];
+        assert(ordered[0].x + ordered[0].width < ordered[1].x);
+        assert(ordered[1].x + ordered[1].width < ordered[2].x);
+        assert.equal(start.width, 14);
+        assert.equal(end.width, 14);
+        assert(Math.abs(start.y - end.y) < 0.01);
+        await expect(button("Loading")).toBeDisabled();
+        await expect(button("Loading")).toHaveAttribute("aria-busy", "true");
       }
       await expect(page.getByTestId("single").getByRole("button")).toHaveCSS("border-radius", "4px");
       const danger = page.getByTestId("danger").getByRole("button");

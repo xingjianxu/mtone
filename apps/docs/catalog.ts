@@ -13,7 +13,7 @@ export type PropDoc = {
  */
 export const componentCategories = [
   "布局容器", "操作命令", "导航切换", "数据录入",
-  "数据展示", "浮层对话", "状态反馈", "全局配置",
+  "数据展示", "AI 界面", "浮层对话", "状态反馈", "全局配置",
 ] as const;
 export type ComponentCategory = (typeof componentCategories)[number];
 export type ComponentDoc = {
@@ -24,8 +24,52 @@ export type ComponentDoc = {
   code: string;
   props: PropDoc[];
   notes: string[];
+  sidebarParent?: string;
+  demoLabel?: string;
 };
 export const componentDocs: ComponentDoc[] = [
+{
+  "name": "Questionnaire",
+  "category": "数据录入",
+  "description": "逐题填写的多步问卷，支持单选、多选、自由文本、其他答案、必答校验和跳过。",
+  "importNames": [
+    "Questionnaire"
+  ],
+  "code": "import { Questionnaire } from \"@bixlab/mtone\";\n\n<Questionnaire\n  items={[\n    { id: \"topic\", type: \"single\", title: \"选择主题\", required: true,\n      choices: [{ value: \"docs\", label: \"文档\" }], other: { label: \"其他\" } },\n    { id: \"notes\", type: \"text\", title: \"还有什么建议？\" },\n  ]}\n  onSubmit={(answers) => console.log(answers)}\n/>",
+  "props": [
+    {
+      "name": "items",
+      "type": "readonly QuestionnaireItem[]",
+      "description": "有序问题：id、title、description、required；type 为 single、multiple 或 text。选项题传 choices；单选可传 other。"
+    },
+    {
+      "name": "answers / defaultAnswers",
+      "type": "QuestionnaireAnswers",
+      "description": "按问题 id 索引的受控或初始答案。"
+    },
+    {
+      "name": "onAnswersChange",
+      "type": "(answers: QuestionnaireAnswers) => void",
+      "description": "输入、选项变化或显式跳过时收到完整草稿。"
+    },
+    {
+      "name": "onSubmit",
+      "type": "(answers: QuestionnaireAnswers) => void | Promise<void>",
+      "description": "末题通过校验时收到有效答案；异步失败后可重试。"
+    },
+    {
+      "name": "submitLabel",
+      "type": "ReactNode",
+      "description": "最终提交按钮内容。"
+    }
+  ],
+  "notes": [
+    "答案为 {type:\"choice\",value}、{type:\"choices\",values} 或 {type:\"text\",value}。提交文本会去除首尾空白，多选按选项顺序返回。",
+    "必答题不能跳过；选答题可留空，显式跳过清除本题草稿。上一题不会清除答案。",
+    "问题 id 在问卷内必须唯一且稳定，选项 value 在本题内必须唯一。已提交后保留完成提示；开始新问卷时以不同 React key 挂载。",
+    "组件不处理保存、传输和条件分支；由调用方在 onSubmit 中处理。"
+  ]
+},
 {
   "name": "TreeSelect",
   "category": "数据录入",
@@ -2142,7 +2186,7 @@ export const componentDocs: ComponentDoc[] = [
     category: "操作命令",
     description: "带完整样式的基础操作按钮。",
     importNames: ["Button"],
-    code: 'import { Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Button variant="blue">启用两步验证</Button>\n  );\n}',
+    code: "import React from \"react\";\nimport { ArrowRight, Download, Image } from \"lucide-react\";\nimport { Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <div style={{ display: \"flex\", gap: 8, flexWrap: \"wrap\" }}>\n      <Button leftSection={<Image size={14} aria-hidden=\"true\" />}>图库</Button>\n      <Button\n        variant=\"solid\"\n        rightSection={<Download size={14} aria-hidden=\"true\" />}\n      >\n        下载\n      </Button>\n      <Button\n        variant=\"soft\"\n        leftSection={<Image size={14} aria-hidden=\"true\" />}\n        rightSection={<ArrowRight size={14} aria-hidden=\"true\" />}\n      >\n        查看图库\n      </Button>\n    </div>\n  );\n}",
     props: [
       {
         name: "variant",
@@ -2169,7 +2213,17 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "icon",
         type: "ReactNode",
-        description: "前置图标。",
+        description: "旧版前置图标；未传 leftSection 时使用。",
+      },
+      {
+        name: "leftSection",
+        type: "ReactNode",
+        description: "文字前的内容，可放图标或装饰；优先于 icon，传 null 可隐藏旧图标。",
+      },
+      {
+        name: "rightSection",
+        type: "ReactNode",
+        description: "文字后的内容，可放图标或装饰；加载期间仍显示。",
       },
       {
         name: "disabled",
@@ -2188,7 +2242,8 @@ export const componentDocs: ComponentDoc[] = [
       },
     ],
     notes: [
-      "支持 ref 和 Base UI Button 的可组合属性。加载中不会重复触发操作。",
+      "支持 ref 和 Base UI Button 的可组合属性。加载中显示前置加载图标并禁用按钮，右侧内容不变。",
+      "左右内容按阅读方向排列，在 RTL 中自动对调。传入内容的一侧使用更紧凑的内边距；装饰图标可标记 aria-hidden。",
       "blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。",
     ],
   },
@@ -4149,6 +4204,60 @@ export default function Demo() {
     ],
     notes: ["不要在提示中放必须操作的交互内容；图标触发器仍需 aria-label。"],
   },
+{
+  "name": "CardGroup",
+  "category": "布局容器",
+  "description": "排列多个独立卡片，支持响应式列数与间距、跨列、纵向排列和行列分隔线。",
+  "importNames": [
+    "CardGroup",
+    "Card"
+  ],
+  "code": "import { Card, CardGroup } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <CardGroup columns={{ xs: 2, md: 3 }} gap={{ xs: 12, md: 20 }} divided>\n      <CardGroup.Item span={{ xs: 2, md: 3 }}>\n        <Card title=\"概览\">跨满当前整行</Card>\n      </CardGroup.Item>\n      <Card title=\"资料\">待整理 12 项</Card>\n      <Card title=\"笔记\">已阅读 20 项</Card>\n      <Card title=\"收藏\">常用资源</Card>\n    </CardGroup>\n  );\n}",
+  "props": [
+    {
+      "name": "direction",
+      "type": "\"horizontal\" | \"vertical\"",
+      "default": "horizontal",
+      "description": "horizontal 使用多列网格；vertical 固定单列并忽略 columns。"
+    },
+    {
+      "name": "columns",
+      "type": "number | Partial<Record<\"xs\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | \"xxl\", number>>",
+      "default": "{ xs: 1, sm: 2, lg: 3 }",
+      "description": "网格列数。数字应用于全部断点；对象按视口断点逐级继承，未定义的初始值为 1。有效值取整并限制为 1–24。"
+    },
+    {
+      "name": "gap",
+      "type": "CardGroupResponsive",
+      "default": "12",
+      "description": "行列间距（px），支持数字或相同断点对象。有效值必须有限且非负，未定义的初始值为 12。"
+    },
+    {
+      "name": "divided",
+      "type": "boolean",
+      "default": "false",
+      "description": "在相邻行列的间距中显示分隔线，跟随当前列数与跨列布局调整。"
+    },
+    {
+      "name": "CardGroup.Item.span",
+      "type": "CardGroupResponsive",
+      "default": "1",
+      "description": "占用列数，可响应式配置；自动限制为当前总列数，不会撑出网格。"
+    },
+    {
+      "name": "children / className / style / 原生属性",
+      "type": "ReactNode / string / CSSProperties / HTMLAttributes<HTMLDivElement>",
+      "description": "根节点与 Item 支持原生 div 属性。普通子元素自动包裹为 Item；显式 Item 可设置 span 或 hidden。"
+    }
+  ],
+  "notes": [
+    "CardGroup 是多个独立 Card 的外层布局；Card.Grid 是一张 Card 内的内容网格，二者不能混作同一个组件。CardGroup.Item 为静态子组件，不是独立命名导出。",
+    "断点按浏览器视口计算：xs 从 0 开始，sm 576px、md 768px、lg 992px、xl 1200px、xxl 1600px；不是容器查询。缩小示例容器不会改变断点。",
+    "默认手机单列；如需手机多列，可显式设置 columns={{ xs: 2, md: 3 }}。内容需适应有限列宽，过长的自定义内容仍须自行约束。",
+    "direction=\"vertical\" 时 Item.span 同样限制为 1；divided 仅显示行间分隔。根 gap=0 时分隔线位于相邻项边缘。",
+    "支持 Fragment 展开；隐藏项使用 CardGroup.Item hidden，不应仅用 CSS display:none 隐藏布局项，否则分隔线的行列推算不会同步。示例只演示本地布局，不读写服务器数据。"
+  ]
+},
   {
     "name": "Card",
     "category": "数据展示",
@@ -4160,6 +4269,11 @@ export default function Demo() {
     ],
     "code": "import { useState } from \"react\";\nimport { Card, Button, Avatar } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [tab, setTab] = useState(\"overview\");\n  const [loading, setLoading] = useState(false);\n  return (\n    <Card\n      title=\"知识库\"\n      htmlTitle=\"原生悬浮提示使用 htmlTitle\"\n      extra={<Button size=\"sm\" onClick={() => setLoading(!loading)}>切换加载</Button>}\n      loading={loading}\n      tabList={[{key:\"overview\",label:\"概览\"},{key:\"notes\",label:\"笔记\"}]}\n      activeTabKey={tab}\n      onTabChange={setTab}\n      actions={[<Button key=\"save\" variant=\"ghost\" onClick={() => alert(\"本地示例\")}>收藏</Button>]}\n    >\n      {tab === \"overview\" ? <Card.Meta avatar={<Avatar name=\"林\" />} title=\"设计知识\" description=\"记录可复用的经验。\" /> : <p>这是笔记内容。</p>}\n    </Card>\n  );\n}",
     "props": [
+{"name": "collapsible", "type": "boolean", "default": "false", "description": "在标题左侧显示收起/展开按钮。默认不折叠。"},
+{"name": "collapsed", "type": "boolean", "description": "受控折叠状态；搭配 onCollapsedChange 更新。"},
+{"name": "defaultCollapsed", "type": "boolean", "default": "false", "description": "非受控初始折叠状态，仅 collapsible 启用时生效。"},
+{"name": "onCollapsedChange", "type": "(collapsed: boolean) => void", "description": "用户点击折叠按钮时请求切换状态；受控模式由父组件接受更新。"},
+{"name": "collapseLabel", "type": "string", "description": "折叠按钮可访问名称；默认按状态与 locale 显示收起卡片/展开卡片（英文对应 Collapse card/Expand card）。"},
       {
         "name": "children",
         "type": "ReactNode",
@@ -4262,6 +4376,8 @@ export default function Demo() {
       }
     ],
     "notes": [
+      "折叠后标题及 extra 操作保持可见，封面、标签、正文与底部 actions 隐藏但不卸载；子组件状态保留。未设置 collapsible 时 collapsed/defaultCollapsed 不会隐藏内容。",
+      "Card.Grid 是单张 Card 内部的网格项；多个独立 Card 的布局、响应式列数、跨列和分隔线请使用 CardGroup。",
       "未提供 bordered/bodyStyle/headStyle；使用 variant 与分区 styles。size 使用 medium/small，tabProps 只支持现有 mtone Tabs 的 className。",
       "迁移提醒：旧 <Card title=\"提示\"> 会改为显示标题栏；原生悬浮提示请改为 <Card htmlTitle=\"提示\">。只有 children、没有新增结构属性的 Card 维持原来的默认视觉。",
       "Card.Meta 与 Card.Grid 是 Card 的静态子组件，不是单独安装或单独命名导出的组件。",
@@ -4676,6 +4792,53 @@ export default function Demo() {
       "虚拟列表通过估算未挂载行和测量可见行支持不等高内容；跳到尚未测量的位置是估算定位，滚动过程中总高度可能修正。需要精确定位时使用固定高度或关闭虚拟滚动。",
       "List 不内置网络请求、分页、选择或排序库。加载与排序由外部受控数据组合；数据模式可在 renderItem 的起始位置放置 List.SortHandle（接受 span 拖放事件）；保留上移和下移按钮供键盘操作。",
       "自定义内容的按钮、链接与拖放可访问性由调用方负责；可为滚动容器设置 aria-label 和 tabIndex。",
+    ],
+  },
+  {
+    name: "DataList",
+    category: "数据展示",
+    description: "用于管理记录的列表，支持搜索筛选、分页、跨页选择、批量操作和行详情。",
+    importNames: ["DataList"],
+    code: `import { DataList, Text } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+const records = [
+  { id: "guide", title: "知识库使用指南" },
+  { id: "notes", title: "研究笔记" },
+];
+
+export default function Demo() {
+  return (
+    <DataList
+      aria-label="文档列表"
+      items={records}
+      getKey={(item) => item.id}
+      getLabel={(item) => item.title}
+      renderItem={(item) => <Text>{item.title}</Text>}
+      search={{ match: (item, query) => item.title.includes(query) }}
+      pagination={{ pageSize: 10 }}
+    />
+  );
+}`,
+    props: [
+      { name: "items / getKey", type: "readonly T[] / (item: T) => string | number", description: "必填。提供数据与稳定唯一的条目键（字符串或有限数值）；远程模式只传当前页记录。" },
+      { name: "getLabel", type: "(item: T) => string", description: "为条目选择和展开按钮提供可读名称；省略时使用键的字符串。" },
+      { name: "renderItem", type: "(item: T, index: number) => ReactNode", description: "必填。仅返回行内容；index 是从 0 开始的当前页索引，不要返回 li 或 ListItem。" },
+      { name: "search", type: "{ value?, defaultValue?, onChange?, placeholder?, label?, match? }", description: "传入后显示搜索框。match(item, query) 用于本地搜索，query 已去掉首尾空白；未传 match 时不自动筛选。" },
+      { name: "filter / filters / toolbar", type: "((item: T) => boolean) / ReactNode / ReactNode", description: "本地筛选条件、筛选控件与工具栏内容。远程模式只呈现应用提供的结果，不执行本地条件。" },
+      { name: "pagination", type: "DataListPagination", description: "省略时不分页。本地配置为 { mode?: 'local', page?, defaultPage?, pageSize?, onPageChange? }，默认第 1 页、每页 10 条；远程配置为 { mode: 'remote', page, pageSize, total, onPageChange }。" },
+      { name: "selection", type: "{ selectedKeys?, defaultSelectedKeys?, onChange?, getDisabled? }", description: "启用选择。使用稳定键保留跨页选择；全选或取消全选只影响当前页的可选条目。" },
+      { name: "expansion", type: "{ expandedKeys?, defaultExpandedKeys?, onChange?, isExpandable?, renderDetail }", description: "启用行详情；renderDetail(item) 返回详情内容。展开不会改变选中状态。" },
+      { name: "renderActions", type: "(item: T) => ReactNode", description: "行尾操作；业务行为由应用处理，不会触发隐式选中。" },
+      { name: "renderBatchActions", type: "({ selectedKeys, clearSelection }) => ReactNode", description: "已选时渲染批量操作；clearSelection() 清除全部选中键，包括其他页。" },
+      { name: "loading / empty", type: "boolean / ReactNode", description: "加载状态与空内容；请求、错误和记录更新由应用处理。" },
+      { name: "原生属性", type: "HTMLAttributes<HTMLElement>", description: "转发 section 根元素属性，例如 aria-label、className、style；行由 renderItem 提供。" },
+    ],
+    notes: [
+      "DataList 用于行内容由应用渲染的数据管理页。仅需基础列表、分组吸顶或虚拟滚动时，使用 List。",
+      "本地搜索与筛选先于分页。输入搜索词会请求回到第 1 页；本地结果缩小时限制页码范围。",
+      "远程模式不会过滤或再次切分 items。应用提供当前页记录、总数、加载及错误状态，管理请求取消；外部筛选变化时由应用重置页码。",
+      "目前不提供卡片网格、内联编辑或虚拟滚动。过滤和翻页后若需批量修改，应按键操作，不以当前页的条目数组为准。",
     ],
   },
   {
@@ -5926,5 +6089,698 @@ export default function Demo() {
     notes: [
       "通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言和主题变量。",
     ],
+  },
+  {
+    name: "AiChat",
+    category: "AI 界面",
+    description: "容纳滚动消息和固定输入区域，可跟随最新消息。",
+    importNames: ["AiChat"],
+    code: 'import { AiChat, AiMessage } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiChat style={{ height: 180, width: "100%" }} aria-label="项目讨论">\n      <AiMessage from="user">下一步做什么？</AiMessage>\n      <AiMessage from="assistant">先把待确认事项列出来。</AiMessage>\n    </AiChat>\n  );\n}',
+    props: [
+      {
+        name: "children / empty / footer",
+        type: "ReactNode",
+        description: "消息、空状态和底部区域。",
+      },
+      {
+        name: "autoFollow",
+        type: "boolean",
+        description: "在阅读位置靠近底部时自动跟随消息；向上浏览时不强制跳回。",
+        default: "true",
+      },
+      {
+        name: "bottomThreshold",
+        type: "number",
+        description: "判断靠近底部的距离，单位 px。",
+        default: "64",
+      },
+      {
+        name: "scrollToBottomLabel",
+        type: "string",
+        description: "覆盖回到底部按钮的名称。",
+      },
+      {
+        name: "className / style / aria-label",
+        type: "HTMLAttributes<HTMLDivElement>",
+        description: "设置对话高度、样式和可访问名称等。",
+      },
+    ],
+    notes: [
+      "给容器设置合适的可用高度，才能在消息区内部滚动。应用负责消息和流式请求；组件不连接模型。",
+    ],
+    demoLabel: "对话容器",
+  },
+  {
+    name: "AiMessage",
+    category: "AI 界面",
+    description: "展示用户、助手或系统消息及生成状态、附件内容和可选操作。",
+    importNames: ["AiMessage"],
+    code: 'import { AiMessage, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiMessage\n      from="assistant"\n      status="streaming"\n      actions={<Button size="sm">复制（示例）</Button>}\n    >\n      正在整理记录。\n    </AiMessage>\n  );\n}',
+    props: [
+      {
+        name: "from",
+        type: '"user" | "assistant" | "system"',
+        description: "必填；决定消息角色及默认显示名称。",
+      },
+      {
+        name: "name / avatar / children / actions",
+        type: "ReactNode",
+        description: "自定义名称、头像、消息内容和操作。",
+      },
+      {
+        name: "status / statusLabel",
+        type: '"idle" | "streaming" | "error" / string',
+        description: "消息状态与可覆盖的状态文字。",
+        default: "idle",
+      },
+    ],
+    notes: [
+      "应用提供内容及其渲染策略；不会将字符串自动解析为 Markdown 或执行 HTML。",
+    ],
+    demoLabel: "消息气泡",
+    sidebarParent: "AiChat",
+  },
+  {
+    name: "AiPromptInput",
+    category: "AI 界面",
+    description: "提供消息输入、提交、停止、附件选择和错误展示。",
+    importNames: ["AiPromptInput"],
+    code: 'import { useState } from "react";\nimport { AiPromptInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [text, setText] = useState("");\n  const [sent, setSent] = useState("");\n  return (\n    <div style={{ width: "100%" }}>\n      <AiPromptInput\n        aria-label="演示消息"\n        value={text}\n        onValueChange={setText}\n        onSubmit={(submission) => {\n          setSent(submission.text);\n          setText("");\n        }}\n      />\n      <p role="status">{sent}</p>\n    </div>\n  );\n}',
+    props: [
+      {
+        name: "value / defaultValue / onValueChange",
+        type: "string / string / (value: string) => void",
+        description: "受控文本、初始文本及变化回调。",
+      },
+      {
+        name: "onSubmit",
+        type: "(submission: AiPromptSubmission) => void | Promise<void>",
+        description:
+          "必填；收到 text 和附件元数据。提交后的清空需要应用自行处理。",
+      },
+      {
+        name: "status / onStop",
+        type: "AiPromptStatus / () => void",
+        description:
+          "状态为 ready、submitted、streaming、error；忙碌时可发出停止请求。",
+        default: "ready",
+      },
+      {
+        name: "attachments / onFilesSelect / onAttachmentRemove",
+        type: "readonly AiPromptAttachment[] / (files: File[]) => void / (id: string) => void",
+        description: "附件由应用持有；选择文件和移除操作只回调。",
+      },
+      {
+        name: "accept / multiple / disabled",
+        type: "string / boolean / boolean",
+        description: "文件类型、允许多选及禁用状态。",
+        default: "— / true / false",
+      },
+      {
+        name: "toolbar / error / placeholder",
+        type: "ReactNode / ReactNode / string",
+        description: "输入区的工具栏、错误提示和占位文本。",
+      },
+      {
+        name: "submitLabel / stopLabel / attachmentLabel",
+        type: "string",
+        description: "自定义各按钮可访问名称。",
+      },
+    ],
+    notes: [
+      "Enter 发送，Shift+Enter 换行；输入法组合期间不会误发送。文件只交给应用，不自动上传。",
+    ],
+    demoLabel: "输入与附件",
+    sidebarParent: "AiChat",
+  },
+  {
+    name: "AiSuggestion",
+    category: "AI 界面",
+    description: "点击后把建议提示词交给应用，用于填入输入框或其他交互。",
+    importNames: ["AiSuggestion"],
+    code: 'import { useState } from "react";\nimport { AiSuggestion } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [text, setText] = useState("");\n  return (\n    <div>\n      <AiSuggestion prompt="整理项目要点" onSelect={setText}>\n        建议：整理项目\n      </AiSuggestion>\n      <p role="status">{text}</p>\n    </div>\n  );\n}',
+    props: [
+      {
+        name: "prompt / onSelect",
+        type: "string / (prompt: string) => void",
+        description: "提示词及选中回调。",
+      },
+      {
+        name: "children / ButtonProps",
+        type: "ReactNode / ButtonProps",
+        description: "可替换显示内容，其余按钮属性照常使用。",
+      },
+    ],
+    notes: ["不会自动调用模型。应用可在 onClick 阻止默认行为以取消 onSelect。"],
+    demoLabel: "建议提示词",
+    sidebarParent: "AiChat",
+  },
+  {
+    name: "AiModelSelector",
+    category: "AI 界面",
+    description: "用受控选择器展示应用提供的模型和可选推理强度。",
+    importNames: ["AiModelSelector"],
+    code: 'import { useState } from "react";\nimport { AiModelSelector } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [model, setModel] = useState("fast");\n  const [effort, setEffort] = useState("normal");\n  return (\n    <AiModelSelector\n      models={[\n        { value: "fast", label: "快速（模拟）" },\n        { value: "review", label: "审阅（模拟）" },\n      ]}\n      value={model}\n      onValueChange={setModel}\n      efforts={[\n        { value: "normal", label: "常规" },\n        { value: "deep", label: "深入" },\n      ]}\n      effort={effort}\n      onEffortChange={setEffort}\n    />\n  );\n}',
+    props: [
+      {
+        name: "models / value / onValueChange",
+        type: "AiModelOption[] / string / (value: string) => void",
+        description: "必填；由应用维护模型选项及选择。",
+      },
+      {
+        name: "efforts / effort / onEffortChange",
+        type: "AiModelOption[] / string / (value: string) => void",
+        description: "可选推理强度；没有变化回调时该选择不可编辑。",
+      },
+      {
+        name: "disabled / modelLabel / effortLabel",
+        type: "boolean / string / string",
+        description: "禁用选择器，或覆盖模型及推理强度的可访问名称。",
+      },
+    ],
+    notes: ["显示的选项由应用定义，不代表实际可用模型或服务权限。"],
+    demoLabel: "模型与强度",
+    sidebarParent: "AiChat",
+  },
+  {
+    name: "AiPlan",
+    category: "AI 界面",
+    description: "用步骤列表和完成进度展示应用提供的任务计划。",
+    importNames: ["AiPlan"],
+    code: 'import { AiPlan } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiPlan\n      title="整理文档"\n      status="running"\n      items={[\n        { id: "read", title: "读取目录", status: "completed" },\n        { id: "write", title: "整理提纲", status: "running" },\n      ]}\n    />\n  );\n}',
+    props: [
+      {
+        name: "items",
+        type: "AiActivityStep[]",
+        description: "必填；计划步骤及状态。",
+      },
+      {
+        name: "title / statusLabel",
+        type: "string",
+        description: "可覆盖折叠标题和状态文字。",
+      },
+      {
+        name: "status",
+        type: "AiActivityStatus",
+        description: "状态为 pending、running、completed、error、cancelled。",
+        default: "pending",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "控制展开状态、指定初始展开状态或监听展开变化。",
+      },
+      {
+        name: "children / 原生属性",
+        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
+        description: "额外内容及根 div 属性。",
+      },
+    ],
+    notes: ["计划默认展开。进度只计入 completed 步骤；不调度或执行任务。"],
+    demoLabel: "执行计划",
+  },
+  {
+    name: "AiChainOfThought",
+    category: "AI 界面",
+    description: "展示应用提供的公开摘要或可观察步骤。",
+    importNames: ["AiChainOfThought"],
+    code: 'import { AiChainOfThought } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiChainOfThought\n      defaultOpen\n      status="completed"\n      steps={[\n        {\n          id: "find",\n          title: "汇总两份资料",\n          status: "completed",\n          description: "已核对标题及日期。",\n        },\n      ]}\n    />\n  );\n}',
+    props: [
+      {
+        name: "steps",
+        type: "AiActivityStep[]",
+        description: "公开摘要步骤；支持说明和状态。",
+      },
+      {
+        name: "title / statusLabel",
+        type: "string",
+        description: "可覆盖折叠标题和状态文字。",
+      },
+      {
+        name: "status",
+        type: "AiActivityStatus",
+        description: "状态为 pending、running、completed、error、cancelled。",
+        default: "pending",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "控制展开状态、指定初始展开状态或监听展开变化。",
+      },
+      {
+        name: "children / 原生属性",
+        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
+        description: "额外内容及根 div 属性。",
+      },
+    ],
+    notes: ["不获取、生成或展示模型隐藏思维链。默认收起。"],
+    demoLabel: "公开过程摘要",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiReasoning",
+    category: "AI 界面",
+    description: "以可折叠区域展示应用提供的公开文字说明。",
+    importNames: ["AiReasoning"],
+    code: 'import { AiReasoning } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiReasoning\n      defaultOpen\n      status="completed"\n      text="只比较发布时间和记录编号，结果仍需人工核对。"\n    />\n  );\n}',
+    props: [
+      {
+        name: "text",
+        type: "string",
+        description: "必填；仅从调用方接收公开说明。",
+      },
+      {
+        name: "title / statusLabel",
+        type: "string",
+        description: "可覆盖折叠标题和状态文字。",
+      },
+      {
+        name: "status",
+        type: "AiActivityStatus",
+        description: "状态为 pending、running、completed、error、cancelled。",
+        default: "pending",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "控制展开状态、指定初始展开状态或监听展开变化。",
+      },
+      {
+        name: "children / 原生属性",
+        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
+        description: "额外内容及根 div 属性。",
+      },
+    ],
+    notes: ["公开说明按文本呈现；不会获取模型隐含推理。默认收起。"],
+    demoLabel: "公开说明",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiTask",
+    category: "AI 界面",
+    description: "展示任务状态及可选步骤列表。",
+    importNames: ["AiTask"],
+    code: 'import { AiTask } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiTask\n      title="核对版本"\n      defaultOpen\n      status="running"\n      steps={[\n        { id: "tag", title: "查看发布标签", status: "completed" },\n        { id: "file", title: "比对内容", status: "running" },\n      ]}\n    />\n  );\n}',
+    props: [
+      {
+        name: "steps",
+        type: "AiActivityStep[]",
+        description: "步骤名称、说明及状态。",
+      },
+      {
+        name: "title / statusLabel",
+        type: "string",
+        description: "可覆盖折叠标题和状态文字。",
+      },
+      {
+        name: "status",
+        type: "AiActivityStatus",
+        description: "状态为 pending、running、completed、error、cancelled。",
+        default: "pending",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "控制展开状态、指定初始展开状态或监听展开变化。",
+      },
+      {
+        name: "children / 原生属性",
+        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
+        description: "额外内容及根 div 属性。",
+      },
+    ],
+    notes: ["默认收起；不会执行任务。"],
+    demoLabel: "子任务",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiQueue",
+    category: "AI 界面",
+    description: "根据状态展示待完成事项与已结束事项。",
+    importNames: ["AiQueue"],
+    code: 'import { AiQueue } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiQueue\n      items={[\n        { id: "first", title: "整理目录", status: "completed" },\n        { id: "second", title: "检查引用", status: "pending" },\n      ]}\n    />\n  );\n}',
+    props: [
+      {
+        name: "items",
+        type: "AiActivityStep[]",
+        description:
+          "必填；completed 和 cancelled 分入已结束，其余分入待完成。",
+      },
+      {
+        name: "title / statusLabel",
+        type: "string",
+        description: "可覆盖折叠标题和状态文字。",
+      },
+      {
+        name: "status",
+        type: "AiActivityStatus",
+        description: "状态为 pending、running、completed、error、cancelled。",
+        default: "pending",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "控制展开状态、指定初始展开状态或监听展开变化。",
+      },
+      {
+        name: "children / 原生属性",
+        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
+        description: "额外内容及根 div 属性。",
+      },
+    ],
+    notes: ["默认展开；只呈现状态，不负责排队或重试。"],
+    demoLabel: "任务队列",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiSubagent",
+    category: "AI 界面",
+    description: "展示应用提供的代理名称、工作描述及结果。",
+    importNames: ["AiSubagent"],
+    code: 'import { AiSubagent } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiSubagent\n      name="文档校对"\n      status="completed"\n      defaultOpen\n      description="核对目录和页码"\n      result="发现一处需要核实的页码。"\n    />\n  );\n}',
+    props: [
+      {
+        name: "name / description / result",
+        type: "string / ReactNode / ReactNode",
+        description: "name 必填，未传 title 时用作标题。",
+      },
+      {
+        name: "title / statusLabel",
+        type: "string",
+        description: "可覆盖折叠标题和状态文字。",
+      },
+      {
+        name: "status",
+        type: "AiActivityStatus",
+        description: "状态为 pending、running、completed、error、cancelled。",
+        default: "pending",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "控制展开状态、指定初始展开状态或监听展开变化。",
+      },
+      {
+        name: "children / 原生属性",
+        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
+        description: "额外内容及根 div 属性。",
+      },
+    ],
+    notes: ["不创建、联系或控制代理。默认收起。"],
+    demoLabel: "子代理状态",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiTool",
+    category: "AI 界面",
+    description: "按纯文本展示工具输入、输出及状态。",
+    importNames: ["AiTool"],
+    code: 'import { AiTool } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiTool\n      name="检索示例"\n      defaultOpen\n      status="completed"\n      input={JSON.stringify({ keyword: "目录" })}\n      output="匹配到 2 条示例记录"\n    />\n  );\n}',
+    props: [
+      {
+        name: "name / input / output",
+        type: "string",
+        description: "name 必填；input 和 output 为纯文本，默认标题取 name。",
+      },
+      {
+        name: "title / statusLabel",
+        type: "string",
+        description: "可覆盖折叠标题和状态文字。",
+      },
+      {
+        name: "status",
+        type: "AiActivityStatus",
+        description: "状态为 pending、running、completed、error、cancelled。",
+        default: "pending",
+      },
+      {
+        name: "open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "控制展开状态、指定初始展开状态或监听展开变化。",
+      },
+      {
+        name: "children / 原生属性",
+        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
+        description: "额外内容及根 div 属性。",
+      },
+    ],
+    notes: ["不调用工具或执行输入、输出中的文本。默认收起。"],
+    demoLabel: "工具调用记录",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiCheckpoint",
+    category: "AI 界面",
+    description: "展示检查点信息，并把恢复请求交给应用。",
+    importNames: ["AiCheckpoint"],
+    code: 'import { useState } from "react";\nimport { AiCheckpoint } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [restored, setRestored] = useState(false);\n  return (\n    <div>\n      <AiCheckpoint\n        label="整理前"\n        description="演示检查点"\n        onRestore={() => setRestored(true)}\n      />\n      {restored && <p role="status">已收到恢复请求（模拟）。</p>}\n    </div>\n  );\n}',
+    props: [
+      {
+        name: "label / description / children",
+        type: "string / ReactNode / ReactNode",
+        description: "标签、说明及补充内容。",
+      },
+      {
+        name: "onRestore / restoreLabel / disabled",
+        type: "() => void / string / boolean",
+        description: "点击时通知应用；未提供回调时按钮禁用。",
+      },
+    ],
+    notes: ["不会自行保存或恢复应用状态。"],
+    demoLabel: "检查点",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiConfirmation",
+    category: "AI 界面",
+    description: "展示待确认事项、受控决定和按钮状态。",
+    importNames: ["AiConfirmation"],
+    code: 'import { useState } from "react";\nimport { AiConfirmation } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [state, setState] = useState<"pending" | "approved" | "rejected">(\n    "pending",\n  );\n  return (\n    <AiConfirmation\n      title="保存示例摘要？"\n      description="仅演示确认界面，不会保存文件。"\n      state={state}\n      onConfirm={() => setState("approved")}\n      onReject={() => setState("rejected")}\n    />\n  );\n}',
+    props: [
+      {
+        name: "title / description / children",
+        type: "string / ReactNode / ReactNode",
+        description: "操作标题、必要说明及补充内容。",
+      },
+      {
+        name: "state / busy",
+        type: '"pending" | "approved" | "rejected" / boolean',
+        description: "决定由调用方维护；busy 时禁用待确认按钮。",
+        default: "pending / false",
+      },
+      {
+        name: "onConfirm / onReject",
+        type: "() => void",
+        description: "相应决定的回调；未传的按钮禁用。",
+      },
+      {
+        name: "confirmLabel / rejectLabel",
+        type: "string",
+        description: "覆盖确认或拒绝的按钮文字。",
+      },
+    ],
+    notes: ["不替应用授权、执行或保存决定；示例的点击仅改变本地显示。"],
+    demoLabel: "确认请求",
+    sidebarParent: "AiPlan",
+  },
+  {
+    name: "AiSources",
+    category: "AI 界面",
+    description: "集中展示引文来源和说明，可折叠并显示数量。",
+    importNames: ["AiSources"],
+    code: 'import { AiSources } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiSources\n      defaultOpen\n      sources={[\n        { id: "one", title: "项目准备说明", description: "示例来源一" },\n        { id: "two", title: "当前文档", url: "#/components/AiSources" },\n      ]}\n    />\n  );\n}',
+    props: [
+      {
+        name: "sources",
+        type: "AiSource[]",
+        description: "必填；条目包含 id、title，及可选 url、description。",
+      },
+      {
+        name: "defaultOpen",
+        type: "boolean",
+        description: "初始展开来源列表。",
+        default: "false",
+      },
+      {
+        name: "label / className / style",
+        type: "string / string / CSSProperties",
+        description: "可覆盖显示名称及局部样式。",
+      },
+    ],
+    notes: [
+      "仅将有效的 HTTP(S)、站内根路径或锚点显示为可点链接；无效 URL 显示为纯文本。组件不会访问或验证来源内容。",
+    ],
+    demoLabel: "来源列表",
+  },
+  {
+    name: "AiInlineCitation",
+    category: "AI 界面",
+    description: "在句子中插入来源编号或标题。",
+    importNames: ["AiInlineCitation"],
+    code: 'import { AiInlineCitation } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <p>\n      整理前请核对原始记录。{" "}\n      <AiInlineCitation\n        index={1}\n        source={{\n          id: "one",\n          title: "查看来源示例",\n          url: "#/components/AiSources?section=ai-sources",\n        }}\n      />\n    </p>\n  );\n}',
+    props: [
+      {
+        name: "source",
+        type: "AiSource",
+        description: "必填；提供 id、title 及可选的 url、description。",
+      },
+      {
+        name: "index",
+        type: "number",
+        description: "显示编号；省略时显示标题。",
+      },
+      {
+        name: "className / style",
+        type: "string / CSSProperties",
+        description: "可覆盖局部样式。",
+      },
+    ],
+    notes: [
+      "仅有效的 HTTP(S)、站内根路径或锚点会渲染为链接；无效或缺省 URL 显示为文本。",
+    ],
+    demoLabel: "行内引用",
+    sidebarParent: "AiSources",
+  },
+  {
+    name: "AiContext",
+    category: "AI 界面",
+    description: "展示调用方报告的词元使用量和预格式化费用。",
+    importNames: ["AiContext"],
+    code: 'import { AiContext } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiContext\n      usedTokens={4200}\n      maxTokens={8000}\n      inputTokens={3200}\n      outputTokens={1000}\n      cost="¥0.08（模拟）"\n    />\n  );\n}',
+    props: [
+      {
+        name: "usedTokens / maxTokens",
+        type: "number",
+        description: "用量必填；可选上限，用于显示进度。",
+      },
+      {
+        name: "inputTokens / outputTokens / cost",
+        type: "number / number / string",
+        description: "可选输入、输出计数及应用已格式化的费用。",
+      },
+      {
+        name: "label / className / style",
+        type: "string / string / CSSProperties",
+        description: "可覆盖显示名称及局部样式。",
+      },
+    ],
+    notes: ["不估算词元或价格，不读取计费账户。"],
+    demoLabel: "上下文用量",
+    sidebarParent: "AiSources",
+  },
+  {
+    name: "AiFileTree",
+    category: "AI 界面",
+    description: "从应用数据展示文件和目录，并回传选择。",
+    importNames: ["AiFileTree"],
+    code: 'import { useState } from "react";\nimport { AiFileTree } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [selected, setSelected] = useState<string | null>(null);\n  return (\n    <div>\n      <AiFileTree\n        items={[\n          {\n            id: "src",\n            name: "src",\n            kind: "folder",\n            children: [\n              { id: "main", name: "main.tsx" },\n              { id: "test", name: "main.test.tsx" },\n            ],\n          },\n        ]}\n        defaultExpandedIds={["src"]}\n        selectedId={selected}\n        onSelect={setSelected}\n      />\n      <p role="status">{selected ? "已选：" + selected : "请选择文件"}</p>\n    </div>\n  );\n}',
+    props: [
+      {
+        name: "items",
+        type: "AiFileNode[]",
+        description: "必填；节点含 id、name，及可选 kind、children、disabled。",
+      },
+      {
+        name: "selectedId / defaultSelectedId / onSelect",
+        type: "string | null / string / (id: string, node: AiFileNode) => void",
+        description: "受控选中键、初始键和选择回调。",
+      },
+      {
+        name: "defaultExpandedIds",
+        type: "string[]",
+        description: "初始展开节点键。",
+      },
+      {
+        name: "label / className / style",
+        type: "string / string / CSSProperties",
+        description: "可覆盖显示名称及局部样式。",
+      },
+    ],
+    notes: [
+      "不读取本地文件、检查权限或自动打开文件。为节点提供稳定唯一的 id。",
+    ],
+    demoLabel: "文件树",
+    sidebarParent: "AiSources",
+  },
+  {
+    name: "AiStackTrace",
+    category: "AI 界面",
+    description: "展示错误文本和可折叠的堆栈帧。",
+    importNames: ["AiStackTrace"],
+    code: 'import { AiStackTrace } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiStackTrace\n      defaultOpen\n      message="Error: Missing project name"\n      frames={[\n        {\n          file: "src/project.ts",\n          line: 24,\n          column: 8,\n          functionName: "readProject",\n        },\n      ]}\n    />\n  );\n}',
+    props: [
+      {
+        name: "message / frames",
+        type: "string / AiStackFrame[]",
+        description: "必填；每帧含 file，可附 line、column、functionName。",
+      },
+      {
+        name: "defaultOpen",
+        type: "boolean",
+        description: "初始展开。",
+        default: "false",
+      },
+      {
+        name: "label / className / style",
+        type: "string / string / CSSProperties",
+        description: "可覆盖显示名称及局部样式。",
+      },
+    ],
+    notes: ["不捕获错误、不解释异常或打开文件。"],
+    demoLabel: "堆栈信息",
+    sidebarParent: "AiSources",
+  },
+  {
+    name: "AiTerminal",
+    category: "AI 界面",
+    description: "以可聚焦的纯文本区域展示命令输出及状态。",
+    importNames: ["AiTerminal"],
+    code: 'import { AiTerminal } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <AiTerminal status="success" output={"$ npm test\\nPASS 3 tests"} />;\n}',
+    props: [
+      { name: "output", type: "string", description: "必填；显示文本输出。" },
+      {
+        name: "status",
+        type: "AiTerminalStatus",
+        description: "idle、running、success 或 error。",
+        default: "idle",
+      },
+      {
+        name: "label / className / style",
+        type: "string / string / CSSProperties",
+        description: "可覆盖显示名称及局部样式。",
+      },
+    ],
+    notes: ["不是交互式终端，不接收命令，也不创建进程。"],
+    demoLabel: "终端输出",
+    sidebarParent: "AiSources",
+  },
+  {
+    name: "AiTestResults",
+    category: "AI 界面",
+    description: "可折叠查看测试结果和状态汇总。",
+    importNames: ["AiTestResults"],
+    code: 'import { AiTestResults } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiTestResults\n      defaultOpen\n      results={[\n        { id: "one", name: "保存标题", status: "passed", durationMs: 15 },\n        {\n          id: "two",\n          name: "空记录提示",\n          status: "failed",\n          details: "期望看到空状态提示",\n        },\n      ]}\n    />\n  );\n}',
+    props: [
+      {
+        name: "results",
+        type: "AiTestResult[]",
+        description:
+          "必填；每项含 id、name、status，可附 durationMs、details。",
+      },
+      {
+        name: "defaultOpen",
+        type: "boolean",
+        description: "初始展开。",
+        default: "false",
+      },
+      {
+        name: "label / className / style",
+        type: "string / string / CSSProperties",
+        description: "可覆盖显示名称及局部样式。",
+      },
+    ],
+    notes: ["状态为 passed、failed、skipped 或 running；组件不执行测试。"],
+    demoLabel: "测试结果",
+    sidebarParent: "AiSources",
   },
 ];

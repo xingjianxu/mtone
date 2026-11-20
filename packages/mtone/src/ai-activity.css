@@ -1,0 +1,201 @@
+.mt-ai-activity {
+  color: var(--mt-fg, #37352f);
+  background: var(--mt-bg, #fff);
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: var(--mt-radius, 4px);
+  min-width: 0;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.mt-ai-activity-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+}
+.mt-ai-activity-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 28px;
+  flex: 1;
+  border: 0;
+  border-radius: 3px;
+  padding: 4px 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.mt-ai-activity-trigger:hover {
+  background: var(--mt-hover, #f1f1ef);
+}
+.mt-ai-activity-trigger:focus-visible {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
+}
+.mt-ai-activity-chevron {
+  flex-shrink: 0;
+  transition: transform 120ms ease;
+}
+.mt-ai-activity-trigger[aria-expanded="true"] .mt-ai-activity-chevron {
+  transform: rotate(90deg);
+}
+[dir="rtl"] .mt-ai-activity-chevron {
+  transform: rotate(180deg);
+}
+.mt-ai-activity-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  color: var(--mt-muted, #787774);
+  font-size: 11px;
+}
+.mt-ai-activity-status {
+  max-width: 50%;
+}
+.mt-ai-activity-status > span {
+  min-width: 0;
+}
+.mt-ai-activity-status svg {
+  flex-shrink: 0;
+}
+.mt-ai-activity-status[data-status="error"] {
+  color: var(--mt-danger, #d44c47);
+}
+.mt-ai-activity-status[data-status="completed"] {
+  color: var(--mt-success, #448361);
+}
+.mt-ai-activity-status[data-status="running"] svg {
+  animation: mt-ai-activity-spin 1.2s linear infinite;
+}
+.mt-ai-activity-content {
+  padding: 10px 12px;
+  border-top: 1px solid var(--mt-border, #e9e9e7);
+}
+.mt-ai-activity-content[hidden] {
+  display: none;
+}
+.mt-ai-activity-content > * + * {
+  margin-block-start: 10px;
+}
+.mt-ai-activity-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.mt-ai-activity-steps > li {
+  padding: 6px 0;
+}
+.mt-ai-activity-steps > li + li {
+  border-top: 1px solid var(--mt-border, #e9e9e7);
+}
+.mt-ai-activity-step-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.mt-ai-activity-step-heading > :first-child {
+  min-width: 0;
+}
+.mt-ai-activity-description,
+.mt-ai-activity-empty {
+  color: var(--mt-muted, #787774);
+  font-size: 12px;
+  margin: 0;
+}
+.mt-ai-activity-description {
+  margin-block-start: 3px;
+}
+.mt-ai-activity-group-label {
+  font-size: 11px;
+  color: var(--mt-muted, #787774);
+  margin-block-end: 4px;
+}
+.mt-ai-activity-text {
+  white-space: pre-wrap;
+}
+.mt-ai-activity-code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 3px;
+  background: var(--mt-subtle, #f7f7f5);
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+.mt-ai-activity-progress {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--mt-muted, #787774);
+}
+.mt-ai-activity-progress progress {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 5px;
+  appearance: none;
+  border: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--mt-subtle, #f7f7f5);
+}
+.mt-ai-activity-progress progress::-webkit-progress-bar {
+  background: var(--mt-subtle, #f7f7f5);
+}
+.mt-ai-activity-progress progress::-webkit-progress-value {
+  background: var(--mt-muted, #787774);
+}
+.mt-ai-activity-progress progress::-moz-progress-bar {
+  background: var(--mt-muted, #787774);
+}
+.mt-ai-checkpoint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+}
+.mt-ai-checkpoint-copy {
+  min-width: 0;
+  flex: 1;
+}
+.mt-ai-checkpoint > button {
+  flex-shrink: 0;
+}
+.mt-ai-confirmation {
+  padding: 12px;
+}
+.mt-ai-confirmation-title {
+  font-weight: 500;
+}
+.mt-ai-confirmation-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-block-start: 10px;
+}
+@keyframes mt-ai-activity-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-ai-activity-status[data-status="running"] svg {
+    animation: none;
+  }
+  .mt-ai-activity-chevron {
+    transition: none;
+  }
+}

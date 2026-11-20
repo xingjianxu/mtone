@@ -9,12 +9,13 @@ const categories = [
   "导航切换",
   "数据录入",
   "数据展示",
+  "AI 界面",
   "浮层对话",
   "状态反馈",
   "全局配置",
 ];
 const expected: Record<string, string[]> = {
-  布局容器: ["Affix", "AdminLayout", "Splitter", "Divider"],
+  布局容器: ["CardGroup", "Affix", "AdminLayout", "Splitter", "Divider"],
   操作命令: [
     "Button",
     "IconButton",
@@ -35,6 +36,7 @@ const expected: Record<string, string[]> = {
     "Segmented",
   ],
   数据录入: [
+    "Questionnaire",
     "Cascader",
     "CascaderPanel",
     "Transfer",
@@ -75,6 +77,7 @@ const expected: Record<string, string[]> = {
     "Paragraph",
     "Link",
     "List",
+    "DataList",
     "ListItem",
     "DocumentList",
     "DocumentCard",
@@ -87,6 +90,13 @@ const expected: Record<string, string[]> = {
     "AvatarGroup",
     "PropertyList",
     "PropertyItem",
+  ],
+  "AI 界面": [
+    "AiChat", "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
+    "AiPlan", "AiChainOfThought", "AiReasoning", "AiTask", "AiQueue",
+    "AiSubagent", "AiTool", "AiCheckpoint", "AiConfirmation",
+    "AiSources", "AiInlineCitation", "AiContext", "AiFileTree", "AiStackTrace",
+    "AiTerminal", "AiTestResults",
   ],
   浮层对话: ["HoverCard",
     "Popconfirm",
@@ -137,7 +147,7 @@ describe("documentation taxonomy", () => {
         (e) => e.textContent,
       ),
     ).toEqual(["开始使用", ...categories]);
-    for (const doc of catalog.componentDocs.filter((doc) => !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"].includes(doc.name))) {
+    for (const doc of catalog.componentDocs.filter((doc) => !doc.sidebarParent && !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"].includes(doc.name))) {
       expect(
         within(nav as HTMLElement).getAllByRole("link", { name: doc.name }),
       ).toHaveLength(1);
@@ -145,6 +155,20 @@ describe("documentation taxonomy", () => {
     expect(
       screen.getByRole("heading", { name: "Button", level: 1 }),
     ).toBeInTheDocument();
+  });
+  it("shows three AI sidebar groups and keeps all 21 components discoverable", () => {
+    window.location.hash = "#/components/AiChat?section=ai-prompt-input";
+    const { container } = render(<DocsApp />);
+    const nav = container.querySelector(".docs-sidebar nav")!;
+    const group = within(nav as HTMLElement).getByText("AI 界面").parentElement!;
+    expect(within(group).getAllByRole("link").map((link) => link.textContent))
+      .toEqual(["AiChat", "AiPlan", "AiSources"]);
+    expect(within(group).getByRole("link", { name: "AiChat" }))
+      .toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("heading", { name: "模拟对话", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "AiPromptInput · 输入与附件", level: 2 }))
+      .toHaveAttribute("id", "ai-prompt-input");
+    expect(searchDocs("AI 界面")).toHaveLength(21);
   });
   it("searches the new categories while preserving description matching", () => {
     expect(

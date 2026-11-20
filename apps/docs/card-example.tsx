@@ -1,3 +1,4 @@
+import CardCollapse from "./secondary-demos/card-collapse";
 import React, { useState } from "react";
 import { BookOpen, Bookmark, Check, MoreHorizontal } from "lucide-react";
 import { Avatar, Badge, Button, Card, IconButton, Text } from "../../packages/mtone/src";
@@ -35,6 +36,7 @@ export function CardExample() {
         {activeTab === "overview" ? <Card.Meta avatar={<Avatar name="林" />} title="把想法组织成知识" description="记录设计决定、使用约定与可复用的经验。" /> : <div><strong>阅读笔记</strong><p style={{ marginBottom: 0 }}>先保持结构清晰，再逐步增加有价值的信息。</p></div>}
       </Card>
       <div role="status" style={{ fontSize: 12, color: "var(--mt-muted, #787774)" }}>{notice}</div>
+      <CardCollapse />
       <Card title="快速入口" size="small">
         <Card.Grid><strong>设计原则</strong><div><Text muted>简洁、清楚、可组合</Text></div></Card.Grid>
         <Card.Grid><strong>组件约定</strong><div><Text muted>一致的交互与反馈</Text></div></Card.Grid>

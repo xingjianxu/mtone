@@ -1,3 +1,15 @@
+import CardCollapse from "./secondary-demos/card-collapse";
+import CardCollapseSource from "./secondary-demos/card-collapse.tsx?raw";
+import CardGroup0 from "./secondary-demos/card-group-responsive";
+import CardGroup0Source from "./secondary-demos/card-group-responsive.tsx?raw";
+import CardGroup1 from "./secondary-demos/card-group-span";
+import CardGroup1Source from "./secondary-demos/card-group-span.tsx?raw";
+import CardGroup2 from "./secondary-demos/card-group-divided";
+import CardGroup2Source from "./secondary-demos/card-group-divided.tsx?raw";
+import CardGroup3 from "./secondary-demos/card-group-vertical";
+import CardGroup3Source from "./secondary-demos/card-group-vertical.tsx?raw";
+import Questionnaire from "./secondary-demos/questionnaire-usage";
+import QuestionnaireSource from "./secondary-demos/questionnaire-usage.tsx?raw";
 import type { DocSection } from "./doc-section";
 import Mentions0 from "./secondary-demos/mentions-usage";
 import Mentions0Source from "./secondary-demos/mentions-usage.tsx?raw";
@@ -252,6 +264,8 @@ import Tree6Source from "./secondary-demos/tree-sorting.tsx?raw";
 
 const source = (tsx: string) =>
   tsx.replaceAll("../../../packages/mtone/src", "@bixlab/mtone");
+const standaloneSource = (tsx: string) =>
+  'import "@bixlab/mtone/styles.css";\n' + source(tsx);
 export const secondaryDocSections: Record<string, readonly DocSection[]> = {
   Mentions: [
     {
@@ -319,6 +333,12 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       source: source(Affix0Source),
     },
   ],
+  CardGroup: [
+    { id: "usage", title: "默认响应式排列", Demo: CardGroup0, source: standaloneSource(CardGroup0Source), note: "默认随视口从 1 列变为 2 列、3 列，间距 12px。" },
+    { id: "span", title: "移动端两列与跨列", Demo: CardGroup1, source: standaloneSource(CardGroup1Source), note: "小屏展示 2 列，768px 起为 3 列，跨列项最多占满当前行。" },
+    { id: "divided", title: "行列分隔线", Demo: CardGroup2, source: standaloneSource(CardGroup2Source), note: "行列分隔线跟随当前断点，间距内可见。" },
+    { id: "vertical", title: "纵向排列", Demo: CardGroup3, source: standaloneSource(CardGroup3Source) },
+  ],
   Card: [
     {
       id: "usage",
@@ -326,6 +346,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       Demo: Card0,
       source: source(Card0Source),
     },
+    { id: "collapse", title: "折叠与保留状态", Demo: CardCollapse, source: standaloneSource(CardCollapseSource) },
     { id: "grid", title: "网格布局", Demo: Card1, source: source(Card1Source) },
     {
       id: "inner",
@@ -500,6 +521,14 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       title: "悬停打开",
       Demo: Menubar2,
       source: source(Menubar2Source),
+    },
+  ],
+  Questionnaire: [
+    {
+      id: "usage",
+      title: "多步问卷",
+      Demo: Questionnaire,
+      source: source(QuestionnaireSource),
     },
   ],
   AutoComplete: [

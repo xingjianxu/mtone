@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ChevronDown } from "lucide-react";
 import { cn, Skeleton, useMtone } from "./basic";
 import { Tabs, type TabsProps } from "./interactive";
 
@@ -32,6 +33,13 @@ export interface CardProps extends Omit<
   "title"
 > {
   title?: React.ReactNode;
+  /** Show a separate header control that hides content without unmounting it. */
+  collapsible?: boolean;
+  collapsed?: boolean;
+  defaultCollapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+  /** Accessible name of the collapse control; defaults to localized action text. */
+  collapseLabel?: string;
   /** Native HTML tooltip, formerly supplied through title. */
   htmlTitle?: string;
   extra?: React.ReactNode;
@@ -85,6 +93,11 @@ function CardRoot(props: CardProps) {
   const {
     children,
     title,
+    collapsible = false,
+    collapsed,
+    defaultCollapsed = false,
+    onCollapsedChange,
+    collapseLabel,
     htmlTitle,
     extra,
     cover,
@@ -109,6 +122,18 @@ function CardRoot(props: CardProps) {
     ...native
   } = props;
   const { locale } = useMtone();
+  const contentId = React.useId();
+  const [localCollapsed, setLocalCollapsed] = React.useState(defaultCollapsed);
+  const isCollapsed = collapsed ?? localCollapsed;
+  const toggleLabel =
+    collapseLabel ??
+    (locale === "zh"
+      ? isCollapsed
+        ? "展开卡片"
+        : "收起卡片"
+      : isCollapsed
+        ? "Expand card"
+        : "Collapse card");
   const [localTab, setLocalTab] = React.useState(defaultActiveTabKey);
   const available = tabList ?? [];
   const first = available.find((tab) => !tab.disabled)?.key;
@@ -127,27 +152,29 @@ function CardRoot(props: CardProps) {
       setLocalTab(first);
   }, [activeTabKey, available, localTab, first]);
   // Keep the original DOM and native padding overrides for existing bare cards.
-  const structured = [
-    "title",
-    "extra",
-    "cover",
-    "actions",
-    "loading",
-    "loadingLabel",
-    "size",
-    "variant",
-    "hoverable",
-    "type",
-    "tabList",
-    "activeTabKey",
-    "defaultActiveTabKey",
-    "onTabChange",
-    "tabBarExtraContent",
-    "tabProps",
-    "classNames",
-    "styles",
-    "tokens",
-  ].some((key) => props[key as keyof CardProps] !== undefined);
+  const structured =
+    collapsible ||
+    [
+      "title",
+      "extra",
+      "cover",
+      "actions",
+      "loading",
+      "loadingLabel",
+      "size",
+      "variant",
+      "hoverable",
+      "type",
+      "tabList",
+      "activeTabKey",
+      "defaultActiveTabKey",
+      "onTabChange",
+      "tabBarExtraContent",
+      "tabProps",
+      "classNames",
+      "styles",
+      "tokens",
+    ].some((key) => props[key as keyof CardProps] !== undefined);
   if (!structured)
     return (
       <div
@@ -161,7 +188,7 @@ function CardRoot(props: CardProps) {
     );
   const classes = resolve(classNames, props),
     css = resolve(styles, props);
-  const hasHeader = hasContent(title) || hasContent(extra);
+  const hasHeader = collapsible || hasContent(title) || hasContent(extra);
   const hasTabs = available.length > 0;
   const loadingText =
     loadingLabel ?? (locale === "zh" ? "正在加载" : "Loading");
@@ -178,46 +205,8 @@ function CardRoot(props: CardProps) {
       )}
     </div>
   );
-  return (
-    <div
-      {...native}
-      title={htmlTitle}
-      aria-busy={loading || native["aria-busy"]}
-      className={cn(
-        "mt-card",
-        "mt-card-structured",
-        size === "small" && "mt-card-small",
-        variant === "borderless" && "mt-card-borderless",
-        hoverable && "mt-card-hoverable",
-        type === "inner" && "mt-card-inner",
-        classes.root,
-        className,
-      )}
-      style={{ ...tokenStyles(tokens), ...css.root, ...style }}
-    >
-      {hasHeader && (
-        <div
-          className={cn("mt-card-header", classes.header)}
-          style={css.header}
-        >
-          {hasContent(title) && (
-            <div
-              className={cn("mt-card-title", classes.title)}
-              style={css.title}
-            >
-              {title}
-            </div>
-          )}
-          {hasContent(extra) && (
-            <div
-              className={cn("mt-card-extra", classes.extra)}
-              style={css.extra}
-            >
-              {extra}
-            </div>
-          )}
-        </div>
-      )}
+  const cardContent = (
+    <>
       {hasContent(cover) && (
         <div className={cn("mt-card-cover", classes.cover)} style={css.cover}>
           {cover}
@@ -259,6 +248,77 @@ function CardRoot(props: CardProps) {
             <li key={i}>{action}</li>
           ))}
         </ul>
+      )}
+    </>
+  );
+  return (
+    <div
+      {...native}
+      title={htmlTitle}
+      {...(collapsible ? { "data-collapsed": isCollapsed } : {})}
+      aria-busy={loading || native["aria-busy"]}
+      className={cn(
+        "mt-card",
+        "mt-card-structured",
+        collapsible && "mt-card-collapsible",
+        size === "small" && "mt-card-small",
+        variant === "borderless" && "mt-card-borderless",
+        hoverable && "mt-card-hoverable",
+        type === "inner" && "mt-card-inner",
+        classes.root,
+        className,
+      )}
+      style={{ ...tokenStyles(tokens), ...css.root, ...style }}
+    >
+      {hasHeader && (
+        <div
+          className={cn("mt-card-header", classes.header)}
+          style={css.header}
+        >
+          {collapsible && (
+            <button
+              type="button"
+              className="mt-card-collapse-toggle"
+              aria-label={toggleLabel}
+              aria-expanded={!isCollapsed}
+              aria-controls={contentId}
+              onClick={() => {
+                const next = !isCollapsed;
+                if (collapsed === undefined) setLocalCollapsed(next);
+                onCollapsedChange?.(next);
+              }}
+            >
+              <ChevronDown size={16} aria-hidden="true" />
+            </button>
+          )}
+          {hasContent(title) && (
+            <div
+              className={cn("mt-card-title", classes.title)}
+              style={css.title}
+            >
+              {title}
+            </div>
+          )}
+          {hasContent(extra) && (
+            <div
+              className={cn("mt-card-extra", classes.extra)}
+              style={css.extra}
+            >
+              {extra}
+            </div>
+          )}
+        </div>
+      )}
+      {collapsible ? (
+        <div
+          id={contentId}
+          className="mt-card-collapse-content"
+          hidden={isCollapsed}
+        >
+          {cardContent}
+        </div>
+      ) : (
+        cardContent
       )}
     </div>
   );
