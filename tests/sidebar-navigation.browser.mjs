@@ -39,12 +39,18 @@ const groupSpacing = (groups) =>
       Number.parseFloat(getComputedStyle(element).marginTop),
     ),
   );
-const groupStartInset = (group) =>
-  group.evaluate(
+const assertGroupStartInset = async (group) => {
+  const inset = await group.evaluate(
     (element) =>
       element.getBoundingClientRect().top -
       element.parentElement.getBoundingClientRect().top,
   );
+  // Firefox can report tiny floating-point differences between DOMRect positions.
+  assert.ok(
+    Math.abs(inset - 12) < 0.01,
+    `Sidebar padding stays 12px (got ${inset}px)`,
+  );
+};
 const alignment = (row) =>
   row.evaluate((element) => {
     const center = (rect) => rect.top + rect.height / 2;
@@ -102,11 +108,7 @@ try {
         `${name}: only groups at the top of sidebar navigation lose extra margin`,
       );
       for (const groups of [directGroups, wrappedGroups]) {
-        assert.equal(
-          await groupStartInset(groups.first()),
-          12,
-          "Sidebar padding stays 12px",
-        );
+        await assertGroupStartInset(groups.first());
       }
 
       const docs = await browser.newPage({
@@ -176,7 +178,7 @@ try {
       await admin.getByRole("button", { name: "收起侧边栏" }).press("Enter");
       assert.equal(await admin.getAttribute("data-collapsed"), "true");
       assert.deepEqual(await groupSpacing(wrappedGroups), [0, 12]);
-      assert.equal(await groupStartInset(wrappedGroups.first()), 12);
+      await assertGroupStartInset(wrappedGroups.first());
       assert.equal(
         await wrappedGroups
           .nth(1)
