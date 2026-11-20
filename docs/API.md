@@ -29,7 +29,7 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 
 ## Buttons and forms
 
-- `Button`: `variant` solid/outline/soft/ghost, `size` sm/md/lg, `danger`, `loading`, `icon`, native/Base UI button props and ref. Loading disables actions.
+- `Button`: `variant` blue/solid/outline/soft/ghost, `size` sm/md/lg, `danger`, `loading`, `icon`, `leftSection`, `rightSection`, native/Base UI button props and ref. The optional sections accept React nodes and follow logical inline start/end (flipped in RTL); a supplied `leftSection` takes precedence over the legacy `icon`. Loading disables actions, displays a spinner instead of the leading content, and keeps the trailing section.
 - `IconButton`: Button props plus required `aria-label`.
 - `ButtonGroup`: group wrapper.
 - `Input`: native input attributes, native ref and `onChange(event)`, with `prefix`, `suffix`, `allowClear`, character counts and appearance options. `Input.Search`, `Input.Password`, `Input.TextArea` and `Input.OTP` are subcomponents; `SearchInput` and `Textarea` remain compatibility exports. See [Input family](#input-family).

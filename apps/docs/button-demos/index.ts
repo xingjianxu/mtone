@@ -6,6 +6,8 @@ import Demo2 from "./button-state";
 import source2 from "./button-state.tsx?raw";
 import Demo3 from "./button-blue";
 import source3 from "./button-blue.tsx?raw";
+import SectionsDemo from "./button-sections";
+import sectionsSource from "./button-sections.tsx?raw";
 
 export const buttonDocSections = [
   {
@@ -13,6 +15,12 @@ export const buttonDocSections = [
     title: "外观",
     Demo: Demo0,
     source: source0.replace("../../../packages/mtone/src", "@bixlab/mtone"),
+  },
+  {
+    id: "button-sections",
+    title: "左右内容",
+    Demo: SectionsDemo,
+    source: sectionsSource.replace("../../../packages/mtone/src", "@bixlab/mtone"),
   },
   {
     id: "danger",

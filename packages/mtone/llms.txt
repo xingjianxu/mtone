@@ -894,20 +894,40 @@ export default function Demo() {
 - size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
 - danger: boolean. 危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。
 - loading: boolean. 显示加载图标并禁用点击。
-- icon: ReactNode. 前置图标。
+- icon: ReactNode. 旧版前置图标；未传 leftSection 时使用。
+- leftSection: ReactNode. 文字前的内容，可放图标或装饰；优先于 icon，传 null 可隐藏旧图标。
+- rightSection: ReactNode. 文字后的内容，可放图标或装饰；加载期间仍显示。
 - disabled: boolean. 禁用按钮。
 - onClick: MouseEventHandler. 点击回调。
 - children: ReactNode. 组件内容。
-- 支持 ref 和 Base UI Button 的可组合属性。加载中不会重复触发操作。
+- 支持 ref 和 Base UI Button 的可组合属性。加载中显示前置加载图标并禁用按钮，右侧内容不变。
+- 左右内容按阅读方向排列，在 RTL 中自动对调。传入内容的一侧使用更紧凑的内边距；装饰图标可标记 aria-hidden。
 - blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。
 
 ```tsx
+import React from "react";
+import { ArrowRight, Download, Image } from "lucide-react";
 import { Button } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <Button variant="blue">启用两步验证</Button>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <Button leftSection={<Image size={14} aria-hidden="true" />}>图库</Button>
+      <Button
+        variant="solid"
+        rightSection={<Download size={14} aria-hidden="true" />}
+      >
+        下载
+      </Button>
+      <Button
+        variant="soft"
+        leftSection={<Image size={14} aria-hidden="true" />}
+        rightSection={<ArrowRight size={14} aria-hidden="true" />}
+      >
+        查看图库
+      </Button>
+    </div>
   );
 }
 ```

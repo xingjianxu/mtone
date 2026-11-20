@@ -94,7 +94,14 @@ export type ButtonProps = Omit<
   danger?: boolean;
   loading?: boolean;
   icon?: React.ReactNode;
+  /** Content before the label (inline start). When omitted, icon is used. */
+  leftSection?: React.ReactNode;
+  /** Content after the label (inline end), including while loading. */
+  rightSection?: React.ReactNode;
 };
+function hasButtonSection(section: React.ReactNode) {
+  return section != null && typeof section !== "boolean" && section !== "";
+}
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
@@ -103,6 +110,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       danger,
       loading,
       icon,
+      leftSection,
+      rightSection,
       children,
       className,
       disabled,
@@ -110,6 +119,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) {
+    const leading = loading ? (
+      <LoaderCircle className="mt-spin" size={14} aria-hidden="true" />
+    ) : leftSection === undefined ? (
+      icon
+    ) : (
+      leftSection
+    );
     return (
       <BaseButton
         {...props}
@@ -124,8 +140,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className,
         )}
       >
-        {loading ? <LoaderCircle className="mt-spin" size={14} /> : icon}
+        {hasButtonSection(leftSection) ? (
+          <span className="mt-btn-section mt-btn-section-start">{leading}</span>
+        ) : (
+          leading
+        )}
         {children}
+        {hasButtonSection(rightSection) && (
+          <span className="mt-btn-section mt-btn-section-end">{rightSection}</span>
+        )}
       </BaseButton>
     );
   },

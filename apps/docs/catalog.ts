@@ -2142,7 +2142,7 @@ export const componentDocs: ComponentDoc[] = [
     category: "操作命令",
     description: "带完整样式的基础操作按钮。",
     importNames: ["Button"],
-    code: 'import { Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Button variant="blue">启用两步验证</Button>\n  );\n}',
+    code: "import React from \"react\";\nimport { ArrowRight, Download, Image } from \"lucide-react\";\nimport { Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <div style={{ display: \"flex\", gap: 8, flexWrap: \"wrap\" }}>\n      <Button leftSection={<Image size={14} aria-hidden=\"true\" />}>图库</Button>\n      <Button\n        variant=\"solid\"\n        rightSection={<Download size={14} aria-hidden=\"true\" />}\n      >\n        下载\n      </Button>\n      <Button\n        variant=\"soft\"\n        leftSection={<Image size={14} aria-hidden=\"true\" />}\n        rightSection={<ArrowRight size={14} aria-hidden=\"true\" />}\n      >\n        查看图库\n      </Button>\n    </div>\n  );\n}",
     props: [
       {
         name: "variant",
@@ -2169,7 +2169,17 @@ export const componentDocs: ComponentDoc[] = [
       {
         name: "icon",
         type: "ReactNode",
-        description: "前置图标。",
+        description: "旧版前置图标；未传 leftSection 时使用。",
+      },
+      {
+        name: "leftSection",
+        type: "ReactNode",
+        description: "文字前的内容，可放图标或装饰；优先于 icon，传 null 可隐藏旧图标。",
+      },
+      {
+        name: "rightSection",
+        type: "ReactNode",
+        description: "文字后的内容，可放图标或装饰；加载期间仍显示。",
       },
       {
         name: "disabled",
@@ -2188,7 +2198,8 @@ export const componentDocs: ComponentDoc[] = [
       },
     ],
     notes: [
-      "支持 ref 和 Base UI Button 的可组合属性。加载中不会重复触发操作。",
+      "支持 ref 和 Base UI Button 的可组合属性。加载中显示前置加载图标并禁用按钮，右侧内容不变。",
+      "左右内容按阅读方向排列，在 RTL 中自动对调。传入内容的一侧使用更紧凑的内边距；装饰图标可标记 aria-hidden。",
       "blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。",
     ],
   },
