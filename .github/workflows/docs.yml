@@ -80,6 +80,7 @@ jobs:
           for browser in chromium firefox webkit; do
             BROWSER=$browser node tests/list.browser.mjs
           done
+          node tests/data-list.browser.mjs
       - name: Typography navigation browser regressions
         run: |
           for browser in chromium firefox webkit; do

@@ -20,6 +20,7 @@ import type { DocSection } from "./doc-section";
 import { inputDocSections } from "./input-demos";
 import { buttonDocSections } from "./button-demos";
 import { tableDocSections } from "./table-example";
+import { dataListDocSections } from "./data-list-demos";
 import { secondaryDocSections } from "./secondary-demo-registry";
 import { inlineDocSections } from "./inline-demo-registry";
 import { ShowcasePage } from "./showcase-page";
@@ -113,7 +114,7 @@ function DocDemo({ item, level }: { item: DocSection; level: number }) {
     {item.children?.map((child) => <DocDemo key={child.id} item={child} level={level + 1} />)}
   </section>;
 }
-export const docSections: Record<string, readonly DocSection[]> = { ...inlineDocSections, ...secondaryDocSections, Input: inputDocSections, Button: buttonDocSections, Table: tableDocSections };
+export const docSections: Record<string, readonly DocSection[]> = { ...inlineDocSections, ...secondaryDocSections, Input: inputDocSections, Button: buttonDocSections, Table: tableDocSections, DataList: dataListDocSections };
 
 function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }) {
   const sections = docSections[doc.name] ?? [];

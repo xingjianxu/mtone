@@ -1,5 +1,6 @@
 import { InputExample } from "./input-example";
 import { ListExample } from "./list-example";
+import LocalDataListDemo from "./data-list-demos/local";
 import { BreadcrumbExample } from "./breadcrumb-example";
 import { ProgressExamples } from "./ProgressExamples";
 import { FieldsetExample } from "./fieldset-example";
@@ -607,6 +608,15 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <span>归档</span>
         </div>
       );
+    case "DataList":
+      return compact ? (
+        <M.DataList
+          aria-label="文档管理预览"
+          items={documents.slice(0, 2)}
+          getKey={(item) => item.id}
+          renderItem={(item) => <M.Text>{item.title}</M.Text>}
+        />
+      ) : <LocalDataListDemo />;
     case "List":
       return <ListExample compact={compact} />;
     case "ListItem":

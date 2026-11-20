@@ -75,6 +75,7 @@ const expected: Record<string, string[]> = {
     "Paragraph",
     "Link",
     "List",
+    "DataList",
     "ListItem",
     "DocumentList",
     "DocumentCard",

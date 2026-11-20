@@ -4679,6 +4679,53 @@ export default function Demo() {
     ],
   },
   {
+    name: "DataList",
+    category: "数据展示",
+    description: "用于管理记录的列表，支持搜索筛选、分页、跨页选择、批量操作和行详情。",
+    importNames: ["DataList"],
+    code: `import { DataList, Text } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+const records = [
+  { id: "guide", title: "知识库使用指南" },
+  { id: "notes", title: "研究笔记" },
+];
+
+export default function Demo() {
+  return (
+    <DataList
+      aria-label="文档列表"
+      items={records}
+      getKey={(item) => item.id}
+      getLabel={(item) => item.title}
+      renderItem={(item) => <Text>{item.title}</Text>}
+      search={{ match: (item, query) => item.title.includes(query) }}
+      pagination={{ pageSize: 10 }}
+    />
+  );
+}`,
+    props: [
+      { name: "items / getKey", type: "readonly T[] / (item: T) => string | number", description: "必填。提供数据与稳定唯一的条目键（字符串或有限数值）；远程模式只传当前页记录。" },
+      { name: "getLabel", type: "(item: T) => string", description: "为条目选择和展开按钮提供可读名称；省略时使用键的字符串。" },
+      { name: "renderItem", type: "(item: T, index: number) => ReactNode", description: "必填。仅返回行内容；index 是从 0 开始的当前页索引，不要返回 li 或 ListItem。" },
+      { name: "search", type: "{ value?, defaultValue?, onChange?, placeholder?, label?, match? }", description: "传入后显示搜索框。match(item, query) 用于本地搜索，query 已去掉首尾空白；未传 match 时不自动筛选。" },
+      { name: "filter / filters / toolbar", type: "((item: T) => boolean) / ReactNode / ReactNode", description: "本地筛选条件、筛选控件与工具栏内容。远程模式只呈现应用提供的结果，不执行本地条件。" },
+      { name: "pagination", type: "DataListPagination", description: "省略时不分页。本地配置为 { mode?: 'local', page?, defaultPage?, pageSize?, onPageChange? }，默认第 1 页、每页 10 条；远程配置为 { mode: 'remote', page, pageSize, total, onPageChange }。" },
+      { name: "selection", type: "{ selectedKeys?, defaultSelectedKeys?, onChange?, getDisabled? }", description: "启用选择。使用稳定键保留跨页选择；全选或取消全选只影响当前页的可选条目。" },
+      { name: "expansion", type: "{ expandedKeys?, defaultExpandedKeys?, onChange?, isExpandable?, renderDetail }", description: "启用行详情；renderDetail(item) 返回详情内容。展开不会改变选中状态。" },
+      { name: "renderActions", type: "(item: T) => ReactNode", description: "行尾操作；业务行为由应用处理，不会触发隐式选中。" },
+      { name: "renderBatchActions", type: "({ selectedKeys, clearSelection }) => ReactNode", description: "已选时渲染批量操作；clearSelection() 清除全部选中键，包括其他页。" },
+      { name: "loading / empty", type: "boolean / ReactNode", description: "加载状态与空内容；请求、错误和记录更新由应用处理。" },
+      { name: "原生属性", type: "HTMLAttributes<HTMLElement>", description: "转发 section 根元素属性，例如 aria-label、className、style；行由 renderItem 提供。" },
+    ],
+    notes: [
+      "DataList 用于行内容由应用渲染的数据管理页。仅需基础列表、分组吸顶或虚拟滚动时，使用 List。",
+      "本地搜索与筛选先于分页。输入搜索词会请求回到第 1 页；本地结果缩小时限制页码范围。",
+      "远程模式不会过滤或再次切分 items。应用提供当前页记录、总数、加载及错误状态，管理请求取消；外部筛选变化时由应用重置页码。",
+      "目前不提供卡片网格、内联编辑或虚拟滚动。过滤和翻页后若需批量修改，应按键操作，不以当前页的条目数组为准。",
+    ],
+  },
+  {
     name: "ListItem",
     category: "数据展示",
     description: "包含图标、说明与尾部操作的列表项。",

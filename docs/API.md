@@ -168,6 +168,44 @@ For controlled drag sorting, render `List.SortHandle` first in each data-row fle
 
 See [List examples and full API](https://xingjianxu.github.io/mtone/#/components/List).
 
+## DataList
+
+`DataList<T>` composes the existing `List` for managing records without changing
+the base list contract. Provide `items: readonly T[]`, stable unique
+`getKey(item): string | number`, and `renderItem(item, index)` (content only, not
+a `ListItem` or `li`; the index is zero-based within the current page). Use
+`getLabel(item)` for readable selection and disclosure names; it defaults to
+the key as a string. Numeric keys must be finite. The root accepts section attributes such as `aria-label`,
+`className` and `style`.
+
+- `search` enables a search input. Use `value` with `onChange` for controlled
+  search or `defaultValue` for the initial query. Set `placeholder`/`label` and
+  a local `match(item, query)` predicate if needed. The local predicate receives
+  a trimmed query. Without `match`, the input does not filter the records.
+  `filter(item)` applies another local predicate; use `filters` to render filter
+  controls and `toolbar` to supply other controls or context.
+- `pagination` is optional. Local mode applies search and filters before paging;
+  `page`/`defaultPage`, `pageSize` (default 10) and `onPageChange` configure it.
+  Local results clamp to the available page range. Editing the search requests
+  page 1. For `mode: "remote"`, supply controlled `page`, `pageSize`, `total`,
+  `onPageChange` and the current page of `items`. DataList neither slices nor
+  filters those items. The application resets the page when external filters
+  change.
+- `selection` provides row checkboxes and select-all for enabled items on the
+  current page; `selectedKeys`/`defaultSelectedKeys`, `onChange` and
+  `getDisabled(item)` configure it. Selection is keyed across pages.
+  `renderBatchActions({ selectedKeys, clearSelection })` provides an optional
+  bulk-action area; clearing it clears keys on other pages too.
+- `expansion` requires `renderDetail(item)` and optionally accepts
+  `expandedKeys`/`defaultExpandedKeys`, `onChange` and `isExpandable(item)`.
+  `renderActions(item)` provides row-level controls; neither they nor the
+  disclosure button implicitly select the row.
+- `loading` and `empty` customize states. For remote mode, the application owns
+  fetching, cancellation and error handling. This version has no built-in grid,
+  editing or virtualization.
+
+See [local and remote examples](https://xingjianxu.github.io/mtone/#/components/DataList).
+
 ## Progress
 
 `value` is normalized to 0–100. `type` is `line` (default), `circle` or `dashboard`;
