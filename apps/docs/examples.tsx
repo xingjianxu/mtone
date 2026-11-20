@@ -1,3 +1,4 @@
+import QuestionnaireExample from "./secondary-demos/questionnaire-usage";
 import { InputExample } from "./input-example";
 import { ListExample } from "./list-example";
 import { BreadcrumbExample } from "./breadcrumb-example";
@@ -236,6 +237,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           {output}
         </div>
       );
+    case "Questionnaire":
+      return <QuestionnaireExample />;
     case "Input":
       return <InputExample compact={compact} />;
     case "SearchInput":

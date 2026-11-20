@@ -71,7 +71,7 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, SearchInput, Textarea, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
+import { MtoneProvider, MtoneScope, Input, SearchInput, Textarea, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, Questionnaire, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert.equal(Input.Search, SearchInput);
 assert.match(renderToStaticMarkup(createElement(List.SortHandle, {'aria-label':'Sort'})), /mt-list-sort-handle/);
@@ -105,6 +105,7 @@ assert.equal(Mention, Mentions);
 assert(renderToStaticMarkup(createElement(Transfer,{items:[{key:'a',label:'Transfer item'}]})).includes('Transfer item'));
 assert(renderToStaticMarkup(createElement(Cascader,{options:[{value:'a',label:'Alpha'}],defaultValue:['a']})).includes('Alpha'));
 assert(renderToStaticMarkup(createElement(CascaderPanel,{options:[{value:'a',label:'Alpha'}]})).includes('Alpha'));
+assert(renderToStaticMarkup(createElement(Questionnaire,{items:[{id:'notes',type:'text',title:'Package questionnaire'}],onSubmit:()=>{}})).includes('Package questionnaire'));
 assert(renderToStaticMarkup(createElement(AutoComplete,{defaultValue:'free',options:[{value:'suggestion'}]})).includes('free'));
 assert.equal(Typography.Text, Text);
 assert(renderToStaticMarkup(createElement(Title,{level:2},'Title')).includes('<h2'));
@@ -142,7 +143,7 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
+    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef } from '@bixlab/mtone';
 // @ts-expect-error The former component and its props are no longer exported.
 import { Layout, type LayoutProps } from '@bixlab/mtone';
 const tagProps: TagSelectProps = {options:[{value:'one',label:'Release tag'}],selectAll:true,value:['one'],onValueChange: value => { const selected: string[] = value; }};
@@ -221,6 +222,8 @@ const cascaderOptions: CascaderOption[] = [{value:"a",label:"Alpha"}];
 const cascaderPath: CascaderPath = ["a"];
 export const cascaderDemo = <Cascader options={cascaderOptions} value={cascaderPath} onValueChange={path=>path.map(String)} />;
 export const cascaderMultiple = <CascaderPanel options={cascaderOptions} multiple value={[cascaderPath]} onValueChange={paths=>paths.map(path=>path.map(String))} />;
+const questionnaireItems: QuestionnaireItem[] = [{id:"topic",type:"single",title:"Topic",required:true,choices:[{value:"docs",label:"Docs"}],other:{label:"Other"}}];
+export const questionnaireDemo = <Questionnaire items={questionnaireItems} onSubmit={(answers: QuestionnaireAnswers) => { if (answers.topic?.type === "choice") answers.topic.value.toUpperCase(); }} />;
 export const autoCompleteDemo = <AutoComplete options={[{value:"a"}]} onChange={v=>v.toUpperCase()} />;
 const mentionsRef = createRef<MentionsRef>();
 export const mentionDemo = <Mentions ref={mentionsRef} prefix={["@","#"]} options={[{value:"alice"}]} onChange={value=>value.toUpperCase()} onSelect={(option,prefix)=>console.log(option.value,prefix)} autoSize={{minRows:2,maxRows:5}} />;

@@ -36,6 +36,14 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 - `Form`: native form props plus managed values and validation through `Form.useForm()`, `form`, `initialValues`, named `Form.Item` fields and `rules`. Use `onFinish` for valid values and `onFinishFailed` for validation errors; `onSubmit` remains available. See the installed declarations for the supported rule and trigger contracts.
 - `FormField`: `label`, `error`, `description`, `required`, one input child. Associates label/error with cloned child's id and ARIA attributes. Use direct label props for compound selectors rather than wrapping them as a native input.
 
+## Questionnaire
+
+`Questionnaire` receives an ordered `items` array. Every item has a unique, stable `id`, a `title`, and optional `description` and `required`. Item types are `single` and `multiple` (both take unique-value `choices`) or `text` (freeform). Single-choice items can add `other: { label?, placeholder? }` as an exclusive text answer.
+
+Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for controlled drafts. Answers are keyed by item id and use tagged shapes: `{type:"choice",value}`, `{type:"choices",values}`, or `{type:"text",value}`. Back preserves drafts. Explicit Skip clears that optional item's draft and omits it from submission. Unanswered optional items are also omitted; text is trimmed and choices are validated and ordered on submit.
+
+`onSubmit` accepts synchronous or asynchronous handling. Pending submission locks the controls; a rejection allows retry. Success shows a completion message; remount with a new React key to start another questionnaire. The component does not create a native form or persist, transmit, or branch answers itself. `submitLabel` sets the final action's label.
+
 ## Selection
 
 `Option = { value: string; label: ReactNode; disabled?: boolean }`.

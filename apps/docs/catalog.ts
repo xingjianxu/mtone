@@ -27,6 +27,48 @@ export type ComponentDoc = {
 };
 export const componentDocs: ComponentDoc[] = [
 {
+  "name": "Questionnaire",
+  "category": "数据录入",
+  "description": "逐题填写的多步问卷，支持单选、多选、自由文本、其他答案、必答校验和跳过。",
+  "importNames": [
+    "Questionnaire"
+  ],
+  "code": "import { Questionnaire } from \"@bixlab/mtone\";\n\n<Questionnaire\n  items={[\n    { id: \"topic\", type: \"single\", title: \"选择主题\", required: true,\n      choices: [{ value: \"docs\", label: \"文档\" }], other: { label: \"其他\" } },\n    { id: \"notes\", type: \"text\", title: \"还有什么建议？\" },\n  ]}\n  onSubmit={(answers) => console.log(answers)}\n/>",
+  "props": [
+    {
+      "name": "items",
+      "type": "readonly QuestionnaireItem[]",
+      "description": "有序问题：id、title、description、required；type 为 single、multiple 或 text。选项题传 choices；单选可传 other。"
+    },
+    {
+      "name": "answers / defaultAnswers",
+      "type": "QuestionnaireAnswers",
+      "description": "按问题 id 索引的受控或初始答案。"
+    },
+    {
+      "name": "onAnswersChange",
+      "type": "(answers: QuestionnaireAnswers) => void",
+      "description": "输入、选项变化或显式跳过时收到完整草稿。"
+    },
+    {
+      "name": "onSubmit",
+      "type": "(answers: QuestionnaireAnswers) => void | Promise<void>",
+      "description": "末题通过校验时收到有效答案；异步失败后可重试。"
+    },
+    {
+      "name": "submitLabel",
+      "type": "ReactNode",
+      "description": "最终提交按钮内容。"
+    }
+  ],
+  "notes": [
+    "答案为 {type:\"choice\",value}、{type:\"choices\",values} 或 {type:\"text\",value}。提交文本会去除首尾空白，多选按选项顺序返回。",
+    "必答题不能跳过；选答题可留空，显式跳过清除本题草稿。上一题不会清除答案。",
+    "问题 id 在问卷内必须唯一且稳定，选项 value 在本题内必须唯一。已提交后保留完成提示；开始新问卷时以不同 React key 挂载。",
+    "组件不处理保存、传输和条件分支；由调用方在 onSubmit 中处理。"
+  ]
+},
+{
   "name": "TreeSelect",
   "category": "数据录入",
   "description": "在紧凑输入框中选择树形数据，支持单选、多选勾选、搜索和异步展开。",

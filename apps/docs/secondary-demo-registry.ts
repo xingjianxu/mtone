@@ -1,3 +1,5 @@
+import Questionnaire from "./secondary-demos/questionnaire-usage";
+import QuestionnaireSource from "./secondary-demos/questionnaire-usage.tsx?raw";
 import type { DocSection } from "./doc-section";
 import Mentions0 from "./secondary-demos/mentions-usage";
 import Mentions0Source from "./secondary-demos/mentions-usage.tsx?raw";
@@ -500,6 +502,14 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       title: "悬停打开",
       Demo: Menubar2,
       source: source(Menubar2Source),
+    },
+  ],
+  Questionnaire: [
+    {
+      id: "usage",
+      title: "多步问卷",
+      Demo: Questionnaire,
+      source: source(QuestionnaireSource),
     },
   ],
   AutoComplete: [

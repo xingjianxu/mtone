@@ -47,3 +47,5 @@ export * from "./fieldset";
 export * from "./tree-select";
 
 export * from "./tag-select";
+
+export * from "./questionnaire";

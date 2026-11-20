@@ -35,6 +35,7 @@ const expected: Record<string, string[]> = {
     "Segmented",
   ],
   数据录入: [
+    "Questionnaire",
     "Cascader",
     "CascaderPanel",
     "Transfer",
