@@ -10,7 +10,7 @@ import {
 export function MenubarExample() {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [sidebar, setSidebar] = useState(true);
-  const [density, setDensity] = useState("compact");
+  const [sortOrder, setSortOrder] = useState("name");
   const [notice, setNotice] = useState("选择菜单命令，或用方向键浏览。");
   const menus: MenubarMenu[] = [
     {
@@ -111,13 +111,13 @@ export function MenubarExample() {
         { type: "divider", key: "separator" },
         {
           type: "radio-group",
-          key: "density",
-          label: "内容密度",
-          value: density,
-          onValueChange: setDensity,
+          key: "sortOrder",
+          label: "排列方式",
+          value: sortOrder,
+          onValueChange: setSortOrder,
           children: [
-            { key: "compact", label: "紧凑" },
-            { key: "comfortable", label: "舒适" },
+            { key: "name", label: "名称" },
+            { key: "modified", label: "修改时间" },
           ],
         },
       ],
@@ -151,8 +151,8 @@ export function MenubarExample() {
           <Text>{notice}</Text>
           <br />
           <Text muted>
-            侧边栏：{sidebar ? "显示" : "隐藏"} · 密度：
-            {density === "compact" ? "紧凑" : "舒适"}
+            侧边栏：{sidebar ? "显示" : "隐藏"} · 排列：
+            {sortOrder === "name" ? "名称" : "修改时间"}
           </Text>
         </div>
       </section>

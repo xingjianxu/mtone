@@ -12,7 +12,7 @@
   --mt-input-height: 24px;
 }
 .mt-input-wrap.mt-input-size-md {
-  --mt-input-height: var(--mt-height, 28px);
+  --mt-input-height: var(--mt-height, 34px);
 }
 .mt-input-wrap.mt-input-size-lg {
   --mt-input-height: 36px;

@@ -7,9 +7,9 @@ let browser;
 try {
   browser = await chromium.launch({ ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}), headless: true });
   const page = await browser.newPage();
-  for (const width of [900, 360]) for (const density of ["compact", "comfortable"]) for (const mode of ["normal", "long", "empty", "wrap"]) {
+  for (const width of [900, 360]) for (const theme of ["light", "dark"]) for (const mode of ["normal", "long", "empty", "wrap"]) {
     await page.setViewportSize({ width, height: 800 });
-    await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?mode=${mode}&density=${density}`);
+    await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?mode=${mode}&theme=${theme}`);
     const dialog = page.getByRole("dialog");
     await dialog.waitFor();
     const result = await dialog.evaluate((el) => {
@@ -28,7 +28,7 @@ try {
       const topInset = header.top - box.top - parseFloat(getComputedStyle(el).borderTopWidth);
       return { topInset, gaps, groupGaps, delta: Math.abs((title.top + title.bottom - close.top - close.bottom) / 2), right: box.right, left: box.left, overflow: el.scrollWidth > el.clientWidth, closeInside: close.left >= box.left && close.right <= box.right, titleGap: close.left - title.right };
     });
-    console.log({ width, density, mode, ...result });
+    console.log({ width, theme, mode, ...result });
     assert.equal(result.topInset, 12, "Modal top padding");
     assert(result.left >= 0 && result.right <= width && !result.overflow && result.closeInside, "Responsive containment");
     if (mode !== "empty") {

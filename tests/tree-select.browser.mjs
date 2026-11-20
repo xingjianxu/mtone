@@ -11,7 +11,7 @@ try{for(const [name,engine] of Object.entries({chromium,firefox,webkit})){
  const single=page.getByRole('combobox',{name:'Single',exact:true});
  // createRoot commits asynchronously; wait for the keyboard target before Tab.
  await expect(single).toBeVisible();await expect(single).toBeEnabled();await page.keyboard.press('Tab');await expect(single).toBeFocused();
- await expect(page.locator('.mt-tree-select').first()).toHaveCSS('height','28px');await expect(page.locator('.mt-tree-select').first()).toHaveCSS('border-top-color','rgb(147, 180, 220)');
+ await expect(page.locator('.mt-tree-select').first()).toHaveCSS('height','34px');await expect(page.locator('.mt-tree-select').first()).toHaveCSS('border-top-color','rgb(147, 180, 220)');
  await single.press('ArrowDown');await expect(page.getByRole('treeitem',{name:'Team',exact:true})).toBeFocused();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await expect(single).toHaveText('Alice');await expect(single).toBeFocused();
  await page.getByRole('button',{name:'Clear selection',exact:true}).click();await expect(single).toHaveText('Select…');
  const multi=page.getByRole('combobox',{name:'Multiple',exact:true});await multi.click();await page.getByRole('searchbox').fill('Alice');await page.getByRole('checkbox',{name:'Team',exact:true}).click();await expect(multi).toHaveText('1 selected');

@@ -49,7 +49,7 @@ try {
     assert.equal(
       results.length,
       14,
-      "Expected both densities and all width/state cases",
+      "Expected both themes and all width/state cases",
     );
     for (const r of results) {
       assert.equal(r.width, 16, `${r.label} icon width`);
@@ -63,13 +63,13 @@ try {
   await check();
   assert(
     await page
-      .getByRole("combobox", { name: "compact-100", exact: true })
+      .getByRole("combobox", { name: "light-100", exact: true })
       .locator(".mt-select-value")
       .evaluate((el) => el.scrollWidth > el.clientWidth),
     "Long value should truncate within narrow trigger",
   );
   await page
-    .getByRole("combobox", { name: "compact-160", exact: true })
+    .getByRole("combobox", { name: "light-160", exact: true })
     .click();
   await page.getByRole("listbox").waitFor();
   const checkSelection = async () => {
@@ -121,31 +121,31 @@ try {
   await page.getByRole("option", { name: "Short", exact: true }).click();
   assert.equal(
     await page
-      .getByRole("combobox", { name: "compact-160", exact: true })
+      .getByRole("combobox", { name: "light-160", exact: true })
       .innerText(),
     "Short",
   );
   await check();
   await page
-    .getByRole("combobox", { name: "compact-160", exact: true })
+    .getByRole("combobox", { name: "light-160", exact: true })
     .click();
   await page.getByRole("listbox").waitFor();
   await checkSelection();
   await page.keyboard.press("Escape");
   await page.getByRole("listbox").waitFor({state:"hidden"});
-  await page.getByRole("combobox", {name:"comfortable-160", exact:true}).click();
+  await page.getByRole("combobox", {name:"dark-160", exact:true}).click();
   await page.getByRole("listbox").waitFor();
   await checkSelection();
   await page.keyboard.press("Escape");
   await page.getByRole("listbox").waitFor({state:"hidden"});
   assert.equal(
     await page
-      .getByRole("combobox", { name: "compact-disabled", exact: true })
+      .getByRole("combobox", { name: "light-disabled", exact: true })
       .isDisabled(),
     true,
   );
-  for (const density of ["compact", "comfortable"]) {
-    const field = page.locator(`.multi-${density}`);
+  for (const theme of ["light", "dark"]) {
+    const field = page.locator(`.multi-${theme}`);
     const trigger = field.getByRole("button", { name: "展开选项" });
     const arrow = await trigger.evaluate(el => {
       const b=el.getBoundingClientRect(), svg=el.querySelector("svg"), s=svg.getBoundingClientRect();
@@ -168,18 +168,18 @@ try {
     await field.getByRole("button",{name:"移除 Beta",exact:true}).click();
     assert.equal(await field.getByRole("button",{name:"移除 Beta",exact:true}).count(),0);
     for (const type of ["check","mixed"]) {
-      const control = field.getByRole("checkbox",{name:`${density}-${type}`});
+      const control = field.getByRole("checkbox",{name:`${theme}-${type}`});
       const geometry = await control.evaluate(el => {
         const b=el.getBoundingClientRect(), svg=el.querySelector("svg"), s=svg.getBoundingClientRect();
         return {w:s.width,h:s.height,delta:Math.abs((s.top+s.bottom-b.top-b.bottom)/2),stroke:svg.getAttribute("stroke-width")};
       });
       assert.deepEqual(geometry,{w:12,h:12,delta:0,stroke:"1.5"});
     }
-    assert(await page.getByRole("combobox",{name:`${density}-multi-disabled`}).isDisabled());
+    assert(await page.getByRole("combobox",{name:`${theme}-multi-disabled`}).isDisabled());
   }
-  for (const density of ["compact", "comfortable"]) {
-    const field = page.locator(`.date-${density}`);
-    const input = field.getByLabel(`${density}-date`, {exact:true});
+  for (const theme of ["light", "dark"]) {
+    const field = page.locator(`.date-${theme}`);
+    const input = field.getByLabel(`${theme}-date`, {exact:true});
     await input.scrollIntoViewIfNeeded();
     assert.equal(await field.locator(".mt-date-icon, .mt-date-field svg").count(), 0);
     const box = await input.boundingBox();
@@ -191,7 +191,7 @@ try {
     assert.equal(await input.inputValue(),"");
     assert.equal(await input.getAttribute("type"),"date");
     assert.equal(await input.getAttribute("min"),"2026-01-01");
-    assert(await page.getByLabel(`${density}-date-disabled`,{exact:true}).isDisabled());
+    assert(await page.getByLabel(`${theme}-date-disabled`,{exact:true}).isDisabled());
   }
   console.log("Select geometry, open, selection and disabled checks passed");
 } finally {

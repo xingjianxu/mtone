@@ -28,7 +28,7 @@ try {
         assert.equal(bounds[1].start, "0px");
         assert.equal(bounds[1].end, "0px");
         assert.equal(bounds[2].end, "4px");
-        assert.equal(bounds[0].height, 28);
+        assert.equal(bounds[0].height, 34);
         assert.equal(dir === "ltr" ? bounds[0].right - bounds[1].left : bounds[1].right - bounds[0].left, 1);
         await buttons.nth(1).focus();
         await expect(buttons.nth(1)).toHaveCSS("z-index", "2");

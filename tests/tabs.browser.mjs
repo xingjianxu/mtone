@@ -111,7 +111,7 @@ try {
       }
       await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "28px");
       await expect(page.getByRole("tab", {name:"Line tab", exact:true})).toHaveCSS("padding-top", "9px");
-      await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "28px");
+      await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
       await page.getByTestId("editable-card-medium-top").screenshot({path:`artifacts/tabs-browser/${name}-compact-card.png`});
       if (errors.length) throw Error(errors.join("\n"));
       console.log(`${name}: Tabs passed`);

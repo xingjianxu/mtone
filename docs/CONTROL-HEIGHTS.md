@@ -1,46 +1,42 @@
 # Single-line control heights
 
-The compact defaults align input, selection and filter controls at **28 CSS px**.
-This is the rendered outer **border-box**, including any borders, rather than the
-height of a child input or a `min-height` that grows through padding.
+Default input, selection and filter controls use a unified **34 CSS px** baseline.
+This is the rendered outer **border-box**, including borders, rather than a child input height.
 
-| Surface | Compact default | Comfortable density |
-| --- | --- | --- |
-| Input, SearchInput, DatePicker input | 28px | 36px |
-| Select trigger | 28px | 34px |
-| NumberInput complete group | 28px | 36px |
-| Table column filter input | 28px | 36px |
-| MultiSelect chips/input container | minimum 28px | minimum 28px |
-| FilterChip | 28px | 28px |
+| Surface | Default |
+| --- | --- |
+| Input, SearchInput, DatePicker input | 34px |
+| Select, TreeSelect, Cascader and AutoComplete trigger/input | 34px |
+| NumberInput complete group | 34px |
+| Table column filter input | 34px |
+| MultiSelect chips/input container | minimum 34px |
+| FilterChip | 34px |
+| TagSelect option, expansion trigger and collapsed viewport | 34px |
 
-MultiSelect grows when chips wrap onto additional rows. Do not override it with
-a fixed 28px height: that can hide selected values, removal buttons or the search
-input. Long Select labels remain single-line and use ellipsis. Icons, labels and
-numeric step controls are centered within their available height.
+MultiSelect grows when chips wrap. Do not force a fixed 34px height that hides values,
+removal buttons or the search input. Long Select labels remain single-line with ellipsis.
 
-## Scope and customization
+## Migration and customization
 
-- The change does not impose 28px on Textarea, option lists, native calendar
-  popups, buttons, badges, checkbox/radio controls, switches, sliders or page
-  layout regions. Spotlight inherits the shared Input styling where used.
-- Focus, validation errors and disabled states do not increase the control's
-  outer dimensions. Existing keyboard focus indicators and forced-colors
-  fallbacks remain available.
-- `MtoneProvider density="comfortable"` retains the existing larger single-line
-  variants listed above. This does not introduce a shared `size` prop.
-- Input, SearchInput, DatePicker and Table filter input use the existing
-  `--mt-height` token. Input also accepts native `style` and `className` props.
-  Select, MultiSelect and NumberInput accept `className` for scoped CSS
-  customization. FilterChip has no `className`, `style` or `size` prop; use a
-  scoped host CSS selector targeting `.mt-filter-chip` if customization is
-  required. Consult each component's declared API rather than assuming common
-  props across every control.
+- Remove `density` from `MtoneProvider`; compact/comfortable modes and their DOM
+  attributes are removed. Theme light/dark/system and language remain independent.
+- This describes the current source. Updating the website does not publish npm;
+  consult the installed declarations for an older release.
+- The 34px baseline does not resize typography, icons, Textarea, option lists,
+  calendar popups, badges, checkbox/radio controls, switches, sliders or layout regions.
+  Tabs retain their independent 24/28/32px card size contract.
+- Independent component size variants remain supported. TreeSelect, Cascader and
+  AutoComplete keep 24px small and 34px large variants; their default is now 34px.
+- Focus, errors and disabled states do not increase outer dimensions. Keyboard
+  focus and forced-colors indicators remain available.
+- `--mt-height` controls the shared baseline. Consult each component's declared
+  props before using className/style; FilterChip has no size prop and can be
+  customized through a scoped `.mt-filter-chip` CSS rule.
 
 ## Verification
 
-Browser checks should measure `getBoundingClientRect().height` at default compact
-settings, with pointer and keyboard focus, errors and disabled states. Include a
-narrow viewport and high device scale factor, chip wrapping and long labels.
-Check the comfortable variants separately. CSS pixels remain CSS pixels at high
-DPI; physical screenshot pixels need not equal 28. Retain the input focus and
-interaction regression suites alongside these geometry checks.
+Measure `getBoundingClientRect().height` for default controls with pointer and
+keyboard focus, errors and disabled states. Include a narrow viewport, chip
+wrapping, long labels, and high device scale factor. CSS pixels remain CSS pixels
+at high DPI; physical screenshot pixels need not equal 34. Retain separate size
+variant, focus and interaction regressions.

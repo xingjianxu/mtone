@@ -188,10 +188,10 @@ describe("styled interactive controls", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByRole("button", { name: "Open editor" })).toHaveFocus();
   });
-  it("portals retain the provider theme and density", () => {
+  it("portals retain the provider theme and tokens", () => {
     render(
       <MtoneProvider
-        density="comfortable"
+        theme="dark"
         tokens={{ "--mt-primary": "purple" }}
       >
         <UI.Dialog open title="Theme">
@@ -200,7 +200,8 @@ describe("styled interactive controls", () => {
       </MtoneProvider>,
     );
     const scope = screen.getByRole("dialog").closest(".mt-scope");
-    expect(scope).toHaveAttribute("data-density", "comfortable");
+    expect(scope).toHaveAttribute("data-mt-theme", "dark");
+    expect(scope).not.toHaveAttribute("data-density");
     expect(scope).toHaveStyle({ "--mt-primary": "purple" });
   });
   it("portal layers appear above modals and below toast notifications", () => {

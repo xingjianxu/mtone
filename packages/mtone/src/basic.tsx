@@ -23,13 +23,11 @@ export type MtoneTheme = "light" | "dark" | "system";
 type Context = {
   theme: MtoneTheme;
   locale: Locale;
-  density: "compact" | "comfortable";
   tokens?: Tokens;
 };
 const MtoneContext = React.createContext<Context>({
   locale: "zh",
   theme: "light",
-  density: "compact",
 });
 export const useMtone = () => React.useContext(MtoneContext);
 export interface MtoneScopeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -54,7 +52,6 @@ export function MtoneScope({
     <div
       {...props}
       className={cn("mt-scope", className)}
-      data-density={c.density}
       data-mt-theme={c.theme}
       data-mt-floating-owners={
         floatingOwners.length ? floatingOwners.join(" ") : undefined
@@ -72,15 +69,14 @@ export type MtoneProviderProps = Partial<Context> & {
 export function MtoneProvider({
   children,
   locale = "zh",
-  density = "compact",
   tokens,
   theme,
 }: MtoneProviderProps) {
   const inherited = useMtone();
   const resolvedTheme = theme ?? inherited.theme;
   const value = React.useMemo(
-    () => ({ locale, density, tokens, theme: resolvedTheme }),
-    [locale, density, tokens, resolvedTheme],
+    () => ({ locale, tokens, theme: resolvedTheme }),
+    [locale, tokens, resolvedTheme],
   );
   return (
     <MtoneContext.Provider value={value}>

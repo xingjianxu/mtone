@@ -12,7 +12,9 @@ website does not publish a new npm version.
 
 ## Provider and styling
 
-`MtoneProvider` accepts `locale="zh" | "en"`, `density="compact" | "comfortable"`, `theme="light" | "dark" | "system"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, compact and light colors. `theme="system"` responds immediately to the operating system color preference. A nested `MtoneScope theme="light"` (or `"dark"` / `"system"`) overrides just that subtree, including its mtone popups. Nested scopes and providers inherit the enclosing theme when omitted. The library does not read or store the selection.
+Migration: remove the former `density` prop. Compact/comfortable modes are no longer part of the provider or scope API; single-line controls use a unified 34px default. Independent component `size` variants and CSS token overrides remain supported. Tabs retain their separate size contract.
+
+`MtoneProvider` accepts `locale="zh" | "en"`, `theme="light" | "dark" | "system"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, a 34px default control baseline and light colors. `theme="system"` responds immediately to the operating system color preference. A nested `MtoneScope theme="light"` (or `"dark"` / `"system"`) overrides just that subtree, including its mtone popups. Nested scopes and providers inherit the enclosing theme when omitted. The library does not read or store the selection.
 
 ```tsx
 <MtoneProvider
@@ -84,7 +86,7 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 `Input` keeps native `value` / `defaultValue`, `onChange(event)`, form attributes and
 an `HTMLInputElement` ref. `className` / `style` target that native input;
 `wrapperClassName` targets its stable wrapper. `controlSize="sm" | "md" | "lg"`
-controls appearance (default md, compact 28px); native `size` still means character
+controls appearance (default md, 34px); native `size` still means character
 width. `variant` is `outlined` (default), `filled`, `borderless` or `underlined`;
 `status` is `error` or `warning`. Focus uses mtone's thin light-blue treatment.
 
@@ -291,7 +293,7 @@ const [value, setValue] = useState("");
 - `size` uses mtone's `"sm" | "md" | "lg"` (default md); `status` is `"error" | "warning"`. `autoSize` accepts a boolean or `{ minRows?, maxRows? }`; default false, `rows` defaults to 3. `allowClear` accepts a boolean or `{ clearIcon?, label?, tabIndex? }`; clearing also invokes `onClear`.
 - Inserting an option that would exceed native `maxLength` does nothing; the option is never partially inserted.
 - Suggestions follow the caret. `placement="top" | "bottom"` sets a preference, with viewport-aware flipping. `getPopupContainer()` overrides the default body portal; avoid transformed fixed-position containing blocks. `popupRender(menu)` should retain the supplied menu and its accessibility semantics. `onPopupScroll` supports application-managed pagination, not built-in virtualization.
-- `className/style` target the root. `classNames/styles` are static objects keyed by `root`, `textarea`, `popup`, `option`, `clear`. Provider locale, density and tokens are retained in the portal.
+- `className/style` target the root. `classNames/styles` are static objects keyed by `root`, `textarea`, `popup`, `option`, `clear`. Provider locale, color theme and tokens are retained in the portal.
 
 Arrows move through enabled options; Enter selects; Escape closes; Tab closes and
 moves focus normally. Composition keys are left to the IME. Native Home/End,

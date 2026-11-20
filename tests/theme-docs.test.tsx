@@ -55,3 +55,16 @@ test("manual theme persists and follows a switch made in another tab", () => {
   expect(document.documentElement).toHaveAttribute("data-mt-theme", "system");
   expect(localStorage.getItem("mtone-docs-theme")).toBeNull();
 });
+
+test("docs expose one 34px control baseline without density API or switches", async () => {
+  const { componentDocs: docs } = await import("../apps/docs/catalog");
+  const provider = docs.find((entry) => entry.name === "MtoneProvider")!;
+  expect(provider.props.some((prop) => prop.name === "density")).toBe(false);
+  for (const file of ["apps/docs/docs-app.tsx", "apps/docs/menubar-example.tsx", "apps/docs/inline-demos/mtone-provider-usage.tsx", "scripts/generate-llms.mjs"]) {
+    const source = await readFile(file, "utf8");
+    expect(source).not.toMatch(/density=|setDensity|docs-density-toggle|density: compact/);
+  }
+  for (const name of ["Input", "SearchInput", "Select", "MultiSelect", "NumberInput", "DatePicker", "FilterChip"]) {
+    expect(docs.find((entry) => entry.name === name)?.notes?.join(" ")).toContain("34px");
+  }
+});
