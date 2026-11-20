@@ -60,8 +60,9 @@ try {
         const ordered = dir === "ltr" ? [start, label, end] : [end, label, start];
         assert(ordered[0].x + ordered[0].width < ordered[1].x);
         assert(ordered[1].x + ordered[1].width < ordered[2].x);
-        assert.equal(start.width, 14);
-        assert.equal(end.width, 14);
+        // Firefox can report a tiny floating-point residue in DOM geometry.
+        assert(Math.abs(start.width - 14) < 0.01, `Expected start icon width of 14px, got ${start.width}px`);
+        assert(Math.abs(end.width - 14) < 0.01, `Expected end icon width of 14px, got ${end.width}px`);
         assert(Math.abs(start.y - end.y) < 0.01);
         await expect(button("Loading")).toBeDisabled();
         await expect(button("Loading")).toHaveAttribute("aria-busy", "true");
