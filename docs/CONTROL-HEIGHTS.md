@@ -12,9 +12,11 @@ This is the rendered outer **border-box**, including borders, rather than a chil
 | MultiSelect chips/input container | minimum 34px |
 | FilterChip | 34px |
 | TagSelect option, expansion trigger and collapsed viewport | 34px |
+| NavItem (including Sidebar, NavGroup and AdminLayout.Sider) and docs sidebar links | 34px |
 
 MultiSelect grows when chips wrap. Do not force a fixed 34px height that hides values,
-removal buttons or the search input. Long Select labels remain single-line with ellipsis.
+removal buttons or the search input. Long Select labels and plain-text navigation labels remain single-line with ellipsis.
+Navigation row gaps, group headings and the collapsed sidebar controls are unchanged.
 
 ## Migration and customization
 

@@ -135,9 +135,17 @@ a:hover {
   align-items: center;
   gap: 8px;
   border-radius: 5px;
-  padding: 5px 10px;
+  height: var(--mt-height, 34px);
+  padding: 0 10px;
   font-size: 13px;
   color: var(--docs-nav-text);
+}
+.docs-sidebar nav a > svg { flex-shrink: 0; }
+.docs-nav-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .docs-sidebar nav > a + a,
 .docs-sidebar nav > div > a + a {

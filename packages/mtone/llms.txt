@@ -840,7 +840,7 @@ export default function Demo() {
 - children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes. 各区域均可嵌套内容和覆盖样式；默认不生成主体 Footer，显式组合 AdminLayout.Footer 时显示，默认高度 42px。
 - 主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。
 - 使用 AdminLayout.Sider、AdminLayout.Header、AdminLayout.Content、AdminLayout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。
-- AdminLayout.Sider 复用本库 Sidebar 的状态、NavItem 图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、IconButton 等已有组件。
+- AdminLayout.Sider 复用本库 Sidebar 的状态、34px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、IconButton 等已有组件。
 - 默认头部 48px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌、侧栏底部版本/折叠行与顶部操作保持可见。
 - 响应式收起为图标窄栏，不是弹出式抽屉。breakpoint 按浏览器视口判断，不按示例容器宽度判断；希望自定义手机抽屉时可组合已有 Drawer。
 - 受控状态必须在 onCollapsedChange 中更新，否则切换只发出请求。导航、路由、数据保存、账号菜单与持久化由应用实现。
@@ -1483,7 +1483,7 @@ export default function Demo() {
 - collapseLabel / expandLabel: string (default: 收起侧边栏 / 展开侧边栏). 切换按钮的可访问名称和提示，可本地化。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
+- NavItem 默认行高为 34px，图标与文字垂直居中。相邻项间距不变，分组标题和分隔线不受行高影响。
 - 收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题并保留分组分隔。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。
 - 收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。
 - 受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。
@@ -1509,6 +1509,7 @@ export default function Demo() {
 - onClick: MouseEventHandler. 由应用执行导航。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
+- 默认行高 34px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。
 - 底层为 button，不是链接；应用负责与路由集成。
 
 ```tsx
@@ -1528,7 +1529,7 @@ export default function Demo() {
 - Import: NavGroup, NavItem from @bixlab/mtone
 - label: ReactNode. 可选分组标题。
 - children: ReactNode. 组件内容。
-- 同组相邻 NavItem 之间保留 3px 间距，与侧边栏菜单一致；分组标题和组间距保持不变。
+- 组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距；分组标题和组间距保持不变。
 
 ```tsx
 import { NavGroup, NavItem } from "@bixlab/mtone";
