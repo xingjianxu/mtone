@@ -1,3 +1,4 @@
+import { CardGroupExample } from "./card-group-example";
 import { InputExample } from "./input-example";
 import { ListExample } from "./list-example";
 import { BreadcrumbExample } from "./breadcrumb-example";
@@ -573,6 +574,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           </M.IconButton>
         </M.Tooltip>
       );
+    case "CardGroup":
+      return <CardGroupExample />;
     case "Card":
       return <CardExample />;
     case "Blockquote":

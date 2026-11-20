@@ -4149,6 +4149,60 @@ export default function Demo() {
     ],
     notes: ["不要在提示中放必须操作的交互内容；图标触发器仍需 aria-label。"],
   },
+{
+  "name": "CardGroup",
+  "category": "布局容器",
+  "description": "排列多个独立卡片，支持响应式列数与间距、跨列、纵向排列和行列分隔线。",
+  "importNames": [
+    "CardGroup",
+    "Card"
+  ],
+  "code": "import { Card, CardGroup } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <CardGroup columns={{ xs: 2, md: 3 }} gap={{ xs: 12, md: 20 }} divided>\n      <CardGroup.Item span={{ xs: 2, md: 3 }}>\n        <Card title=\"概览\">跨满当前整行</Card>\n      </CardGroup.Item>\n      <Card title=\"资料\">待整理 12 项</Card>\n      <Card title=\"笔记\">已阅读 20 项</Card>\n      <Card title=\"收藏\">常用资源</Card>\n    </CardGroup>\n  );\n}",
+  "props": [
+    {
+      "name": "direction",
+      "type": "\"horizontal\" | \"vertical\"",
+      "default": "horizontal",
+      "description": "horizontal 使用多列网格；vertical 固定单列并忽略 columns。"
+    },
+    {
+      "name": "columns",
+      "type": "number | Partial<Record<\"xs\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | \"xxl\", number>>",
+      "default": "{ xs: 1, sm: 2, lg: 3 }",
+      "description": "网格列数。数字应用于全部断点；对象按视口断点逐级继承，未定义的初始值为 1。有效值取整并限制为 1–24。"
+    },
+    {
+      "name": "gap",
+      "type": "CardGroupResponsive",
+      "default": "12",
+      "description": "行列间距（px），支持数字或相同断点对象。有效值必须有限且非负，未定义的初始值为 12。"
+    },
+    {
+      "name": "divided",
+      "type": "boolean",
+      "default": "false",
+      "description": "在相邻行列的间距中显示分隔线，跟随当前列数与跨列布局调整。"
+    },
+    {
+      "name": "CardGroup.Item.span",
+      "type": "CardGroupResponsive",
+      "default": "1",
+      "description": "占用列数，可响应式配置；自动限制为当前总列数，不会撑出网格。"
+    },
+    {
+      "name": "children / className / style / 原生属性",
+      "type": "ReactNode / string / CSSProperties / HTMLAttributes<HTMLDivElement>",
+      "description": "根节点与 Item 支持原生 div 属性。普通子元素自动包裹为 Item；显式 Item 可设置 span 或 hidden。"
+    }
+  ],
+  "notes": [
+    "CardGroup 是多个独立 Card 的外层布局；Card.Grid 是一张 Card 内的内容网格，二者不能混作同一个组件。CardGroup.Item 为静态子组件，不是独立命名导出。",
+    "断点按浏览器视口计算：xs 从 0 开始，sm 576px、md 768px、lg 992px、xl 1200px、xxl 1600px；不是容器查询。缩小示例容器不会改变断点。",
+    "默认手机单列；如需手机多列，可显式设置 columns={{ xs: 2, md: 3 }}。内容需适应有限列宽，过长的自定义内容仍须自行约束。",
+    "direction=\"vertical\" 时 Item.span 同样限制为 1；divided 仅显示行间分隔。根 gap=0 时分隔线位于相邻项边缘。",
+    "支持 Fragment 展开；隐藏项使用 CardGroup.Item hidden，不应仅用 CSS display:none 隐藏布局项，否则分隔线的行列推算不会同步。示例只演示本地布局，不读写服务器数据。"
+  ]
+},
   {
     "name": "Card",
     "category": "数据展示",
@@ -4160,6 +4214,11 @@ export default function Demo() {
     ],
     "code": "import { useState } from \"react\";\nimport { Card, Button, Avatar } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [tab, setTab] = useState(\"overview\");\n  const [loading, setLoading] = useState(false);\n  return (\n    <Card\n      title=\"知识库\"\n      htmlTitle=\"原生悬浮提示使用 htmlTitle\"\n      extra={<Button size=\"sm\" onClick={() => setLoading(!loading)}>切换加载</Button>}\n      loading={loading}\n      tabList={[{key:\"overview\",label:\"概览\"},{key:\"notes\",label:\"笔记\"}]}\n      activeTabKey={tab}\n      onTabChange={setTab}\n      actions={[<Button key=\"save\" variant=\"ghost\" onClick={() => alert(\"本地示例\")}>收藏</Button>]}\n    >\n      {tab === \"overview\" ? <Card.Meta avatar={<Avatar name=\"林\" />} title=\"设计知识\" description=\"记录可复用的经验。\" /> : <p>这是笔记内容。</p>}\n    </Card>\n  );\n}",
     "props": [
+{"name": "collapsible", "type": "boolean", "default": "false", "description": "在标题左侧显示收起/展开按钮。默认不折叠。"},
+{"name": "collapsed", "type": "boolean", "description": "受控折叠状态；搭配 onCollapsedChange 更新。"},
+{"name": "defaultCollapsed", "type": "boolean", "default": "false", "description": "非受控初始折叠状态，仅 collapsible 启用时生效。"},
+{"name": "onCollapsedChange", "type": "(collapsed: boolean) => void", "description": "用户点击折叠按钮时请求切换状态；受控模式由父组件接受更新。"},
+{"name": "collapseLabel", "type": "string", "description": "折叠按钮可访问名称；默认按状态与 locale 显示收起卡片/展开卡片（英文对应 Collapse card/Expand card）。"},
       {
         "name": "children",
         "type": "ReactNode",
@@ -4262,6 +4321,8 @@ export default function Demo() {
       }
     ],
     "notes": [
+      "折叠后标题及 extra 操作保持可见，封面、标签、正文与底部 actions 隐藏但不卸载；子组件状态保留。未设置 collapsible 时 collapsed/defaultCollapsed 不会隐藏内容。",
+      "Card.Grid 是单张 Card 内部的网格项；多个独立 Card 的布局、响应式列数、跨列和分隔线请使用 CardGroup。",
       "未提供 bordered/bodyStyle/headStyle；使用 variant 与分区 styles。size 使用 medium/small，tabProps 只支持现有 mtone Tabs 的 className。",
       "迁移提醒：旧 <Card title=\"提示\"> 会改为显示标题栏；原生悬浮提示请改为 <Card htmlTitle=\"提示\">。只有 children、没有新增结构属性的 Card 维持原来的默认视觉。",
       "Card.Meta 与 Card.Grid 是 Card 的静态子组件，不是单独安装或单独命名导出的组件。",

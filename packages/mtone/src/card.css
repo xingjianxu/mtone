@@ -211,3 +211,69 @@
   > .mt-card-grid {
   padding: var(--mt-card-body-padding-sm, 12px);
 }
+
+/* Collapse is opt-in. Its content stays mounted while hidden. */
+.mt-card-collapse-content {
+  min-width: 0;
+  border-radius: inherit;
+}
+.mt-card-collapse-content[hidden] {
+  display: none;
+}
+.mt-card-collapse-toggle {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--mt-muted, #787774);
+  cursor: pointer;
+}
+.mt-card-collapse-toggle:hover {
+  background: var(--mt-hover, #f1f1ef);
+  color: var(--mt-text, #37352f);
+}
+.mt-card-collapse-toggle:focus-visible {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: 2px;
+}
+.mt-card-collapse-toggle[aria-expanded="false"] > svg {
+  transform: rotate(-90deg);
+}
+.mt-card-collapsible[data-collapsed="true"] > .mt-card-header {
+  border-bottom-color: transparent;
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+}
+.mt-card-small
+  > .mt-card-collapse-content
+  > .mt-card-body:not(:has(> .mt-card-grid)),
+.mt-card-small
+  > .mt-card-collapse-content
+  > .mt-card-tabs-layout
+  > .mt-card-tabs
+  > .mt-tab-panel
+  > .mt-card-body:not(:has(> .mt-card-grid)),
+.mt-card-small > .mt-card-collapse-content > .mt-card-body > .mt-card-grid,
+.mt-card-small
+  > .mt-card-collapse-content
+  > .mt-card-tabs-layout
+  > .mt-card-tabs
+  > .mt-tab-panel
+  > .mt-card-body
+  > .mt-card-grid {
+  padding: var(--mt-card-body-padding-sm, 12px);
+}
+
+/* A collapsible card always has a header before its cover. */
+.mt-card-collapse-content > .mt-card-cover:first-child {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}

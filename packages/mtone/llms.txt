@@ -1930,10 +1930,49 @@ export default function Demo() {
 }
 ```
 
+### CardGroup
+
+- [CardGroup](https://xingjianxu.github.io/mtone/#/components/CardGroup): 排列多个独立卡片，支持响应式列数与间距、跨列、纵向排列和行列分隔线。
+- Import: CardGroup, Card from @bixlab/mtone
+- direction: "horizontal" | "vertical" (default: horizontal). horizontal 使用多列网格；vertical 固定单列并忽略 columns。
+- columns: number | Partial<Record<"xs" | "sm" | "md" | "lg" | "xl" | "xxl", number>> (default: { xs: 1, sm: 2, lg: 3 }). 网格列数。数字应用于全部断点；对象按视口断点逐级继承，未定义的初始值为 1。有效值取整并限制为 1–24。
+- gap: CardGroupResponsive (default: 12). 行列间距（px），支持数字或相同断点对象。有效值必须有限且非负，未定义的初始值为 12。
+- divided: boolean (default: false). 在相邻行列的间距中显示分隔线，跟随当前列数与跨列布局调整。
+- CardGroup.Item.span: CardGroupResponsive (default: 1). 占用列数，可响应式配置；自动限制为当前总列数，不会撑出网格。
+- children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes<HTMLDivElement>. 根节点与 Item 支持原生 div 属性。普通子元素自动包裹为 Item；显式 Item 可设置 span 或 hidden。
+- CardGroup 是多个独立 Card 的外层布局；Card.Grid 是一张 Card 内的内容网格，二者不能混作同一个组件。CardGroup.Item 为静态子组件，不是独立命名导出。
+- 断点按浏览器视口计算：xs 从 0 开始，sm 576px、md 768px、lg 992px、xl 1200px、xxl 1600px；不是容器查询。缩小示例容器不会改变断点。
+- 默认手机单列；如需手机多列，可显式设置 columns={{ xs: 2, md: 3 }}。内容需适应有限列宽，过长的自定义内容仍须自行约束。
+- direction="vertical" 时 Item.span 同样限制为 1；divided 仅显示行间分隔。根 gap=0 时分隔线位于相邻项边缘。
+- 支持 Fragment 展开；隐藏项使用 CardGroup.Item hidden，不应仅用 CSS display:none 隐藏布局项，否则分隔线的行列推算不会同步。示例只演示本地布局，不读写服务器数据。
+
+```tsx
+import { Card, CardGroup } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <CardGroup columns={{ xs: 2, md: 3 }} gap={{ xs: 12, md: 20 }} divided>
+      <CardGroup.Item span={{ xs: 2, md: 3 }}>
+        <Card title="概览">跨满当前整行</Card>
+      </CardGroup.Item>
+      <Card title="资料">待整理 12 项</Card>
+      <Card title="笔记">已阅读 20 项</Card>
+      <Card title="收藏">常用资源</Card>
+    </CardGroup>
+  );
+}
+```
+
 ### Card
 
 - [Card](https://xingjianxu.github.io/mtone/#/components/Card): 紧凑的结构化内容卡片，支持封面、操作、加载、标签页、元信息与网格。
 - Import: Card, Button, Avatar from @bixlab/mtone
+- collapsible: boolean (default: false). 在标题左侧显示收起/展开按钮。默认不折叠。
+- collapsed: boolean. 受控折叠状态；搭配 onCollapsedChange 更新。
+- defaultCollapsed: boolean (default: false). 非受控初始折叠状态，仅 collapsible 启用时生效。
+- onCollapsedChange: (collapsed: boolean) => void. 用户点击折叠按钮时请求切换状态；受控模式由父组件接受更新。
+- collapseLabel: string. 折叠按钮可访问名称；默认按状态与 locale 显示收起卡片/展开卡片（英文对应 Collapse card/Expand card）。
 - children: ReactNode. 卡片主体；tabList 项未指定 content 时也用作该标签页主体。
 - title / extra: ReactNode. 可见标题与标题栏尾部区域；无内容时不生成空标题栏。
 - htmlTitle: string. 原生 HTML title 悬浮提示。旧 Card title 原生提示用法需迁移到此属性。
@@ -1954,6 +1993,8 @@ export default function Demo() {
 - Card.Meta: avatar?: ReactNode; title?: ReactNode; description?: ReactNode; htmlTitle?: string. 元信息布局；支持原生 div 属性，以及 root、section、avatar、title、description 分区 classNames/styles（对象或 ({props}) => 对象）。
 - Card.Grid: hoverable?: boolean + HTMLAttributes<HTMLDivElement>. 卡片网格项，hoverable 默认 true；作为 Card 的直接子元素使用以启用响应式网格布局。
 - 原生属性: Omit<HTMLAttributes<HTMLDivElement>, "title">. 支持根节点 className、style、aria-* 与适用 DOM 事件。title 已改为可见标题；原生提示使用 htmlTitle。
+- 折叠后标题及 extra 操作保持可见，封面、标签、正文与底部 actions 隐藏但不卸载；子组件状态保留。未设置 collapsible 时 collapsed/defaultCollapsed 不会隐藏内容。
+- Card.Grid 是单张 Card 内部的网格项；多个独立 Card 的布局、响应式列数、跨列和分隔线请使用 CardGroup。
 - 未提供 bordered/bodyStyle/headStyle；使用 variant 与分区 styles。size 使用 medium/small，tabProps 只支持现有 mtone Tabs 的 className。
 - 迁移提醒：旧 <Card title="提示"> 会改为显示标题栏；原生悬浮提示请改为 <Card htmlTitle="提示">。只有 children、没有新增结构属性的 Card 维持原来的默认视觉。
 - Card.Meta 与 Card.Grid 是 Card 的静态子组件，不是单独安装或单独命名导出的组件。
