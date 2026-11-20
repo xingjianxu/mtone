@@ -465,24 +465,25 @@ export function DocsApp() {
               href="#/start"
               aria-current={route.kind === "start" ? "page" : undefined}
             >
-              <BookOpen size={15} />
-              快速开始
+              <BookOpen size={15} aria-hidden="true" />
+              <span className="docs-nav-label">快速开始</span>
             </a>
             <a
               href="#/gallery"
               aria-current={route.kind === "gallery" ? "page" : undefined}
             >
-              <Layers size={15} />
-              Component gallery
+              <Layers size={15} aria-hidden="true" />
+              <span className="docs-nav-label">Component gallery</span>
             </a>
             <a href="./showcase.html" target="_blank" rel="noopener noreferrer" >
-              <Layers size={15} />应用示例
+              <Layers size={15} aria-hidden="true" />
+              <span className="docs-nav-label">应用示例</span>
             </a>
             <a
               href="#/theme"
               aria-current={route.kind === "theme" ? "page" : undefined}
             >
-              主题与样式
+              <span className="docs-nav-label">主题与样式</span>
             </a>
             {groups.map((group) => {
                 // Preserve semantic group order, but make each component easy to find by name.
@@ -501,7 +502,7 @@ export function DocsApp() {
                             doc?.name === d.name ? "page" : undefined
                           }
                         >
-                          {d.name}
+                          <span className="docs-nav-label">{d.name}</span>
                         </a>
                       ))}
                     </div>

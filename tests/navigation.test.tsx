@@ -16,7 +16,7 @@ it("marks current breadcrumb", () => {
 });
 it("marks selected navigation", () => {
   render(<NavItem active>Inbox</NavItem>);
-  expect(screen.getByText("Inbox")).toHaveAttribute("aria-current", "page");
+  expect(screen.getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-current", "page");
 });
 it("removes filters", () => {
   const f = vi.fn();

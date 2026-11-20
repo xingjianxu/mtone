@@ -107,11 +107,9 @@ export const NavItem = React.forwardRef<
 >(function NavItem({ active, icon, children, className, ...p }, ref) {
   const collapsed = React.useContext(SidebarContext);
   const [tipOpen, setTipOpen] = React.useState(false);
-  const label =
-    p["aria-label"] ??
-    (typeof children === "string" || typeof children === "number"
-      ? String(children)
-      : undefined);
+  const plainLabel =
+    typeof children === "string" || typeof children === "number";
+  const label = p["aria-label"] ?? (plainLabel ? String(children) : undefined);
   const button = (
     <button
       type="button"
@@ -128,6 +126,8 @@ export const NavItem = React.forwardRef<
       {icon || (collapsed ? <Circle size={16} aria-hidden="true" /> : null)}
       {collapsed ? (
         <span className="mt-sidebar-sr-only">{children}</span>
+      ) : plainLabel ? (
+        <span className="mt-nav-item-label">{children}</span>
       ) : (
         children
       )}
