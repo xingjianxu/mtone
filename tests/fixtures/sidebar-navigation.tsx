@@ -29,9 +29,19 @@ createRoot(document.getElementById("root")!).render(
         </NavGroup>
       </Sidebar>
     </div>
+    <Sidebar aria-label="Grouped" style={{ width: 180 }}>
+      <NavGroup label="Personal">
+        <NavItem>Inbox</NavItem>
+      </NavGroup>
+      <NavGroup label="Shared">
+        <NavItem>Team</NavItem>
+      </NavGroup>
+    </Sidebar>
     <AdminLayout hasSider style={{ height: 240 }}>
       <AdminLayout.Sider aria-label="Admin" collapsible>
-        <NavItem>Dashboard</NavItem>
+        <NavGroup label="General">
+          <NavItem>Dashboard</NavItem>
+        </NavGroup>
         <NavGroup label="Permissions">
           <NavItem>Members</NavItem>
         </NavGroup>

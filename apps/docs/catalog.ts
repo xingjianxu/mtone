@@ -3399,7 +3399,7 @@ export default function Demo() {
         description: "组件内容。",
       },
     ],
-    notes: ["组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距；分组标题和组间距保持不变。"],
+    notes: ["组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距。侧边栏导航以分组开头时，首组仅保留侧边栏原有内边距，不额外加上方空白；后续分组间距不变。"],
   },
   {
       "name": "Breadcrumb",

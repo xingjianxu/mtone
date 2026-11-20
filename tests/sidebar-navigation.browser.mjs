@@ -33,6 +33,18 @@ const gap = (first, second) =>
       next.getBoundingClientRect().top - element.getBoundingClientRect().bottom,
     second,
   );
+const groupSpacing = (groups) =>
+  groups.evaluateAll((elements) =>
+    elements.map((element) =>
+      Number.parseFloat(getComputedStyle(element).marginTop),
+    ),
+  );
+const groupStartInset = (group) =>
+  group.evaluate(
+    (element) =>
+      element.getBoundingClientRect().top -
+      element.parentElement.getBoundingClientRect().top,
+  );
 const alignment = (row) =>
   row.evaluate((element) => {
     const center = (rect) => rect.top + rect.height / 2;
@@ -64,6 +76,14 @@ try {
       await page.goto(`${fixtureURL}tests/fixtures/sidebar-navigation.html`);
       const sidebar = page.getByRole("complementary", { name: "Library" });
       const admin = page.getByRole("complementary", { name: "Admin" });
+      const unwrapped = page.getByRole("complementary", { name: "Grouped" });
+      const directGroups = unwrapped.locator(":scope > .mt-nav-group");
+      const wrappedGroups = admin.locator(
+        ".mt-sidebar-content > .mt-nav-group",
+      );
+      const followingLooseItems = sidebar.locator(
+        ".mt-sidebar-content > .mt-nav-group",
+      );
       const overview = sidebar.getByRole("button", { name: "Overview" });
       const longLabel = sidebar.getByRole("button", {
         name: /^A navigation label/,
@@ -71,6 +91,23 @@ try {
       await longLabel.waitFor();
       const librarySizes = await sizes(sidebar.locator(".mt-nav-item"));
       const adminSizes = await sizes(admin.locator(".mt-nav-item"));
+
+      assert.deepEqual(
+        {
+          direct: await groupSpacing(directGroups),
+          wrapped: await groupSpacing(wrappedGroups),
+          afterLooseItems: await groupSpacing(followingLooseItems),
+        },
+        { direct: [0, 12], wrapped: [0, 12], afterLooseItems: [12] },
+        `${name}: only groups at the top of sidebar navigation lose extra margin`,
+      );
+      for (const groups of [directGroups, wrappedGroups]) {
+        assert.equal(
+          await groupStartInset(groups.first()),
+          12,
+          "Sidebar padding stays 12px",
+        );
+      }
 
       const docs = await browser.newPage({
         viewport: { width: 1200, height: 850 },
@@ -135,6 +172,18 @@ try {
       await tooltip.waitFor({ state: "hidden" });
       await sidebar.getByRole("button", { name: "展开侧边栏" }).click();
       assert.equal(await sidebar.getAttribute("data-collapsed"), "false");
+
+      await admin.getByRole("button", { name: "收起侧边栏" }).press("Enter");
+      assert.equal(await admin.getAttribute("data-collapsed"), "true");
+      assert.deepEqual(await groupSpacing(wrappedGroups), [0, 12]);
+      assert.equal(await groupStartInset(wrappedGroups.first()), 12);
+      assert.equal(
+        await wrappedGroups
+          .nth(1)
+          .evaluate((group) => getComputedStyle(group).borderTopWidth),
+        "1px",
+      );
+      assert.deepEqual(await sizes(admin.locator(".mt-nav-item")), [34, 34]);
 
       await docs.setViewportSize({ width: 390, height: 850 });
       await nav.waitFor({ state: "hidden" });
