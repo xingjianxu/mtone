@@ -189,7 +189,7 @@
   display: inline-flex;
   gap: 4px;
 }
-/* Direct button children retain their own size, variant and interaction. */
+/* Join direct buttons without counting popup focus guards as group items. */
 .mt-button-group-connected {
   gap: 0;
   isolation: isolate;
@@ -197,14 +197,12 @@
 .mt-button-group-connected > .mt-btn {
   position: relative;
 }
-.mt-button-group-connected > .mt-btn + .mt-btn {
+.mt-button-group-connected > .mt-btn ~ .mt-btn {
   margin-inline-start: -1px;
-}
-.mt-button-group-connected > .mt-btn:not(:first-child) {
   border-start-start-radius: 0;
   border-end-start-radius: 0;
 }
-.mt-button-group-connected > .mt-btn:not(:last-child) {
+.mt-button-group-connected > .mt-btn:has(~ .mt-btn) {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }
@@ -212,10 +210,10 @@
 .mt-button-group-connected > .mt-btn:is(.mt-btn-blue, .mt-danger) {
   --mt-button-separator: var(--mt-blue-button-separator, rgb(255 255 255 / 30%));
 }
-.mt-button-group-connected > .mt-btn:is(.mt-btn-solid, .mt-btn-blue):not(:first-child) {
+.mt-button-group-connected > .mt-btn ~ .mt-btn:is(.mt-btn-solid, .mt-btn-blue) {
   border-inline-start-color: var(--mt-button-separator, rgb(255 255 255 / 30%));
 }
-.mt-button-group-connected > .mt-btn:is(.mt-btn-solid, .mt-btn-blue):not(:last-child) {
+.mt-button-group-connected > .mt-btn:is(.mt-btn-solid, .mt-btn-blue):has(~ .mt-btn) {
   border-inline-end-color: var(--mt-button-separator, rgb(255 255 255 / 30%));
 }
 .mt-button-group-connected > .mt-btn:hover:not(:disabled) {

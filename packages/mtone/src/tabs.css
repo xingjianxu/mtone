@@ -353,3 +353,69 @@
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"]) > .mt-tab-bar > .mt-tab-list > .mt-tab-item[data-active] > .mt-tab:hover {
   background-color: transparent;
 }
+
+/* Anchor the divider to the last tab row, not to the height of any extra
+   actions. The native scrollbar remains visible over the panel surface. */
+.mt-tabs[data-variant="attached"] > .mt-tab-bar {
+  --mt-tabs-attached-border: var(--mt-border, #e9e9e7);
+  --mt-tabs-attached-surface: var(--mt-bg, #fff);
+  --mt-tabs-attached-scrollbar: 0px;
+  position: relative;
+  isolation: isolate;
+  padding-block-start: 4px;
+  padding-inline: 6px;
+  background: var(--mt-subtle, #f7f7f5);
+}
+.mt-tabs[data-variant="attached"] > .mt-tab-bar::before,
+.mt-tabs[data-variant="attached"] > .mt-tab-bar::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset-inline: 0;
+  pointer-events: none;
+}
+.mt-tabs[data-variant="attached"] > .mt-tab-bar::before {
+  inset-block-end: var(--mt-tabs-attached-scrollbar);
+  border-block-start: 1px solid var(--mt-tabs-attached-border);
+}
+.mt-tabs[data-variant="attached"] > .mt-tab-bar::after {
+  inset-block-end: 0;
+  block-size: var(--mt-tabs-attached-scrollbar);
+  background: var(--mt-tabs-attached-surface);
+}
+.mt-tabs[data-variant="attached"] > .mt-tab-bar > .mt-tab-list {
+  align-self: flex-end;
+  min-block-size: 34px;
+  overflow-y: hidden;
+  border-block-end: 0;
+  scrollbar-color: var(--mt-muted, #787774) var(--mt-tabs-attached-surface);
+  gap: var(--mt-tabs-gap, 4px);
+}
+.mt-tabs[data-variant="attached"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab {
+  padding-inline: 10px;
+  border: 1px solid transparent;
+  border-block-end: 0;
+  border-radius: 6px 6px 0 0;
+  /* Keep the muted appearance legible on the tinted rail and on hover. */
+  color: color-mix(in srgb, var(--mt-muted, #787774) 84%, var(--mt-fg, #37352f));
+}
+.mt-tabs[data-variant="attached"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active] {
+  color: var(--mt-text, var(--mt-fg, #37352f));
+  border-color: var(--mt-tabs-attached-border);
+  background: var(--mt-tabs-attached-surface);
+}
+.mt-tabs[data-variant="attached"] > .mt-tab-panel {
+  background: var(--mt-bg, #fff);
+}
+@media (forced-colors: active) {
+  .mt-tabs[data-variant="attached"] > .mt-tab-bar {
+    --mt-tabs-attached-border: CanvasText;
+    --mt-tabs-attached-surface: Canvas;
+  }
+  .mt-tabs[data-variant="attached"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab:not([data-active]) {
+    /* Forced colors can paint a transparent border. Keep its space as padding. */
+    border-style: none;
+    padding-inline: 11px;
+    padding-block-start: 1px;
+  }
+}

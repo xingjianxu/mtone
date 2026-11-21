@@ -3908,7 +3908,7 @@ export default function Demo() {
   {
     name: "Tabs",
     category: "导航切换",
-    description: "中性风格的标签切换，支持卡片编辑、多方向布局和溢出导航。",
+    description: "中性风格的标签切换，支持顶部贴合、卡片编辑、多方向布局和溢出导航。",
     importNames: ["Tabs"],
     code: 'import { Tabs } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />;\n}',
     props: [
@@ -3935,8 +3935,8 @@ export default function Demo() {
       },
       {
         name: "variant",
-        type: '"line" | "card" | "editable-card"',
-        description: "默认 line。",
+        type: '"line" | "card" | "editable-card" | "attached"',
+        description: "默认 line。attached 的顶部选中项与内容区相接；bottom/start/end 保留指定位置并使用 line 样式。",
       },
       {
         name: "size",
@@ -3947,12 +3947,12 @@ export default function Demo() {
         name: "indicatorColor",
         type: "TabsIndicatorColor",
         default: "currentColor",
-        description: "仅 line 的选中指示线颜色。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。",
+        description: "使用 line 样式时的选中指示线颜色，包含 attached 在非顶部位置的线型回退。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。",
       },
       {
         name: "centered / gap",
         type: "boolean / number",
-        description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 6px，card/editable-card 为 4px。",
+        description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认线型为 6px，card/editable-card 和顶部 attached 为 4px。",
       },
       {
         name: "extraStart / extraEnd",
@@ -4008,6 +4008,7 @@ export default function Demo() {
       "非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。",
       "editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。",
       "主题通过 --mt-accent-* 为指示线和其他组件提供共享色；可在 MtoneProvider tokens 内覆盖。强制色彩模式保留系统可见线条。",
+      "顶部 attached 使用淡底导航栏和单条分隔线。选中项保留上边与左右边，悬停仍使用面板底色；未选中项透明无描边。",
       "线型标签文字两侧各保留 6px 外边距。卡片式与可编辑卡片式的选中标签悬停时保持原背景。",
       "溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。",
       "默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。",

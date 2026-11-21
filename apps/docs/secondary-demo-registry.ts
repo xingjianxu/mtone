@@ -262,6 +262,8 @@ import Rate3 from "./secondary-demos/rate-custom";
 import Rate3Source from "./secondary-demos/rate-custom.tsx?raw";
 import Rate4 from "./secondary-demos/rate-rtl";
 import Rate4Source from "./secondary-demos/rate-rtl.tsx?raw";
+import TabsAttachedDemo from "./secondary-demos/tabs-attached";
+import TabsAttachedSource from "./secondary-demos/tabs-attached.tsx?raw";
 import TabsIndicatorColorDemo from "./secondary-demos/tabs-indicator-color";
 import TabsIndicatorColorSource from "./secondary-demos/tabs-indicator-color.tsx?raw";
 import Tabs0 from "./secondary-demos/tabs-usage";
@@ -1080,6 +1082,13 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       title: "基础与附加操作",
       Demo: Tabs0,
       source: source(Tabs0Source),
+    },
+    {
+      id: "attached",
+      title: "贴合内容区",
+      note: '设置 variant="attached"，顶部选中标签与内容连成一体。底部和侧边位置仍按指定方向排列，采用线型样式。',
+      Demo: TabsAttachedDemo,
+      source: source(TabsAttachedSource),
     },
     {
       id: "indicator-color",

@@ -26,12 +26,14 @@ function declarations(selector: string) {
   css.walkRules(rule => { if (rule.selectors.includes(selector)) rule.walkDecls(d => { values[d.prop] = d.value; }); });
   return values;
 }
-it("joins borders without clipping focus and preserves logical outer corners", () => {
+it("joins direct buttons across non-button siblings and preserves focus and logical corners", () => {
   expect(declarations(".mt-button-group").gap).toBe("4px");
   expect(declarations(".mt-button-group-connected").gap).toBe("0");
-  expect(declarations(".mt-button-group-connected > .mt-btn + .mt-btn")["margin-inline-start"]).toBe("-1px");
-  expect(declarations(".mt-button-group-connected > .mt-btn:not(:first-child)")["border-start-start-radius"]).toBe("0");
-  expect(declarations(".mt-button-group-connected > .mt-btn:not(:last-child)")["border-end-end-radius"]).toBe("0");
+  const withPreviousButton = declarations(".mt-button-group-connected > .mt-btn ~ .mt-btn");
+  const withNextButton = declarations(".mt-button-group-connected > .mt-btn:has(~ .mt-btn)");
+  expect(withPreviousButton["margin-inline-start"]).toBe("-1px");
+  expect(withPreviousButton["border-start-start-radius"]).toBe("0");
+  expect(withNextButton["border-end-end-radius"]).toBe("0");
   expect(declarations(".mt-button-group-connected > .mt-btn:focus-visible")["z-index"]).toBe("2");
 });
 it("keeps solid danger hover red rather than neutral", () => {

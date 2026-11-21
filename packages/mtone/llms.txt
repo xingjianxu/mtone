@@ -1815,16 +1815,16 @@ export default function Demo() {
 
 ### Tabs
 
-- [Tabs](https://xingjianxu.github.io/mtone/#/components/Tabs): 中性风格的标签切换，支持卡片编辑、多方向布局和溢出导航。
+- [Tabs](https://xingjianxu.github.io/mtone/#/components/Tabs): 中性风格的标签切换，支持顶部贴合、卡片编辑、多方向布局和溢出导航。
 - Import: Tabs from @bixlab/mtone
 - items: TabItem[]. 必填；value、label、content，另可设 disabled、icon、closable、closeLabel、forceRender、destroyOnHidden。
 - value / defaultValue: string. 受控/初始值；省略时选择首个未禁用项。
 - onValueChange: (value: string) => void. 用户切换及非受控有效回退时触发。
 - placement: "top" | "bottom" | "start" | "end". 默认 top；start/end 为逻辑方向。
-- variant: "line" | "card" | "editable-card". 默认 line。
+- variant: "line" | "card" | "editable-card" | "attached". 默认 line。attached 的顶部选中项与内容区相接；bottom/start/end 保留指定位置并使用 line 样式。
 - size: "small" | "medium" | "large". 默认 medium。所有变体、尺寸和位置的标签项外高均为 34px（含边框）；size 仍区分字号。
-- indicatorColor: TabsIndicatorColor (default: currentColor). 仅 line 的选中指示线颜色。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。
-- centered / gap: boolean / number. 居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 6px，card/editable-card 为 4px。
+- indicatorColor: TabsIndicatorColor (default: currentColor). 使用 line 样式时的选中指示线颜色，包含 attached 在非顶部位置的线型回退。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。
+- centered / gap: boolean / number. 居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认线型为 6px，card/editable-card 和顶部 attached 为 4px。
 - extraStart / extraEnd: ReactNode. 导航栏前后附加内容。
 - activateOnFocus: boolean. 默认 false，方向键移动焦点不立即切换。
 - destroyOnHidden: boolean. 默认 true，卸载隐藏面板；false 保留已访问面板状态。
@@ -1840,6 +1840,7 @@ export default function Demo() {
 - 非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。
 - editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。
 - 主题通过 --mt-accent-* 为指示线和其他组件提供共享色；可在 MtoneProvider tokens 内覆盖。强制色彩模式保留系统可见线条。
+- 顶部 attached 使用淡底导航栏和单条分隔线。选中项保留上边与左右边，悬停仍使用面板底色；未选中项透明无描边。
 - 线型标签文字两侧各保留 6px 外边距。卡片式与可编辑卡片式的选中标签悬停时保持原背景。
 - 溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。
 - 默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。

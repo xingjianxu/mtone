@@ -13,7 +13,8 @@ try {
     try {
       browser = await engine.launch({
         headless: true,
-        executablePath: name === "chromium" ? process.env.CHROMIUM_PATH : undefined,
+        executablePath: name === "chromium" ? process.env.CHROMIUM_PATH :
+          name === "webkit" ? process.env.WEBKIT_PATH : undefined,
       });
       const page = await browser.newPage({ viewport: { width: 800, height: 650 } });
       await page.goto("http://127.0.0.1:5219/tests/fixtures/button-group.html");
@@ -78,32 +79,69 @@ try {
       await expect(danger.first()).toHaveCSS("border-inline-end-color", "rgba(255, 255, 255, 0.3)");
       await expect(danger.last()).toBeDisabled();
       await expect(danger.last()).toHaveCSS("background-color", "rgb(182, 64, 59)");
-      const docs = page.getByTestId("docs");
-      const split = docs.getByRole("group", { name: "导出文档" });
-      const primary = split.getByRole("button", { name: "导出 PDF" });
-      const trigger = split.getByRole("button", { name: "更多导出格式" });
-      const splitBounds = await split.getByRole("button").evaluateAll(nodes => nodes.map(n => { const r = n.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, height: r.height }; }));
-      assert.equal(splitBounds[0].right - splitBounds[1].left, 1);
-      assert.equal(splitBounds[0].height, splitBounds[1].height);
-      assert.equal(splitBounds[0].top, splitBounds[1].top);
-      await primary.click();
-      await expect(docs.getByRole("status")).toHaveText("已选择导出 PDF");
-      await trigger.focus();
+      const menu = page.getByRole("menu");
+      const dangerTrigger = danger.nth(1);
+      await dangerTrigger.focus();
       await page.keyboard.press("ArrowDown");
-      await expect(page.getByRole("menu")).toBeVisible();
+      await expect(menu.getByRole("menuitem", { name: "Confirm removal" })).toBeFocused();
+      await expect(dangerTrigger).toHaveCSS("margin-inline-start", "-1px");
+      await expect(dangerTrigger).toHaveCSS("border-radius", "0px");
+      await expect(dangerTrigger).toHaveCSS("border-inline-start-color", "rgba(255, 255, 255, 0.3)");
+      await expect(dangerTrigger).toHaveCSS("border-inline-end-color", "rgba(255, 255, 255, 0.3)");
       await page.keyboard.press("Escape");
-      await expect(trigger).toBeFocused();
-      await trigger.click();
-      await page.getByRole("menuitem", { name: "导出 Markdown" }).click();
-      await expect(docs.getByRole("status")).toHaveText("已选择导出 Markdown");
-      await trigger.focus();
-      await page.keyboard.press("ArrowDown");
-      await expect(page.getByRole("menuitem", { name: "导出 Markdown" })).toBeFocused();
-      await page.keyboard.press("End");
-      await page.keyboard.press("Enter");
-      await expect(docs.getByRole("status")).toHaveText("已选择导出 HTML");
-      await trigger.click();
-      await expect(page.getByRole("menu")).toBeVisible();
+      await expect(menu).toHaveCount(0);
+      await expect(dangerTrigger).toBeFocused();
+
+      for (const dir of ["ltr", "rtl"]) {
+        const docs = page.getByTestId("docs-" + dir);
+        const split = docs.getByRole("group", { name: "导出文档" });
+        const primary = split.getByRole("button", { name: "导出 PDF" });
+        const trigger = split.getByRole("button", { name: "更多导出格式" });
+        const assertSeam = async () => {
+          const [first, last] = await split.getByRole("button").evaluateAll(nodes => nodes.map(n => {
+            const rect = n.getBoundingClientRect();
+            const css = getComputedStyle(n);
+            return {
+              left: rect.left, right: rect.right, top: rect.top, height: rect.height,
+              radii: [css.borderStartStartRadius, css.borderEndStartRadius, css.borderStartEndRadius, css.borderEndEndRadius],
+              margin: css.marginInlineStart,
+            };
+          }));
+          const overlap = dir === "ltr" ? first.right - last.left : last.right - first.left;
+          assert(Math.abs(overlap - 1) < 0.01, dir + " expected 1px overlap, got " + overlap);
+          assert.equal(first.height, last.height);
+          assert.equal(first.top, last.top);
+          assert.deepEqual(first.radii, ["4px", "4px", "0px", "0px"]);
+          assert.deepEqual(last.radii, ["0px", "0px", "4px", "4px"]);
+          assert.equal(last.margin, "-1px");
+        };
+        await assertSeam();
+        await primary.click();
+        await expect(docs.getByRole("status")).toHaveText("已选择导出 PDF");
+        await trigger.focus();
+        await page.keyboard.press("ArrowDown");
+        await expect(menu.getByRole("menuitem", { name: "导出 Markdown" })).toBeFocused();
+        await assertSeam();
+        await page.keyboard.press("Escape");
+        await expect(trigger).toBeFocused();
+        await expect(menu).toHaveCount(0);
+        await assertSeam();
+        await trigger.click();
+        await expect(menu).toBeVisible();
+        await assertSeam();
+        await menu.getByRole("menuitem", { name: "导出 Markdown" }).click();
+        await expect(docs.getByRole("status")).toHaveText("已选择导出 Markdown");
+        await assertSeam();
+        await trigger.focus();
+        await page.keyboard.press("ArrowDown");
+        await expect(menu.getByRole("menuitem", { name: "导出 Markdown" })).toBeFocused();
+        await page.keyboard.press("End");
+        await page.keyboard.press("Enter");
+        await expect(docs.getByRole("status")).toHaveText("已选择导出 HTML");
+        await assertSeam();
+      }
+      await page.getByTestId("docs-ltr").getByRole("button", { name: "更多导出格式" }).click();
+      await expect(menu).toBeVisible();
       await page.screenshot({ path: "artifacts/button-group-browser/" + name + ".png", fullPage: true });
       console.log(name + " passed");
     } catch (error) { failed = true; console.error(name, error); }
