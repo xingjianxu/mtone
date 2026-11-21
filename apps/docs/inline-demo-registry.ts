@@ -1,3 +1,5 @@
+import NavItemLink from "./inline-demos/nav-item-link";
+import NavItemLinkSource from "./inline-demos/nav-item-link.tsx?raw";
 import type { DocSection } from "./doc-section";
 import Example0_0 from "./inline-demos/icon-button-usage";
 import Example0_0Raw from "./inline-demos/icon-button-usage.tsx?raw";
@@ -295,6 +297,7 @@ export const inlineDocSections: Readonly<
       Demo: Example12_0,
       source: source(Example12_0Raw),
     },
+    { id: "link", title: "原生链接", Demo: NavItemLink, source: source(NavItemLinkSource) },
   ],
   Segmented: [
     {

@@ -145,7 +145,7 @@ describe("documentation taxonomy", () => {
       container.querySelector("aside nav");
     expect(nav).not.toBeNull();
     expect(
-      Array.from(nav!.querySelectorAll(".nav-heading")).map(
+      Array.from(nav!.querySelectorAll(":scope > .mt-nav-group > .mt-nav-label")).map(
         (e) => e.textContent,
       ),
     ).toEqual(["开始使用", ...categories]);

@@ -2249,7 +2249,7 @@ export default function Demo() {
   {
     name: "Button",
     category: "操作命令",
-    description: "带完整样式的基础操作按钮。",
+    description: "带完整样式的基础操作按钮，支持可选的按下状态。",
     importNames: ["Button"],
     code: "import React from \"react\";\nimport { ArrowRight, Download, Image } from \"lucide-react\";\nimport { Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <div style={{ display: \"flex\", gap: 8, flexWrap: \"wrap\" }}>\n      <Button leftSection={<Image size={14} aria-hidden=\"true\" />}>图库</Button>\n      <Button\n        variant=\"solid\"\n        rightSection={<Download size={14} aria-hidden=\"true\" />}\n      >\n        下载\n      </Button>\n      <Button\n        variant=\"soft\"\n        leftSection={<Image size={14} aria-hidden=\"true\" />}\n        rightSection={<ArrowRight size={14} aria-hidden=\"true\" />}\n      >\n        查看图库\n      </Button>\n    </div>\n  );\n}",
     props: [
@@ -2291,6 +2291,28 @@ export default function Demo() {
         description: "文字后的内容，可放图标或装饰；加载期间仍显示。",
       },
       {
+        name: "toggle",
+        type: "boolean | ButtonToggleOptions",
+        default: "false",
+        description: '设为 true 或 { mode: "background" } 时用背景显示按下状态；{ mode: "icon", preset: "star" | "pin" } 用轮廓/实心图标显示状态；亦可用 { mode: "icon", offIcon, onIcon } 自定义一对图标。',
+      },
+      {
+        name: "pressed",
+        type: "boolean",
+        description: "开关按钮的受控按下状态；须配合 onPressedChange 更新。",
+      },
+      {
+        name: "defaultPressed",
+        type: "boolean",
+        default: "false",
+        description: "非受控开关按钮初始是否按下。",
+      },
+      {
+        name: "onPressedChange",
+        type: "(pressed: boolean) => void",
+        description: "开关按钮请求切换时调用；禁用、加载或 onClick 调用 preventDefault() 时不调用。",
+      },
+      {
         name: "disabled",
         type: "boolean",
         description: "禁用按钮。",
@@ -2307,6 +2329,9 @@ export default function Demo() {
       },
     ],
     notes: [
+      "未开启 toggle 时保留普通按钮行为，不接管应用手动设置的 aria-pressed。开启时由 Button 提供 aria-pressed。保留前后状态一致的按钮名；纯图标使用固定 aria-label。",
+      "图标模式不改变按钮背景，切换图标替代左侧 leftSection 与 icon，加载指示器优先，rightSection 保留。preset 和自定义图标对互斥；建议自定义图标两态同尺寸，且不要传入可交互内容。",
+      "例如 <Button toggle>仅显示未读</Button> 或 <IconButton aria-label=\"收藏\" toggle={{ mode: \"icon\", preset: \"star\" }} />。",
       "支持 ref 和 Base UI Button 的可组合属性。加载中显示前置加载图标并禁用按钮，右侧内容不变。",
       "左右内容按阅读方向排列，在 RTL 中自动对调。传入内容的一侧使用更紧凑的内边距；装饰图标可标记 aria-hidden。",
       "blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。",
@@ -2367,7 +2392,8 @@ export default function Demo() {
         description: "组件内容。",
       },
     ],
-    notes: ["children 中可直接放 lucide-react 图标；不要只用图标而省略名称。"],
+    notes: [
+      "可使用 Button 的 toggle、pressed、defaultPressed 和 onPressedChange。切换时请保留同一个 aria-label。","children 中可直接放 lucide-react 图标；不要只用图标而省略名称。"],
   },
   {
     name: "ButtonGroup",
@@ -3465,7 +3491,7 @@ export default function Demo() {
   {
     name: "NavItem",
     category: "导航切换",
-    description: "支持当前状态和图标的导航按钮。",
+    description: "支持当前状态和图标的导航项，可作为按钮或原生链接。",
     importNames: ["NavItem"],
     code: 'import { NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NavItem active onClick={() => console.log("navigation")}>我的知识库</NavItem>\n  );\n}',
     props: [
@@ -3480,6 +3506,16 @@ export default function Demo() {
         description: "前置图标。",
       },
       {
+        name: "href",
+        type: "string",
+        description: "提供时渲染原生链接，支持 target、rel、键盘和浏览器原生打开行为。",
+      },
+      {
+        name: "disabled",
+        type: "boolean",
+        description: "禁用时阻止激活；链接移除实际 href 和 Tab 停靠点。",
+      },
+      {
         name: "onClick",
         type: "MouseEventHandler",
         description: "由应用执行导航。",
@@ -3491,7 +3527,7 @@ export default function Demo() {
       },
       {
         name: "原生属性",
-        type: "HTMLAttributes",
+        type: "ButtonHTMLAttributes | AnchorHTMLAttributes",
         description:
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
@@ -3499,7 +3535,7 @@ export default function Demo() {
     notes: [
       "当前页使用灰色圆角底和逻辑起始侧蓝色竖标；悬停不显示竖标。",
       "默认行高 34px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。",
-      "底层为 button，不是链接；应用负责与路由集成。",
+      "不提供 href 时仍为按钮。ref 指向实际 button 或 a；组件不接管路由。",
     ],
   },
   {

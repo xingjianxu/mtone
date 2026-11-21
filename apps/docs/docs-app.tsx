@@ -476,31 +476,31 @@ export function DocsApp() {
               if ((event.target as HTMLElement).closest("a")) setMobile(false);
             }}
           >
-            <div className="nav-heading">开始使用</div>
-            <a
-              href="#/start"
-              aria-current={route.kind === "start" ? "page" : undefined}
-            >
-              <BookOpen size={15} aria-hidden="true" />
-              <span className="docs-nav-label">快速开始</span>
-            </a>
-            <a
-              href="#/gallery"
-              aria-current={route.kind === "gallery" ? "page" : undefined}
-            >
-              <Layers size={15} aria-hidden="true" />
-              <span className="docs-nav-label">Component gallery</span>
-            </a>
-            <a href="./showcase.html" target="_blank" rel="noopener noreferrer" >
-              <Layers size={15} aria-hidden="true" />
-              <span className="docs-nav-label">应用示例</span>
-            </a>
-            <a
-              href="#/theme"
-              aria-current={route.kind === "theme" ? "page" : undefined}
-            >
-              <span className="docs-nav-label">主题与样式</span>
-            </a>
+            <M.NavGroup label="开始使用">
+              <M.NavItem
+                href="#/start"
+                active={route.kind === "start"}
+                icon={<BookOpen size={15} aria-hidden="true" />}
+              >
+                快速开始
+              </M.NavItem>
+              <M.NavItem
+                href="#/gallery"
+                active={route.kind === "gallery"}
+                icon={<Layers size={15} aria-hidden="true" />}
+              >
+                Component gallery
+              </M.NavItem>
+              <M.NavItem href="./showcase.html" target="_blank" rel="noopener noreferrer" icon={<Layers size={15} aria-hidden="true" />}>
+                应用示例
+              </M.NavItem>
+              <M.NavItem
+                href="#/theme"
+                active={route.kind === "theme"}
+              >
+                主题与样式
+              </M.NavItem>
+            </M.NavGroup>
             {groups.map((group) => {
                 // Preserve semantic group order, but make each component easy to find by name.
                 const members = componentDocs
@@ -508,20 +508,17 @@ export function DocsApp() {
                   .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
                 return (
                   members.length > 0 && (
-                    <div key={group}>
-                      <div className="nav-heading">{group}</div>
+                    <M.NavGroup key={group} label={group}>
                       {members.map((d) => (
-                        <a
+                        <M.NavItem
                           key={d.name}
                           href={componentDocHref(d.name)}
-                          aria-current={
-                            doc?.name === d.name || doc?.sidebarParent === d.name ? "page" : undefined
-                          }
+                          active={doc?.name === d.name || doc?.sidebarParent === d.name}
                         >
-                          <span className="docs-nav-label">{d.name}</span>
-                        </a>
+                          {d.name}
+                        </M.NavItem>
                       ))}
-                    </div>
+                    </M.NavGroup>
                   )
                 );
               })}

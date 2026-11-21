@@ -4,13 +4,9 @@ it('does not ship preflight or unscoped host element rules',()=>{const css=readF
 it('uses neutral gray sidebar states while preserving focus indicators', () => {
   const docs = readFileSync('apps/docs/site.css', 'utf8');
   const library = readFileSync('packages/mtone/src/styles.css', 'utf8');
-  const docsTokens = readFileSync('apps/docs/theme-preference.css', 'utf8');
-  const docsRule = docs.slice(docs.indexOf('.docs-sidebar nav a[aria-current="page"]')).split('}')[0];
   const libraryRule = library.slice(library.indexOf('.mt-nav-item.mt-active')).split('}')[0];
-  expect(docsRule).toContain('background: var(--docs-nav-active)');
-  expect(docsRule).toContain('color: var(--docs-nav-active-ink)');
-  expect(docsTokens).toContain('--docs-nav-active: #e5e5e5');
-  expect(docsTokens).toContain('--docs-nav-active-ink: #262626');
+  expect(docs).not.toContain('.docs-sidebar nav a[aria-current="page"]');
+  expect(library).toContain('.mt-nav-item.mt-active::before');
   expect(libraryRule).toContain('background: var(--mt-nav-selected, #e5e5e5)');
   expect(libraryRule).toContain('color: var(--mt-nav-current-text, #262626)');
   expect(library).toContain('.mt-nav-item:focus-visible');

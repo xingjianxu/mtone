@@ -1,3 +1,4 @@
+import React from "react";
 import userEvent from "@testing-library/user-event";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { it, expect, vi } from "vitest";
@@ -93,4 +94,41 @@ it.each([false, true])('spaces plain Sidebar siblings with collapsible=%s', (col
   const selector = '.mt-sidebar > .mt-nav-item + .mt-nav-item, .mt-sidebar-content > .mt-nav-item + .mt-nav-item';
   expect(container.querySelectorAll(selector)).toHaveLength(1);
   expect(screen.getByRole('button', { name: 'Second' }).matches(selector)).toBe(true);
+});
+
+it("uses native anchor semantics and an anchor ref when href is provided", async () => {
+  const anchor = React.createRef<HTMLAnchorElement>();
+  const button = React.createRef<HTMLButtonElement>();
+  const handle = vi.fn();
+  render(<NavGroup>
+    <NavItem ref={anchor} href="/guide" target="_blank" rel="noopener noreferrer" active onClick={(event) => { event.preventDefault(); handle(event.currentTarget); }}>Guide</NavItem>
+    <NavItem ref={button}>Action</NavItem>
+    <NavItem href="/blocked" disabled onClick={handle}>Blocked</NavItem>
+  </NavGroup>);
+  const link = screen.getByRole("link", { name: "Guide" });
+  expect(anchor.current).toBe(link);
+  expect(link).toHaveAttribute("href", "/guide");
+  expect(link).toHaveAttribute("target", "_blank");
+  expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  expect(link).toHaveAttribute("aria-current", "page");
+  link.focus();
+  await userEvent.keyboard("{Enter}");
+  expect(handle).toHaveBeenCalledWith(link);
+  expect(button.current).toBe(screen.getByRole("button", { name: "Action" }));
+  const blocked = screen.getByRole("link", { name: "Blocked" });
+  expect(blocked).not.toHaveAttribute("href");
+  expect(blocked).toHaveAttribute("aria-disabled", "true");
+  expect(blocked).toHaveAttribute("tabindex", "-1");
+  fireEvent.click(blocked);
+  expect(handle).toHaveBeenCalledTimes(1);
+});
+
+it("keeps a collapsed native link named and shows its tooltip on keyboard focus", async () => {
+  render(<Sidebar collapsible defaultCollapsed><NavItem href="#billing">Billing details</NavItem></Sidebar>);
+  const link = screen.getByRole("link", { name: "Billing details" });
+  expect(link).toHaveClass("mt-nav-item-collapsed");
+  link.focus();
+  const tooltip = await screen.findByRole("tooltip");
+  expect(tooltip).toHaveTextContent("Billing details");
+  expect(link).toHaveFocus();
 });

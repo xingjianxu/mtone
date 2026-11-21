@@ -100,59 +100,96 @@ export function Sidebar({
   );
 }
 
-export const NavItem = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    active?: boolean;
-    icon?: React.ReactNode;
-  }
->(function NavItem({ active, icon, children, className, onClick, ...p }, ref) {
-  const collapsed = React.useContext(SidebarContext);
-  const [tipOpen, setTipOpen] = React.useState(false);
-  const onSubmenuSelect = React.useContext(NavSubmenuSelectionContext);
-  const plainLabel =
-    typeof children === "string" || typeof children === "number";
-  const label = p["aria-label"] ?? (plainLabel ? String(children) : undefined);
-  const button = (
-    <button
-      type="button"
-      {...p}
-      ref={ref}
-      onClick={(event) => {
-        onClick?.(event);
-        if (!event.defaultPrevented) onSubmenuSelect?.();
-      }}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "mt-nav-item",
-        active && "mt-active",
-        collapsed && "mt-nav-item-collapsed",
-        className,
-      )}
-    >
-      {icon || (collapsed ? <Circle size={16} aria-hidden="true" /> : null)}
-      {collapsed ? (
-        <span className="mt-sidebar-sr-only">{children}</span>
-      ) : plainLabel ? (
-        <span className="mt-nav-item-label">{children}</span>
-      ) : (
-        children
-      )}
-    </button>
-  );
-  return label ? (
-    <Tooltip
-      content={label}
-      side="right"
-      open={collapsed && tipOpen}
-      onOpenChange={(open) => setTipOpen(collapsed && open)}
-    >
-      {button}
-    </Tooltip>
-  ) : (
-    button
-  );
-});
+interface NavItemCommonProps {
+  active?: boolean;
+  icon?: React.ReactNode;
+}
+export type NavItemButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  NavItemCommonProps & { href?: undefined };
+export type NavItemLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> &
+  NavItemCommonProps & { href: string; disabled?: boolean };
+export type NavItemProps = NavItemButtonProps | NavItemLinkProps;
+
+export const NavItem = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, NavItemProps>(
+  function NavItem(props, ref) {
+    const collapsed = React.useContext(SidebarContext);
+    const [tipOpen, setTipOpen] = React.useState(false);
+    const onSubmenuSelect = React.useContext(NavSubmenuSelectionContext);
+    const { active, icon, children, className } = props;
+    const plainLabel = typeof children === "string" || typeof children === "number";
+    const label = props["aria-label"] ?? (plainLabel ? String(children) : undefined);
+    const rowProps = {
+      "aria-current": active ? ("page" as const) : undefined,
+      className: cn("mt-nav-item", active && "mt-active", collapsed && "mt-nav-item-collapsed", className),
+    };
+    const content = (
+      <>
+        {icon || (collapsed ? <Circle size={16} aria-hidden="true" /> : null)}
+        {collapsed ? <span className="mt-sidebar-sr-only">{children}</span>
+          : plainLabel ? <span className="mt-nav-item-label">{children}</span>
+          : children}
+      </>
+    );
+
+    let row: React.ReactElement;
+    if (typeof props.href === "string") {
+      const { href, disabled, onClick, onAuxClick, active, icon, children, className, ...linkProps } = props;
+      row = (
+        <a
+          {...linkProps}
+          {...rowProps}
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          href={disabled ? undefined : href}
+          role={disabled ? "link" : linkProps.role}
+          aria-disabled={disabled ? true : linkProps["aria-disabled"]}
+          tabIndex={disabled ? -1 : linkProps.tabIndex}
+          onAuxClick={disabled ? undefined : onAuxClick}
+          onClick={(event) => {
+            if (disabled) return;
+            onClick?.(event);
+            if (!event.defaultPrevented && event.button === 0 &&
+              !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+              onSubmenuSelect?.();
+            }
+          }}
+        >
+          {content}
+        </a>
+      );
+    } else {
+      const { href, active, icon, children, className, onClick, ...buttonProps } = props;
+      row = (
+        <button
+          type="button"
+          {...buttonProps}
+          {...rowProps}
+          ref={ref as React.Ref<HTMLButtonElement>}
+          onClick={(event) => {
+            onClick?.(event);
+            if (!event.defaultPrevented) onSubmenuSelect?.();
+          }}
+        >
+          {content}
+        </button>
+      );
+    }
+
+    return label ? (
+      <Tooltip
+        content={label}
+        side="right"
+        open={collapsed && tipOpen}
+        onOpenChange={(open) => setTipOpen(collapsed && open)}
+      >
+        {row}
+      </Tooltip>
+    ) : row;
+  },
+) as {
+  (props: NavItemLinkProps & React.RefAttributes<HTMLAnchorElement>): React.ReactNode;
+  (props: NavItemButtonProps & React.RefAttributes<HTMLButtonElement>): React.ReactNode;
+};
+
 export function NavGroup({
   label,
   children,
@@ -290,7 +327,7 @@ export function NavSubmenu({
                   ref={popupRef}
                   className="mt-popup mt-nav-submenu-popup"
                   aria-labelledby={popupTitleId}
-                  initialFocus={() => popupRef.current?.querySelector<HTMLElement>(".mt-nav-item:not(:disabled)") ?? popupRef.current}
+                  initialFocus={() => popupRef.current?.querySelector<HTMLElement>('.mt-nav-item:not(:disabled):not([aria-disabled="true"])') ?? popupRef.current}
                 >
                   <span id={popupTitleId} className="mt-sidebar-sr-only">{label}</span>
                   <SidebarContext.Provider value={false}>

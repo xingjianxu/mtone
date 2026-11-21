@@ -2,7 +2,6 @@
 :root {
   --docs-fg: #37352f;
   --docs-text: #292929;
-  --docs-nav-active-ink: #262626;
   --docs-nav-text: #6c6b65;
   --docs-strong-muted: #555;
   --docs-muted: #787774;
@@ -29,8 +28,6 @@
   --docs-code: #f8f8f6;
   --docs-hover: #efefed;
   --docs-inline-hover: #f1f1ef;
-  --docs-nav-hover: #efefef;
-  --docs-nav-active: #e5e5e5;
   --docs-showcase-tag: #f6f6f5;
   --docs-showcase-sidebar: #f8f8f7;
   --docs-showcase-selection: #90978a;
@@ -67,7 +64,6 @@
 :root[data-mt-theme="dark"] {
   --docs-fg: var(--mt-fg, #eeece8);
   --docs-text: var(--mt-fg, #eeece8);
-  --docs-nav-active-ink: #eeece8;
   --docs-nav-text: #bdb9b1;
   --docs-strong-muted: #d0cdc6;
   --docs-muted: var(--mt-muted, #aeaaa4);
@@ -94,8 +90,6 @@
   --docs-code: #262624;
   --docs-hover: #30302e;
   --docs-inline-hover: #30302e;
-  --docs-nav-hover: #30302e;
-  --docs-nav-active: #383834;
   --docs-showcase-tag: #2b2b29;
   --docs-showcase-sidebar: #252524;
   --docs-showcase-selection: #9da898;
@@ -133,7 +127,6 @@
   :root[data-mt-theme="system"] {
     --docs-fg: var(--mt-fg, #eeece8);
     --docs-text: var(--mt-fg, #eeece8);
-    --docs-nav-active-ink: #eeece8;
     --docs-nav-text: #bdb9b1;
     --docs-strong-muted: #d0cdc6;
     --docs-muted: var(--mt-muted, #aeaaa4);
@@ -160,8 +153,6 @@
     --docs-code: #262624;
     --docs-hover: #30302e;
     --docs-inline-hover: #30302e;
-    --docs-nav-hover: #30302e;
-    --docs-nav-active: #383834;
     --docs-showcase-tag: #2b2b29;
     --docs-showcase-sidebar: #252524;
     --docs-showcase-selection: #9da898;

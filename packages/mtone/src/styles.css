@@ -125,6 +125,30 @@
 .mt-btn-blue.mt-danger:hover:not(:disabled) {
   background: #9e3632;
 }
+/* The unpressed variant and both states of icon mode keep their usual colors. */
+.mt-btn[data-toggle-mode="background"][aria-pressed="true"] {
+  background: var(--mt-nav-selected, #e5e5e5);
+}
+.mt-btn.mt-btn-solid[data-toggle-mode="background"][aria-pressed="true"] {
+  background: color-mix(in srgb, var(--mt-solid-hover, #53514c) 88%, var(--mt-on-primary, white));
+}
+.mt-btn.mt-btn-blue[data-toggle-mode="background"][aria-pressed="true"] {
+  background: #185c9f;
+}
+.mt-btn:is(.mt-btn-solid, .mt-btn-blue).mt-danger[data-toggle-mode="background"][aria-pressed="true"] {
+  background: #872c28;
+}
+@media (forced-colors: active) {
+  .mt-btn:is(.mt-btn, .mt-btn-solid.mt-danger)[data-toggle-mode="background"][aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+  .mt-btn[data-toggle-mode="background"][aria-pressed="true"]:focus-visible {
+    outline-color: HighlightText;
+  }
+}
 .mt-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
@@ -559,7 +583,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.mt-nav-item:hover {
+.mt-nav-item:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--mt-nav-hover, #efefef);
 }
 .mt-nav-item.mt-active {
@@ -586,7 +610,11 @@
   outline: 1px solid var(--mt-focus, #93b4dc);
   outline-offset: -1px;
 }
-.mt-nav-item:disabled {
+a.mt-nav-item {
+  text-decoration: none;
+}
+.mt-nav-item:disabled,
+.mt-nav-item[aria-disabled="true"] {
   opacity: 0.4;
   cursor: not-allowed;
 }

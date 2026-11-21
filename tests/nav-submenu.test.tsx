@@ -88,3 +88,21 @@ test("marks only the parent label when a child NavItem is current", () => {
   rerender(view(false));
   expect(label).not.toHaveClass("mt-nav-submenu-label-active");
 });
+
+test("keeps a collapsed popup open for modifier clicks on links, then closes for normal activation", async () => {
+  render(<M.Sidebar collapsible defaultCollapsed>
+    <M.NavSubmenu label="Billing">
+      <M.NavItem href="#disabled" disabled>Unavailable</M.NavItem>
+      <M.NavItem href="#submenu-usage">Usage</M.NavItem>
+    </M.NavSubmenu>
+  </M.Sidebar>);
+  fireEvent.click(screen.getByRole("button", { name: "Billing" }));
+  const popup = await screen.findByRole("dialog", { name: "Billing" });
+  const link = within(popup).getByRole("link", { name: "Usage" });
+  await waitFor(() => expect(link).toHaveFocus());
+  fireEvent.click(link, { ctrlKey: true, button: 0 });
+  expect(popup).toBeVisible();
+  fireEvent.click(link, { button: 0 });
+  await waitFor(() => expect(screen.getByRole("button", { name: "Billing" })).toHaveAttribute("aria-expanded", "false"));
+  window.history.replaceState(null, "", "/");
+});

@@ -6,6 +6,8 @@ import * as React from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import {
   LoaderCircle,
+  Pin,
+  Star,
   X,
   FileText,
   Inbox,
@@ -84,6 +86,17 @@ export function MtoneProvider({
     </MtoneContext.Provider>
   );
 }
+/** Visual treatment of an opt-in pressed Button. */
+export type ButtonToggleOptions =
+  | { mode: "background" }
+  | { mode: "icon"; preset: "star" | "pin"; offIcon?: never; onIcon?: never }
+  | {
+      mode: "icon";
+      preset?: never;
+      offIcon: React.ReactNode;
+      onIcon: React.ReactNode;
+    };
+
 export type ButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof BaseButton>,
   "className"
@@ -93,6 +106,11 @@ export type ButtonProps = Omit<
   size?: "sm" | "md" | "lg";
   danger?: boolean;
   loading?: boolean;
+  /** Opt into a persistent pressed state. True uses background mode. */
+  toggle?: boolean | ButtonToggleOptions;
+  pressed?: boolean;
+  defaultPressed?: boolean;
+  onPressedChange?: (pressed: boolean) => void;
   icon?: React.ReactNode;
   /** Content before the label (inline start). When omitted, icon is used. */
   leftSection?: React.ReactNode;
@@ -109,6 +127,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size = "md",
       danger,
       loading,
+      toggle,
+      pressed,
+      defaultPressed = false,
+      onPressedChange,
+      onClick,
       icon,
       leftSection,
       rightSection,
@@ -119,8 +142,30 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) {
+    const [localPressed, setLocalPressed] = React.useState(defaultPressed);
+    const isPressed = pressed ?? localPressed;
+    const effectiveDisabled = useFieldsetDisabled(disabled) || loading;
+    const mode = toggle === true ? "background" : toggle ? toggle.mode : undefined;
+    const iconToggle =
+      toggle && typeof toggle === "object" && toggle.mode === "icon"
+        ? toggle
+        : undefined;
+    const Preset =
+      iconToggle?.preset === "star"
+        ? Star
+        : iconToggle?.preset === "pin"
+          ? Pin
+          : undefined;
     const leading = loading ? (
       <LoaderCircle className="mt-spin" size={14} aria-hidden="true" />
+    ) : iconToggle ? (
+      Preset ? (
+        <Preset size={14} fill={isPressed ? "currentColor" : "none"} />
+      ) : isPressed ? (
+        iconToggle.onIcon
+      ) : (
+        iconToggle.offIcon
+      )
     ) : leftSection === undefined ? (
       icon
     ) : (
@@ -130,8 +175,21 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <BaseButton
         {...props}
         ref={ref}
-        disabled={useFieldsetDisabled(disabled) || loading}
+        disabled={effectiveDisabled}
         aria-busy={loading || undefined}
+        {...(mode ? { "aria-pressed": isPressed, "data-toggle-mode": mode } : {})}
+        onClick={
+          mode
+            ? (event) => {
+                if (effectiveDisabled) return;
+                onClick?.(event);
+                if (event.defaultPrevented) return;
+                const next = !isPressed;
+                if (pressed === undefined) setLocalPressed(next);
+                onPressedChange?.(next);
+              }
+            : onClick
+        }
         className={cn(
           "mt-btn",
           `mt-btn-${variant}`,
@@ -140,7 +198,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className,
         )}
       >
-        {hasButtonSection(leftSection) ? (
+        {iconToggle ? (
+          <span className="mt-btn-section mt-btn-section-start" aria-hidden="true">
+            {leading}
+          </span>
+        ) : hasButtonSection(leftSection) ? (
           <span className="mt-btn-section mt-btn-section-start">{leading}</span>
         ) : (
           leading

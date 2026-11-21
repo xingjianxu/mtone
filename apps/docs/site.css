@@ -40,7 +40,7 @@ a:focus-visible,
 input:focus-visible {
   outline: 1px solid var(--mt-focus, #93b4dc);
 }
-a:hover {
+a:hover:not(:where(.mt-nav-item)) {
   color: var(--docs-accent-link);
 }
 .topbar {
@@ -129,43 +129,23 @@ a:hover {
 .docs-search-trigger:hover { background: var(--docs-hover); }
 .docs-search-trigger:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
 .docs-search-trigger kbd { font: 10px ui-monospace, monospace; color: var(--docs-keycap); }
-.docs-sidebar nav > a,
-.docs-sidebar nav > div > a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 5px;
-  height: var(--mt-height, 34px);
-  padding: 0 10px;
+.docs-sidebar nav > .mt-nav-group > .mt-nav-item {
+  padding-inline: 10px;
   font-size: 13px;
+}
+.docs-sidebar .mt-nav-item:not(.mt-active) {
   color: var(--docs-nav-text);
 }
-.docs-sidebar nav a > svg { flex-shrink: 0; }
-.docs-nav-label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.docs-sidebar nav > a + a,
-.docs-sidebar nav > div > a + a {
-  margin-top: 3px;
-}
-.docs-sidebar nav a:hover {
-  background: var(--docs-nav-hover);
-  color: var(--docs-nav-active-ink);
-}
-.docs-sidebar nav a[aria-current="page"] {
-  background: var(--docs-nav-active);
-  color: var(--docs-nav-active-ink);
+.docs-sidebar .mt-nav-item.mt-active {
   font-weight: 600;
 }
-.nav-heading {
+.docs-sidebar .mt-nav-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--docs-faint);
-  margin: 23px 10px 8px;
+  padding: 0;
+  margin: 0 10px 8px;
 }
 .sidebar-foot {
   font-size: 9px;

@@ -9,6 +9,9 @@ import source3 from "./button-blue.tsx?raw";
 import SectionsDemo from "./button-sections";
 import sectionsSource from "./button-sections.tsx?raw";
 
+import ToggleDemo from "./button-toggle";
+import toggleSource from "./button-toggle.tsx?raw";
+
 export const buttonDocSections = [
   {
     id: "usage",
@@ -17,10 +20,24 @@ export const buttonDocSections = [
     source: source0.replace("../../../packages/mtone/src", "@bixlab/mtone"),
   },
   {
+    id: "button-toggle",
+    title: "开关按钮",
+    description:
+      "保持按钮名称不变，以背景或图标显示按下状态。图标示例包括收藏、受控置顶与自定义书签。",
+    Demo: ToggleDemo,
+    source: toggleSource.replace(
+      "../../../packages/mtone/src",
+      "@bixlab/mtone",
+    ),
+  },
+  {
     id: "button-sections",
     title: "左右内容",
     Demo: SectionsDemo,
-    source: sectionsSource.replace("../../../packages/mtone/src", "@bixlab/mtone"),
+    source: sectionsSource.replace(
+      "../../../packages/mtone/src",
+      "@bixlab/mtone",
+    ),
   },
   {
     id: "danger",
