@@ -165,13 +165,13 @@ try {
       }
       await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
       await expect(page.getByRole("tablist", {name:"Explicit zero gap", exact:true})).toHaveCSS("gap", "0px");
-      async function lowerRows(frame, offset = 20) {
+      async function lowerRows(frame, offset = 20, count = 2) {
         const rect = await frame.boundingBox();
         // Locator screenshots can capture a neighboring row because of
         // clip rounding. Sample the frame’s last two rows directly from
         // the viewport, including the divider when it shares that edge.
         const data = (await page.screenshot({ scale: "css" })).toString("base64");
-        return page.evaluate(async ({ data, x, bottom }) => {
+        return page.evaluate(async ({ data, x, bottom, count }) => {
           const image = await createImageBitmap(await (await fetch("data:image/png;base64," + data)).blob());
           const canvas = document.createElement("canvas");
           canvas.width = image.width;
@@ -179,8 +179,8 @@ try {
           const context = canvas.getContext("2d");
           context.drawImage(image, 0, 0);
           const pixel = (y) => [...context.getImageData(x, y, 1, 1).data];
-          return [pixel(bottom - 1), pixel(bottom - 2)];
-        }, { data, x: Math.floor(rect.x + offset), bottom: Math.round(rect.y + rect.height) });
+          return Array.from({length:count}, (_, i) => pixel(bottom - i - 1));
+        }, { data, x: Math.floor(rect.x + offset), bottom: Math.round(rect.y + rect.height), count });
       }
       for (const variant of ["card", "editable-card"]) {
         const region = page.getByTestId(`${variant}-medium-top`);
@@ -239,6 +239,41 @@ try {
         await region.evaluate((node) => {
           for (const prop of ["position", "top", "left", "width", "z-index"]) node.style.removeProperty(prop);
         });
+      }
+      const line = page.getByTestId("line-medium-top");
+      await line.evaluate(node => Object.assign(node.style, {
+        position: "fixed", top: "24px", left: "24px", width: "380px", zIndex: "10",
+      }));
+      const topList = line.getByRole("tablist");
+      const selected = topList.getByRole("tab", {name:"Icon tab", exact:true});
+      const adjacent = topList.getByRole("tab", {name:"Plain tab", exact:true});
+      await expect(topList).toHaveCSS("height", "35px");
+      await expect(selected).toHaveCSS("height", "34px");
+      const firstBox = await selected.boundingBox();
+      const nextBox = await adjacent.boundingBox();
+      const barBox = await topList.boundingBox();
+      const selectedX = firstBox.x - barBox.x + 20;
+      const adjacentX = nextBox.x - barBox.x + 20;
+      const [baseline, adjacentSecond] = await lowerRows(topList, adjacentX);
+      const [lineEdge, lineSecond, lineThird] = await lowerRows(topList, selectedX, 3);
+      expect(lineEdge).toEqual(lineSecond);
+      expect(lineThird).not.toEqual(lineSecond);
+      expect(lineEdge).not.toEqual(baseline);
+      expect(baseline).not.toEqual(adjacentSecond);
+      const label = selected.locator(".mt-tab-label");
+      const beforeY = (await label.boundingBox()).y;
+      await selected.hover();
+      expect((await label.boundingBox()).y).toBe(beforeY);
+      expect((await lowerRows(topList, selectedX, 3)).slice(0, 2)).toEqual([lineEdge,lineEdge]);
+      expect(await topList.evaluate(node => node.scrollHeight === node.clientHeight && node.scrollTop === 0)).toBe(true);
+      await line.screenshot({path:`artifacts/tabs-browser/${name}-line-indicator.png`});
+      if (name === "chromium") {
+        await page.emulateMedia({forcedColors:"active"});
+        await expect(topList).toHaveCSS("border-bottom-width", "1px");
+        await expect(topList).toHaveCSS("height", "35px");
+        await expect(selected).toHaveCSS("border-bottom-width", "2px");
+        expect(await selected.evaluate(el => getComputedStyle(el, "::after").content)).toBe("none");
+        await page.emulateMedia({forcedColors:"none"});
       }
       if (errors.length) throw Error(errors.join("\n"));
       console.log(`${name}: Tabs passed`);

@@ -71,3 +71,18 @@ it("aligns both top card states without adding to the scrollable height", () => 
     "background-clip": "padding-box",
   });
 });
+
+it("moves only the top line indicator down while preserving the baseline row", () => {
+  const list = '.mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list';
+  const active = list + " > .mt-tab-item > .mt-tab[data-active]";
+  expect(declarations(list)).toEqual({
+    "border-bottom": "0",
+    "padding-bottom": "1px",
+    "box-shadow": "inset 0 -1px var(--mt-border, #e9e9e7)",
+  });
+  expect(declarations(active)).toEqual({position:"relative","border-bottom-color":"transparent"});
+  expect(declarations(active + "::after")).toEqual({
+    content: '""', position: "absolute", "inset-inline": "0", bottom: "-3px",
+    height: "2px", background: "currentColor", "pointer-events": "none",
+  });
+});

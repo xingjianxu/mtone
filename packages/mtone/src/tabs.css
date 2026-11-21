@@ -116,6 +116,39 @@
 .mt-tabs[data-variant="line"] > .mt-tab-bar > .mt-tab-list {
   gap: var(--mt-tabs-gap, 6px);
 }
+/* Reserve the same 1px for the baseline inside the scrollport, so the
+   selected underline can overlap it without moving the tab or being clipped. */
+.mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list {
+  border-bottom: 0;
+  padding-bottom: 1px;
+  box-shadow: inset 0 -1px var(--mt-border, #e9e9e7);
+}
+.mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active] {
+  position: relative;
+  border-bottom-color: transparent;
+}
+.mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -3px;
+  height: 2px;
+  background: currentColor;
+  pointer-events: none;
+}
+/* Forced colors removes shadows; keep the native divider and selection stroke. */
+@media (forced-colors: active) {
+  .mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list {
+    border-bottom: 1px solid CanvasText;
+    padding-bottom: 0;
+  }
+  .mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active] {
+    border-bottom-color: currentColor;
+  }
+  .mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active]::after {
+    content: none;
+  }
+}
 .mt-tabs[data-variant="card"] > .mt-tab-bar > .mt-tab-list,
 .mt-tabs[data-variant="editable-card"] > .mt-tab-bar > .mt-tab-list {
   gap: var(--mt-tabs-gap, 4px);
