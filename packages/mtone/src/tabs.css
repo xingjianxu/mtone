@@ -36,7 +36,7 @@
   text-decoration: none;
 }
 .mt-tabs[data-variant="line"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab > span.mt-tab-label {
-  margin-inline: 3px;
+  margin-inline: 6px;
 }
 .mt-tab:hover:not(:disabled):not([data-disabled]) {
   color: var(--mt-fg, #37352f);
@@ -114,7 +114,7 @@
   font-size: 15px;
 }
 .mt-tabs[data-variant="line"] > .mt-tab-bar > .mt-tab-list {
-  gap: var(--mt-tabs-gap, 0px);
+  gap: var(--mt-tabs-gap, 6px);
 }
 .mt-tabs[data-variant="card"] > .mt-tab-bar > .mt-tab-list,
 .mt-tabs[data-variant="editable-card"] > .mt-tab-bar > .mt-tab-list {
@@ -276,12 +276,7 @@
   margin-inline: 3px;
 }
 
-/* The active top card's one-pixel seam is white at rest. Carry the hovered
-   tab fill through that seam without moving or recoloring the card border. */
-.mt-tabs[data-variant="editable-card"][data-placement="top"]
-  > .mt-tab-bar
-  > .mt-tab-list
-  > .mt-tab-item[data-active]
-  > .mt-tab:hover:not(:disabled):not([data-disabled]) {
-  box-shadow: 0 1px 0 var(--mt-hover, #f1f1ef);
+/* Keep the selected card's own background visible through the tab trigger. */
+.mt-tabs:is([data-variant="card"], [data-variant="editable-card"]) > .mt-tab-bar > .mt-tab-list > .mt-tab-item[data-active] > .mt-tab:hover {
+  background-color: transparent;
 }

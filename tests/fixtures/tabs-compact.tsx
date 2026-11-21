@@ -18,4 +18,5 @@ createRoot(document.getElementById("root")!).render(<MtoneProvider locale="en"><
 <Input aria-label="Unchanged input"/><Select label="Unchanged select" options={[{value:"one",label:"One"}]}/>
 <Tabs label="Unchanged line" items={[{value:"line",label:"Line tab",content:"Line content"}]}/>
 {(["top","start"] as const).map(placement => <Tabs key={placement} label={`Custom gap ${placement}`} gap={9} placement={placement} items={[{value:"one",label:"One",content:"One"},{value:"two",label:"Two",content:"Two"}]}/>)}
+<Tabs label="Explicit zero gap" gap={0} items={[{value:"one",label:"One",content:"One"},{value:"two",label:"Two",content:"Two"}]}/>
 </main></MtoneProvider>);

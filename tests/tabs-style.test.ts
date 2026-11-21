@@ -36,12 +36,17 @@ it("moves 3px of existing editable trigger padding onto the text label", () => {
   expect(declarations(editable + " > .mt-tab > .mt-tab-label")["margin-inline"]).toBe("3px");
 });
 
-it("adds line spacing to the label, not the trigger, item or list", () => {
+it("sets line label margin and default list gap without adding item margins", () => {
   const list = '.mt-tabs[data-variant="line"] > .mt-tab-bar > .mt-tab-list';
   const item = list + " > .mt-tab-item";
   const tab = item + " > .mt-tab";
-  expect(declarations(tab + " > span.mt-tab-label")).toEqual({ "margin-inline": "3px" });
+  expect(declarations(tab + " > span.mt-tab-label")).toEqual({ "margin-inline": "6px" });
   expect(declarations(tab)["padding-inline"]).toBeUndefined();
   expect(declarations(item)["margin-inline"]).toBeUndefined();
-  expect(declarations(list).gap).toBe("var(--mt-tabs-gap, 0px)");
+  expect(declarations(list).gap).toBe("var(--mt-tabs-gap, 6px)");
+});
+
+it("keeps the tab trigger transparent on active card hover", () => {
+  const active = root + " > .mt-tab-bar > .mt-tab-list > .mt-tab-item[data-active]";
+  expect(declarations(active + " > .mt-tab:hover")).toEqual({"background-color": "transparent"});
 });

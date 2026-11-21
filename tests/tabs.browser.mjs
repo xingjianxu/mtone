@@ -93,14 +93,14 @@ try {
           for (const placement of ["top", "bottom", "start", "end"]) {
             const region = page.getByTestId(`${variant}-${size}-${placement}`);
             const frames = region.locator(".mt-tab-item");
-            await expect(region.getByRole("tablist")).toHaveCSS("gap", variant === "line" ? "0px" : "4px");
+            await expect(region.getByRole("tablist")).toHaveCSS("gap", variant === "line" ? "6px" : "4px");
             const vertical = ["start", "end"].includes(placement);
             const spacing = await frames.evaluateAll(([a, b], isVertical) => {
               const first = a.getBoundingClientRect();
               const second = b.getBoundingClientRect();
               return isVertical ? second.top - first.bottom : second.left - first.right;
             }, vertical);
-            expect(spacing).toBeCloseTo(variant === "line" ? 0 : 4);
+            expect(spacing).toBeCloseTo(variant === "line" ? 6 : 4);
 
             for (const frame of await frames.all()) {
               await expect(frame).toHaveCSS("height", "34px");
@@ -110,7 +110,7 @@ try {
             const tab = region.getByRole("tab", {name:"Icon tab", exact:true});
             await expect(tab).toHaveCSS("font-size", `${font}px`);
             const label = tab.locator(".mt-tab-label");
-            const margin = variant === "card" ? "0px" : "3px";
+            const margin = variant === "card" ? "0px" : variant === "line" ? "6px" : "3px";
             const padding = variant === "editable-card" ? "7px" : variant === "card" || ["start", "end"].includes(placement) ? "10px" : size === "large" ? "4px" : "2px";
             await expect(label).toHaveCSS("margin-inline-start", margin);
             await expect(label).toHaveCSS("margin-inline-end", margin);
@@ -132,13 +132,13 @@ try {
       await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "34px");
       const lineTab = page.getByRole("tab", {name:"Line tab", exact:true});
       const lineLabel = lineTab.locator("span.mt-tab-label");
-      await expect(lineLabel).toHaveCSS("margin-inline-start", "3px");
-      await expect(lineLabel).toHaveCSS("margin-inline-end", "3px");
+      await expect(lineLabel).toHaveCSS("margin-inline-start", "6px");
+      await expect(lineLabel).toHaveCSS("margin-inline-end", "6px");
       await expect(lineTab).toHaveCSS("padding-top", "0px");
       await expect(lineTab).toHaveCSS("padding-inline-start", "2px");
       await expect(lineTab).toHaveCSS("padding-inline-end", "2px");
       const lineList = page.getByRole("tablist", {name:"Unchanged line", exact:true});
-      await expect(lineList).toHaveCSS("gap", "0px");
+      await expect(lineList).toHaveCSS("gap", "6px");
       await expect(lineList.locator(".mt-tab-item")).toHaveCSS("margin-inline-start", "0px");
       await expect(lineList.locator(".mt-tab-item")).toHaveCSS("margin-inline-end", "0px");
       for (const placement of ["top", "start"]) {
@@ -152,11 +152,7 @@ try {
         expect(spacing).toBeCloseTo(9);
       }
       await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
-      const editable = page.getByTestId("editable-card-medium-top");
-      // Anchor the frame at integer viewport coordinates before sampling.
-      await editable.evaluate((node) => Object.assign(node.style, {
-        position: "fixed", top: "24px", left: "24px", width: "380px", zIndex: "10",
-      }));
+      await expect(page.getByRole("tablist", {name:"Explicit zero gap", exact:true})).toHaveCSS("gap", "0px");
       async function lowerRows(frame) {
         const rect = await frame.boundingBox();
         // Locator screenshots can capture a neighboring row because of
@@ -174,24 +170,44 @@ try {
           return [pixel(bottom - 1), pixel(bottom - 2)];
         }, { data, x: Math.floor(rect.x + 20), bottom: Math.round(rect.y + rect.height) });
       }
-      const activeFrame = editable.locator(".mt-tab-item[data-active]");
-      const inactiveFrame = editable.locator(".mt-tab-item:not([data-active])").first();
-      await page.mouse.move(0, 0);
-      const [idleEdge] = await lowerRows(activeFrame);
-      await activeFrame.getByRole("tab").hover();
-      const [activeEdge, activeFill] = await lowerRows(activeFrame);
-      expect(activeEdge).toEqual(activeFill);
-      expect(activeEdge).not.toEqual(idleEdge);
-      await editable.screenshot({path:`artifacts/tabs-browser/${name}-compact-card.png`});
-      await inactiveFrame.getByRole("tab").hover();
-      const [inactiveEdge, inactiveFill] = await lowerRows(inactiveFrame);
-      // The inactive stroke should stay visible; the gray hover reaches it directly.
-      const expectedBorder = await inactiveFrame.evaluate((node) =>
-        getComputedStyle(node).borderBottomColor.match(/\d+/g).map(Number),
-      );
-      expect(inactiveEdge).toEqual([...expectedBorder, 255]);
-      expect(inactiveFill).toEqual(activeFill);
-      await expect(inactiveFrame).toHaveCSS("border-bottom-width", "1px");
+      for (const variant of ["card", "editable-card"]) {
+        const region = page.getByTestId(`${variant}-medium-top`);
+        // Anchor the frame at integer viewport coordinates before sampling.
+        await region.evaluate((node) => Object.assign(node.style, {
+          position: "fixed", top: "24px", left: "24px", width: "380px", zIndex: "10",
+        }));
+        const activeFrame = region.locator(".mt-tab-item[data-active]");
+        const inactiveFrame = region.locator(".mt-tab-item:not([data-active])").first();
+        const activeTab = activeFrame.getByRole("tab");
+        await page.mouse.move(0, 0);
+        const activeIdle = await lowerRows(activeFrame);
+        await activeTab.hover();
+        await expect(activeTab).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        expect(await lowerRows(activeFrame)).toEqual(activeIdle);
+        if (variant === "editable-card") {
+          const close = activeFrame.getByRole("button", {name:"Close Icon tab", exact:true});
+          await close.hover();
+          await expect(close).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+          await expect(activeTab).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+          expect(await lowerRows(activeFrame)).toEqual(activeIdle);
+        }
+        const inactiveTab = inactiveFrame.getByRole("tab");
+        await inactiveTab.hover();
+        const [inactiveEdge, inactiveFill] = await lowerRows(inactiveFrame);
+        const [border, fill] = await inactiveTab.evaluate((tab) => [
+          getComputedStyle(tab.parentElement).borderBottomColor,
+          getComputedStyle(tab).backgroundColor,
+        ].map(color => color.match(/\d+/g).map(Number)));
+        // Gray hover reaches the unchanged stroke without a white seam.
+        expect(inactiveEdge).toEqual([...border, 255]);
+        expect(inactiveFill).toEqual([...fill, 255]);
+        expect(inactiveFill).not.toEqual(activeIdle[1]);
+        await expect(inactiveFrame).toHaveCSS("border-bottom-width", "1px");
+        await region.screenshot({path:`artifacts/tabs-browser/${name}-${variant}-hover.png`});
+        await region.evaluate((node) => {
+          for (const prop of ["position", "top", "left", "width", "z-index"]) node.style.removeProperty(prop);
+        });
+      }
       if (errors.length) throw Error(errors.join("\n"));
       console.log(`${name}: Tabs passed`);
     } catch (e) {

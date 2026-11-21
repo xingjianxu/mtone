@@ -3879,7 +3879,7 @@ export default function Demo() {
       {
         name: "centered / gap",
         type: "boolean / number",
-        description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 0px，card/editable-card 为 4px。",
+        description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 6px，card/editable-card 为 4px。",
       },
       {
         name: "extraStart / extraEnd",
@@ -3934,6 +3934,7 @@ export default function Demo() {
       "默认 destroyOnHidden=true 延续旧版隐藏面板卸载行为；false 时仅保留访问过的面板。forceRender 让该面板始终挂载；项目级 destroyOnHidden 可覆盖全局值。",
       "非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。",
       "editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。",
+      "线型标签文字两侧各保留 6px 外边距。卡片式与可编辑卡片式的选中标签悬停时保持原背景。",
       "溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。",
       "默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。",
       "未实现自定义 tabBar 渲染器、指示线动画引擎或更多菜单搜索。标签 label 请勿嵌入交互控件。",
