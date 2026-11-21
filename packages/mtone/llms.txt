@@ -31,6 +31,7 @@ This file describes this package checkout, not necessarily the latest published 
 
 - [Getting started](https://xingjianxu.github.io/mtone/#/start): installation and AI usage
 - [Theme and styling](https://xingjianxu.github.io/mtone/#/theme): color modes and tokens
+- [Shared color presets](https://xingjianxu.github.io/mtone/#/theme/color-presets): live palette, CSS reuse, and scoped overrides
 - [Component gallery](https://xingjianxu.github.io/mtone/#/gallery): independent component examples
 - [Application showcase](https://xingjianxu.github.io/mtone/showcase.html): interactive in-memory demo, not a backend
 - [Source repository](https://github.com/xingjianxu/mtone): current code and migration notes

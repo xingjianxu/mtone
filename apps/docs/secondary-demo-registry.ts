@@ -1,4 +1,5 @@
 import NavSubmenuUsage from "./secondary-demos/nav-submenu-usage";
+import { colorPresetsHref } from "./color-presets";
 import NavSubmenuUsageSource from "./secondary-demos/nav-submenu-usage.tsx?raw";
 import NavSubmenuRail from "./secondary-demos/nav-submenu-rail";
 import NavSubmenuRailSource from "./secondary-demos/nav-submenu-rail.tsx?raw";
@@ -1083,6 +1084,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
     {
       id: "indicator-color",
       title: "选中指示线颜色",
+      relatedLink: { href: colorPresetsHref, label: "颜色预设" },
       Demo: TabsIndicatorColorDemo,
       source: source(TabsIndicatorColorSource),
     },

@@ -25,7 +25,7 @@ test("sidebar preserves semantic groups and guide order while sorting component 
     expect(names).toEqual(expected);
   }
   expect(Array.from(sidebar.querySelectorAll('a:not([href^="#/components/"])'), (link) => link.getAttribute("href")))
-    .toEqual(["#/start", "#/gallery", "./showcase.html", "#/theme"]);
+    .toEqual(["#/start", "#/gallery", "./showcase.html", "#/theme", "#/theme/color-presets"]);
   expect(sidebar.querySelector('a[href="#/start"]')).toHaveAttribute("aria-current", "page");
   expect(sidebar.querySelectorAll("nav a:not(.mt-nav-item)")).toHaveLength(0);
   expect(sidebar.querySelector('a[href="./showcase.html"]')).toHaveAttribute("target", "_blank");

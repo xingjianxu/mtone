@@ -742,3 +742,38 @@ section > p {
 }
 
 .theme-release-note { color: var(--docs-component-muted); font-size: 12px; }
+
+.docs-inline-link {
+  color: var(--docs-accent-link);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.accent-palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accent-palette li {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--docs-border);
+  border-radius: 6px;
+}
+
+.accent-palette-swatch {
+  block-size: 32px;
+  border-radius: 4px;
+  margin-block-end: 4px;
+  forced-color-adjust: none;
+}
+
+.accent-palette code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}

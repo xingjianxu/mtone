@@ -40,6 +40,7 @@ const lines = [
 "",
 "- [Getting started](" + site + "#/start): installation and AI usage",
 "- [Theme and styling](" + site + "#/theme): color modes and tokens",
+"- [Shared color presets](" + site + "#/theme/color-presets): live palette, CSS reuse, and scoped overrides",
 "- [Component gallery](" + site + "#/gallery): independent component examples",
 "- [Application showcase](" + site + "showcase.html): interactive in-memory demo, not a backend",
 "- [Source repository](https://github.com/xingjianxu/mtone): current code and migration notes",

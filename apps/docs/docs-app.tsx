@@ -26,8 +26,10 @@ import { inlineDocSections } from "./inline-demo-registry";
 import { aiDocSections, aiSectionHref } from "./ai-demos";
 import { ShowcasePage } from "./showcase-page";
 import { ThemeSelect, useThemePreference } from "./theme-preference";
+import { CodeBlock } from "./code-block";
+import { ColorPresets, colorPresetsHeading, colorPresetsHref } from "./color-presets";
 export type Route =
-  | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
+  | { kind: "gallery" | "showcase" | "start" | "theme" | "color-presets" | "not-found" }
   | { kind: "component"; name: string; section?: string };
 export function parseRoute(hash: string): Route {
   if (hash === "#/components/SearchInput" || hash === "#/components/Textarea") return { kind: "component", name: "Input", section: hash.endsWith("SearchInput") ? "input-search" : "input-textarea" };
@@ -45,6 +47,7 @@ export function parseRoute(hash: string): Route {
     return { kind: "gallery" };
   if (hash === "#/showcase" || hash === "#/apps") return { kind: "showcase" };
   if (hash === "#/start") return { kind: "start" };
+  if (hash === colorPresetsHref) return { kind: "color-presets" };
   if (hash === "#/theme") return { kind: "theme" };
   const m = hash.match(/^#\/components\/([A-Za-z]+)(?:\?section=([A-Za-z][A-Za-z0-9-]*))?$/);
   return m && componentDocs.some((d) => d.name === m[1])
@@ -59,36 +62,6 @@ export function searchDocs(query: string) {
 }
 const groups = componentCategories;
 const componentDocHref = (name: string) => aiSectionHref(name) ?? baseComponentDocHref(name);
-function CodeBlock({ code }: { code: string }) {
-  const [status, setStatus] = useState("");
-  return (
-    <div className="code-box">
-      <div className="code-head">
-        <span>TSX</span>
-        <button
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(code);
-              setStatus("已复制");
-            } catch {
-              setStatus("复制失败，请手动选择代码");
-            }
-          }}
-          aria-label="复制代码"
-        >
-          {status === "已复制" ? <Check size={14} /> : <Copy size={14} />}{" "}
-          {status || "复制"}
-        </button>
-      </div>
-      <pre tabIndex={0}>
-        <code>{code}</code>
-      </pre>
-      <span className="sr-only" role="status">
-        {status}
-      </span>
-    </div>
-  );
-}
 function ImportLine({ code }: { code: string }) {
   const [status, setStatus] = useState("");
   return <div className="component-import">
@@ -109,6 +82,7 @@ function DocDemo({ item, level }: { item: DocSection; level: number }) {
   return <section className="component-doc-section">
     <Heading id={item.id} tabIndex={-1}>{item.title}</Heading>
     {item.note && <p>{item.note}</p>}
+    {item.relatedLink && <p>另见：<a className="docs-inline-link" href={item.relatedLink.href}>{item.relatedLink.label}</a>。</p>}
     {item.Demo && <div className="component-demo-card">
       <div className="component-demo-stage example-stage"><item.Demo /></div>
       {item.source && <details className="component-demo-source"><summary>查看代码</summary><CodeBlock code={item.source} /></details>}
@@ -325,7 +299,7 @@ function Theme() {
                 ["--mt-height", "控件高度"],
                 ["--mt-radius", "圆角"],
                 ["--mt-focus", "统一焦点色，独立于 --mt-primary"],
-                ["--mt-accent-*", "可复用主题色：neutral、blue、green、orange、red、purple、teal；可通过 MtoneProvider tokens 覆盖。"],
+                ["--mt-accent-*", "七种共享预设色，可通过 CSS 变量复用，在 MtoneProvider tokens 中覆盖。"],
               ].map(([k, v]) => (
                 <tr key={k}>
                   <td>
@@ -337,6 +311,7 @@ function Theme() {
             </tbody>
           </table>
         </div>
+        <p>查看<a className="docs-inline-link" href={colorPresetsHref}>颜色预设</a>，比较浅色与深色的实际色板并查看复用示例。</p>
       </section>
       <section>
         <h2>宿主样式与无障碍</h2>
@@ -382,12 +357,14 @@ export function DocsApp() {
     return () => window.removeEventListener("hashchange", change);
   }, []);
   useEffect(() => {
-    document.title = `${route.kind === "component" ? route.name : route.kind === "gallery" ? "组件总览" : route.kind === "showcase" ? "应用示例" : route.kind === "start" ? "快速开始" : route.kind === "theme" ? "主题与样式" : "页面未找到"} · mtone`;
+    document.title = `${route.kind === "component" ? route.name : route.kind === "gallery" ? "组件总览" : route.kind === "showcase" ? "应用示例" : route.kind === "start" ? "快速开始" : route.kind === "theme" ? "主题与样式" : route.kind === "color-presets" ? "颜色预设" : "页面未找到"} · mtone`;
   }, [route]);
   useEffect(() => {
     if (route.kind === "component" && route.section) {
       if (route.name === "Typography" && isTypographySection(route.section)) focusTypographySection(route.section);
       else focusDocSection(route.section);
+    } else if (route.kind === "color-presets") {
+      document.getElementById(colorPresetsHeading)?.focus({ preventScroll: true });
     }
   }, [route]);
   if (route.kind === "showcase") return <ShowcasePage preference={preference} />;
@@ -501,6 +478,9 @@ export function DocsApp() {
               >
                 主题与样式
               </M.NavItem>
+              <M.NavItem href={colorPresetsHref} active={route.kind === "color-presets"}>
+                颜色预设
+              </M.NavItem>
             </M.NavGroup>
             {groups.map((group) => {
                 // Preserve semantic group order, but make each component easy to find by name.
@@ -600,6 +580,8 @@ export function DocsApp() {
               <Start />
             ) : route.kind === "theme" ? (
               <Theme />
+            ) : route.kind === "color-presets" ? (
+              <ColorPresets />
             ) : (
               <>
                 <h1>页面未找到</h1>

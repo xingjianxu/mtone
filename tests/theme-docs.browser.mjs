@@ -83,6 +83,47 @@ try {
   expect(await header.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
   await page.getByRole("button", { name: "打开导航" }).click();
   await expect(page.getByRole("navigation", { name: "文档导航" })).toBeVisible();
+  const navigation = page.getByRole("navigation", { name: "文档导航" });
+  const paletteLink = navigation.getByRole("link", { name: "颜色预设", exact: true });
+  await paletteLink.click();
+  await expect(page).toHaveURL(/#\/theme\/color-presets$/);
+  await expect(page.getByRole("heading", { level: 1, name: "颜色预设" })).toBeFocused();
+  await expect(page.locator('.docs-sidebar a[href="#/theme/color-presets"]')).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("button", { name: "打开导航" })).toHaveAttribute("aria-expanded", "false");
+  expect(await page.locator("html").evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+
+  const palette = page.getByRole("list", { name: "共享颜色预设" });
+  const readPalette = () => palette.getByRole("listitem").evaluateAll((items) => items.map((item) => {
+    const swatch = item.firstElementChild;
+    const actual = getComputedStyle(swatch).backgroundColor;
+    const reference = document.createElement("span");
+    reference.style.color = getComputedStyle(item).getPropertyValue(item.querySelector("code").textContent);
+    item.append(reference);
+    const expected = getComputedStyle(reference).color;
+    reference.remove();
+    return { actual, expected };
+  }));
+  const dark = await readPalette();
+  await mode(page, "浅色").click();
+  await expect(root).toHaveCSS("color-scheme", "light");
+  const light = await readPalette();
+  expect(light).toHaveLength(7);
+  expect(dark).toHaveLength(7);
+  light.forEach(({ actual, expected }, index) => {
+    expect(actual).toBe(expected);
+    expect(dark[index].actual).toBe(dark[index].expected);
+    expect(actual).not.toBe(dark[index].actual);
+  });
+
+  const readStatus = (name) => page.getByText(name, { exact: true })
+    .evaluate((label) => getComputedStyle(label.firstElementChild).backgroundColor);
+  expect(await readStatus("局部覆盖")).toBe("rgb(82, 138, 114)");
+  expect(await readStatus("已同步")).toBe(light[2].actual);
+  expect(await readStatus("默认绿色")).toBe(light[2].actual);
+
+  await page.goto(base + "#/components/Tabs?section=indicator-color");
+  await page.getByRole("main").getByRole("link", { name: "颜色预设", exact: true }).click();
+  await expect(page).toHaveURL(/#\/theme\/color-presets$/);
   console.log(`Docs theme browser checks passed (${engine})`);
 } finally {
   await browser?.close();

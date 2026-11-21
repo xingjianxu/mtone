@@ -10,5 +10,6 @@ export interface DocSection extends OutlineEntry {
   Demo?: ComponentType;
   source?: string;
   note?: string;
+  relatedLink?: { href: string; label: string };
   children?: readonly DocSection[];
 }
