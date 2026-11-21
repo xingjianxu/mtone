@@ -1,0 +1,179 @@
+.mt-check-card {
+  --mt-check-card-padding: 12px;
+  --mt-check-card-gap: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: var(--mt-radius, 4px);
+  background: var(--mt-bg, #fff);
+  color: var(--mt-fg, #37352f);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.mt-card-group-item > .mt-check-card {
+  min-block-size: 100%;
+}
+.mt-check-card[data-bordered="false"] {
+  border-color: transparent;
+}
+.mt-check-card[data-size="sm"] {
+  --mt-check-card-padding: 8px;
+  --mt-check-card-gap: 8px;
+  font-size: 12px;
+}
+.mt-check-card[data-size="lg"] {
+  --mt-check-card-padding: 16px;
+  --mt-check-card-gap: 12px;
+  font-size: 16px;
+}
+.mt-check-card-control {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.mt-check-card-label {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-inline-size: 0;
+  border-radius: inherit;
+  cursor: pointer;
+}
+.mt-check-card-control:focus-visible + .mt-check-card-label {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
+}
+.mt-check-card:has(> .mt-check-card-control:checked) {
+  background: var(--mt-badge-blue-bg, #e7f0f9);
+}
+.mt-check-card[data-bordered="true"]:has(> .mt-check-card-control:checked) {
+  border-color: var(--mt-focus, #93b4dc);
+}
+.mt-check-card-control:not(:disabled):not(:checked) + .mt-check-card-label:hover {
+  background: var(--mt-hover, #f1f1ef);
+}
+.mt-check-card-control:disabled + .mt-check-card-label {
+  opacity: .58;
+  cursor: not-allowed;
+}
+.mt-check-card-cover {
+  display: block;
+  overflow: hidden;
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+.mt-check-card-cover img {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+.mt-check-card-main {
+  display: flex;
+  min-inline-size: 0;
+  align-items: flex-start;
+  gap: var(--mt-check-card-gap);
+  padding: var(--mt-check-card-padding);
+}
+.mt-check-card-avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+.mt-check-card-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  gap: 3px;
+  overflow-wrap: anywhere;
+}
+.mt-check-card-title {
+  font-weight: 600;
+}
+.mt-check-card-description {
+  color: var(--mt-muted, #787774);
+  font-size: .9em;
+}
+.mt-check-card-extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-inline-size: 0;
+  padding: 0 var(--mt-check-card-padding) var(--mt-check-card-padding);
+}
+.mt-check-card-indicator {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  box-sizing: border-box;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: 3px;
+  background: var(--mt-bg, #fff);
+  color: var(--mt-indicator, #5378aa);
+}
+.mt-check-card-control[type="radio"] + .mt-check-card-label .mt-check-card-indicator {
+  border-radius: 50%;
+}
+.mt-check-card-radio-dot {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.mt-check-card-control:checked + .mt-check-card-label .mt-check-card-indicator {
+  border-color: currentColor;
+}
+.mt-check-card-control:not(:checked) + .mt-check-card-label :is(.mt-check-card-check, .mt-check-card-radio-dot) {
+  visibility: hidden;
+}
+.mt-check-card[data-loading] .mt-check-card-indicator {
+  border-color: transparent;
+  background: transparent;
+}
+.mt-check-card-group {
+  min-inline-size: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.mt-check-card-legend {
+  padding: 0;
+  margin-block-end: 8px;
+  font-weight: 600;
+}
+.mt-check-card-group-items {
+  display: grid;
+  min-inline-size: 0;
+  gap: 8px;
+}
+@media (forced-colors: active) {
+  .mt-check-card-indicator {
+    border-color: ButtonText;
+  }
+  .mt-check-card-control:checked + .mt-check-card-label .mt-check-card-indicator {
+    color: Highlight;
+  }
+  .mt-check-card-control:focus-visible + .mt-check-card-label {
+    outline-color: Highlight;
+  }
+  .mt-check-card-radio-dot {
+    forced-color-adjust: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-check-card .mt-spin {
+    animation: none;
+  }
+}
