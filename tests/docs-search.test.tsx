@@ -16,7 +16,7 @@ test("topbar Spotlight replaces sidebar search and retains every searchable comp
   fireEvent.click(topbar.getByRole("button", { name: "搜索组件" }));
   const input = await screen.findByRole("combobox");
   expect(screen.getAllByRole("option")).toHaveLength(componentDocs.length);
-  for (const query of ["button", "数据录入", "布局", "zzzzzz"]) {
+  for (const query of ["button", "表单输入", "布局", "zzzzzz"]) {
     fireEvent.change(input, { target: { value: query } });
     expect(screen.queryAllByRole("option")).toHaveLength(searchDocs(query).length);
   }

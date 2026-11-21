@@ -19,10 +19,10 @@ import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
 import { Button, MtoneScope, useMtone, cn } from "./basic";
 import {
-  DropdownOwnerContext,
-  DropdownSurface,
-  type DropdownLayoutProps,
-} from "./dropdown";
+  MenuSurfaceOwnerContext,
+  FloatingSurface,
+  type FloatingLayoutProps,
+} from "./floating-surface";
 
 export interface Option {
   value: string;
@@ -444,7 +444,7 @@ export interface MenuRadioGroup {
 }
 export type MenuEntry =
   MenuItem | MenuGroup | MenuDivider | MenuCheckboxItem | MenuRadioGroup;
-export interface MenuProps extends OpenProps, DropdownLayoutProps {
+export interface MenuProps extends OpenProps, FloatingLayoutProps {
   trigger: string | React.ReactElement;
   /** Whether a mouse hover can open the menu in addition to normal presses. */
   triggerMode?: "click" | "hover";
@@ -549,9 +549,9 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
                   className="mt-menu-submenu-arrow"
                 />
               </BMenu.SubmenuTrigger>
-              <DropdownSurface kind="submenu">
+              <FloatingSurface kind="submenu">
                 <MenuItems items={item.children} onSelect={onSelect} />
-              </DropdownSurface>
+              </FloatingSurface>
             </BMenu.SubmenuRoot>
           );
         return (
@@ -631,19 +631,19 @@ export function Menu({
         openOnHover={hover ? !ariaDisabled : undefined}
         disabled={hover ? disabled : undefined}
       />
-      <DropdownSurface
+      <FloatingSurface
         kind="menu"
         width={width}
         align={align}
         initialFocus={hover && openedByHover ? false : undefined}
       >
         <MenuItems items={items} onSelect={onSelect} />
-      </DropdownSurface>
+      </FloatingSurface>
     </BMenu.Root>
   );
 }
 /** A top-level application menu. Keys must be unique within the bar. */
-export interface MenubarMenu extends DropdownLayoutProps {
+export interface MenubarMenu extends FloatingLayoutProps {
   key: string;
   label: React.ReactNode;
   icon?: React.ReactNode;
@@ -653,7 +653,7 @@ export interface MenubarMenu extends DropdownLayoutProps {
 export interface MenubarProps
   extends
     Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect" | "children">,
-    DropdownLayoutProps {
+    FloatingLayoutProps {
   menus: MenubarMenu[];
   openKey?: string | null;
   defaultOpenKey?: string | null;
@@ -663,7 +663,7 @@ export interface MenubarProps
   loop?: boolean;
   trigger?: "click" | "hover";
 }
-/** Coordinated command menus, sharing Menu items and Dropdown surfaces. */
+/** Coordinated command menus, sharing Menu items and floating surfaces. */
 export function Menubar({
   menus,
   openKey,
@@ -704,8 +704,8 @@ export function Menubar({
       if (
         barRef.current?.contains(target) ||
         target
-          .closest("[data-dropdown-owner]")
-          ?.getAttribute("data-dropdown-owner") === ownerId
+          .closest("[data-menu-owner]")
+          ?.getAttribute("data-menu-owner") === ownerId
       ) {
         cancelClose();
         return;
@@ -721,7 +721,7 @@ export function Menubar({
     };
   }, [trigger, activeKey, openKey, onOpenChange, ownerId]);
   return (
-    <DropdownOwnerContext.Provider value={ownerId}>
+    <MenuSurfaceOwnerContext.Provider value={ownerId}>
       <BMenubar
         ref={barRef}
         {...props}
@@ -742,8 +742,8 @@ export function Menubar({
               if (
                 !open && details.reason === "trigger-focus" &&
                 activeRef.current === menu.key &&
-                focused?.closest("[data-dropdown-owner]")
-                  ?.getAttribute("data-dropdown-owner") === ownerId
+                focused?.closest("[data-menu-owner]")
+                  ?.getAttribute("data-menu-owner") === ownerId
               ) {
                 details.cancel();
                 return;
@@ -772,7 +772,7 @@ export function Menubar({
               )}
               {menu.label}
             </BMenu.Trigger>
-            <DropdownSurface
+            <FloatingSurface
               kind="menu"
               finalFocus={() => activeRef.current === null}
               width={menu.width ?? width}
@@ -782,11 +782,11 @@ export function Menubar({
                 items={menu.items}
                 onSelect={(key) => onSelect?.(key, menu.key)}
               />
-            </DropdownSurface>
+            </FloatingSurface>
           </BMenu.Root>
         ))}
       </BMenubar>
-    </DropdownOwnerContext.Provider>
+    </MenuSurfaceOwnerContext.Provider>
   );
 }
 /** @deprecated Use MenuProps instead. */
@@ -803,46 +803,62 @@ export function ContextMenu({
   return (
     <BContextMenu.Root {...props}>
       <BContextMenu.Trigger>{children}</BContextMenu.Trigger>
-      <DropdownSurface kind="context" width={width}>
+      <FloatingSurface kind="context" width={width}>
         <MenuItems items={items} onSelect={onSelect} />
-      </DropdownSurface>
+      </FloatingSurface>
     </BContextMenu.Root>
   );
 }
-export interface PopoverProps extends OpenProps {
-  trigger: React.ReactElement;
+export interface PopoverProps
+  extends OpenProps, Omit<FloatingLayoutProps, "align"> {
+  trigger: string | React.ReactElement;
   content: React.ReactNode;
   title?: React.ReactNode;
+  /** Accessible name. Overrides the visible title when supplied. */
+  label?: string;
   side?: "top" | "bottom" | "left" | "right";
+  align?: FloatingLayoutProps["align"] | "center";
+  /** Remove the Popup frame, padding and background, keeping positioning and focus. */
+  unstyled?: boolean;
 }
 export function Popover({
   trigger,
   content,
   title,
+  label,
   side = "bottom",
+  align = "center",
+  width,
+  unstyled,
   ...props
 }: PopoverProps) {
+  const { locale } = useMtone();
+  const hasTitle = title != null && title !== false && title !== "";
+  const popupLabel =
+    label ?? (hasTitle ? undefined : locale === "zh" ? "浮层内容" : "Popover content");
+  const triggerElement =
+    typeof trigger === "string" ? (
+      <Button preset="dropdown" style={{ width: "fit-content", maxWidth: "100%" }}>
+        {trigger}
+      </Button>
+    ) : trigger;
   return (
-    <BPopover.Root {...props}>
-      <BPopover.Trigger render={trigger} />
-      <BPopover.Portal>
-        <MtoneScope>
-          <BPopover.Positioner
-            className="mt-positioner"
-            sideOffset={6}
-            side={side}
-          >
-            <BPopover.Popup className="mt-popup mt-popover">
-              {title && (
-                <BPopover.Title className="mt-popup-title">
-                  {title}
-                </BPopover.Title>
-              )}
-              {content}
-            </BPopover.Popup>
-          </BPopover.Positioner>
-        </MtoneScope>
-      </BPopover.Portal>
+    <BPopover.Root {...props} modal={false}>
+      <BPopover.Trigger render={triggerElement} />
+      <FloatingSurface
+        side={side}
+        align={align}
+        width={width}
+        unstyled={unstyled}
+        label={popupLabel}
+      >
+        {hasTitle && (label !== undefined ? (
+          <h2 className="mt-popup-title">{title}</h2>
+        ) : (
+          <BPopover.Title className="mt-popup-title">{title}</BPopover.Title>
+        ))}
+        {content}
+      </FloatingSurface>
     </BPopover.Root>
   );
 }
@@ -851,7 +867,7 @@ export function Tooltip({
   content,
   side = "top",
   ...props
-}: Omit<PopoverProps, "trigger" | "title"> & { children: React.ReactElement }) {
+}: OpenProps & Pick<PopoverProps, "content" | "side"> & { children: React.ReactElement }) {
   const id = useId();
   return (
     <BTooltip.Provider>

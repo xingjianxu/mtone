@@ -12,7 +12,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import * as M from "../../packages/mtone/src";
-import { componentCategories, componentDocs, type ComponentDoc } from "./catalog";
+import { componentCategories, componentDocGroups, componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
 import { standaloneTypographySections, focusTypographySection, isTypographySection, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
 import { ComponentOutline, focusDocSection } from "./component-outline";
@@ -61,6 +61,12 @@ export function searchDocs(query: string) {
   );
 }
 const groups = componentCategories;
+const sidebarGroups = componentDocGroups.map(({ label, members }) => ({
+  label,
+  members: members.filter((doc) =>
+    !doc.sidebarParent && !isTypographySection(doc.name) && doc.name !== "SearchInput" && doc.name !== "Textarea",
+  ),
+}));
 const componentDocHref = (name: string) => aiSectionHref(name) ?? baseComponentDocHref(name);
 function ImportLine({ code }: { code: string }) {
   const [status, setStatus] = useState("");
@@ -482,27 +488,19 @@ export function DocsApp() {
                 颜色预设
               </M.NavItem>
             </M.NavGroup>
-            {groups.map((group) => {
-                // Preserve semantic group order, but make each component easy to find by name.
-                const members = componentDocs
-                  .filter((d) => d.category === group && !d.sidebarParent && !isTypographySection(d.name) && d.name !== "SearchInput" && d.name !== "Textarea")
-                  .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
-                return (
-                  members.length > 0 && (
-                    <M.NavGroup key={group} label={group}>
-                      {members.map((d) => (
-                        <M.NavItem
-                          key={d.name}
-                          href={componentDocHref(d.name)}
-                          active={doc?.name === d.name || doc?.sidebarParent === d.name}
-                        >
-                          {d.name}
-                        </M.NavItem>
-                      ))}
-                    </M.NavGroup>
-                  )
-                );
-              })}
+            {sidebarGroups.map(({ label, members }) => (
+              <M.NavGroup key={label} label={label}>
+                {members.map((docItem) => (
+                  <M.NavItem
+                    key={docItem.name}
+                    href={componentDocHref(docItem.name)}
+                    active={doc?.name === docItem.name || doc?.sidebarParent === docItem.name}
+                  >
+                    {docItem.name}
+                  </M.NavItem>
+                ))}
+              </M.NavGroup>
+            ))}
           </nav>
           <div className="sidebar-foot">BASE UI · TAILWIND · LUCIDE</div>
         </aside>

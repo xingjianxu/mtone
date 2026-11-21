@@ -58,6 +58,10 @@ import Card1 from "./secondary-demos/card-grid";
 import Card1Source from "./secondary-demos/card-grid.tsx?raw";
 import Card2 from "./secondary-demos/card-inner";
 import Card2Source from "./secondary-demos/card-inner.tsx?raw";
+import AdminLayoutNotice from "./secondary-demos/admin-layout-notice";
+import AdminLayoutNoticeSource from "./secondary-demos/admin-layout-notice.tsx?raw";
+import GlobalNoticeUsage from "./secondary-demos/global-notice-usage";
+import GlobalNoticeUsageSource from "./secondary-demos/global-notice-usage.tsx?raw";
 import AdminLayout0 from "./secondary-demos/admin-layout-usage";
 import AdminLayout0Source from "./secondary-demos/admin-layout-usage.tsx?raw";
 import Spotlight0 from "./secondary-demos/spotlight-usage";
@@ -86,10 +90,6 @@ import Progress8 from "./secondary-demos/ProgressExamples-format";
 import Progress8Source from "./secondary-demos/ProgressExamples-format.tsx?raw";
 import Progress9 from "./secondary-demos/ProgressExamples-controlled";
 import Progress9Source from "./secondary-demos/ProgressExamples-controlled.tsx?raw";
-import Dropdown0 from "./secondary-demos/dropdown-usage";
-import Dropdown0Source from "./secondary-demos/dropdown-usage.tsx?raw";
-import Dropdown1 from "./secondary-demos/dropdown-controlled";
-import Dropdown1Source from "./secondary-demos/dropdown-controlled.tsx?raw";
 import HoverCard0 from "./secondary-demos/hover-card-usage";
 import HoverCard0Source from "./secondary-demos/hover-card-usage.tsx?raw";
 import HoverCard1 from "./secondary-demos/hover-card-delays";
@@ -148,6 +148,7 @@ import Typography7 from "./secondary-demos/typography-link";
 import Typography7Source from "./secondary-demos/typography-link.tsx?raw";
 import Typography8 from "./secondary-demos/typography-blockquote";
 import Typography8Source from "./secondary-demos/typography-blockquote.tsx?raw";
+import TypographyCodeHighlightDemo from "./secondary-demos/typography-code-highlight";
 import TypographyCodeDemo from "./secondary-demos/typography-code";
 import TypographyCodeSource from "./secondary-demos/typography-code.tsx?raw";
 import Breadcrumb0 from "./secondary-demos/breadcrumb-usage";
@@ -409,6 +410,23 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       Demo: AdminLayout0,
       source: source(AdminLayout0Source),
     },
+    {
+      id: "global-notice",
+      title: "管理模式与退出重试",
+      note: "通知插在外层 AdminLayout，切换成员或日志时仍保留。首次模拟退出失败，重试成功后回到稳定的头部按钮。",
+      Demo: AdminLayoutNotice,
+      source: source(AdminLayoutNoticeSource),
+    },
+  ],
+  GlobalNotice: [
+    {
+      id: "usage",
+      title: "关闭通知",
+      note: "省略 actionLabel 时显示带无障碍名称的关闭按钮。通知关闭后，示例主动把焦点移回重新显示按钮。",
+      Demo: GlobalNoticeUsage,
+      source: source(GlobalNoticeUsageSource),
+      relatedLink: { label: "在应用布局中显示持续通知", href: "#/components/AdminLayout?section=global-notice" },
+    },
   ],
   Spotlight: [
     {
@@ -494,20 +512,6 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       title: "动态更新",
       Demo: Progress9,
       source: source(Progress9Source),
-    },
-  ],
-  Dropdown: [
-    {
-      id: "usage",
-      title: "基础用法",
-      Demo: Dropdown0,
-      source: source(Dropdown0Source),
-    },
-    {
-      id: "controlled",
-      title: "受控打开与固定宽度",
-      Demo: Dropdown1,
-      source: source(Dropdown1Source),
     },
   ],
   HoverCard: [
@@ -724,9 +728,23 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
     {
       id: "typography-code",
       title: "Code",
-      note: "默认在正文中显示行内代码；加上 block 显示保留换行和缩进的代码块。长行在块内滚动，不内置语法高亮或复制按钮。",
+      note: "默认在正文中显示行内代码；加上 block 显示保留换行和缩进的代码块。长行在块内滚动，不内置复制按钮。",
       Demo: TypographyCodeDemo,
       source: source(TypographyCodeSource),
+    },
+    {
+      id: "typography-code-highlight",
+      title: "语法高亮",
+      note: "代码块可选指定语言。上方 TSX 示例在文档构建时已着色；下方示例默认是纯文本，点击按钮才加载实时语法高亮。",
+      Demo: TypographyCodeHighlightDemo,
+      source: `import { Typography } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <Typography.Code block language="tsx">
+    {'const title = <strong>mtone</strong>;'}
+  </Typography.Code>;
+}`,
     },
   ],
   Breadcrumb: [

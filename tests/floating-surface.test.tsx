@@ -3,13 +3,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { DirectionProvider } from "@base-ui/react/direction-provider";
-import { Dropdown, Menu, ContextMenu } from "../packages/mtone/src";
+import { Popover, Menu, ContextMenu } from "../packages/mtone/src";
 import { readFileSync } from "node:fs";
 
-describe("Dropdown", () => {
+describe("Popover", () => {
   it("renders independent custom content with named nonmodal dialog semantics", async () => {
     render(
-      <Dropdown
+      <Popover
         trigger={<button>Details</button>}
         label="Details panel"
         content={<input aria-label="Name" />}
@@ -36,7 +36,7 @@ describe("Dropdown", () => {
     function Demo() {
       const [open, setOpen] = React.useState(false);
       return (
-        <Dropdown
+        <Popover
           trigger={<button>Open</button>}
           content={<button onClick={() => setOpen(false)}>Done</button>}
           open={open}
@@ -51,7 +51,7 @@ describe("Dropdown", () => {
     for (let n = 0; n < 2; n++) {
       await userEvent.click(screen.getByRole("button", { name: "Open" }));
       expect(
-        await screen.findByRole("dialog", { name: "下拉内容" }),
+        await screen.findByRole("dialog", { name: "浮层内容" }),
       ).toBeVisible();
       await userEvent.click(screen.getByRole("button", { name: "Done" }));
       await waitFor(() =>
@@ -62,7 +62,7 @@ describe("Dropdown", () => {
   });
   it("keeps explicit width on the panel rather than the trigger", async () => {
     render(
-      <Dropdown
+      <Popover
         trigger={<button>Open</button>}
         width={240}
         align="right"
@@ -88,7 +88,7 @@ describe("Dropdown", () => {
     async (direction, align, expected) => {
       render(
         <DirectionProvider direction={direction}>
-          <Dropdown
+          <Popover
             trigger={<button>Open</button>}
             align={align}
             defaultOpen
@@ -130,24 +130,24 @@ describe("Menu sizing", () => {
       width: "max-content",
     });
   });
-  it("overrides anchor-based width only for the shared dropdown surface", () => {
+  it("overrides anchor-based width only for the shared floating surface", () => {
     const css = readFileSync("packages/mtone/src/interactive.css", "utf8");
     expect(css).toMatch(
-      /\.mt-dropdown-popup\s*\{[^}]*max-width:[^;]*--available-width/s,
+      /\.mt-floating-popup\s*\{[^}]*max-width:[^;]*--available-width/s,
     );
-    expect(css).toMatch(/\.mt-dropdown-popup\s*\{[^}]*min-width: min\(160px/s);
+    expect(css).toMatch(/\.mt-floating-popup\s*\{[^}]*min-width: min\(160px/s);
     const defaults = css.slice(css.indexOf(".mt-popup {")).split("}")[0];
     expect(defaults).toContain("var(--anchor-width");
   });
 });
 
 it('preserves Base UI pointer offsets for ContextMenu instead of overriding them',()=>{
-  const source=readFileSync('packages/mtone/src/dropdown.tsx','utf8');
+  const source=readFileSync('packages/mtone/src/floating-surface.tsx','utf8');
   expect(source).toContain('kind === "context" ? undefined');
   expect(source).not.toContain('kind === "context" ? 0 : 4');
 });
 
 it('allows long shortcut text to shrink and wrap within a narrow menu',()=>{
   const css=readFileSync('packages/mtone/src/interactive.css','utf8');
-  expect(css).toMatch(/\.mt-dropdown-popup \.mt-shortcut\s*\{[^}]*min-width: 0;[^}]*max-width: 40%;[^}]*overflow-wrap: anywhere/s);
+  expect(css).toMatch(/\.mt-floating-popup \.mt-shortcut\s*\{[^}]*min-width: 0;[^}]*max-width: 40%;[^}]*overflow-wrap: anywhere/s);
 });

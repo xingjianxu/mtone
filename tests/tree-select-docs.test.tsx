@@ -5,7 +5,7 @@ import { componentDocs } from "../apps/docs/catalog";
 import { ComponentExample } from "../apps/docs/examples";
 it("documents TreeSelect's independent selection and loading contract", () => {
   const doc = componentDocs.find((d) => d.name === "TreeSelect");
-  expect(doc?.category).toBe("数据录入");
+  expect(doc?.category).toBe("表单输入");
   expect(doc?.props.map((p) => p.name)).toEqual(
     expect.arrayContaining([
       "items",

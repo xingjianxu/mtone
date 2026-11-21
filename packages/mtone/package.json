@@ -1,6 +1,6 @@
 {
   "name": "@bixlab/mtone",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "type": "module",
   "description": "Compact, ready-styled React components powered by Base UI",
   "files": [
@@ -30,6 +30,10 @@
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@rc-component/table": "^1.12.0",
+    "@shikijs/core": "4.6.0",
+    "@shikijs/engine-javascript": "4.6.0",
+    "@shikijs/langs": "4.6.0",
+    "@shikijs/themes": "4.6.0",
     "lucide-react": "1.73.0",
     "react-resizable-panels": "4.24.0"
   },

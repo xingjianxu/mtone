@@ -6,6 +6,7 @@ export * from "./interactive";
 export * from "./data";
 
 export * from "./admin-layout";
+export * from "./global-notice";
 export * from "./page-layout";
 
 export * from "./spotlight";
@@ -38,8 +39,6 @@ export * from "./transfer";
 
 export * from "./typography";
 
-export { Dropdown } from "./dropdown";
-export type { DropdownProps, DropdownAlign, DropdownLayoutProps } from "./dropdown";
 
 export * from "./loading-overlay";
 export * from "./hover-card";

@@ -318,7 +318,13 @@
 }
 .mt-popover {
   padding: 12px;
-  max-width: 320px;
+}
+.mt-popover.mt-popover-unstyled {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .mt-popup-title {
   font-weight: 600;
@@ -565,17 +571,17 @@
   .mt-menu-item[data-highlighted]:not([data-disabled]) { border-color: Highlight; }
 }
 
-/* Dropdown surfaces size to content, not the trigger. Existing Select/Popover
-   retain their anchor-based .mt-popup sizing. Min/max both clamp narrow screens. */
-.mt-dropdown-popup {
+/* Menu and Popover surfaces size to content, not the trigger. Select keeps
+   its anchor-based width. Both bounds honor viewport collision space. */
+.mt-floating-popup {
   box-sizing: border-box;
   min-width: min(160px, var(--available-width, 100vw), calc(100vw - 16px));
   max-width: min(var(--available-width, 100vw), calc(100vw - 16px));
   overflow-wrap: anywhere;
 }
-.mt-dropdown-popup .mt-menu-label { min-width: 0; }
-.mt-dropdown-popup .mt-menu-text { min-width: 0; overflow-wrap: anywhere; }
-.mt-dropdown-popup .mt-shortcut { min-width: 0; max-width: 40%; overflow-wrap: anywhere; }
+.mt-floating-popup .mt-menu-label { min-width: 0; }
+.mt-floating-popup .mt-menu-text { min-width: 0; overflow-wrap: anywhere; }
+.mt-floating-popup .mt-shortcut { min-width: 0; max-width: 40%; overflow-wrap: anywhere; }
 
 .mt-menubar {
   display: flex;

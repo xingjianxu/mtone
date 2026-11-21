@@ -5,6 +5,8 @@ import { Sidebar, type SidebarProps } from "./navigation";
 export type AdminLayoutProps = React.HTMLAttributes<HTMLDivElement> & {
   hasSider?: boolean;
   fullHeight?: boolean;
+  /** Optional banner above the sidebar and main area, outside their scroll regions. */
+  notice?: React.ReactNode;
 };
 export type AdminLayoutSiderProps = Omit<
   SidebarProps,
@@ -144,8 +146,10 @@ function AdminLayoutRoot({
   fullHeight = false,
   className,
   children,
+  notice,
   ...props
 }: AdminLayoutProps) {
+  const showNotice = notice != null && typeof notice !== "boolean" && notice !== "";
   return (
     <div
       {...props}
@@ -153,9 +157,11 @@ function AdminLayoutRoot({
         "mt-layout",
         (hasSider ?? containsSider(children)) && "mt-layout-has-sider",
         fullHeight && "mt-layout-full-height",
+        showNotice && "mt-layout-with-notice",
         className,
       )}
     >
+      {showNotice && <div className="mt-layout-notice">{notice}</div>}
       {children}
     </div>
   );

@@ -30,7 +30,7 @@ test("CardGroup demo includes real mobile two-column and divided layouts", () =>
 
 test("CardGroup belongs to layout and documents differences from Card.Grid", () => {
   const group = componentDocs.find(x=>x.name==='CardGroup')!;
-  expect(group.category).toBe('布局容器');
+  expect(group.category).toBe('数据展示');
   expect(group.props.map(x=>x.name)).toEqual(expect.arrayContaining(['columns','gap','divided','direction','CardGroup.Item.span']));
   expect(group.notes.join(' ')).toContain('Card.Grid');
   const card = componentDocs.find(x=>x.name==='Card')!;

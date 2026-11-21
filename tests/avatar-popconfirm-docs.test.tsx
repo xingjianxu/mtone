@@ -21,6 +21,6 @@ test("Popconfirm demo is interactive and has complete reference", async () => {
   fireEvent.click(await screen.findByRole("button", { name: "确定" }));
   expect(screen.getByText("已确认移除（本地示例）")).toBeInTheDocument();
   const doc = componentDocs.find((d) => d.name === "Popconfirm");
-  expect(doc?.category).toBe("浮层对话");
+  expect(doc?.category).toBe("弹层与菜单");
   expect(doc?.props.some((p) => p.name === "onConfirm")).toBe(true);
 });

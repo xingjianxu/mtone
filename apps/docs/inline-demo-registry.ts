@@ -1,3 +1,7 @@
+import PopoverControlled from "./inline-demos/popover-controlled";
+import PopoverControlledSource from "./inline-demos/popover-controlled.tsx?raw";
+import PopoverCard from "./inline-demos/popover-card";
+import PopoverCardSource from "./inline-demos/popover-card.tsx?raw";
 import NavItemActions from "./inline-demos/nav-item-actions";
 import NavItemActionsSource from "./inline-demos/nav-item-actions.tsx?raw";
 import NavItemLink from "./inline-demos/nav-item-link";
@@ -358,6 +362,19 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example19_0,
       source: source(Example19_0Raw),
+    },
+    {
+      id: "controlled",
+      title: "受控表单与固定宽度",
+      Demo: PopoverControlled,
+      source: source(PopoverControlledSource),
+    },
+    {
+      id: "card",
+      title: "卡片浮层",
+      note: "有边框的 Card 自带外观。使用 unstyled 去掉 Popover 的外框，保留定位、键盘操作和开关行为。",
+      Demo: PopoverCard,
+      source: source(PopoverCardSource),
     },
   ],
   Tooltip: [

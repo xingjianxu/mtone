@@ -11,6 +11,10 @@ let browser;
 try {
   browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH });
   const page = await browser.newPage({ viewport: { width: 320, height: 680 }, colorScheme: "light" });
+  const highlightRequests = [];
+  page.on("request", (request) => {
+    if (/typography-highlight|shikijs/i.test(request.url())) highlightRequests.push(request.url());
+  });
   await page.goto(server.resolvedUrls.local[0] + "#/components/Typography?section=Code");
   const title = page.getByRole("heading", { name: "Code", exact: true });
   await expect(title).toBeFocused();
@@ -38,6 +42,24 @@ try {
   await page.setViewportSize({ width: 1550, height: 720 });
   await expect.poll(() => block.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(false);
   await expect(block).not.toHaveAttribute("tabindex", "0");
+  const fixed = page.getByLabel("预先着色的 TSX 示例", { exact: true });
+  const live = page.getByLabel("可切换高亮的 TS 示例", { exact: true });
+  const fixedTokens = fixed.locator(".mt-code-token");
+  expect(await fixedTokens.count()).toBeGreaterThan(0);
+  await expect(live.locator(".mt-code-token")).toHaveCount(0);
+  expect(highlightRequests).toEqual([]);
+  const liveText = await live.locator("code").textContent();
+  const darkColor = await fixedTokens.first().evaluate((token) => getComputedStyle(token).color);
+  await page.getByRole("button", { name: "浅色", exact: true }).click();
+  await expect(fixedTokens.first()).not.toHaveCSS("color", darkColor);
+  expect(highlightRequests).toEqual([]);
+  await page.getByRole("button", { name: "实时语法高亮" }).click();
+  const liveTokens = live.locator(".mt-code-token");
+  await expect(liveTokens.first()).toBeVisible();
+  expect(await live.locator("code").textContent()).toBe(liveText);
+  expect(highlightRequests.some((url) => /typography-highlight/.test(url))).toBe(true);
+  await page.getByRole("button", { name: "实时语法高亮" }).click();
+  await expect(liveTokens).toHaveCount(0);
   console.log("Typography.Code semantic docs and keyboard scrolling verified");
 } finally {
   await browser?.close();

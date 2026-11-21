@@ -6,7 +6,7 @@ import { ComponentExample } from "../apps/docs/examples";
 import { parseRoute } from "../apps/docs/docs-app";
 test("documents Mentions as one data-input component with alias and plain-text limitations", () => {
   const doc = componentDocs.find((doc) => doc.name === "Mentions");
-  expect(doc?.category).toBe("数据录入");
+  expect(doc?.category).toBe("表单输入");
   expect(doc?.importNames).toEqual(
     expect.arrayContaining(["Mentions", "Mention", "getMentions"]),
   );
