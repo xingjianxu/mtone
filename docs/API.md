@@ -71,9 +71,9 @@ source content and access. Supply stable IDs for evidence lists and file trees.
 
 ## Provider and styling
 
-Migration: remove the former `density` prop. Compact/comfortable modes are no longer part of the provider or scope API; single-line controls use a unified 34px default. Independent component `size` variants and CSS token overrides remain supported. Tabs use the same 34px height for every tab item; their separate size prop still varies typography.
+Migration: remove the former `density` prop. Compact/comfortable modes are no longer part of the provider or scope API; single-line controls use a unified 32px default. Independent component `size` variants and CSS token overrides remain supported. Tabs use the same 32px height for every tab item; their separate size prop still varies typography.
 
-`MtoneProvider` accepts `locale="zh" | "en"`, `theme="light" | "dark" | "system"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, a 34px default control baseline and light colors. `theme="system"` responds immediately to the operating system color preference. A nested `MtoneScope theme="light"` (or `"dark"` / `"system"`) overrides just that subtree, including its mtone popups. Nested scopes and providers inherit the enclosing theme when omitted. The library does not read or store the selection.
+`MtoneProvider` accepts `locale="zh" | "en"`, `theme="light" | "dark" | "system"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, a 32px default control baseline and light colors. `theme="system"` responds immediately to the operating system color preference. A nested `MtoneScope theme="light"` (or `"dark"` / `"system"`) overrides just that subtree, including its mtone popups. Nested scopes and providers inherit the enclosing theme when omitted. The library does not read or store the selection.
 
 ```tsx
 <MtoneProvider
@@ -92,9 +92,9 @@ Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-gree
 
 ## Buttons and forms
 
-- `Button`: `variant` blue/solid/outline/soft/ghost, `size` sm/md/lg, `danger`, `loading`, `icon`, `leftSection`, `rightSection`, native/Base UI button props and ref. The optional sections accept React nodes and follow logical inline start/end (flipped in RTL); a supplied `leftSection` takes precedence over the legacy `icon`. Loading disables actions, displays a spinner instead of the leading content, and keeps the trailing section.
+- `Button`: `variant` blue/solid/outline/soft/ghost, `size` small / normal / large (28 / 32 / 36px, with sm / md / lg as aliases), `danger`, `loading`, `icon`, `leftSection`, `rightSection`, native/Base UI button props and ref. The optional sections accept React nodes and follow logical inline start/end (flipped in RTL); a supplied `leftSection` takes precedence over the legacy `icon`. Loading disables actions, displays a spinner instead of the leading content, and keeps the trailing section.
 - `Button iconOnly`: square icon-only mode with the same variants, sizes, loading, and toggle behavior. Give it an accessible name with either `aria-label` or `aria-labelledby`. See the [icon-only example](https://xingjianxu.github.io/mtone/#/components/Button?section=icon-only).
-- `ButtonGroup`: group wrapper.
+- `ButtonGroup`: optional `size` using the same names as Button. Button descendants without an explicit size inherit it, including a Menu trigger composed from Button. A nested group can override its outer group; ungrouped buttons default to normal.
 - `Input`: native input attributes, native ref and `onChange(event)`, with `prefix`, `suffix`, `allowClear`, character counts and appearance options. `Input.Search`, `Input.Password`, `Input.TextArea` and `Input.OTP` are subcomponents; `SearchInput` and `Textarea` remain compatibility exports. See [Input family](#input-family).
 - `Form`: native form props plus managed values and validation through `Form.useForm()`, `form`, `initialValues`, named `Form.Item` fields and `rules`. Use `onFinish` for valid values and `onFinishFailed` for validation errors; `onSubmit` remains available. See the installed declarations for the supported rule and trigger contracts.
 - `FormField`: `label`, `error`, `description`, `required`, one input child. Associates label/error with cloned child's id and ARIA attributes. Use direct label props for compound selectors rather than wrapping them as a native input.
@@ -127,7 +127,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - NavSubmenu: a navigation branch with required `label` and NavItem children, optional `icon` and `disabled`, and `defaultExpanded` / `expanded` / `onExpandedChange` for inline disclosure. A collapsed Sidebar or AdminLayout.Sider opens a side popup; set active leaf state on NavItem.
 - Breadcrumb: items `{label,href?}`; final item is current page.
 - Tree/DirectoryTree: legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
-- Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. Every tab item is 34px tall including borders, in every variant, size and placement. The default inter-item gap is 6px for line and 4px for both card variants; explicit `gap` overrides the default. Line labels have 6px inline margins. Selected card and editable-card labels retain their background on hover. `indicatorColor` styles only the selected line indicator, using an accent preset or a CSS color (including a CSS variable); it defaults to `currentColor` and does not recolor the list divider, text, or cards. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
+- Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card/attached variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. Every tab item is 32px tall including borders, in every variant, size and placement. The default inter-item gap is 6px for line and 4px for both card variants; explicit `gap` overrides the default. Line labels have 6px inline margins. Selected card and editable-card labels retain their background on hover. `indicatorColor` styles only the selected line indicator, using an accent preset or a CSS color (including a CSS variable); it defaults to `currentColor` and does not recolor the list divider, text, or cards. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
 - Segmented: options, value/defaultValue/onValueChange, label.
 - FilterBar: flexible layout; FilterChip(children,onRemove).
 - Pagination: total, pageSize (default10), **controlled** page/onPageChange.
@@ -159,7 +159,7 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 `Input` keeps native `value` / `defaultValue`, `onChange(event)`, form attributes and
 an `HTMLInputElement` ref. `className` / `style` target that native input;
 `wrapperClassName` targets its stable wrapper. `controlSize="sm" | "md" | "lg"`
-controls appearance (default md, 34px); native `size` still means character
+controls appearance (default md, 32px); native `size` still means character
 width. `variant` is `outlined` (default), `filled`, `borderless` or `underlined`;
 `status` is `error` or `warning`. Focus uses mtone's thin light-blue treatment.
 

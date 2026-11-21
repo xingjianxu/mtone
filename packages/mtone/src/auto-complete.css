@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  height: var(--mt-height, 34px);
+  height: var(--mt-height, 32px);
   min-width: 0;
   width: 100%;
   padding: 0 8px;
@@ -40,6 +40,7 @@
   background: transparent;
   color: inherit;
   font: inherit;
+  line-height: 20px;
   min-width: 0;
   width: 100%;
   height: 100%;

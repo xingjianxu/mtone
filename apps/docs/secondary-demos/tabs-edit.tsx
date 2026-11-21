@@ -23,7 +23,7 @@ export default function Demo() {
   return (
     <div style={{ display: "grid", gap: 24, minWidth: 0 }}>
       <p>
-        卡片标签项外高34px（含边框），默认文字与图标均为14px，文字与图标间距6px；顶部圆角，底部直角，选中标签悬停时不改变背景。关闭/新增由应用更新
+        卡片标签项外高32px（含边框），默认文字与图标均为14px，文字与图标间距6px；顶部圆角，底部直角，选中标签悬停时不改变背景。关闭/新增由应用更新
         items；Alt+Shift+方向键可调整顺序。切换保留输入。
       </p>
       <Tabs

@@ -33,7 +33,8 @@ export interface TabsProps extends Omit<
   onValueChange?: (value: string) => void;
   label?: string;
   placement?: "top" | "bottom" | "start" | "end";
-  variant?: "line" | "card" | "editable-card";
+  /** Attached connects to the panel at top; other placements use line styling. */
+  variant?: "line" | "card" | "editable-card" | "attached";
   size?: "small" | "medium" | "large";
   /** Color of the selected line indicator; defaults to currentColor. */
   indicatorColor?: TabsIndicatorColor;
@@ -104,6 +105,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   const [overflow, setOverflow] = useState(false);
   const dragValue = useRef<string | null>(null);
   const vertical = placement === "start" || placement === "end";
+  const appliedVariant = variant === "attached" && placement !== "top" ? "line" : variant;
   const focusAfterRemove = useRef<{
     key: string;
     trigger: Element | null;
@@ -145,25 +147,35 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
-    const measure = () =>
+    const attachedRail = appliedVariant === "attached" ? list.parentElement : null;
+    const scrollbarProperty = "--mt-tabs-attached-scrollbar";
+    const measure = () => {
       setOverflow(
         vertical
           ? list.scrollHeight > list.clientHeight + 1
           : list.scrollWidth > list.clientWidth + 1,
       );
+      if (attachedRail) {
+        // Attached's list has no block borders: the difference is the native scrollbar gutter.
+        const scrollbar = `${list.offsetHeight - list.clientHeight}px`;
+        if (attachedRail.style.getPropertyValue(scrollbarProperty) !== scrollbar)
+          attachedRail.style.setProperty(scrollbarProperty, scrollbar);
+      }
+    };
     measure();
     const observer =
       typeof ResizeObserver === "undefined"
         ? null
         : new ResizeObserver(measure);
-    observer?.observe(list);
+    observer?.observe(list, attachedRail ? { box: "border-box" } : undefined);
     Array.from(list.children).forEach((child) => observer?.observe(child));
     window.addEventListener("resize", measure);
     return () => {
       observer?.disconnect();
+      attachedRail?.style.removeProperty(scrollbarProperty);
       window.removeEventListener("resize", measure);
     };
-  }, [items, vertical, size, extraStart, extraEnd]);
+  }, [items, vertical, appliedVariant, gap, size, extraStart, extraEnd]);
   useEffect(() => {
     const active = listRef.current?.querySelector<HTMLButtonElement>(
       '[role="tab"][aria-selected="true"]',
@@ -229,7 +241,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
         style={
           {
             ...style,
-            ...(variant === "line" && indicatorColor !== undefined
+            ...(appliedVariant === "line" && indicatorColor !== undefined
               ? { "--mt-tabs-indicator-color": resolveAccentColor(indicatorColor) }
               : {}),
             ...(gap !== undefined
@@ -238,7 +250,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
           } as React.CSSProperties
         }
         data-placement={placement}
-        data-variant={variant}
+        data-variant={appliedVariant}
         data-size={size}
         data-centered={centered || undefined}
         orientation={vertical ? "vertical" : "horizontal"}

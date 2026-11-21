@@ -22,7 +22,7 @@ try {
     const links = groups.first().locator(":scope > a");
     assert.deepEqual(await links.evaluateAll((elements) =>
       elements.slice(0, 2).map((link) => [getComputedStyle(link).height, getComputedStyle(link).marginTop])),
-      [["34px", "0px"], ["34px", "3px"]]);
+      [["32px", "0px"], ["32px", "3px"]]);
     assert.equal(await links.first().getAttribute("aria-current"), "page");
     const showcase = sidebar.getByRole("link", { name: "应用示例", exact: true });
     assert.equal(await showcase.getAttribute("href"), "./showcase.html");

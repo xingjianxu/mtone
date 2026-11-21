@@ -129,8 +129,8 @@ try {
           admin: distinct(adminSizes),
           docs: distinct(docsSizes),
         },
-        { sidebar: [34], admin: [34], docs: [34] },
-        `${name}: all navigation rows are 34 CSS px`,
+        { sidebar: [32], admin: [32], docs: [32] },
+        `${name}: all navigation rows are 32 CSS px`,
       );
       assert.equal(await gap(overview, await longLabel.elementHandle()), 3);
       assert.equal(
@@ -159,7 +159,7 @@ try {
       assert.equal(await sidebar.getAttribute("data-collapsed"), "true");
       assert.deepEqual(
         await sizes(sidebar.locator(".mt-nav-item")),
-        [34, 34, 34, 34],
+        [32, 32, 32, 32],
       );
       assert.equal((await sidebar.boundingBox()).width, 52);
       await page.keyboard.press("Tab");
@@ -189,18 +189,18 @@ try {
       });
       assert.deepEqual(await railDivider(wrappedGroups.first()), ["0px", false, "0px"]);
       assert.deepEqual(await railDivider(wrappedGroups.nth(1)), ["0px", true, "1px"]);
-      assert.deepEqual(await sizes(admin.locator(".mt-nav-item")), [34, 34]);
+      assert.deepEqual(await sizes(admin.locator(".mt-nav-item")), [32, 32]);
 
       await docs.setViewportSize({ width: 390, height: 850 });
       await nav.waitFor({ state: "hidden" });
       await docs.getByRole("button", { name: "打开导航" }).click();
       await gallery.waitFor();
-      assert.deepEqual(distinct(await sizes(nav.getByRole("link"))), [34]);
+      assert.deepEqual(distinct(await sizes(nav.getByRole("link"))), [32]);
       await gallery.click();
       await nav.waitFor({ state: "hidden" });
       assert.equal(new URL(docs.url()).hash, "#/gallery");
       console.log(
-        `${name}: 34px sidebar, AdminLayout and docs navigation; spacing, alignment and collapse preserved`,
+        `${name}: 32px sidebar, AdminLayout and docs navigation; spacing, alignment and collapse preserved`,
       );
     } finally {
       await browser.close();

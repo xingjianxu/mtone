@@ -3,7 +3,7 @@
   align-items: center;
   min-width: 0;
   width: 100%;
-  height: var(--mt-height, 34px);
+  height: var(--mt-height, 32px);
   box-sizing: border-box;
   border: 1px solid var(--mt-border, #e9e9e7);
   border-radius: var(--mt-radius, 4px);
@@ -60,6 +60,7 @@
 }
 .mt-tree-select-value {
   flex: 1;
+  line-height: 20px;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;

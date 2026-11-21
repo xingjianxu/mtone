@@ -12,7 +12,7 @@
   --mt-input-height: 24px;
 }
 .mt-input-wrap.mt-input-size-md {
-  --mt-input-height: var(--mt-height, 34px);
+  --mt-input-height: var(--mt-height, 32px);
 }
 .mt-input-wrap.mt-input-size-lg {
   --mt-input-height: 36px;
@@ -35,7 +35,8 @@
   box-shadow: none;
   background: transparent;
   height: calc(var(--mt-input-height) - 2px);
-  padding: 3px 0;
+  padding-inline: 0;
+  padding-block: clamp(0px, calc((var(--mt-input-height) - 22px) / 2), 5px);
   flex: 1 1 0%;
 }
 .mt-input-decorated:focus-within:not([data-disabled]):not(

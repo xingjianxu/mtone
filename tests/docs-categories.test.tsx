@@ -139,19 +139,37 @@ describe("documentation taxonomy", () => {
   it("renders sidebar groups in declared order with no duplicate component links", () => {
     window.location.hash = "#/components/Button";
     const { container } = render(<DocsApp />);
-    const nav =
-      container.querySelector(".docs-sidebar nav") ??
-      container.querySelector("aside nav");
-    expect(nav).not.toBeNull();
-    expect(
-      Array.from(nav!.querySelectorAll(":scope > .mt-nav-group > .mt-nav-label")).map(
-        (e) => e.textContent,
+    const nav = within(container).getByRole("navigation", { name: "文档导航" });
+    const groups = Array.from(nav.querySelectorAll(":scope > .mt-nav-group"));
+    expect(groups.map((group) => group.querySelector(":scope > .mt-nav-label")?.textContent))
+      .toEqual(["开始使用", ...categories]);
+
+    // Walk accessible links once, rather than scanning the whole navigation
+    // for every component name.
+    const linksByGroup = new Map(groups.map((group) => [group, [] as HTMLElement[]]));
+    for (const link of within(nav).getAllByRole("link")) {
+      const groupLinks = linksByGroup.get(link.closest(".mt-nav-group")!);
+      expect(groupLinks).toBeDefined();
+      groupLinks!.push(link);
+    }
+    const sectionOnly = new Set([
+      "Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea",
+      ...catalog.componentDocs.filter((doc) => doc.sidebarParent).map((doc) => doc.name),
+    ]);
+    const expectedLinks = [
+      ["快速开始", "Component gallery", "应用示例", "主题与样式", "颜色预设"],
+      ...categories.map((category) =>
+        expected[category].filter((name) => !sectionOnly.has(name))
+          .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" })),
       ),
-    ).toEqual(["开始使用", ...categories]);
-    for (const doc of catalog.componentDocs.filter((doc) => !doc.sidebarParent && !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"].includes(doc.name))) {
-      expect(
-        within(nav as HTMLElement).getAllByRole("link", { name: doc.name }),
-      ).toHaveLength(1);
+    ];
+    for (const [index, group] of groups.entries()) {
+      const links = linksByGroup.get(group)!;
+      const names = expectedLinks[index];
+      expect(links).toHaveLength(names.length);
+      for (const [position, link] of links.entries()) {
+        expect(link).toHaveAccessibleName(names[position]);
+      }
     }
     expect(
       screen.getByRole("heading", { name: "Button", level: 1 }),

@@ -209,7 +209,7 @@ function Start() {
             'import { Button, MtoneProvider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function App() {\n  return (\n    <MtoneProvider locale="zh">\n      <Button onClick={() => console.log("create")}>新建文档</Button>\n    </MtoneProvider>\n  );\n}'
           }
         />
-        <p>样式只需导入一次。简单组件无需 Provider，使用默认中文与 34px 控件基准。</p>
+        <p>样式只需导入一次。简单组件无需 Provider，使用默认中文与 32px 控件基准。</p>
       </section>
       <section id="ai-coding">
         <h2>与 AI 一起编程</h2>
@@ -242,7 +242,7 @@ function Theme() {
       <section>
         <h2>主题与控件尺寸</h2>
         <p className="theme-release-note">
-          当前文档预览统一 34px 控件基准，移除了密度切换；已安装版本请以包内类型声明为准。
+          当前文档预览统一 32px 控件基准，移除了密度切换；已安装版本请以包内类型声明为准。
         </p>
         <CodeBlock
           code={
@@ -257,7 +257,7 @@ function Theme() {
         </p>
         <p>
           文档站和应用示例默认跟随系统，也可在顶部手动切换；所选主题会记住。
-          默认单行控件统一采用 34px 基准高度，不再区分密度。升级时移除 Provider 上的 density 属性；独立 size 变体与 CSS 变量定制仍可使用。
+          默认单行控件统一采用 32px 基准高度，不再区分密度。升级时移除 Provider 上的 density 属性；独立 size 变体与 CSS 变量定制仍可使用。
         </p>
       </section>
       <section>

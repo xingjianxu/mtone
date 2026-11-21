@@ -3,6 +3,7 @@ import { expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import postcss from "postcss";
 import { Button, ButtonGroup } from "../packages/mtone/src/basic";
+import { Menu } from "../packages/mtone/src";
 
 it("keeps separated groups as the default and supports connected groups without forwarding the prop", () => {
   const { rerender } = render(<ButtonGroup aria-label="Actions"><Button>Copy</Button></ButtonGroup>);
@@ -26,15 +27,37 @@ function declarations(selector: string) {
   css.walkRules(rule => { if (rule.selectors.includes(selector)) rule.walkDecls(d => { values[d.prop] = d.value; }); });
   return values;
 }
-it("joins borders without clipping focus and preserves logical outer corners", () => {
+it("joins direct buttons across non-button siblings and preserves focus and logical corners", () => {
   expect(declarations(".mt-button-group").gap).toBe("4px");
   expect(declarations(".mt-button-group-connected").gap).toBe("0");
-  expect(declarations(".mt-button-group-connected > .mt-btn + .mt-btn")["margin-inline-start"]).toBe("-1px");
-  expect(declarations(".mt-button-group-connected > .mt-btn:not(:first-child)")["border-start-start-radius"]).toBe("0");
-  expect(declarations(".mt-button-group-connected > .mt-btn:not(:last-child)")["border-end-end-radius"]).toBe("0");
+  const withPreviousButton = declarations(".mt-button-group-connected > .mt-btn ~ .mt-btn");
+  const withNextButton = declarations(".mt-button-group-connected > .mt-btn:has(~ .mt-btn)");
+  expect(withPreviousButton["margin-inline-start"]).toBe("-1px");
+  expect(withPreviousButton["border-start-start-radius"]).toBe("0");
+  expect(withNextButton["border-end-end-radius"]).toBe("0");
   expect(declarations(".mt-button-group-connected > .mt-btn:focus-visible")["z-index"]).toBe("2");
 });
 it("keeps solid danger hover red rather than neutral", () => {
   expect(declarations(".mt-btn-solid.mt-danger").background).toBe("#b6403b");
   expect(declarations(".mt-btn-solid.mt-danger:hover:not(:disabled)").background).toBe("#9e3632");
+});
+
+it("inherits canonical sizes through composed triggers and nested groups; explicit aliases override", () => {
+  render(
+    <ButtonGroup size="small" aria-label="Outer">
+      <Button>Primary</Button>
+      <Menu trigger={<Button iconOnly aria-label="More">+</Button>} items={[{ key: "open", label: "Open" }]} />
+      <Button size="lg">Large override</Button>
+      <ButtonGroup aria-label="Inner">
+        <Button>Nested inherited</Button>
+        <Button size="normal">Normal override</Button>
+      </ButtonGroup>
+    </ButtonGroup>,
+  );
+  expect(screen.getByRole("group", { name: "Outer" })).not.toHaveAttribute("size");
+  expect(screen.getByRole("button", { name: "Primary" })).toHaveClass("mt-size-sm");
+  expect(screen.getByRole("button", { name: "More" })).toHaveClass("mt-size-sm");
+  expect(screen.getByRole("button", { name: "Large override" })).toHaveClass("mt-size-lg");
+  expect(screen.getByRole("button", { name: "Nested inherited" })).toHaveClass("mt-size-sm");
+  expect(screen.getByRole("button", { name: "Normal override" })).toHaveClass("mt-size-md");
 });

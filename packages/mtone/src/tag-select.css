@@ -9,7 +9,7 @@
   min-inline-size: 0;
 }
 .mt-tag-select-viewport[data-collapsed] {
-  block-size: var(--mt-height, 34px);
+  block-size: var(--mt-height, 32px);
   overflow: hidden;
 }
 .mt-tag-select-options {
@@ -23,13 +23,15 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: var(--mt-height, 34px);
+  height: var(--mt-height, 32px);
   padding-inline: 8px;
+  padding-block: clamp(0px, calc((var(--mt-height, 32px) - 22px) / 2), 5px);
   border: 1px solid transparent;
   border-radius: 5px;
   background: transparent;
   color: inherit;
   font: inherit;
+  line-height: 20px;
   cursor: pointer;
 }
 .mt-tag-select-option {

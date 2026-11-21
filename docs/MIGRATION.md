@@ -1,7 +1,7 @@
 # Upgrade notes for 0.8.0
 
 - Remove `density` from `MtoneProvider`. The compact/comfortable modes and their `data-density` attributes are no longer present. Theme and locale remain independent.
-- Default single-line controls and sidebar navigation rows now use a 34px outer height. Remove legacy height overrides if you want the new default, or use explicit size variants where supported. MultiSelect still grows when chips wrap. See [control heights](CONTROL-HEIGHTS.md).
+- Default single-line controls and sidebar navigation rows now use a 32px outer height. Remove legacy height overrides if you want the new default, or use explicit size variants where supported. MultiSelect still grows when chips wrap. See [control heights](CONTROL-HEIGHTS.md).
 - Expanded `NavItem` renders plain-text and numeric labels in `.mt-nav-item-label` for single-line truncation. Complex children keep their previous structure; review custom direct-child selectors that depend on plain label markup.
 
 # Upgrade notes for 0.7.0

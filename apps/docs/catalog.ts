@@ -256,7 +256,7 @@ export default function Demo() {
     {
       "name": "size",
       "type": "\"sm\" | \"md\" | \"lg\"",
-      "description": "触发器高度为 24 / 34 / 34px。",
+      "description": "触发器高度为 24 / 32 / 34px。",
       "default": "\"md\""
     },
     {
@@ -567,7 +567,7 @@ export default function Demo() {
       {
         name: "size / status",
         type: '"sm" | "md" | "lg" / "error" | "warning"',
-        description: "仅 Cascader：高度 24 / 34 / 34px，及校验状态",
+        description: "仅 Cascader：高度 24 / 32 / 34px，及校验状态",
         default: "md",
       },
       {
@@ -922,7 +922,7 @@ export default function Demo() {
       "name": "size / status",
       "type": "sm | md | lg / error | warning",
       "default": "md",
-      "description": "高度24/34/34px和校验状态"
+      "description": "高度24/32/34px和校验状态"
     },
     {
       "name": "prefix / suffix",
@@ -2240,7 +2240,7 @@ export default function Demo() {
     notes: [
       "主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。",
       "使用 AdminLayout.Sider、AdminLayout.Header、AdminLayout.Content、AdminLayout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。",
-      "AdminLayout.Sider 复用本库 Sidebar 的状态、34px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。",
+      "AdminLayout.Sider 复用本库 Sidebar 的状态、32px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。",
       "默认头部 48px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌、侧栏底部版本/折叠行与顶部操作保持可见。",
       "响应式收起为图标窄栏，不是弹出式抽屉。breakpoint 按浏览器视口判断，不按示例容器宽度判断；希望自定义手机抽屉时可组合已有 Drawer。",
       "受控状态必须在 onCollapsedChange 中更新，否则切换只发出请求。导航、路由、数据保存、账号菜单与持久化由应用实现。",
@@ -2262,9 +2262,9 @@ export default function Demo() {
       },
       {
         name: "size",
-        type: '"sm" | "md" | "lg"',
-        description: "按钮尺寸。",
-        default: "md",
+        type: 'ButtonSize',
+        description: "small / normal / large 分别高 28 / 32 / 36px；接受旧别名 sm / md / lg。未设置时继承 ButtonGroup，组外为 normal。",
+        default: "normal",
       },
       {
         name: "iconOnly",
@@ -2336,6 +2336,7 @@ export default function Demo() {
       },
     ],
     notes: [
+      "文字按钮行高为 20px，标准带边框样式的上下内边距为 3 / 5 / 7px；纯图标按钮与高度等宽，不添加内边距。normal 可用 --mt-height 覆盖。",
       "未开启 toggle 时保留普通按钮行为，不接管应用手动设置的 aria-pressed。开启时由 Button 提供 aria-pressed。保留前后状态一致的按钮名；纯图标使用固定 aria-label 或 aria-labelledby。",
       "图标模式不改变按钮背景，切换图标替代左侧 leftSection 与 icon，加载指示器优先，rightSection 保留。preset 和自定义图标对互斥；建议自定义图标两态同尺寸，且不要传入可交互内容。",
       "例如 <Button toggle>仅显示未读</Button> 或 <Button iconOnly aria-label=\"收藏\" toggle={{ mode: \"icon\", preset: \"star\" }} />。",
@@ -2351,6 +2352,7 @@ export default function Demo() {
     importNames: ["ButtonGroup", "Button", "Menu"],
     code: "import { useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { ButtonGroup, Button, Menu } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [message, setMessage] = useState(\"\");\n  return (\n    <div>\n      <ButtonGroup connected aria-label=\"导出文档\">\n        <Button onClick={() => setMessage(\"已选择导出 PDF\")}>导出 PDF</Button>\n        <Menu\n          trigger={<Button iconOnly aria-label=\"更多导出格式\"><ChevronDown size={14} /></Button>}\n          items={[\n            { key: \"markdown\", label: \"导出 Markdown\", onSelect: () => setMessage(\"已选择导出 Markdown\") },\n            { key: \"html\", label: \"导出 HTML\", onSelect: () => setMessage(\"已选择导出 HTML\") },\n          ]}\n        />\n      </ButtonGroup>\n      <p role=\"status\">{message}</p>\n    </div>\n  );\n}",
     props: [
+      { name: "size", type: "ButtonSize", description: "未单独设置尺寸的 Button 会继承，含 Menu 的 Button 触发器；支持 small / normal / large 与 sm / md / lg，外层未设置时为 normal。" },
       { name: "connected", type: "boolean", default: "false", description: "相连样式：移除间距、共享边框，仅保留外侧圆角。" },
       {
         name: "children",
@@ -2364,7 +2366,7 @@ export default function Demo() {
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ['Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置同尺寸的 Button（可使用 iconOnly），不要增加包裹元素。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
+    notes: ['Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置 Button（可使用 iconOnly）；在 ButtonGroup 设置 size 可统一尺寸，子按钮显式 size 会覆盖继承值。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
   },
   {
   "name": "Input",
@@ -2469,7 +2471,7 @@ export default function Demo() {
     }
   ],
   "notes": [
-    "默认单行34px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。",
+    "默认单行32px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。",
     "Input.Search 是搜索子组件；SearchInput 是同一组件的兼容导出。Input.TextArea 与 Textarea 也是同一组件；新代码推荐子组件写法。",
     "原生 size、type、name、form、aria-* 和原生 ref 保留。className/style 面向原生输入，不代表外层容器。",
     "Input.OTP 支持粘贴、组合输入、方向键与删除；删除会将后续字符前移，不保留空格占位。空白字符会移除。mask 不提供任意字符替换。",
@@ -2516,7 +2518,7 @@ export default function Demo() {
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["默认单行外框高度为 34px（含边框），搜索图标垂直居中，可通过 --mt-height 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
+    notes: ["默认单行外框高度为 32px（含边框），搜索图标垂直居中，可通过 --mt-height 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
   },
   {
     name: "Textarea",
@@ -3086,7 +3088,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 34px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
+      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 32px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
   {
     name: "TagSelect",
@@ -3114,7 +3116,7 @@ export default function Demo() {
       { name: "onExpandedChange", type: "(expanded: boolean) => void", description: "请求切换展开状态时触发。" },
       { name: "expandLabel / collapseLabel", type: "string", description: "展开与收起按钮文字，默认「展开」与「收起」。" },
     ],
-    notes: ["选项按钮、展开按钮及单行折叠视口统一采用 34px 基准高度。建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。"],
+    notes: ["选项按钮、展开按钮及单行折叠视口统一采用 32px 基准高度。建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。"],
   },
   {
     name: "MultiSelect",
@@ -3186,7 +3188,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框最小高度为 34px（含边框）；多个标签换行时自动增高，不强制裁剪为 34px；可用 className 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
+      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框最小高度为 32px（含边框）；多个标签换行时自动增高，不强制裁剪为 32px；可用 className 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
   },
   {
     name: "Slider",
@@ -3296,7 +3298,7 @@ export default function Demo() {
         description: "步进大小。",
       },
     ],
-    notes: ["默认整体外框高度为 34px（含边框），增减按钮位于边框内。可用 className 定制尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "清空时 value 可为 null；defaultValue 应传 number。"],
+    notes: ["默认整体外框高度为 32px（含边框），增减按钮位于边框内。可用 className 定制尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "清空时 value 可为 null；defaultValue 应传 number。"],
   },
   {
     name: "DatePicker",
@@ -3357,7 +3359,7 @@ export default function Demo() {
         default: "true",
       },
     ],
-    notes: ["默认单行输入外框高度为 34px（含边框），可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
+    notes: ["默认单行输入外框高度为 32px（含边框），可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。",
       "值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。",
       "日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。",
       "仅对支持样式的原生日期指示器使用与 Select 一致的 16px 箭头，不叠加第二个图标；其他浏览器和强制颜色模式保留原生日期界面。",
@@ -3430,7 +3432,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "NavItem 默认行高为 34px，图标与文字垂直居中。相邻项间距不变，分组标题和分隔线不受行高影响。",
+      "NavItem 默认行高为 32px，图标与文字垂直居中。相邻项间距不变，分组标题和分隔线不受行高影响。",
       "收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题与标题操作，保留默认分组分隔（可用 divider={false} 关闭）。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。",
       "收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。",
       "受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。",
@@ -3488,7 +3490,7 @@ export default function Demo() {
     ],
     notes: [
       "当前页使用灰色圆角底和逻辑起始侧蓝色竖标；悬停不显示竖标。",
-      "默认行高 34px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。",
+      "默认行高 32px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。",
       "尾部操作不触发导航。建议使用提供可访问名称的 Button iconOnly；Sidebar 的图标窄栏隐藏尾部操作，窄栏子菜单弹层中的完整行仍显示。",
       "不提供 href 时仍为按钮。ref 指向实际 button 或 a；组件不接管路由。",
     ],
@@ -3564,7 +3566,7 @@ export default function Demo() {
     ],
     notes: [
       "组前分隔线是装饰，不会出现在无障碍树中。独立导航和 Sidebar 展开、收起时均支持相邻组分隔；有其它导航项隔开时不画线。",
-      "组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距。首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。",
+      "组内 NavItem 默认行高 32px，相邻项仍保留 3px 间距。首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。",
       '标题操作不触发导航项；建议使用 size="sm"、variant="ghost" 的 Button iconOnly 并提供可访问名称。操作区与标题分开布局，过长的标题会截断。',
     ],
   },
@@ -3908,7 +3910,7 @@ export default function Demo() {
   {
     name: "Tabs",
     category: "导航切换",
-    description: "中性风格的标签切换，支持卡片编辑、多方向布局和溢出导航。",
+    description: "中性风格的标签切换，支持顶部贴合、卡片编辑、多方向布局和溢出导航。",
     importNames: ["Tabs"],
     code: 'import { Tabs } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />;\n}',
     props: [
@@ -3935,24 +3937,24 @@ export default function Demo() {
       },
       {
         name: "variant",
-        type: '"line" | "card" | "editable-card"',
-        description: "默认 line。",
+        type: '"line" | "card" | "editable-card" | "attached"',
+        description: "默认 line。attached 的顶部选中项与内容区相接；bottom/start/end 保留指定位置并使用 line 样式。",
       },
       {
         name: "size",
         type: '"small" | "medium" | "large"',
-        description: "默认 medium。所有变体、尺寸和位置的标签项外高均为 34px（含边框）；size 仍区分字号。",
+        description: "默认 medium。所有变体、尺寸和位置的标签项外高均为 32px（含边框）；size 仍区分字号。",
       },
       {
         name: "indicatorColor",
         type: "TabsIndicatorColor",
         default: "currentColor",
-        description: "仅 line 的选中指示线颜色。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。",
+        description: "使用 line 样式时的选中指示线颜色，包含 attached 在非顶部位置的线型回退。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。",
       },
       {
         name: "centered / gap",
         type: "boolean / number",
-        description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 6px，card/editable-card 为 4px。",
+        description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认线型为 6px，card/editable-card 和顶部 attached 为 4px。",
       },
       {
         name: "extraStart / extraEnd",
@@ -4008,6 +4010,7 @@ export default function Demo() {
       "非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。",
       "editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。",
       "主题通过 --mt-accent-* 为指示线和其他组件提供共享色；可在 MtoneProvider tokens 内覆盖。强制色彩模式保留系统可见线条。",
+      "顶部 attached 使用淡底导航栏和单条分隔线。选中项保留上边与左右边，悬停仍使用面板底色；未选中项透明无描边。",
       "线型标签文字两侧各保留 6px 外边距。卡片式与可编辑卡片式的选中标签悬停时保持原背景。",
       "溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。",
       "默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。",
@@ -4053,7 +4056,7 @@ export default function Demo() {
         description: "必填；移除请求，由应用更新条件。",
       },
     ],
-    notes: ["默认单行外框高度为 34px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。", "点击移除不会自行隐藏，应用负责更新状态。"],
+    notes: ["默认单行外框高度为 32px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。", "点击移除不会自行隐藏，应用负责更新状态。"],
   },
   {
     name: "Pagination",
