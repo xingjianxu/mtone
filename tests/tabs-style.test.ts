@@ -4,9 +4,13 @@ import postcss from "postcss";
 
 const css = postcss.parse(readFileSync("packages/mtone/src/tabs.css", "utf8"));
 const root = '.mt-tabs:is([data-variant="card"], [data-variant="editable-card"])';
-function declarations(selector: string) {
+function declarations(selector: string, media?: string) {
   const values: Record<string, string> = {};
-  css.walkRules(selector, rule => { rule.walkDecls(d => { values[d.prop] = d.value; }); });
+  css.walkRules(selector, rule => {
+    const parent = rule.parent;
+    if (media ? parent?.type !== "atrule" || parent.params !== media : parent?.type !== "root") return;
+    rule.walkDecls(d => { values[d.prop] = d.value; });
+  });
   return values;
 }
 it("uses a single 34px border-box item height and preserves size typography", () => {
@@ -51,16 +55,19 @@ it("keeps the tab trigger transparent on active card hover", () => {
   expect(declarations(active + " > .mt-tab:hover")).toEqual({"background-color": "transparent"});
 });
 
-it("aligns selected and inactive top cards 1px down and preserves inactive border treatment", () => {
+it("aligns both top card states without adding to the scrollable height", () => {
   const list = root + '[data-placement="top"] > .mt-tab-bar > .mt-tab-list';
-  expect(declarations(list)["overflow-y"]).toBe("hidden");
-  const inactive = list + " > .mt-tab-item:not([data-active])";
-  const rule = declarations(inactive);
-  expect(rule["border-bottom-color"]).toBe("transparent");
-  expect(rule["background-clip"]).toBe("padding-box");
-  const item = declarations(list + " > .mt-tab-item");
-  expect(item).toEqual({position:"relative",top:"1px"});
-  expect(rule.position).toBeUndefined();
-  expect(rule.top).toBeUndefined();
-  expect(rule.height).toBeUndefined();
+  const divider = declarations(list);
+  expect(divider["overflow-y"]).toBe("hidden");
+  expect(divider["padding-block-end"]).toBe("1px");
+  expect(divider["border-bottom-width"]).toBe("0");
+  expect(divider["border-image"]).toMatch(/ 1 \/ 0 0 1px$/);
+  expect(divider["--mt-tabs-card-divider"]).toBe("var(--mt-border, #e9e9e7)");
+  expect(declarations(list, "(forced-colors: active)")["--mt-tabs-card-divider"]).toBe("CanvasText");
+  expect(declarations(list + " > .mt-tab-item")).toEqual({
+    position: "relative",
+    top: "1px",
+    "border-bottom-color": "transparent",
+    "background-clip": "padding-box",
+  });
 });

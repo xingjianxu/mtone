@@ -276,19 +276,27 @@
   margin-inline: 3px;
 }
 
-/* Keep horizontal scrolling, but do not scroll the one-pixel decorative overlap. */
+/* Keep one pixel inside the scrollport for the offset frames. Paint the
+   divider without a physical border that would create vertical overflow. */
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list {
+  --mt-tabs-card-divider: var(--mt-border, #e9e9e7);
   overflow-y: hidden;
+  padding-block-end: 1px;
+  border-bottom-width: 0;
+  border-image: linear-gradient(var(--mt-tabs-card-divider), var(--mt-tabs-card-divider)) 1 / 0 0 1px;
 }
 
-/* Align both states one pixel down where the divider meets the top cards. */
+@media (forced-colors: active) {
+  .mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list {
+    --mt-tabs-card-divider: CanvasText;
+  }
+}
+
+/* Align both states one pixel down. Their unpainted bottom edge leaves
+   the single list divider visible without changing the 34px frame. */
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item {
   position: relative;
   top: 1px;
-}
-
-/* Preserve the inactive border geometry without painting a second stroke. */
-.mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item:not([data-active]) {
   border-bottom-color: transparent;
   background-clip: padding-box;
 }

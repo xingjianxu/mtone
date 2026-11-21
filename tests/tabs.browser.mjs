@@ -168,8 +168,8 @@ try {
       async function lowerRows(frame, offset = 20) {
         const rect = await frame.boundingBox();
         // Locator screenshots can capture a neighboring row because of
-        // clip rounding. Sample the two pixels inside the frame
-        // directly from the viewport, excluding the adjacent list border.
+        // clip rounding. Sample the frame’s last two rows directly from
+        // the viewport, including the divider when it shares that edge.
         const data = (await page.screenshot({ scale: "css" })).toString("base64");
         return page.evaluate(async ({ data, x, bottom }) => {
           const image = await createImageBitmap(await (await fetch("data:image/png;base64," + data)).blob());
@@ -205,6 +205,13 @@ try {
         }
         const inactiveTab = inactiveFrame.getByRole("tab");
         await inactiveTab.hover();
+        const list = region.getByRole("tablist");
+        // A horizontal scroller must never pick up a one-pixel vertical range.
+        // WebKit scrolls that extra pixel into view on hover, exposing a seam.
+        expect(await list.evaluate(node => ({
+          position: node.scrollTop,
+          range: node.scrollHeight - node.clientHeight,
+        }))).toEqual({ position: 0, range: 0 });
         const [inactiveEdge, inactiveFill] = await lowerRows(inactiveFrame);
         const fill = await inactiveTab.evaluate(tab => getComputedStyle(tab).backgroundColor.match(/\d+/g).map(Number));
         // The frame bottom now lands on the uninterrupted list divider.
@@ -213,9 +220,6 @@ try {
         const divider = await inactiveFrame.evaluate(frame =>
           getComputedStyle(frame.parentElement).borderBottomColor.match(/\d+/g).map(Number));
         expect(inactiveEdge).toEqual([...divider, 255]);
-        // A selected fill can meet the divider differently by browser;
-        // its hover pixels must still match idle, as checked above.
-        expect(activeIdle[1]).not.toEqual(inactiveFill);
         const [gapEdge] = await lowerRows(inactiveFrame, -2);
         expect(gapEdge).toEqual(inactiveEdge);
         expect(await inactiveFrame.evaluate(frame =>
@@ -226,7 +230,6 @@ try {
         await expect(inactiveFrame).toHaveCSS("border-bottom-width", "1px");
         await region.screenshot({path:`artifacts/tabs-browser/${name}-${variant}-hover.png`});
         await region.evaluate(node => { node.style.width = "145px"; });
-        const list = region.getByRole("tablist");
         await expect.poll(() => list.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
         await activeTab.focus();
         await page.keyboard.press("ArrowRight");
