@@ -26,6 +26,7 @@ export default function Demo() {
   ];
   return (
     <div style={{ display: "grid", gap: 24, minWidth: 0 }}>
+      <p>标签项统一高 34px；线型标签默认相邻无间距，可用 gap 自定义。</p>
       <Tabs items={base} extraEnd={<Button size="sm">操作</Button>} />
     </div>
   );

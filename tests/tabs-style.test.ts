@@ -9,19 +9,21 @@ function declarations(selector: string) {
   css.walkRules(selector, rule => { rule.walkDecls(d => { values[d.prop] = d.value; }); });
   return values;
 }
-it("defines compact card size tokens without changing line tabs", () => {
-  expect(declarations(root)["--mt-tabs-card-height"]).toBe("28px");
-  expect(declarations(root + '[data-size="small"]')["--mt-tabs-card-height"]).toBe("24px");
-  expect(declarations(root + '[data-size="large"]')["--mt-tabs-card-height"]).toBe("32px");
-  expect(declarations(".mt-tabs")["--mt-tabs-card-height"]).toBeUndefined();
-});
-it("includes card borders in the requested height and keeps square bottom corners", () => {
-  const item = declarations(root + " > .mt-tab-bar > .mt-tab-list > .mt-tab-item");
+it("uses a single 34px border-box item height and preserves size typography", () => {
+  const item = declarations(".mt-tab-item");
   expect(item["box-sizing"]).toBe("border-box");
-  expect(item.height).toBe("var(--mt-tabs-card-height)");
+  expect(item.height).toBe("34px");
+  expect(declarations(root)["--mt-tabs-card-height"]).toBeUndefined();
+  expect(declarations(root)["--mt-tabs-card-font-size"]).toBe("14px");
+  expect(declarations(root + '[data-size="small"]')["--mt-tabs-card-font-size"]).toBe("12px");
+  expect(declarations(root + '[data-size="large"]')["--mt-tabs-card-font-size"]).toBe("15px");
+});
+it("keeps square card bottom corners", () => {
+  const item = declarations(root + " > .mt-tab-bar > .mt-tab-list > .mt-tab-item");
+  expect(item.height).toBeUndefined();
   expect(item["border-radius"]).toBe("5px 5px 0 0");
   const tab = declarations(root + " > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab");
-  expect(tab["padding-block"]).toBe("0");
+  expect(declarations(".mt-tab")["padding-block"]).toBe("0");
   expect(tab["border-radius"]).toBe("4px 4px 0 0");
   expect(tab["font-size"]).toBe("var(--mt-tabs-card-font-size)");
   expect(tab["line-height"]).toBe("20px");
@@ -41,5 +43,5 @@ it("adds line spacing to the label, not the trigger, item or list", () => {
   expect(declarations(tab + " > span.mt-tab-label")).toEqual({ "margin-inline": "3px" });
   expect(declarations(tab)["padding-inline"]).toBeUndefined();
   expect(declarations(item)["margin-inline"]).toBeUndefined();
-  expect(declarations(list).gap).toBeUndefined();
+  expect(declarations(list).gap).toBe("var(--mt-tabs-gap, 0px)");
 });

@@ -80,7 +80,7 @@ try {
         }
       }
       const nested = page.getByRole("tab", { name: "Inner", exact: true });
-      await expect(nested).toHaveCSS("padding-top", "9px");
+      await expect(nested).toHaveCSS("padding-top", "0px");
       await expect(nested).toHaveCSS("border-inline-end-width", "0px");
       await page.getByRole("tab", { name: "First RTL", exact: true }).focus();
       await page.keyboard.press("ArrowLeft");
@@ -88,21 +88,30 @@ try {
         page.getByRole("tab", { name: "Second RTL", exact: true }),
       ).toBeFocused();
       await page.goto("http://127.0.0.1:5212/tests/fixtures/tabs-compact.html");
-      for (const variant of ["card", "editable-card"]) {
-        for (const [size, height, font] of [["small", 24, 12], ["medium", 28, 14], ["large", 32, 15]]) {
+      for (const variant of ["line", "card", "editable-card"]) {
+        for (const [size, font] of [["small", 12], ["medium", 14], ["large", 15]]) {
           for (const placement of ["top", "bottom", "start", "end"]) {
             const region = page.getByTestId(`${variant}-${size}-${placement}`);
             const frames = region.locator(".mt-tab-item");
+            await expect(region.getByRole("tablist")).toHaveCSS("gap", variant === "line" ? "0px" : "4px");
+            const vertical = ["start", "end"].includes(placement);
+            const spacing = await frames.evaluateAll(([a, b], isVertical) => {
+              const first = a.getBoundingClientRect();
+              const second = b.getBoundingClientRect();
+              return isVertical ? second.top - first.bottom : second.left - first.right;
+            }, vertical);
+            expect(spacing).toBeCloseTo(variant === "line" ? 0 : 4);
+
             for (const frame of await frames.all()) {
-              await expect(frame).toHaveCSS("height", `${height}px`);
+              await expect(frame).toHaveCSS("height", "34px");
               await expect(frame).toHaveCSS("border-bottom-left-radius", "0px");
               await expect(frame).toHaveCSS("border-bottom-right-radius", "0px");
             }
             const tab = region.getByRole("tab", {name:"Icon tab", exact:true});
             await expect(tab).toHaveCSS("font-size", `${font}px`);
             const label = tab.locator(".mt-tab-label");
-            const margin = variant === "editable-card" ? "3px" : "0px";
-            const padding = variant === "editable-card" ? "7px" : "10px";
+            const margin = variant === "card" ? "0px" : "3px";
+            const padding = variant === "editable-card" ? "7px" : variant === "card" || ["start", "end"].includes(placement) ? "10px" : size === "large" ? "4px" : "2px";
             await expect(label).toHaveCSS("margin-inline-start", margin);
             await expect(label).toHaveCSS("margin-inline-end", margin);
             await expect(tab).toHaveCSS("padding-inline-start", padding);
@@ -120,18 +129,28 @@ try {
           }
         }
       }
-      await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "28px");
+      await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "34px");
       const lineTab = page.getByRole("tab", {name:"Line tab", exact:true});
       const lineLabel = lineTab.locator("span.mt-tab-label");
       await expect(lineLabel).toHaveCSS("margin-inline-start", "3px");
       await expect(lineLabel).toHaveCSS("margin-inline-end", "3px");
-      await expect(lineTab).toHaveCSS("padding-top", "9px");
+      await expect(lineTab).toHaveCSS("padding-top", "0px");
       await expect(lineTab).toHaveCSS("padding-inline-start", "2px");
       await expect(lineTab).toHaveCSS("padding-inline-end", "2px");
       const lineList = page.getByRole("tablist", {name:"Unchanged line", exact:true});
-      await expect(lineList).toHaveCSS("gap", "16px");
+      await expect(lineList).toHaveCSS("gap", "0px");
       await expect(lineList.locator(".mt-tab-item")).toHaveCSS("margin-inline-start", "0px");
       await expect(lineList.locator(".mt-tab-item")).toHaveCSS("margin-inline-end", "0px");
+      for (const placement of ["top", "start"]) {
+        const customList = page.getByRole("tablist", {name:`Custom gap ${placement}`, exact:true});
+        await expect(customList).toHaveCSS("gap", "9px");
+        const spacing = await customList.locator(".mt-tab-item").evaluateAll(([a, b], vertical) => {
+          const first = a.getBoundingClientRect();
+          const second = b.getBoundingClientRect();
+          return vertical ? second.top - first.bottom : second.left - first.right;
+        }, placement === "start");
+        expect(spacing).toBeCloseTo(9);
+      }
       await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
       const editable = page.getByTestId("editable-card-medium-top");
       // Pixel sampling needs an integer origin; this fixture follows many

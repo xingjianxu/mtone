@@ -3874,12 +3874,12 @@ export default function Demo() {
       {
         name: "size",
         type: '"small" | "medium" | "large"',
-        description: "默认 medium。card/editable-card 外框高度：small 24px、medium 28px、large 32px；line 保持原间距。",
+        description: "默认 medium。所有变体、尺寸和位置的标签项外高均为 34px（含边框）；size 仍区分字号。",
       },
       {
         name: "centered / gap",
         type: "boolean / number",
-        description: "居中排列（溢出时回到起点）；间隔单位px，最小0。",
+        description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 0px，card/editable-card 为 4px。",
       },
       {
         name: "extraStart / extraEnd",

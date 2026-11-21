@@ -71,7 +71,7 @@ source content and access. Supply stable IDs for evidence lists and file trees.
 
 ## Provider and styling
 
-Migration: remove the former `density` prop. Compact/comfortable modes are no longer part of the provider or scope API; single-line controls use a unified 34px default. Independent component `size` variants and CSS token overrides remain supported. Tabs retain their separate size contract.
+Migration: remove the former `density` prop. Compact/comfortable modes are no longer part of the provider or scope API; single-line controls use a unified 34px default. Independent component `size` variants and CSS token overrides remain supported. Tabs use the same 34px height for every tab item; their separate size prop still varies typography.
 
 `MtoneProvider` accepts `locale="zh" | "en"`, `theme="light" | "dark" | "system"` and `tokens` (CSS custom properties). All are optional. Without a provider components use Chinese, a 34px default control baseline and light colors. `theme="system"` responds immediately to the operating system color preference. A nested `MtoneScope theme="light"` (or `"dark"` / `"system"`) overrides just that subtree, including its mtone popups. Nested scopes and providers inherit the enclosing theme when omitted. The library does not read or store the selection.
 
@@ -121,7 +121,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - Sidebar, NavGroup(label), NavItem(active, icon, native button props): layout and navigation buttons. Routing remains the application's responsibility.
 - Breadcrumb: items `{label,href?}`; final item is current page.
 - Tree/DirectoryTree: legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
-- Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
+- Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. Every tab item is 34px tall including borders, in every variant, size and placement. The default inter-item gap is 0px for line and 4px for both card variants; explicit `gap` overrides the default. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
 - Segmented: options, value/defaultValue/onValueChange, label.
 - FilterBar: flexible layout; FilterChip(children,onRemove).
 - Pagination: total, pageSize (default10), **controlled** page/onPageChange.

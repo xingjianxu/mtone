@@ -17,12 +17,17 @@
   gap: var(--mt-tabs-gap, 16px);
 }
 .mt-tab-item {
+  box-sizing: border-box;
+  height: 34px;
   display: flex;
   align-items: stretch;
   flex-shrink: 0;
   min-width: 0;
 }
 .mt-tab {
+  box-sizing: border-box;
+  min-height: 0;
+  padding-block: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -97,7 +102,7 @@
   > .mt-tab-list
   > .mt-tab-item
   > .mt-tab {
-  padding: 5px 2px;
+  padding-inline: 2px;
   font-size: 12px;
 }
 .mt-tabs[data-size="large"]
@@ -105,8 +110,11 @@
   > .mt-tab-list
   > .mt-tab-item
   > .mt-tab {
-  padding: 12px 4px;
+  padding-inline: 4px;
   font-size: 15px;
+}
+.mt-tabs[data-variant="line"] > .mt-tab-bar > .mt-tab-list {
+  gap: var(--mt-tabs-gap, 0px);
 }
 .mt-tabs[data-variant="card"] > .mt-tab-bar > .mt-tab-list,
 .mt-tabs[data-variant="editable-card"] > .mt-tab-bar > .mt-tab-list {
@@ -241,29 +249,20 @@
   overflow: auto;
 }
 
-/* Compact card frames include their borders; line tabs keep their original rhythm.
-   Reset tokens on each root so nested Tabs never inherit another size. */
+/* Reset typography on each card root so nested Tabs never inherit another size. */
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"]) {
-  --mt-tabs-card-height: 28px;
   --mt-tabs-card-font-size: 14px;
 }
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-size="small"] {
-  --mt-tabs-card-height: 24px;
   --mt-tabs-card-font-size: 12px;
 }
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-size="large"] {
-  --mt-tabs-card-height: 32px;
   --mt-tabs-card-font-size: 15px;
 }
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"]) > .mt-tab-bar > .mt-tab-list > .mt-tab-item {
-  box-sizing: border-box;
-  height: var(--mt-tabs-card-height);
   border-radius: 5px 5px 0 0;
 }
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"]) > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab {
-  box-sizing: border-box;
-  min-height: 0;
-  padding-block: 0;
   font-size: var(--mt-tabs-card-font-size);
   line-height: 20px;
   border-radius: 4px 4px 0 0;
