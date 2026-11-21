@@ -4,8 +4,15 @@ import { pathToFileURL } from "node:url";
 const workflowPath = ".github/workflows/docs.yml";
 const candidatePrefix = "release-candidate/";
 const shaPattern = /^[0-9a-f]{40}$/;
+const zeroSha = "0".repeat(40);
+export const candidateBranch = (base, head) =>
+  `${candidatePrefix}${base}/${head}`;
+const isCommitSha = (value) =>
+  typeof value === "string" && shaPattern.test(value) && value !== zeroSha;
+const validationJob = "Targeted validation";
 const proofSteps = [
   "Assert exact candidate checkout",
+  "Run targeted checks",
   "Assert tracked files unchanged",
 ];
 
@@ -20,15 +27,14 @@ function arrayField(response, key) {
   return values;
 }
 
-function qualifyingRun(run, repository, repositoryId) {
+function qualifyingRun(run, repository, repositoryId, expectedBaseSha) {
   const sameRepository = (entry) =>
     entry?.id === repositoryId &&
     entry.full_name?.toLowerCase() === repository.toLowerCase();
   return (
     (run.event === "push" || run.event === "workflow_dispatch") &&
-    typeof run.head_branch === "string" &&
-    run.head_branch.startsWith(candidatePrefix) &&
-    run.head_branch.length > candidatePrefix.length &&
+    isCommitSha(run.head_sha) &&
+    run.head_branch === candidateBranch(expectedBaseSha, run.head_sha) &&
     [
       workflowPath,
       `${workflowPath}@${run.head_branch}`,
@@ -36,23 +42,22 @@ function qualifyingRun(run, repository, repositoryId) {
     ].includes(run.path) &&
     sameRepository(run.repository) &&
     sameRepository(run.head_repository) &&
-    shaPattern.test(run.head_sha) &&
     positiveInteger(run.id) &&
     positiveInteger(run.run_attempt)
   );
 }
 
-async function completedFullJob(request, root, run) {
+async function completedValidationJob(request, root, run) {
   // Use the reported attempt, never mix separately rerun jobs.
   const jobsPath = `${root}/actions/runs/${run.id}/attempts/${run.run_attempt}/jobs`;
   const jobs = arrayField(await request(jobsPath, { per_page: 100 }), "jobs");
-  const full = jobs.find((job) => job.name === "Full regression");
+  const validation = jobs.find((job) => job.name === validationJob);
   if (
-    successful(full) &&
-    full.run_id === run.id &&
-    full.head_sha === run.head_sha &&
+    successful(validation) &&
+    validation.run_id === run.id &&
+    validation.head_sha === run.head_sha &&
     proofSteps.every((name) =>
-      full.steps?.some((step) => step.name === name && successful(step)),
+      validation.steps?.some((step) => step.name === name && successful(step)),
     )
   ) {
     return {
@@ -69,7 +74,14 @@ export async function verifiedCandidateRun({
   repositoryId,
   branch,
   sha,
+  expectedBaseSha,
 }) {
+  if (!isCommitSha(expectedBaseSha))
+    throw new Error("An exact nonzero baseline commit SHA is required.");
+  if (!isCommitSha(sha) || branch !== candidateBranch(expectedBaseSha, sha))
+    throw new Error(
+      "Candidate branch must bind the expected baseline and exact head.",
+    );
   const root = `/repos/${repository}`;
   const runs = arrayField(
     await request(`${root}/actions/workflows/docs.yml/runs`, {
@@ -83,7 +95,7 @@ export async function verifiedCandidateRun({
     (entry) =>
       entry.head_branch === branch &&
       entry.head_sha === sha &&
-      qualifyingRun(entry, repository, repositoryId),
+      qualifyingRun(entry, repository, repositoryId, expectedBaseSha),
   );
   if (!run || run.status !== "completed") return;
   const link = `https://github.com/${repository}/actions/runs/${run.id}`;
@@ -91,10 +103,10 @@ export async function verifiedCandidateRun({
     throw new Error(
       `Candidate Documentation run finished as ${run.conclusion}: ${link}.`,
     );
-  const proof = await completedFullJob(request, root, run);
+  const proof = await completedValidationJob(request, root, run);
   if (!proof)
     throw new Error(
-      `Candidate run lacks successful Full regression proof: ${link}.`,
+      `Candidate run lacks successful ${validationJob} proof: ${link}.`,
     );
   return proof;
 }
@@ -105,11 +117,14 @@ export async function findRegressionProof({
   repositoryId,
   targetSha,
   targetTree,
+  expectedBaseSha,
 }) {
+  if (!isCommitSha(expectedBaseSha))
+    throw new Error("An exact nonzero baseline commit SHA is required.");
   if (
     !/^[\w.-]+\/[\w.-]+$/.test(repository) ||
     !positiveInteger(repositoryId) ||
-    !shaPattern.test(targetSha) ||
+    !isCommitSha(targetSha) ||
     !shaPattern.test(targetTree)
   ) {
     throw new Error(
@@ -125,7 +140,10 @@ export async function findRegressionProof({
   const query = { status: "success", per_page: 100 };
   async function inspect(runs) {
     for (const run of runs) {
-      if (!successful(run) || !qualifyingRun(run, repository, repositoryId))
+      if (
+        !successful(run) ||
+        !qualifyingRun(run, repository, repositoryId, expectedBaseSha)
+      )
         continue;
       const key = `${run.id}:${run.run_attempt}`;
       if (inspected.has(key)) continue;
@@ -155,7 +173,7 @@ export async function findRegressionProof({
 
       // The run's aggregate result alone is not sufficient: a job can be skipped.
       // Bind evidence to the reported attempt instead of mixing separately rerun jobs.
-      const proof = await completedFullJob(request, root, run);
+      const proof = await completedValidationJob(request, root, run);
       if (proof) return proof;
     }
     return undefined;
@@ -180,9 +198,9 @@ export async function findRegressionProof({
   if (treeProof) return treeProof;
 
   throw new Error(
-    `No verified full regression for master ${targetSha} (tree ${targetTree}). ` +
-      "Push this exact tree to a trusted release-candidate/<name> branch, " +
-      "wait for successful Full regression, then rerun Documentation on master. " +
+    `No verified targeted validation for master ${targetSha} (tree ${targetTree}, baseline ${expectedBaseSha}). ` +
+      "Check the pre-merge release-candidate/<base-sha>/<head-sha> evidence and retry the original master push using its unchanged baseline. " +
+      "If it was never verified, prepare a reviewed candidate from current master; do not substitute an unrelated baseline. " +
       "No Pages artifact was accepted; see docs/CONTRIBUTING-CI.md.",
   );
 }
@@ -216,9 +234,13 @@ async function main() {
   const git = (value) =>
     execFileSync("git", ["rev-parse", value], { encoding: "utf8" }).trim();
   const targetSha = git("HEAD");
-  if (env.GITHUB_REF !== "refs/heads/master" || targetSha !== env.GITHUB_SHA) {
+  if (
+    env.GITHUB_EVENT_NAME !== "push" ||
+    env.GITHUB_REF !== "refs/heads/master" ||
+    targetSha !== env.GITHUB_SHA
+  ) {
     throw new Error(
-      "Docs proof must run on the immutable master event checkout.",
+      "Docs proof must run on the immutable master push checkout.",
     );
   }
   const request = createGitHubRequest(env.GITHUB_API_URL, env.GH_TOKEN);
@@ -228,6 +250,7 @@ async function main() {
     repositoryId: Number(env.GITHUB_REPOSITORY_ID),
     targetSha,
     targetTree: git("HEAD^{tree}"),
+    expectedBaseSha: env.MTONE_BASE_SHA,
   });
   process.stdout.write(
     `Verified Documentation run ${proof.runId} attempt ${proof.runAttempt}, candidate ${proof.testedSha}, master ${targetSha}.\n`,

@@ -21,28 +21,29 @@ the file is still current; an artificial text change is not required.
 
 ## Verify the package and website stay consistent
 
-Run the applicable tests plus the following before completing a component change:
+Run relevant checks, not the full suite, for ordinary changes. Use the exact
+Git diff and preview its component/docs checks with:
 
 ```sh
-npm run typecheck
-npm test
-npm run build:docs
-npm run test:package
-cmp packages/mtone/llms.txt dist/docs/llms.txt
+node scripts/check-targeted-changes.mjs <exact-master-base-SHA> <candidate-SHA> --plan
 git diff --check
 ```
 
-The package build regenerates the file. Review and commit any generated diff.
-The docs Vite build emits that same file as `dist/docs/llms.txt`; do not maintain
-a separate manually copied website reference.
+Markdown-only changes check source integrity without installing dependencies;
+the Pages build still checks the generated reference.
+Application, component, package and shared changes check the affected tests
+and applicable type/build/package smoke. The docs build emits the same generated
+file as `dist/docs/llms.txt`; do not maintain a separate website reference.
+Keep the full unit and comprehensive browser suite for the stable npm release
+gate in [the release guide](docs/RELEASING.md), not routine merges or Pages.
 
-Before an authorized merge, follow [the Documentation CI workflow](docs/CONTRIBUTING-CI.md):
-use `node scripts/merge-verified.mjs --expect-master <exact-remote-SHA> [candidate]`
-for an authorized fast-forward. The entry requires a clean committed candidate,
-validates it on a same-repository release-candidate branch, and promotes only
-after that full regression succeeds. For a protected-branch PR, follow the
-equivalent exact-tree gate in the linked workflow. Master automatically builds
-and deploys Pages after checking the evidence; it does not repeat regression.
+For an authorized fast-forward, use
+`node scripts/merge-verified.mjs --expect-master <exact-remote-SHA> [candidate]`.
+The entry requires a clean committed candidate and verifies targeted checks on
+the exact same-repository candidate, bound to the intended master baseline.
+Protected PR merges require the same evidence for the final complete Git tree.
+Master automatically builds and deploys Pages after checking that proof,
+without repeating tests. See [the CI guide](docs/CONTRIBUTING-CI.md).
 
 The real npm tarball must contain `package/llms.txt`, and the installed file must
 be available as `node_modules/@bixlab/mtone/llms.txt` (also exported through

@@ -2,7 +2,6 @@ name: Publish npm package
 on:
   release:
     types: [published]
-  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
@@ -10,24 +9,135 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verify:
+    name: Full release regression
+    if: github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Assert exact release checkout
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          test "$GITHUB_REF" = "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
           package-manager-cache: false
+      - name: Validate release metadata and approved license
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: node scripts/check-release.mjs
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
       - run: npm run build:docs
-      - run: npx playwright install --with-deps chromium
-      - run: node tests/select-layout.browser.mjs
       - run: npm run test:package
+      - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: node tests/ai-elements.browser.mjs
+      - name: Color theme browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/theme-palette.browser.mjs
+            BROWSER=$browser node tests/theme-docs.browser.mjs
+          done
+      - run: node tests/tag-select.browser.mjs
+      - run: node tests/tree-select.browser.mjs
+      - run: node tests/date-picker.browser.mjs
+      - run: node tests/select-layout.browser.mjs
+      - run: node tests/select-focus.browser.mjs
+      - run: node tests/spotlight.browser.mjs
+      - run: node tests/input-family.browser.mjs
+      - run: node tests/input-focus.browser.mjs
+      - run: node tests/field-focus.browser.mjs
+      - run: node tests/focus-unify.browser.mjs
+      - run: node tests/control-height.browser.mjs
+      - run: node tests/sidebar-navigation.browser.mjs
+      - run: node tests/menu-icons.browser.mjs
+      - run: node tests/menu.browser.mjs
+      - run: node tests/menu-spacing.browser.mjs
+      - run: node tests/dropdown.browser.mjs
+      - run: node tests/menubar.browser.mjs
+      - run: node tests/loading-overlay.browser.mjs
+      - name: Docs search browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/docs-search.browser.mjs
+          done
+      - name: Component detail browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/component-layout.browser.mjs || exit 1
+          done
+      - run: node tests/hover-card-arrow.browser.mjs
+      - run: node tests/hover-card.browser.mjs
+      - run: node tests/hover-card-portals.browser.mjs
+      - run: node tests/card.browser.mjs
+      - run: node tests/table.browser.mjs
+      - run: node tests/mentions.browser.mjs
+      - run: node tests/calendar.browser.mjs
+      - run: node tests/rate.browser.mjs
+      - run: node tests/timeline.browser.mjs
+      - run: node tests/tree.browser.mjs
+      - run: node tests/image.browser.mjs
+      - run: node tests/table-of-contents.browser.mjs
+      - run: node tests/transfer.browser.mjs
+      - run: node tests/tabs.browser.mjs
+      - run: node tests/divider.browser.mjs
+      - run: node tests/button-group.browser.mjs
+      - run: node tests/typography.browser.mjs
+      - name: List browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/list.browser.mjs
+          done
+          node tests/data-list.browser.mjs
+      - name: Typography navigation browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/typography-navigation.browser.mjs
+          done
+      - run: node tests/breadcrumb.browser.mjs
+      - run: node tests/auto-complete.browser.mjs
+      - run: node tests/cascader.browser.mjs
+      - run: node tests/avatar-popconfirm.browser.mjs
+      - run: node tests/affix.browser.mjs
+      - run: node tests/result.browser.mjs
+      - name: Splitter browser regressions
+        run: |
+          status=0
+          node tests/splitter-cycle.browser.mjs || status=1
+          node tests/splitter.browser.mjs || status=1
+          exit $status
+      - run: node tests/form.browser.mjs
+      - run: node tests/modal-layout.browser.mjs
+      - name: PageLayout browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/page-layout.browser.mjs || exit 1
+          done
+      - name: NavSubmenu browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/nav-submenu.browser.mjs || exit 1
+          done
+      - run: node tests/showcase.browser.mjs
+      - run: node tests/card-group-docs.browser.mjs
+      - run: node tests/card-group.browser.mjs
+      - run: node tests/check-card.browser.mjs
+      - run: node tests/fieldset.browser.mjs
+      - run: node tests/progress.browser.mjs
+      - run: node tests/questionnaire.browser.mjs
+      - name: Assert tracked files unchanged
+        run: git diff --exit-code HEAD --
       - run: npm pack -w @bixlab/mtone --dry-run
   publish:
-    # Manual runs validate only. Only a non-prerelease GitHub Release publishes.
-    if: github.event_name == 'release' && !github.event.release.prerelease
+    if: github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft
     needs: verify
     runs-on: ubuntu-latest
     environment: npm
@@ -36,6 +146,15 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Assert exact release checkout
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          test "$GITHUB_REF" = "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
       - uses: actions/setup-node@v6
         with:
           node-version: '24'

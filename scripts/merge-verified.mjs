@@ -10,7 +10,10 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
-import { verifiedCandidateRun } from "./verify-docs-regression.mjs";
+import {
+  candidateBranch,
+  verifiedCandidateRun,
+} from "./verify-docs-regression.mjs";
 
 const repository = "xingjianxu/mtone";
 const repositoryPath = `/repos/${repository}`;
@@ -45,10 +48,17 @@ const commitChecks = (sha) => `${repositoryUrl}/commit/${sha}/checks`;
 // sends that same previous object in the ordinary non-force ref update. Reject
 // a different advertised object rather than accepting a racy fast-forward.
 export function guardedPush({ cwd, sha, ref, expected }) {
+  const candidateBase = ref?.match(
+    /^refs\/heads\/release-candidate\/([0-9a-f]{40})\/[0-9a-f]{40}$/,
+  )?.[1];
+  const validCandidate =
+    candidateBase &&
+    candidateBase !== zero &&
+    ref === `refs/heads/${candidateBranch(candidateBase, sha)}`;
   if (
     !shaPattern.test(sha) ||
     (expected !== undefined && !shaPattern.test(expected)) ||
-    ![masterRef, `refs/heads/release-candidate/${sha}`].includes(ref)
+    (ref !== masterRef && !validCandidate)
   ) {
     throw new Error(
       "An exact single-ref push and expected old SHA are required.",
@@ -229,7 +239,7 @@ export async function promoteCandidate({
   sleep: wait = sleep,
   report = () => {},
 }) {
-  if (!shaPattern.test(expectedMaster))
+  if (!shaPattern.test(expectedMaster) || expectedMaster === zero)
     throw new Error(
       "--expect-master must be the exact 40-character remote master SHA.",
     );
@@ -260,7 +270,7 @@ export async function promoteCandidate({
       "GitHub did not confirm the trusted mtone repository identity.",
     );
 
-  const branch = `release-candidate/${sha}`;
+  const branch = candidateBranch(expectedMaster, sha);
   const ref = `refs/heads/${branch}`;
   const existing = git.remoteRef(ref);
   if (existing !== undefined && existing !== sha)
@@ -285,7 +295,7 @@ export async function promoteCandidate({
     );
 
   const tracker = `${branch} — ${commitChecks(sha)}`;
-  report(`Waiting for Full regression: ${tracker}`);
+  report(`Waiting for Targeted validation: ${tracker}`);
   const deadline = now() + timeoutMs;
   let proof;
   while (now() < deadline) {
@@ -295,6 +305,7 @@ export async function promoteCandidate({
       repositoryId: identity.id,
       branch,
       sha,
+      expectedBaseSha: expectedMaster,
     });
     if (proof) break;
     const remaining = deadline - now();
@@ -302,7 +313,7 @@ export async function promoteCandidate({
   }
   if (!proof || now() > deadline)
     throw new Error(
-      `Timed out waiting for exact Full regression; master was not pushed. ${tracker}`,
+      `Timed out waiting for exact Targeted validation; master was not pushed. ${tracker}`,
     );
 
   git.assertOrigin();

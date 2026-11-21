@@ -7,14 +7,22 @@ const targetSha = "a".repeat(40);
 const testedSha = "b".repeat(40);
 const targetTree = "c".repeat(40);
 const otherTree = "d".repeat(40);
+const baseSha = "e".repeat(40);
+const otherBase = "f".repeat(40);
+const branch = (base, head) => `release-candidate/${base}/${head}`;
 const path = `/repos/${repository}/actions/workflows/docs.yml/runs`;
 const fullJob = {
-  name: "Full regression",
+  name: "Targeted validation",
   status: "completed",
   conclusion: "success",
   steps: [
     {
       name: "Assert exact candidate checkout",
+      status: "completed",
+      conclusion: "success",
+    },
+    {
+      name: "Run targeted checks",
       status: "completed",
       conclusion: "success",
     },
@@ -32,7 +40,7 @@ const run = {
   status: "completed",
   conclusion: "success",
   path: ".github/workflows/docs.yml",
-  head_branch: "release-candidate/tabs",
+  head_branch: branch(baseSha, targetSha),
   head_sha: targetSha,
   repository: { id: repositoryId, full_name: repository },
   head_repository: { id: repositoryId, full_name: repository },
@@ -44,6 +52,7 @@ function setup({
   recent = [],
   jobs = [fullJob],
   tree = targetTree,
+  expectedBaseSha = baseSha,
 } = {}) {
   const request = vi.fn(async (resource, query) => {
     if (resource === path)
@@ -70,6 +79,7 @@ function setup({
         repositoryId,
         targetSha,
         targetTree,
+        expectedBaseSha,
       }),
   };
 }
@@ -93,7 +103,7 @@ describe("Pages pre-merge regression proof", () => {
     ]);
   });
 
-  it.each(["@release-candidate/tabs", "@refs/heads/release-candidate/tabs"])(
+  it.each([`@${run.head_branch}`, `@refs/heads/${run.head_branch}`])(
     "accepts the GitHub API path suffix %s only for the candidate ref",
     async (suffix) => {
       const { lookup } = setup({
@@ -107,6 +117,7 @@ describe("Pages pre-merge regression proof", () => {
     const candidate = {
       ...run,
       head_sha: testedSha,
+      head_branch: branch(baseSha, testedSha),
       event: "workflow_dispatch",
     };
     await expect(
@@ -121,6 +132,7 @@ describe("Pages pre-merge regression proof", () => {
     const candidate = {
       ...run,
       head_sha: testedSha,
+      head_branch: branch(baseSha, testedSha),
       head_commit: { tree_id: targetTree },
     };
     await expect(
@@ -134,6 +146,10 @@ describe("Pages pre-merge regression proof", () => {
     { event: "pull_request" },
     { event: "workflow_run" },
     { head_branch: "master" },
+    { head_branch: branch(otherBase, targetSha) },
+    { head_branch: branch(baseSha, testedSha) },
+    { head_branch: `release-candidate/${targetSha}` },
+    { head_branch: `${branch(baseSha, targetSha)}/extra` },
     { head_repository: { id: 601, full_name: repository } },
     { repository: { id: repositoryId, full_name: "someone/else" } },
     { status: "in_progress" },
@@ -151,6 +167,7 @@ describe("Pages pre-merge regression proof", () => {
     { jobs: [{ ...fullJob, conclusion: "skipped" }] },
     { jobs: [{ ...fullJob, status: "in_progress" }] },
     { jobs: [{ ...fullJob, name: "Fake successful job" }] },
+    { jobs: [{ ...fullJob, name: "Full regression" }] },
     { jobs: [{ ...fullJob, run_id: 999 }] },
     { jobs: [{ ...fullJob, head_sha: testedSha }] },
     { jobs: [{ ...fullJob, steps: fullJob.steps.slice(0, 1) }] },
@@ -160,7 +177,7 @@ describe("Pages pre-merge regression proof", () => {
           ...fullJob,
           steps: [
             { ...fullJob.steps[0], conclusion: "skipped" },
-            fullJob.steps[1],
+            ...fullJob.steps.slice(1),
           ],
         },
       ],
@@ -175,6 +192,39 @@ describe("Pages pre-merge regression proof", () => {
     },
   );
 
+  it.each(["skipped", "missing"])(
+    "rejects successful candidate jobs with a %s targeted check",
+    async (mode) => {
+      const steps = fullJob.steps.flatMap((step) => {
+        if (step.name !== "Run targeted checks") return [step];
+        return mode === "missing" ? [] : [{ ...step, conclusion: mode }];
+      });
+      await expect(
+        setup({ direct: [run], jobs: [{ ...fullJob, steps }] }).lookup(),
+      ).rejects.toThrow(/release-candidate/);
+    },
+  );
+
+  it.each(["", "master", "0".repeat(40)])(
+    "rejects invalid expected baseline %s without querying GitHub",
+    async (expectedBaseSha) => {
+      const { lookup, request } = setup({ direct: [run], expectedBaseSha });
+      await expect(lookup()).rejects.toThrow(/baseline/);
+      expect(request).not.toHaveBeenCalled();
+    },
+  );
+
+  it("does not reuse an equal complete tree tested against a different baseline", async () => {
+    const candidate = {
+      ...run,
+      head_sha: testedSha,
+      head_branch: branch(otherBase, testedSha),
+    };
+    const { lookup, request } = setup({ recent: [candidate] });
+    await expect(lookup()).rejects.toThrow(/release-candidate/);
+    expect(request).not.toHaveBeenCalledWith(jobPath, expect.anything());
+  });
+
   it("does not make deployable proof when authoritative workflow API lookup fails", async () => {
     const request = vi
       .fn()
@@ -186,6 +236,7 @@ describe("Pages pre-merge regression proof", () => {
         repositoryId,
         targetSha,
         targetTree,
+        expectedBaseSha: baseSha,
       }),
     ).rejects.toThrow(/API inaccessible/);
   });

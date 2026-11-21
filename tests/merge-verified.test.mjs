@@ -11,7 +11,7 @@ const base = "a".repeat(40);
 const sha = "b".repeat(40);
 const tree = "c".repeat(40);
 const other = "d".repeat(40);
-const branch = `release-candidate/${sha}`;
+const branch = `release-candidate/${base}/${sha}`;
 const candidateRef = `refs/heads/${branch}`;
 const masterRef = "refs/heads/master";
 const identity = { id: 101, full_name: repository };
@@ -30,11 +30,12 @@ const run = {
 const full = {
   status: "completed",
   conclusion: "success",
-  name: "Full regression",
+  name: "Targeted validation",
   run_id: run.id,
   head_sha: sha,
   steps: [
     "Assert exact candidate checkout",
+    "Run targeted checks",
     "Assert tracked files unchanged",
   ].map((name) => ({ name, status: "completed", conclusion: "success" })),
 };
@@ -152,6 +153,8 @@ describe("Authorized fast-forward after release-candidate regression", () => {
     { runs: [] },
     { runs: [{ ...run, head_sha: other }] },
     { runs: [{ ...run, head_branch: "release-candidate/unrelated" }] },
+    { runs: [{ ...run, head_branch: `release-candidate/${other}/${sha}` }] },
+    { runs: [{ ...run, head_branch: `release-candidate/${base}/${other}` }] },
     { runs: [{ ...run, head_repository: { ...identity, id: 102 } }] },
     { runs: [{ ...run, status: "queued", conclusion: null }] },
   ])(
@@ -171,7 +174,7 @@ describe("Authorized fast-forward after release-candidate regression", () => {
 
   it("refuses success with a skipped actual job", async () => {
     const { go, git } = setup({ jobs: [{ ...full, conclusion: "skipped" }] });
-    await expect(go()).rejects.toThrow(/Full regression/);
+    await expect(go()).rejects.toThrow(/Targeted validation/);
     expect(git.push.mock.calls).toEqual([[sha, candidateRef, undefined]]);
   });
 
@@ -232,6 +235,24 @@ describe("Non-force push expected-old guard", () => {
       const competing = commit();
       git(local, ["push", "origin", `${competing}:${masterRef}`]);
       const candidate = commit();
+      expect(() =>
+        guardedPush({
+          cwd: local,
+          sha: candidate,
+          ref: `refs/heads/release-candidate/${candidate}`,
+        }),
+      ).toThrow(/single-ref/);
+      guardedPush({
+        cwd: local,
+        sha: candidate,
+        ref: `refs/heads/release-candidate/${predecessor}/${candidate}`,
+      });
+      expect(
+        git(bare, [
+          "rev-parse",
+          `refs/heads/release-candidate/${predecessor}/${candidate}`,
+        ]),
+      ).toBe(candidate);
       const hooks = join(local, "local-hooks");
       mkdirSync(hooks);
       const marker = join(local, "user-hook-ran");
