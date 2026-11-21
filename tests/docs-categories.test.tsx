@@ -15,7 +15,7 @@ const categories = [
   "全局配置",
 ];
 const expected: Record<string, string[]> = {
-  布局容器: ["CardGroup", "Affix", "AdminLayout", "Splitter", "Divider"],
+  布局容器: ["CardGroup", "Affix", "AdminLayout", "PageLayout", "Splitter", "Divider"],
   操作命令: [
     "Button",
     "IconButton",

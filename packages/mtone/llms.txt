@@ -887,6 +887,31 @@ export default function Demo() {
 }
 ```
 
+### PageLayout
+
+- [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): 组织单页标题、操作、标签页和内容。
+- Import: PageLayout from @bixlab/mtone
+- title: ReactNode. 必填标题，渲染在语义标题元素中。
+- headingLevel: 1 | 2 | 3 | 4 | 5 | 6 (default: 1). 标题级别；嵌入时按页面结构调整。
+- subtitle: ReactNode. 标题下方的简短补充。
+- icon: ReactNode. 标题前的图标。
+- actions: ReactNode. 标题行的操作，空间不足时自然换行。
+- description: ReactNode. 标题行下方的补充内容。
+- extra: ReactNode. 与描述同组的附加信息。
+- tabs: ReactNode. 标题区之后、正文之前的内容，可传入完整 Tabs。
+- children: ReactNode. 正文。
+- HTML div 属性: Omit<ComponentPropsWithRef<"div">, "title">. className、style、ref 等传给根元素。
+- 只负责单页布局，不管理标签状态、路由或应用导航。
+
+```tsx
+import { PageLayout } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <PageLayout title="项目总览">本周有 3 项任务待处理。</PageLayout>;
+}
+```
+
 ### AdminLayout
 
 - [AdminLayout](https://xingjianxu.github.io/mtone/#/components/AdminLayout): 可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。

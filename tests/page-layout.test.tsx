@@ -1,0 +1,52 @@
+import React from "react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { expect, test, vi } from "vitest";
+import * as Mtone from "../packages/mtone/src";
+
+test("renders only the heading and content when optional slots are omitted", () => {
+  const { PageLayout } = Mtone;
+  const { container } = render(<PageLayout title="Inventory">Rows</PageLayout>);
+  expect(screen.getByRole("heading", { level: 1, name: "Inventory" })).toBeVisible();
+  expect(screen.queryByRole("main")).not.toBeInTheDocument();
+  const root = container.firstElementChild!;
+  expect([...root.children].map((element) => element.tagName)).toEqual(["DIV", "DIV"]);
+  expect(root.querySelector(".mt-page-layout-header")).toHaveTextContent("Inventory");
+  expect(root.lastElementChild).toHaveTextContent("Rows");
+});
+
+test("preserves slot order, native props, and interactive action handlers", () => {
+  const { PageLayout } = Mtone;
+  const click = vi.fn();
+  render(<PageLayout id="overview" aria-label="Overview" className="dashboard" style={{ marginTop: 7 }}
+    headingLevel={3} title={<em>Overview</em>} subtitle="Daily totals" icon={<span>Icon</span>}
+    actions={<button onClick={click}>Export</button>} description="Totals are provisional"
+    extra={<span>Updated today</span>} tabs={<button>History</button>}><div>Chart</div></PageLayout>);
+  const root = document.getElementById("overview")!;
+  expect(root).toHaveClass("dashboard");
+  expect(root).toHaveStyle({ marginTop: "7px" });
+  expect(root).toHaveAttribute("aria-label", "Overview");
+  expect(root).not.toHaveAttribute("title");
+  expect(screen.getByRole("heading", { level: 3 })).toContainElement(screen.getByText("Overview"));
+  expect(root.firstElementChild).toHaveTextContent("IconOverviewDaily totalsExportTotals are provisionalUpdated today");
+  expect(root.children[1]).toContainElement(screen.getByRole("button", { name: "History" }));
+  expect(root.children[2]).toHaveTextContent("Chart");
+  fireEvent.click(screen.getByRole("button", { name: "Export" }));
+  expect(click).toHaveBeenCalledOnce();
+});
+
+test("omits empty optional rows", () => {
+  const { PageLayout } = Mtone;
+  const { container } = render(<PageLayout title="Title" subtitle="" icon={false} actions={null} description="" extra={[]} tabs={false} />);
+  expect(container.querySelectorAll(".mt-page-layout-subtitle, .mt-page-layout-icon, .mt-page-layout-actions, .mt-page-layout-description, .mt-page-layout-extra, .mt-page-layout-tabs, .mt-page-layout-body")).toHaveLength(0);
+});
+
+test("does not create a second banner next to a shell header", () => {
+  render(
+    <>
+      <header>Shell</header>
+      <Mtone.PageLayout title="Inventory">Rows</Mtone.PageLayout>
+    </>,
+  );
+  expect(screen.getAllByRole("banner")).toHaveLength(1);
+  expect(screen.getByRole("heading", { level: 1, name: "Inventory" })).toBeVisible();
+});

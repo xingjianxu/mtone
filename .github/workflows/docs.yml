@@ -101,6 +101,11 @@ jobs:
           exit $status
       - run: node tests/form.browser.mjs
       - run: node tests/modal-layout.browser.mjs
+      - name: PageLayout browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/page-layout.browser.mjs || exit 1
+          done
       - run: node tests/showcase.browser.mjs
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/master'

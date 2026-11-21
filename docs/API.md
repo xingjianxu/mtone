@@ -117,6 +117,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 
 ## Navigation
 
+- [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): single-page frame with a required `title`, optional `headingLevel` (default 1), `icon`, `subtitle`, `actions`, `description`, `extra`, `tabs`, and body children. Pass a complete `Tabs` instance to render its own panels after the header. PageLayout does not manage navigation or tab state; it can sit inside `AdminLayout.Content`.
 - AdminLayout: application shell; compose `AdminLayout.Sider`, `AdminLayout.Header`, `AdminLayout.Content`, and optional `AdminLayout.Footer`. This replaces `Layout` starting with 0.6.0, without a compatibility alias.
 - Sidebar, NavGroup(label), NavItem(active, icon, native button props): layout and navigation buttons. Routing remains the application's responsibility.
 - Breadcrumb: items `{label,href?}`; final item is current page.

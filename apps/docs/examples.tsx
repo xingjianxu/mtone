@@ -1,3 +1,4 @@
+import PageLayoutExample from "./secondary-demos/page-layout-usage";
 import CheckCardExample from "./secondary-demos/check-card-usage";
 import { CardGroupExample } from "./card-group-example";
 import QuestionnaireExample from "./secondary-demos/questionnaire-usage";
@@ -158,6 +159,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <SplitterExample />;
     case "Spotlight":
       return <SpotlightExample />;
+    case "PageLayout":
+      return <PageLayoutExample />;
     case "AdminLayout":
       return <AdminLayoutExample compact={compact} />;
     case "Button":

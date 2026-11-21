@@ -5,6 +5,7 @@ export * from "./interactive";
 export * from "./data";
 
 export * from "./admin-layout";
+export * from "./page-layout";
 
 export * from "./spotlight";
 

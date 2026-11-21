@@ -2109,6 +2109,26 @@ export default function Demo() {
   ]
 },
   {
+    name: "PageLayout",
+    category: "布局容器",
+    description: "组织单页标题、操作、标签页和内容。",
+    importNames: ["PageLayout"],
+    code: 'import { PageLayout } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <PageLayout title="项目总览">本周有 3 项任务待处理。</PageLayout>;\n}',
+    props: [
+      { name: "title", type: "ReactNode", description: "必填标题，渲染在语义标题元素中。" },
+      { name: "headingLevel", type: "1 | 2 | 3 | 4 | 5 | 6", default: "1", description: "标题级别；嵌入时按页面结构调整。" },
+      { name: "subtitle", type: "ReactNode", description: "标题下方的简短补充。" },
+      { name: "icon", type: "ReactNode", description: "标题前的图标。" },
+      { name: "actions", type: "ReactNode", description: "标题行的操作，空间不足时自然换行。" },
+      { name: "description", type: "ReactNode", description: "标题行下方的补充内容。" },
+      { name: "extra", type: "ReactNode", description: "与描述同组的附加信息。" },
+      { name: "tabs", type: "ReactNode", description: "标题区之后、正文之前的内容，可传入完整 Tabs。" },
+      { name: "children", type: "ReactNode", description: "正文。" },
+      { name: "HTML div 属性", type: 'Omit<ComponentPropsWithRef<"div">, "title">', description: "className、style、ref 等传给根元素。" },
+    ],
+    notes: ["只负责单页布局，不管理标签状态、路由或应用导航。"],
+  },
+  {
     name: "AdminLayout",
     category: "布局容器",
     description:

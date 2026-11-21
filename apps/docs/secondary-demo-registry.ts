@@ -1,3 +1,7 @@
+import PageLayoutUsage from "./secondary-demos/page-layout-usage";
+import PageLayoutUsageSource from "./secondary-demos/page-layout-usage.tsx?raw";
+import PageLayoutComposed from "./secondary-demos/page-layout-composed";
+import PageLayoutComposedSource from "./secondary-demos/page-layout-composed.tsx?raw";
 import CheckCardUsage from "./secondary-demos/check-card-usage";
 import CheckCardUsageSource from "./secondary-demos/check-card-usage.tsx?raw";
 import CheckCardSingle from "./secondary-demos/check-card-single";
@@ -374,6 +378,10 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       Demo: Card2,
       source: source(Card2Source),
     },
+  ],
+  PageLayout: [
+    { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },
+    { id: "actions-and-tabs", title: "操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
   ],
   AdminLayout: [
     {
