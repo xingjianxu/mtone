@@ -9,6 +9,7 @@ export default function Demo() {
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <Tabs label="主题预设色" items={items} indicatorColor="blue" />
+      <Tabs label="珊瑚色指示线" items={items} indicatorColor="coral" />
       <Tabs label="自定义 CSS 颜色" items={items} indicatorColor="#b54b81" />
       <MtoneProvider tokens={{ "--mt-accent-teal": "#25686c" }}>
         <Tabs label="应用覆盖主题色" items={items} indicatorColor="teal" />

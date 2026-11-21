@@ -5,7 +5,10 @@ export const typographySections = [
   { name: "Paragraph", label: "Paragraph 段落" },
   { name: "Link", label: "Link 链接" },
   { name: "Blockquote", label: "Blockquote 引用" },
+  { name: "Code", label: "Code 代码", namespaceOnly: true },
 ] as const;
+
+export const standaloneTypographySections = typographySections.filter((section) => !("namespaceOnly" in section));
 
 export function isTypographySection(name: string) {
   return typographySections.some((section) => section.name === name);

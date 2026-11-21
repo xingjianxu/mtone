@@ -14,7 +14,7 @@ import {
 import * as M from "../../packages/mtone/src";
 import { componentCategories, componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
-import { typographySections, focusTypographySection, isTypographySection, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
+import { standaloneTypographySections, focusTypographySection, isTypographySection, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
 import { ComponentOutline, focusDocSection } from "./component-outline";
 import type { DocSection } from "./doc-section";
 import { inputDocSections } from "./input-demos";
@@ -38,7 +38,7 @@ export function parseRoute(hash: string): Route {
     return { kind: "component", name: "Typography", section: typography[1] };
   if (typography && !isTypographySection(typography[1]) && !/^(usage|props|notes)$/.test(typography[1])) return { kind: "not-found" };
   const legacyTypography = hash.match(/^#\/components\/([A-Za-z]+)$/);
-  if (legacyTypography && isTypographySection(legacyTypography[1]))
+  if (legacyTypography && standaloneTypographySections.some(({ name }) => name === legacyTypography[1]))
     return { kind: "component", name: "Typography", section: legacyTypography[1] };
   if (hash === "#/components/Mention") return { kind: "component", name: "Mentions" };
   if (hash === "#/components/DropdownMenu") return { kind: "component", name: "Menu" };
@@ -103,7 +103,7 @@ export const docSections: Record<string, readonly DocSection[]> = {
 function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }) {
   const sections = docSections[doc.name] ?? [];
   const apiChildren = doc.name === "Typography"
-    ? typographySections
+    ? standaloneTypographySections
     : componentDocs.filter((item) => item.sidebarParent === doc.name)
         .map((item) => ({ name: item.name, label: item.name }));
 
@@ -299,7 +299,7 @@ function Theme() {
                 ["--mt-height", "控件高度"],
                 ["--mt-radius", "圆角"],
                 ["--mt-focus", "统一焦点色，独立于 --mt-primary"],
-                ["--mt-accent-*", "七种共享预设色，可通过 CSS 变量复用，在 MtoneProvider tokens 中覆盖。"],
+                ["--mt-accent-*", "八种共享预设色，可通过 CSS 变量复用，在 MtoneProvider tokens 中覆盖。"],
               ].map(([k, v]) => (
                 <tr key={k}>
                   <td>

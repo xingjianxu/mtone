@@ -25,6 +25,23 @@ try {
     <div class="mt-popup" id="global">Browser-level overlay</div>
   `);
   await page.addStyleTag({ path: resolve(process.env.THEME_CSS_PATH ?? "packages/mtone/dist/styles.css") });
+  const expectCoral = async (selector, color) => {
+    const swatch = await page.locator(selector).evaluate((root) => {
+      const el = document.createElement("span");
+      el.style.backgroundColor = "var(--mt-accent-coral)";
+      root.append(el);
+      const painted = getComputedStyle(el).backgroundColor;
+      el.remove();
+      return painted;
+    });
+    expect(swatch).toBe(color);
+  };
+  const coralLight = "rgb(209, 99, 75)";
+  const coralDark = "rgb(253, 140, 115)";
+  for (const selector of ["#default", "#nested", "#system"]) {
+    await expectCoral(selector, coralLight);
+  }
+  await expectCoral("#dark", coralDark);
   const light = "rgb(255, 255, 255)";
   const dark = "rgb(32, 32, 31)";
   const lightText = "rgb(55, 53, 47)";
@@ -48,12 +65,15 @@ try {
   await expect(page.locator("#dark .mt-badge")).toHaveCSS("background-color", "rgb(73, 47, 45)");
   await expect(page.locator("#dark .mt-badge")).toHaveCSS("color", "rgb(255, 170, 164)");
   await page.emulateMedia({ colorScheme: "dark" });
+  await expectCoral("#system", coralDark);
+  await expectCoral("#nested", coralLight);
   await expect(page.locator("#system input")).toHaveCSS("background-color", dark);
   await expect(page.locator("#default input")).toHaveCSS("background-color", light);
   await expect(page.locator("#nested input")).toHaveCSS("background-color", light);
   await page.locator("html").evaluate((root) => root.setAttribute("data-mt-theme", "system"));
   await expect(page.locator("#global")).toHaveCSS("background-color", dark);
   await page.emulateMedia({ colorScheme: "light" });
+  await expectCoral("#system", coralLight);
   await expect(page.locator("#system input")).toHaveCSS("background-color", light);
   await expect(page.locator("#global")).toHaveCSS("background-color", light);
   await expect(page.locator("#dark > input")).toHaveCSS("background-color", dark);

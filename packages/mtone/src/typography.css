@@ -63,6 +63,7 @@
   border-radius: 2px;
   padding: 0 2px;
 }
+.mt-typography-code,
 .mt-typography code,
 .mt-typography kbd {
   font-size: 0.9em;
@@ -70,6 +71,37 @@
   border: 1px solid var(--mt-border, #e9e9e7);
   border-radius: 3px;
   padding: 1px 4px;
+}
+.mt-typography-code-block {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  white-space: pre;
+  overflow-wrap: normal;
+  color: var(--mt-fg, #37352f);
+  background: var(--mt-subtle, #f7f7f5);
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: 4px;
+  font: 13px/1.6 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+.mt-typography-code-block > code {
+  /* Observe the intrinsic line width as well as the scrollport. */
+  display: block;
+  inline-size: max-content;
+  min-inline-size: 100%;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+.mt-typography-code-block:focus-visible {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
 }
 .mt-typography kbd {
   box-shadow: 0 1px 0 var(--mt-border, #e9e9e7);

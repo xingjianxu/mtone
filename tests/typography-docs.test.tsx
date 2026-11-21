@@ -12,6 +12,7 @@ it("gives every Typography subcomponent a separate named demo", () => {
     "Paragraph 段落",
     "Link 链接",
     "Blockquote 引用",
+    "Code 代码",
   ]) {
     const section = screen.getByRole("region", { name });
     expect(section).toHaveStyle({ margin: 0 });
@@ -32,7 +33,7 @@ it("does not apply the site's page footer layout to quotation attributions", asy
 it("offers an in-page navigation link for each Typography demo", () => {
   render(<TypographyExample />);
   const nav = screen.getByRole("navigation", { name: "Typography 子组件" });
-  for (const name of ["Title", "Text", "Paragraph", "Link", "Blockquote"]) {
+  for (const name of ["Title", "Text", "Paragraph", "Link", "Blockquote", "Code"]) {
     const link = within(nav).getByRole("link", { name });
     expect(link).toHaveAttribute(
       "href",
@@ -89,4 +90,17 @@ it("keeps compact gallery previews free of duplicate page anchors", () => {
   expect(
     screen.queryByRole("navigation", { name: "Typography 子组件" }),
   ).not.toBeInTheDocument();
+});
+
+it("documents Code within Typography without registering a standalone Code component", () => {
+  expect(parseRoute("#/components/Code")).toEqual({ kind: "not-found" });
+  expect(parseRoute("#/components/Typography?section=Code")).toEqual({
+    kind: "component", name: "Typography", section: "Code",
+  });
+  window.location.hash = "#/components/Typography?section=Code";
+  render(<DocsApp />);
+  expect(screen.getByRole("heading", { name: /^Code$/ })).toHaveFocus();
+  expect(screen.getByLabelText("配置示例").tagName).toBe("PRE");
+  expect(screen.getByText("Code.block")).toBeVisible();
+  expect(within(screen.getByRole("navigation", { name: "文档导航" })).queryByRole("link", { name: /^Code$/ })).not.toBeInTheDocument();
 });

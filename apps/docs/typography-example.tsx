@@ -6,6 +6,7 @@ import {
   componentDocHref,
   handleTypographyNavigation,
 } from "./typography-navigation";
+import TypographyCodeDemo from "./secondary-demos/typography-code";
 import { Typography, Button } from "../../packages/mtone/src";
 
 function DemoSection({
@@ -58,7 +59,7 @@ export function TypographyExample() {
     >
       <p style={{ margin: 0 }}>
         Typography 包含 Title、Text、Paragraph、Link 和
-        Blockquote。下方按子组件分别演示；均可单独导入。
+        Blockquote、Code。Code 通过 Typography 命名空间使用。
       </p>
       <nav className="typography-subnav" aria-label="Typography 子组件">
         {typographySections.map(({ name }) => (
@@ -227,6 +228,12 @@ export function TypographyExample() {
           颜色；不设置时沿用主题中性色。radius、iconSize 支持数字（px）或 CSS
           长度。
         </p>
+      </DemoSection>
+      <DemoSection
+        name="Code 代码"
+        code={'<Typography.Code>npm test</Typography.Code>\n<Typography.Code block aria-label="配置示例">{source}</Typography.Code>'}
+      >
+        <TypographyCodeDemo />
       </DemoSection>
     </div>
   );

@@ -2293,9 +2293,14 @@ export default function Demo() {
         description: "文字前的内容，可放图标或装饰；优先于 icon，传 null 可隐藏旧图标。",
       },
       {
+        name: "preset",
+        type: '"dropdown"',
+        description: "仅外观；在文字后显示 14px 装饰箭头，不打开菜单或添加菜单 ARIA 属性。",
+      },
+      {
         name: "rightSection",
         type: "ReactNode",
-        description: "文字后的内容，可放图标或装饰；加载期间仍显示。",
+        description: "文字后的内容，可放图标或装饰；加载期间仍显示。显式设置时优先于 preset，传 null 可隐藏预设箭头。",
       },
       {
         name: "toggle",
@@ -3949,7 +3954,7 @@ export default function Demo() {
         name: "indicatorColor",
         type: "TabsIndicatorColor",
         default: "currentColor",
-        description: "使用 line 样式时的选中指示线颜色，包含 attached 在非顶部位置的线型回退。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。",
+        description: "使用 line 样式时的选中指示线颜色，包含 attached 在非顶部位置的线型回退。支持主题预设 neutral/blue/green/orange/red/purple/teal/coral，或任意有效 CSS 颜色；不改变基准线和文字颜色。",
       },
       {
         name: "centered / gap",
@@ -4150,14 +4155,14 @@ export default function Demo() {
     category: "操作命令",
     description: "默认点击打开的操作菜单，可启用悬停，支持分组与多级子菜单。",
     importNames: ["Menu", "Button"],
-    code: 'import { Menu, Button } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu trigger={<Button>文档操作</Button>} items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
+    code: 'import { Menu } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu trigger="文档操作" items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
     props: [
       { name: "width", type: "CSSProperties['width']", description: "主菜单默认按内容宽度（最小160px），不再与trigger等宽；可指定number像素或CSS宽度，受可用视口宽度限制。子菜单独立按内容宽度，不继承此值。" },
       { name: "align", type: "'start' | 'end' | 'left' | 'right'", default: "start", description: "主菜单与trigger对齐边；left/right是物理左右，start/end随DirectionProvider的RTL方向变化，碰撞时可自动调整。" },
       {
         name: "trigger",
-        type: "ReactElement",
-        description: "必填；触发元素。",
+        type: "string | ReactElement",
+        description: "必填。文字使用内容宽度的预设下拉按钮；传 React 元素可完全自定义触发外观。",
       },
       {
         name: "triggerMode",
@@ -4518,13 +4523,14 @@ export default function Demo() {
   {
   "name": "Typography",
   "category": "数据展示",
-  "description": "统一的标题、正文、段落、链接与引用，按子组件独立演示，支持复制、纯文本编辑及省略展开。",
+  "description": "统一的标题、正文、段落、链接、引用与代码，按子组件独立演示，支持复制、纯文本编辑及省略展开。",
   "importNames": [
     "Typography"
   ],
   "code": "import { Typography } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <section>\n    <Typography.Title level={2}>工作笔记</Typography.Title>\n    <Typography.Paragraph copyable>让内容清晰、有层次。</Typography.Paragraph>\n    <Typography.Text muted>更新于今天</Typography.Text>\n    <Typography.Link href=\"/docs\">查看文档</Typography.Link>\n  </section>;\n}",
   "props": [
     {"name":"Title.divider", "type":"boolean", "default":"level === 2", "description":"标题下方的整行分隔线，仅二级标题默认启用；不同于给文字添加下划线的 underline。"},
+    {"name":"Code.block", "type":"boolean", "default":"false", "description":"Typography.Code 默认渲染行内 <code>；block 渲染 <pre><code> 并保留缩进和换行。长行在块内滚动，溢出时可用 Tab 聚焦并按左右方向键滚动。"},
     {"name":"Blockquote", "type":"BlockquoteProps", "description":"引用子组件；支持 cite 可见署名、citeUrl 来源 URL、icon、iconSize（默认 28）、color（CSS 色值）、radius（默认 4）、textWrap（默认 wrap）。它不支持 Text 的复制、编辑或省略属性；完整 API 见 Blockquote 条目。"},
     {
       "name": "muted / type",
@@ -4569,6 +4575,7 @@ export default function Demo() {
   ],
   "notes": [
     "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。",
+    "Typography.Code 只从 Typography 命名空间使用，支持原生属性和 ref（指向外层 code 或 pre）；可用 tabIndex 覆盖默认 Tab 顺序。不提供语法高亮或复制按钮；Typography.Text 的 code 用法保持不变。",
     "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
     "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
     "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",

@@ -179,6 +179,8 @@ describe("line indicator color", () => {
     const {container, rerender} = render(<Tabs items={items} indicatorColor="teal" />);
     const root = () => container.querySelector<HTMLElement>(".mt-tabs")!;
     expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("var(--mt-accent-teal)");
+    rerender(<Tabs items={items} indicatorColor="coral" />);
+    expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("var(--mt-accent-coral)");
     rerender(<Tabs items={items} indicatorColor="oklch(62% .16 33)" />);
     expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("oklch(62% .16 33)");
     rerender(<Tabs items={items} indicatorColor="var(--custom-color)" />);

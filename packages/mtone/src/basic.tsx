@@ -5,6 +5,7 @@ import { Card } from "./card";
 import * as React from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import {
+  ChevronDown,
   LoaderCircle,
   Pin,
   Star,
@@ -126,6 +127,8 @@ export type ButtonProps = Omit<
   leftSection?: React.ReactNode;
   /** Content after the label (inline end), including while loading. */
   rightSection?: React.ReactNode;
+  /** Visual-only dropdown chevron, unless rightSection is explicitly specified. */
+  preset?: "dropdown";
 };
 
 function hasButtonSection(section: React.ReactNode) {
@@ -147,6 +150,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       leftSection,
       rightSection,
+      preset,
       children,
       className,
       disabled,
@@ -184,6 +188,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ) : (
       leftSection
     );
+    const trailing =
+      rightSection === undefined && preset === "dropdown" ? (
+        <ChevronDown size={14} aria-hidden="true" />
+      ) : (
+        rightSection
+      );
     return (
       <BaseButton
         {...props}
@@ -222,8 +232,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           leading
         )}
         {children}
-        {hasButtonSection(rightSection) && (
-          <span className="mt-btn-section mt-btn-section-end">{rightSection}</span>
+        {hasButtonSection(trailing) && (
+          <span className="mt-btn-section mt-btn-section-end">{trailing}</span>
         )}
       </BaseButton>
     );

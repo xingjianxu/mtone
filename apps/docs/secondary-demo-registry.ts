@@ -126,6 +126,8 @@ import Menu0 from "./secondary-demos/menu-usage";
 import Menu0Source from "./secondary-demos/menu-usage.tsx?raw";
 import Menu1 from "./secondary-demos/menu-alignment";
 import Menu1Source from "./secondary-demos/menu-alignment.tsx?raw";
+import MenuTriggerOptions from "./secondary-demos/menu-trigger-options";
+import MenuTriggerOptionsSource from "./secondary-demos/menu-trigger-options.tsx?raw";
 import MenuTriggerMode from "./secondary-demos/menu-trigger-mode";
 import MenuTriggerModeSource from "./secondary-demos/menu-trigger-mode.tsx?raw";
 import Typography0 from "./secondary-demos/typography-title";
@@ -146,6 +148,8 @@ import Typography7 from "./secondary-demos/typography-link";
 import Typography7Source from "./secondary-demos/typography-link.tsx?raw";
 import Typography8 from "./secondary-demos/typography-blockquote";
 import Typography8Source from "./secondary-demos/typography-blockquote.tsx?raw";
+import TypographyCodeDemo from "./secondary-demos/typography-code";
+import TypographyCodeSource from "./secondary-demos/typography-code.tsx?raw";
 import Breadcrumb0 from "./secondary-demos/breadcrumb-usage";
 import Breadcrumb0Source from "./secondary-demos/breadcrumb-usage.tsx?raw";
 import Breadcrumb1 from "./secondary-demos/breadcrumb-icons";
@@ -630,6 +634,13 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       source: source(Menu0Source),
     },
     {
+      id: "trigger-options",
+      title: "三种触发按钮",
+      note: "文字触发使用默认的内容宽度按钮；预设按钮便于选择外观；传入自定义元素时由调用方决定图标与样式。",
+      Demo: MenuTriggerOptions,
+      source: source(MenuTriggerOptionsSource),
+    },
+    {
       id: "trigger-mode",
       title: "点击与悬停触发",
       note: "默认点击打开。悬停模式支持桌面鼠标从触发按钮移动到菜单和子菜单，不抢占键盘焦点；点击、键盘与触屏操作仍可使用。",
@@ -709,6 +720,13 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       title: "Blockquote",
       Demo: Typography8,
       source: source(Typography8Source),
+    },
+    {
+      id: "typography-code",
+      title: "Code",
+      note: "默认在正文中显示行内代码；加上 block 显示保留换行和缩进的代码块。长行在块内滚动，不内置语法高亮或复制按钮。",
+      Demo: TypographyCodeDemo,
+      source: source(TypographyCodeSource),
     },
   ],
   Breadcrumb: [

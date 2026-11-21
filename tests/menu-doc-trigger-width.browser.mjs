@@ -50,6 +50,7 @@ try {
   const base = server.resolvedUrls.local[0];
   const menuName = "文档操作";
   const alignedName = "右对齐菜单，宽度 240px";
+  const stringTriggerName = "默认文字触发";
   for (const viewport of [1440, 390]) {
     await page.setViewportSize({ width: viewport, height: 840 });
     await page.goto(new URL("#/components/Menu", base).href);
@@ -57,6 +58,18 @@ try {
     const aligned = page.getByRole("button", { name: alignedName, exact: true });
     await assertContentWidth(plain);
     await assertContentWidth(aligned);
+    const stringTrigger = page.getByRole("button", { name: stringTriggerName, exact: true });
+    await assertContentWidth(stringTrigger);
+    const preset = page.getByRole("button", { name: "预设按钮触发", exact: true });
+    const custom = page.getByRole("button", { name: "自定义元素触发", exact: true });
+    await expect(preset.locator(".mt-btn-section-end svg")).toHaveAttribute("width", "14");
+    await expect(custom.locator(".mt-btn-section-end svg")).toHaveAttribute("width", "16");
+    await expect(stringTrigger.locator(".mt-btn-section-end svg")).toHaveAttribute("aria-hidden", "true");
+    await stringTrigger.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("menuitem", { name: "导出 PDF", exact: true })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(stringTrigger).toBeFocused();
     await expect(page.getByRole("menu")).toHaveCount(0);
 
     await plain.click();
@@ -87,6 +100,22 @@ try {
   });
   await assertContentWidth(card.getByRole("button", { name: menuName, exact: true }));
   await assertContentWidth(card.getByRole("button", { name: alignedName, exact: true }));
+
+  await page.goto(new URL("#/components/Button?section=dropdown-preset", base).href);
+  const standalone = page.getByRole("button", { name: "筛选方式", exact: true });
+  await expect(standalone.locator(".mt-btn-section-end svg")).toHaveAttribute("width", "14");
+  await expect(standalone).not.toHaveAttribute("aria-haspopup", "menu");
+  await standalone.click();
+  await expect(page.getByRole("status").filter({ hasText: "普通点击次数：1" })).toBeVisible();
+  await expect(page.getByRole("menu")).toHaveCount(0);
+
+  const mobile = await browser.newPage({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 840 } });
+  await mobile.goto(new URL("#/components/Menu?section=trigger-options", base).href);
+  await mobile.getByRole("button", { name: stringTriggerName, exact: true }).tap();
+  await expect(mobile.getByRole("menuitem", { name: "导出 PDF", exact: true })).toBeVisible();
+  await mobile.getByRole("menuitem", { name: "导出 PDF", exact: true }).tap();
+  await expect(mobile.getByRole("status").filter({ hasText: "默认文字：pdf" })).toBeVisible();
+  await mobile.close();
 
   console.log("Menu docs: content-sized triggers on desktop/mobile and in the gallery; popup widths and alignment preserved");
 } finally {

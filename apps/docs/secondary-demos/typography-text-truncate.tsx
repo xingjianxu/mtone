@@ -11,7 +11,7 @@ export default function Demo() {
         maxWidth: 640,
       }}
     >
-      <div style={{ maxWidth: 300 }}>
+      <div style={{ minWidth: 0, maxWidth: 300 }}>
         <Typography.Text ellipsis>
           单行内容会在容器宽度不足时省略，请为容器设置可用宽度。
         </Typography.Text>

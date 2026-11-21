@@ -13,6 +13,7 @@ const presetLabels: Record<MtoneAccent, string> = {
   red: "红色",
   purple: "紫色",
   teal: "青色",
+  coral: "珊瑚色",
 };
 
 const statusDotStyle = {
@@ -73,6 +74,7 @@ export function ColorPresets() {
             );
           })}
         </ul>
+        <p>珊瑚色浅色为 <code>#D1634B</code>，深色为 <code>#FD8C73</code>。适合指示线等装饰；若用作文字颜色，请另行检查对比度。</p>
       </section>
 
       <section>

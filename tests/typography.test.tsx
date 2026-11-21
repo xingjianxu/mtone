@@ -226,3 +226,39 @@ it("resets composition after blur and preserves destination focus", async () => 
   fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
   expect(screen.getByText("Saved")).toBeVisible();
 });
+
+describe("Typography.Code", () => {
+  it("renders semantic inline code without a wrapper and retains Text's code option", () => {
+    const ref = React.createRef<HTMLElement>();
+    render(
+      <p>
+        Use <Typography.Code ref={ref} className="custom-code" title="Command">npm test</Typography.Code>.
+        <Text code>npm run typecheck</Text>
+      </p>,
+    );
+    const inline = screen.getByText("npm test");
+    expect(inline.tagName).toBe("CODE");
+    expect(inline.parentElement?.tagName).toBe("P");
+    expect(inline).toHaveClass("custom-code");
+    expect(inline).toHaveAttribute("title", "Command");
+    expect(ref.current).toBe(inline);
+    expect(screen.getByText("npm run typecheck").tagName).toBe("CODE");
+  });
+
+  it("forwards native attributes and ref to the block's pre element and preserves whitespace", () => {
+    const ref = React.createRef<HTMLPreElement>();
+    const source = "\nconst options = {\n  strict: true,\n};\n";
+    render(
+      <Typography.Code block ref={ref} aria-label="Example options" tabIndex={-1}>
+        {source}
+      </Typography.Code>,
+    );
+    const pre = screen.getByLabelText("Example options");
+    expect(pre.tagName).toBe("PRE");
+    expect(pre).toHaveAttribute("tabindex", "-1");
+    expect(ref.current).toBe(pre);
+    expect(pre.children).toHaveLength(1);
+    expect(pre.firstElementChild?.tagName).toBe("CODE");
+    expect(pre.firstElementChild?.textContent).toBe(source);
+  });
+});

@@ -17,7 +17,7 @@ import { Tooltip as BTooltip } from "@base-ui/react/tooltip";
 import { Dialog as BDialog } from "@base-ui/react/dialog";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
-import { MtoneScope, useMtone, cn } from "./basic";
+import { Button, MtoneScope, useMtone, cn } from "./basic";
 import {
   DropdownOwnerContext,
   DropdownSurface,
@@ -445,7 +445,7 @@ export interface MenuRadioGroup {
 export type MenuEntry =
   MenuItem | MenuGroup | MenuDivider | MenuCheckboxItem | MenuRadioGroup;
 export interface MenuProps extends OpenProps, DropdownLayoutProps {
-  trigger: React.ReactElement;
+  trigger: string | React.ReactElement;
   /** Whether a mouse hover can open the menu in addition to normal presses. */
   triggerMode?: "click" | "hover";
   items: MenuEntry[];
@@ -587,7 +587,15 @@ export function Menu({
   const hover = triggerMode === "hover";
   // Base UI normally focuses the popup; a mouse hover must not move focus.
   const [openedByHover, setOpenedByHover] = useState(false);
-  const triggerProps = trigger.props as {
+  const triggerElement =
+    typeof trigger === "string" ? (
+      <Button preset="dropdown" style={{ width: "fit-content", maxWidth: "100%" }}>
+        {trigger}
+      </Button>
+    ) : (
+      trigger
+    );
+  const triggerProps = triggerElement.props as {
     disabled?: boolean;
     "aria-disabled"?: boolean | string;
   };
@@ -619,7 +627,7 @@ export function Menu({
       onOpenChange={hover ? handleHoverOpenChange : onOpenChange}
     >
       <BMenu.Trigger
-        render={trigger}
+        render={triggerElement}
         openOnHover={hover ? !ariaDisabled : undefined}
         disabled={hover ? disabled : undefined}
       />

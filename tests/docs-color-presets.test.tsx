@@ -13,7 +13,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("the direct color presets route exposes all seven tokens and is the current navigation item", () => {
+test("the direct color presets route exposes all eight tokens and is the current navigation item", () => {
   window.location.hash = paletteRoute;
   render(<DocsApp />);
 
@@ -24,8 +24,8 @@ test("the direct color presets route exposes all seven tokens and is the current
   expect(within(navigation).getByRole("link", { name: "主题与样式" })).not.toHaveAttribute("aria-current");
 
   const palette = within(screen.getByRole("list", { name: "共享颜色预设" }));
-  expect(palette.getAllByRole("listitem")).toHaveLength(7);
-  for (const key of ["neutral", "blue", "green", "orange", "red", "purple", "teal"]) {
+  expect(palette.getAllByRole("listitem")).toHaveLength(8);
+  for (const key of ["neutral", "blue", "green", "orange", "red", "purple", "teal", "coral"]) {
     expect(palette.getByText(`--mt-accent-${key}`)).toBeVisible();
   }
 });

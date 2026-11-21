@@ -101,19 +101,22 @@ try {
     item.append(reference);
     const expected = getComputedStyle(reference).color;
     reference.remove();
-    return { actual, expected };
+    return { token: item.querySelector("code").textContent, actual, expected };
   }));
   const dark = await readPalette();
   await mode(page, "浅色").click();
   await expect(root).toHaveCSS("color-scheme", "light");
   const light = await readPalette();
-  expect(light).toHaveLength(7);
-  expect(dark).toHaveLength(7);
+  expect(light).toHaveLength(8);
+  expect(dark).toHaveLength(8);
   light.forEach(({ actual, expected }, index) => {
     expect(actual).toBe(expected);
     expect(dark[index].actual).toBe(dark[index].expected);
     expect(actual).not.toBe(dark[index].actual);
   });
+
+  expect(light.find((color) => color.token === "--mt-accent-coral")?.actual).toBe("rgb(209, 99, 75)");
+  expect(dark.find((color) => color.token === "--mt-accent-coral")?.actual).toBe("rgb(253, 140, 115)");
 
   const readStatus = (name) => page.getByText(name, { exact: true })
     .evaluate((label) => getComputedStyle(label.firstElementChild).backgroundColor);
@@ -122,6 +125,11 @@ try {
   expect(await readStatus("默认绿色")).toBe(light[2].actual);
 
   await page.goto(base + "#/components/Tabs?section=indicator-color");
+  const coral = page.getByRole("tablist", { name: "珊瑚色指示线" }).getByRole("tab", { selected: true });
+  expect(await coral.evaluate((tab) => getComputedStyle(tab, "::after").backgroundColor)).toBe("rgb(209, 99, 75)");
+  await mode(page, "深色").click();
+  await expect(root).toHaveCSS("color-scheme", "dark");
+  expect(await coral.evaluate((tab) => getComputedStyle(tab, "::after").backgroundColor)).toBe("rgb(253, 140, 115)");
   await page.getByRole("main").getByRole("link", { name: "颜色预设", exact: true }).click();
   await expect(page).toHaveURL(/#\/theme\/color-presets$/);
   console.log(`Docs theme browser checks passed (${engine})`);

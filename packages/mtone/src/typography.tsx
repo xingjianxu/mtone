@@ -429,8 +429,57 @@ export const Blockquote = React.forwardRef<HTMLQuoteElement, BlockquoteProps>(
   },
 );
 
+export interface TypographyCodeProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "dangerouslySetInnerHTML"
+> {
+  /** Render a preformatted block instead of inline code. */
+  block?: boolean;
+}
+const Code = React.forwardRef<HTMLElement, TypographyCodeProps>(function Code(
+  { block = false, children, className, tabIndex, ...props },
+  ref,
+) {
+  const element = React.useRef<HTMLElement | null>(null);
+  const setElement = React.useCallback((node: HTMLElement | null) => {
+    element.current = node;
+  }, []);
+  const [overflows, setOverflows] = React.useState(false);
+  React.useImperativeHandle(ref, () => element.current!, [block]);
+  React.useLayoutEffect(() => {
+    const node = element.current;
+    if (!block || !node || tabIndex !== undefined) return;
+    const measure = () => setOverflows(node.scrollWidth > node.clientWidth);
+    measure();
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    observer?.observe(node);
+    if (node.firstElementChild) observer?.observe(node.firstElementChild);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [block, children, tabIndex]);
+
+  if (block) {
+    return (
+      <pre
+        {...props}
+        ref={setElement}
+        tabIndex={tabIndex ?? (overflows ? 0 : undefined)}
+        className={cn("mt-typography-code-block", className)}
+      ><code>{children}</code></pre>
+    );
+  }
+  return (
+    <code {...props} ref={setElement} tabIndex={tabIndex} className={cn("mt-typography-code", className)}>
+      {children}
+    </code>
+  );
+});
+
 Text.displayName = "Text";
 Title.displayName = "Title";
 Paragraph.displayName = "Paragraph";
 Link.displayName = "Link";
-export const Typography = { Text, Title, Paragraph, Link, Blockquote };
+export const Typography = { Text, Title, Paragraph, Link, Blockquote, Code };

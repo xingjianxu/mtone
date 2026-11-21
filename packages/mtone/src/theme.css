@@ -21,6 +21,7 @@
   --mt-accent-red: #b43e38;
   --mt-accent-purple: #7951a3;
   --mt-accent-teal: #157768;
+  --mt-accent-coral: #D1634B;
 }
 
 /* Select colors at the scope boundary. WebKit can resolve light-dark()
@@ -112,6 +113,7 @@
   --mt-accent-red: #f68f8c;
   --mt-accent-purple: #caa7ee;
   --mt-accent-teal: #77d0bd;
+  --mt-accent-coral: #FD8C73;
   --mt-fg: #eeece8;
   --mt-bg: #20201f;
   --mt-primary: #eeece8;
@@ -198,6 +200,7 @@
     --mt-accent-red: #f68f8c;
     --mt-accent-purple: #caa7ee;
     --mt-accent-teal: #77d0bd;
+    --mt-accent-coral: #FD8C73;
     --mt-fg: #eeece8;
     --mt-bg: #20201f;
     --mt-primary: #eeece8;

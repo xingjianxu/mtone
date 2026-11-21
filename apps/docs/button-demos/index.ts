@@ -1,3 +1,5 @@
+import PresetDemo from "./button-preset";
+import presetSource from "./button-preset.tsx?raw";
 import Demo0 from "./usage";
 import source0 from "./usage.tsx?raw";
 import Demo1 from "./danger";
@@ -48,6 +50,13 @@ export const buttonDocSections = [
       "../../../packages/mtone/src",
       "@bixlab/mtone",
     ),
+  },
+  {
+    id: "dropdown-preset",
+    title: "下拉按钮外观",
+    note: 'preset="dropdown" 只添加装饰箭头。示例仍是普通按钮，点击不会打开菜单；需要下拉行为时请组合 Menu。',
+    Demo: PresetDemo,
+    source: presetSource.replace("../../../packages/mtone/src", "@bixlab/mtone"),
   },
   {
     id: "danger",
