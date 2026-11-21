@@ -7,6 +7,7 @@ function Fixture() {
   const [saved, setSaved] = useState(false);
   return (
     <div data-mt-theme="dark" style={{ background: "var(--mt-bg)", width: "min(100%, 920px)" }}>
+      <Button data-testid="outside-button">Save draft</Button>
       <AdminLayout hasSider>
         <AdminLayout.Sider width={180} breakpoint={0}>Menu</AdminLayout.Sider>
         <AdminLayout.Content style={{ padding: 10 }}>
@@ -15,7 +16,7 @@ function Fixture() {
             title={<span>ProjectActivityForTeamsWithLongNames</span>}
             subtitle="Workspace"
             icon={<span aria-hidden="true" style={{ display: "block", width: 22, height: 22 }}>▸</span>}
-            actions={<><Button onClick={() => setSaved(true)}>Save draft</Button><Button>Share update</Button><Button>Review history</Button></>}
+            actions={<><Button onClick={() => setSaved(true)}>Save draft</Button><Button>Share update</Button><Button style={{ fontSize: 18 }}>Review 项目交付历史</Button></>}
             description="Latest activity"
             extra={saved ? "Saved" : "Unsaved"}
             tabs={<Tabs items={[

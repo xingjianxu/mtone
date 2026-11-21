@@ -20,7 +20,7 @@ try {
     const root = page.locator(".mt-page-layout");
     await expect(root.getByRole("heading", { level: 1 })).toBeVisible();
     const geometry = await root.evaluate((el) => {
-      const boxes = [...el.querySelectorAll(".mt-page-layout-title, .mt-page-layout-actions, .mt-page-layout-tabs, .mt-page-layout-body, .mt-page-layout-description, .mt-page-layout-extra, .mt-page-layout-actions button")].map((item) => item.getBoundingClientRect());
+      const boxes = [...el.querySelectorAll(".mt-page-layout-title, .mt-page-layout-actions, .mt-page-layout-tabs, .mt-page-layout-body, .mt-page-layout-description, .mt-page-layout-extra, .mt-page-layout-actions button")].map((item) => ({ box: item.getBoundingClientRect(), text: item.textContent?.trim(), className: item.className }));
       const rootBox = el.getBoundingClientRect();
       const probe = document.createElement("span");
       probe.style.color = "var(--mt-fg)";
@@ -28,17 +28,33 @@ try {
       const themeColor = getComputedStyle(probe).color;
       probe.remove();
       return {
-        offenders: boxes.filter((box) => box.right > rootBox.right + 1).map((box) => ({ right: box.right, width: box.width })),
+        offenders: boxes.filter(({ box }) => box.right > rootBox.right + 1).map(({ box, text, className }) => ({ text, className, right: box.right, width: box.width })),
         remaining: rootBox.width, scroll: el.scrollWidth,
         fitsViewport: document.documentElement.scrollWidth <= innerWidth,
-        fitsParent: el.scrollWidth <= Math.ceil(rootBox.width) && boxes.every((box) => box.right <= rootBox.right + 1),
+        fitsParent: el.scrollWidth <= Math.ceil(rootBox.width) && boxes.every(({ box }) => box.right <= rootBox.right + 1),
         titleHeight: el.querySelector(".mt-page-layout-title").getBoundingClientRect().height,
         themed: themeColor !== "rgb(55, 53, 47)" && getComputedStyle(el).color === themeColor,
       };
     });
     assert(geometry.fitsViewport && geometry.fitsParent && geometry.themed, JSON.stringify({ width, geometry }));
     if (width === 320) assert(geometry.titleHeight > 30, "Unbroken heading wraps even in nested narrow content");
-    await root.getByRole("button", { name: "Save draft" }).click();
+    const save = root.getByRole("button", { name: "Save draft" });
+    if (width === 1280) {
+      assert.equal((await save.boundingBox()).height, (await page.getByTestId("outside-button").boundingBox()).height);
+    }
+    const longButton = root.getByRole("button", { name: "Review 项目交付历史" });
+    const content = await longButton.evaluate((button) => {
+      const bounds = button.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(button);
+      const lines = [...range.getClientRects()];
+      return {
+        fits: lines.every((line) => line.left >= bounds.left - 1 && line.right <= bounds.right + 1 && line.top >= bounds.top - 1 && line.bottom <= bounds.bottom + 1),
+        rows: new Set(lines.map((line) => Math.round(line.top))).size,
+      };
+    });
+    assert(content.fits && (width !== 320 || content.rows > 1), JSON.stringify({ width, content }));
+    await save.click();
     await expect(root.getByText("Saved", { exact: true })).toBeVisible();
     await root.getByRole("tab", { name: "Week" }).click();
     await expect(root.getByRole("tabpanel", { name: "Week" })).toHaveText("Weekly activity");

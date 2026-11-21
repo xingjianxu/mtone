@@ -60,3 +60,20 @@
 .mt-page-layout-body {
   min-inline-size: 0;
 }
+
+/* Button labels normally stay on one line. Allow them to wrap in narrow
+ * page headers while preserving the standard height for one-line buttons. */
+:is(.mt-page-layout-actions, .mt-page-layout-extra) > .mt-btn:not(.mt-icon-btn) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  height: auto;
+  min-height: var(--mt-height, 34px);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+:is(.mt-page-layout-actions, .mt-page-layout-extra) > .mt-btn.mt-size-sm:not(.mt-icon-btn) {
+  min-height: 24px;
+}
+:is(.mt-page-layout-actions, .mt-page-layout-extra) > .mt-btn.mt-size-lg:not(.mt-icon-btn) {
+  min-height: 36px;
+}
