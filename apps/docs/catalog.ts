@@ -3482,7 +3482,7 @@ export default function Demo() {
     ],
     notes: [
       "NavItem 默认行高为 34px，图标与文字垂直居中。相邻项间距不变，分组标题和分隔线不受行高影响。",
-      "收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题并保留分组分隔。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。",
+      "收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题与标题操作，保留默认分组分隔（可用 divider={false} 关闭）。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。",
       "收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。",
       "受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。",
       "不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。",
@@ -3491,7 +3491,7 @@ export default function Demo() {
   {
     name: "NavItem",
     category: "导航切换",
-    description: "支持当前状态和图标的导航项，可作为按钮或原生链接。",
+    description: "支持当前状态和图标的导航项，可作为按钮或原生链接，并可添加独立的尾部操作。",
     importNames: ["NavItem"],
     code: 'import { NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NavItem active onClick={() => console.log("navigation")}>我的知识库</NavItem>\n  );\n}',
     props: [
@@ -3504,6 +3504,11 @@ export default function Demo() {
         name: "icon",
         type: "ReactNode",
         description: "前置图标。",
+      },
+      {
+        name: "actions",
+        type: "NavItemAction | readonly NavItemAction[]",
+        description: "一个或多个尾部操作：{ content: ReactNode, visibility?: 'always' | 'hover' | 'active' }。默认 always；hover 在悬停、行内键盘聚焦和无悬停设备上显示；导航本身无法通过 Tab 聚焦时操作仍可见。active 只在当前项显示。",
       },
       {
         name: "href",
@@ -3535,6 +3540,7 @@ export default function Demo() {
     notes: [
       "当前页使用灰色圆角底和逻辑起始侧蓝色竖标；悬停不显示竖标。",
       "默认行高 34px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。",
+      "尾部操作不触发导航。建议使用自带 aria-label 的 IconButton；Sidebar 的图标窄栏隐藏尾部操作，窄栏子菜单弹层中的完整行仍显示。",
       "不提供 href 时仍为按钮。ref 指向实际 button 或 a；组件不接管路由。",
     ],
   },
@@ -3561,9 +3567,29 @@ export default function Demo() {
   {
     name: "NavGroup",
     category: "导航切换",
-    description: "以可选分组标题组织导航内容。",
-    importNames: ["NavGroup", "NavItem"],
-    code: 'import { NavGroup, NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NavGroup label="私人空间"><NavItem active>工作笔记</NavItem><NavItem>阅读记录</NavItem></NavGroup>\n  );\n}',
+    description: "以可选标题组织导航项，相邻组默认以细线分隔，标题末端可放置独立操作。",
+    importNames: ["NavGroup", "NavItem", "IconButton"],
+    code: `import { useState } from "react";
+import { NavGroup, NavItem, IconButton } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const [viewCount, setViewCount] = useState(0);
+  return (
+    <nav aria-label="工作空间">
+      <NavGroup label="个人空间">
+        <NavItem active>工作笔记</NavItem>
+        <NavItem>阅读记录</NavItem>
+      </NavGroup>
+      <NavGroup label="保存的视图" actions={<IconButton size="sm" variant="ghost" aria-label="新增视图" onClick={() => setViewCount((count) => count + 1)}>+</IconButton>}>
+        <NavItem>保存的视图：{viewCount}</NavItem>
+      </NavGroup>
+      <NavGroup label="工具" divider={false}>
+        <NavItem>设置</NavItem>
+      </NavGroup>
+    </nav>
+  );
+}`,
     props: [
       {
         name: "label",
@@ -3571,12 +3597,27 @@ export default function Demo() {
         description: "可选分组标题。",
       },
       {
+        name: "divider",
+        type: "boolean",
+        default: "true",
+        description: "仅在前一个兄弟元素也是 NavGroup 时绘制组前分隔线。设为 false 只隐藏这一条线，不改变间距。",
+      },
+      {
+        name: "actions",
+        type: "ReactNode",
+        description: "标题行末端的独立操作。可传入一个控件，或用片段组合多个控件；无标题时仍可单独显示。收起的 Sidebar 隐藏此操作区。",
+      },
+      {
         name: "children",
         type: "ReactNode",
         description: "组件内容。",
       },
     ],
-    notes: ["组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距。导航容器以 NavGroup 开头时（包括独立导航或经过一层包装的 Sidebar 导航），首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。"],
+    notes: [
+      "组前分隔线是装饰，不会出现在无障碍树中。独立导航和 Sidebar 展开、收起时均支持相邻组分隔；有其它导航项隔开时不画线。",
+      "组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距。首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。",
+      '标题操作不触发导航项；建议使用 size="sm"、variant="ghost" 的 IconButton 并提供 aria-label。操作区与标题分开布局，过长的标题会截断。',
+    ],
   },
   {
       "name": "Breadcrumb",
@@ -3954,6 +3995,12 @@ export default function Demo() {
         description: "默认 medium。所有变体、尺寸和位置的标签项外高均为 34px（含边框）；size 仍区分字号。",
       },
       {
+        name: "indicatorColor",
+        type: "TabsIndicatorColor",
+        default: "currentColor",
+        description: "仅 line 的选中指示线颜色。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。",
+      },
+      {
         name: "centered / gap",
         type: "boolean / number",
         description: "居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 6px，card/editable-card 为 4px。",
@@ -4011,6 +4058,7 @@ export default function Demo() {
       "默认 destroyOnHidden=true 延续旧版隐藏面板卸载行为；false 时仅保留访问过的面板。forceRender 让该面板始终挂载；项目级 destroyOnHidden 可覆盖全局值。",
       "非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。",
       "editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。",
+      "主题通过 --mt-accent-* 为指示线和其他组件提供共享色；可在 MtoneProvider tokens 内覆盖。强制色彩模式保留系统可见线条。",
       "线型标签文字两侧各保留 6px 外边距。卡片式与可编辑卡片式的选中标签悬停时保持原背景。",
       "溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。",
       "默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。",

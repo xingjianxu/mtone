@@ -179,12 +179,16 @@ try {
       assert.equal(await admin.getAttribute("data-collapsed"), "true");
       assert.deepEqual(await groupSpacing(wrappedGroups), [0, 12]);
       await assertGroupStartInset(wrappedGroups.first());
-      assert.equal(
-        await wrappedGroups
-          .nth(1)
-          .evaluate((group) => getComputedStyle(group).borderTopWidth),
-        "1px",
-      );
+      const railDivider = (group) => group.evaluate((node) => {
+        const divider = getComputedStyle(node, "::before");
+        return [
+          getComputedStyle(node).borderBlockStartWidth,
+          divider.content !== "none",
+          divider.borderBlockStartWidth,
+        ];
+      });
+      assert.deepEqual(await railDivider(wrappedGroups.first()), ["0px", false, "0px"]);
+      assert.deepEqual(await railDivider(wrappedGroups.nth(1)), ["0px", true, "1px"]);
       assert.deepEqual(await sizes(admin.locator(".mt-nav-item")), [34, 34]);
 
       await docs.setViewportSize({ width: 390, height: 850 });

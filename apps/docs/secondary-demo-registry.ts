@@ -259,6 +259,8 @@ import Rate3 from "./secondary-demos/rate-custom";
 import Rate3Source from "./secondary-demos/rate-custom.tsx?raw";
 import Rate4 from "./secondary-demos/rate-rtl";
 import Rate4Source from "./secondary-demos/rate-rtl.tsx?raw";
+import TabsIndicatorColorDemo from "./secondary-demos/tabs-indicator-color";
+import TabsIndicatorColorSource from "./secondary-demos/tabs-indicator-color.tsx?raw";
 import Tabs0 from "./secondary-demos/tabs-usage";
 import Tabs0Source from "./secondary-demos/tabs-usage.tsx?raw";
 import Tabs1 from "./secondary-demos/tabs-edit";
@@ -1068,6 +1070,12 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       title: "基础与附加操作",
       Demo: Tabs0,
       source: source(Tabs0Source),
+    },
+    {
+      id: "indicator-color",
+      title: "选中指示线颜色",
+      Demo: TabsIndicatorColorDemo,
+      source: source(TabsIndicatorColorSource),
     },
     {
       id: "edit",

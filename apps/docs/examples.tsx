@@ -1,3 +1,4 @@
+import NavGroupExample from "./inline-demos/nav-group-usage";
 import NavSubmenuExample from "./secondary-demos/nav-submenu-usage";
 import PageLayoutExample from "./secondary-demos/page-layout-usage";
 import CheckCardExample from "./secondary-demos/check-card-usage";
@@ -434,24 +435,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "NavSubmenu":
       return <NavSubmenuExample />;
     case "NavGroup":
-      return (
-        <div style={{ width: 220 }}>
-          <M.NavGroup label="个人空间">
-            <M.NavItem
-              active={value === "design"}
-              onClick={() => setValue("design")}
-            >
-              设计资料
-            </M.NavItem>
-            <M.NavItem
-              active={value === "research"}
-              onClick={() => setValue("research")}
-            >
-              研究资料
-            </M.NavItem>
-          </M.NavGroup>
-        </div>
-      );
+      return <NavGroupExample />;
     case "NavItem":
       return (
         <div style={{ width: 220 }}>

@@ -374,7 +374,7 @@ export function NumberInput({ label, className, ...props }: NumberInputProps) {
   );
 }
 export { Tabs } from "./tabs";
-export type { TabItem, TabsProps } from "./tabs";
+export type { TabItem, TabsProps, TabsIndicatorColor } from "./tabs";
 export function Segmented({
   options,
   label,

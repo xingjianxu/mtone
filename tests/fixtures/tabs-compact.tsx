@@ -19,4 +19,11 @@ createRoot(document.getElementById("root")!).render(<MtoneProvider locale="en"><
 <Tabs label="Unchanged line" items={[{value:"line",label:"Line tab",content:"Line content"}]}/>
 {(["top","start"] as const).map(placement => <Tabs key={placement} label={`Custom gap ${placement}`} gap={9} placement={placement} items={[{value:"one",label:"One",content:"One"},{value:"two",label:"Two",content:"Two"}]}/>)}
 <Tabs label="Explicit zero gap" gap={0} items={[{value:"one",label:"One",content:"One"},{value:"two",label:"Two",content:"Two"}]}/>
+{(["top","bottom","start","end"] as const).map(placement => <Tabs key={placement} label={`Color ${placement}`} indicatorColor="blue" placement={placement} items={[{value:"one",label:"One",content:"One"}]}/>)}
+<Tabs label="Custom indicator" indicatorColor="var(--example-indicator)" style={{"--example-indicator":"#bf3974"} as React.CSSProperties} items={[{value:"one",label:"One",content:"One"}]}/>
+<MtoneProvider theme="dark"><Tabs label="Dark indicator" indicatorColor="blue" items={[{value:"one",label:"One",content:"One"}]}/></MtoneProvider>
+<MtoneProvider theme="system"><Tabs label="System indicator" indicatorColor="blue" items={[{value:"one",label:"One",content:"One"}]}/></MtoneProvider>
+<MtoneProvider tokens={{"--mt-accent-blue":"#173344"}}><Tabs label="Override indicator" indicatorColor="blue" items={[{value:"one",label:"One",content:
+  <Tabs label="Nested default indicator" items={[{value:"inner",label:"Inner",content:"Nested"}]}/>
+}]}/></MtoneProvider>
 </main></MtoneProvider>);

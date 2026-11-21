@@ -100,9 +100,15 @@ export function Sidebar({
   );
 }
 
+export interface NavItemAction {
+  content: React.ReactNode;
+  visibility?: "always" | "hover" | "active";
+}
+
 interface NavItemCommonProps {
   active?: boolean;
   icon?: React.ReactNode;
+  actions?: NavItemAction | readonly NavItemAction[];
 }
 export type NavItemButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   NavItemCommonProps & { href?: undefined };
@@ -115,7 +121,9 @@ export const NavItem = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, N
     const collapsed = React.useContext(SidebarContext);
     const [tipOpen, setTipOpen] = React.useState(false);
     const onSubmenuSelect = React.useContext(NavSubmenuSelectionContext);
-    const { active, icon, children, className } = props;
+    const { active, icon, children, className, actions } = props;
+    const actionItems: readonly NavItemAction[] = !actions ? [] : "content" in actions ? [actions] : actions;
+    const hasActions = !collapsed && actionItems.length > 0;
     const plainLabel = typeof children === "string" || typeof children === "number";
     const label = props["aria-label"] ?? (plainLabel ? String(children) : undefined);
     const rowProps = {
@@ -133,7 +141,7 @@ export const NavItem = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, N
 
     let row: React.ReactElement;
     if (typeof props.href === "string") {
-      const { href, disabled, onClick, onAuxClick, active, icon, children, className, ...linkProps } = props;
+      const { href, disabled, onClick, onAuxClick, active, icon, children, className, actions, ...linkProps } = props;
       row = (
         <a
           {...linkProps}
@@ -157,7 +165,7 @@ export const NavItem = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, N
         </a>
       );
     } else {
-      const { href, active, icon, children, className, onClick, ...buttonProps } = props;
+      const { href, active, icon, children, className, actions, onClick, ...buttonProps } = props;
       row = (
         <button
           type="button"
@@ -174,7 +182,7 @@ export const NavItem = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, N
       );
     }
 
-    return label ? (
+    const trigger = label ? (
       <Tooltip
         content={label}
         side="right"
@@ -184,27 +192,52 @@ export const NavItem = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, N
         {row}
       </Tooltip>
     ) : row;
+
+    return hasActions ? (
+      <div className="mt-nav-item-row" data-active={active || undefined}>
+        {trigger}
+        <div className="mt-nav-item-actions">
+          {actionItems.map(({ content, visibility = "always" }, index) => (
+            <div className="mt-nav-item-action" key={index} data-visibility={visibility}>
+              {content}
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : trigger;
   },
 ) as {
   (props: NavItemLinkProps & React.RefAttributes<HTMLAnchorElement>): React.ReactNode;
   (props: NavItemButtonProps & React.RefAttributes<HTMLButtonElement>): React.ReactNode;
 };
 
-export function NavGroup({
-  label,
-  children,
-}: {
+export interface NavGroupProps {
   label?: React.ReactNode;
   children: React.ReactNode;
-}) {
+  /** Show a decorative divider before this group when it follows another group. */
+  divider?: boolean;
+  /** Header controls at the inline end, hidden in the collapsed sidebar. */
+  actions?: React.ReactNode;
+}
+
+export function NavGroup({ label, children, divider = true, actions }: NavGroupProps) {
   const collapsed = React.useContext(SidebarContext);
+  const heading = label ? (
+    <div className={collapsed ? "mt-sidebar-sr-only" : "mt-nav-label"}>
+      {label}
+    </div>
+  ) : null;
   return (
-    <div className={cn("mt-nav-group", collapsed && "mt-nav-group-collapsed")}>
-      {label && (
-        <div className={collapsed ? "mt-sidebar-sr-only" : "mt-nav-label"}>
-          {label}
+    <div
+      className={cn("mt-nav-group", collapsed && "mt-nav-group-collapsed")}
+      data-no-divider={!divider || undefined}
+    >
+      {!collapsed && React.Children.toArray(actions).length > 0 ? (
+        <div className="mt-nav-group-header">
+          {heading}
+          <div className="mt-nav-group-actions">{actions}</div>
         </div>
-      )}
+      ) : heading}
       {children}
     </div>
   );

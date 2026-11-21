@@ -275,6 +275,35 @@ try {
         expect(await selected.evaluate(el => getComputedStyle(el, "::after").content)).toBe("none");
         await page.emulateMedia({forcedColors:"none"});
       }
+      const colored = (name) => page.getByRole("tablist", {name, exact:true});
+      const topAccent = async (name) => colored(name).getByRole("tab").evaluate(tab => ({
+        indicator: getComputedStyle(tab, "::after").backgroundColor,
+        text: getComputedStyle(tab).color,
+      }));
+      const defaultBlue = "rgb(37, 99, 173)";
+      for (const [placement, property] of [["bottom","border-top-color"],["start","border-inline-end-color"],["end","border-inline-start-color"]]) {
+        const list = colored(`Color ${placement}`);
+        await expect(list.getByRole("tab")).toHaveCSS(property, defaultBlue);
+        await expect(list.getByRole("tab")).not.toHaveCSS("color", defaultBlue);
+      }
+      expect((await topAccent("Color top")).indicator).toBe(defaultBlue);
+      expect((await topAccent("Color top")).text).not.toBe(defaultBlue);
+      expect((await topAccent("Custom indicator")).indicator).toBe("rgb(191, 57, 116)");
+      expect((await topAccent("Dark indicator")).indicator).toBe("rgb(134, 181, 237)");
+      expect((await topAccent("Override indicator")).indicator).toBe("rgb(23, 51, 68)");
+      const nestedColor = await topAccent("Nested default indicator");
+      expect(nestedColor.indicator).toBe(nestedColor.text);
+      await page.emulateMedia({colorScheme:"dark"});
+      expect((await topAccent("System indicator")).indicator).toBe("rgb(134, 181, 237)");
+      expect((await topAccent("Color top")).indicator).toBe(defaultBlue);
+      await page.emulateMedia({colorScheme:"light"});
+      expect((await topAccent("System indicator")).indicator).toBe(defaultBlue);
+      if (name === "chromium") {
+        await page.emulateMedia({forcedColors:"active"});
+        await expect(colored("Color bottom").getByRole("tab")).not.toHaveCSS("border-top-color", defaultBlue);
+        await expect(colored("Color top")).toHaveCSS("border-bottom-width", "1px");
+        await page.emulateMedia({forcedColors:"none"});
+      }
       if (errors.length) throw Error(errors.join("\n"));
       console.log(`${name}: Tabs passed`);
     } catch (e) {

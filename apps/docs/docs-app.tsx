@@ -325,6 +325,7 @@ function Theme() {
                 ["--mt-height", "控件高度"],
                 ["--mt-radius", "圆角"],
                 ["--mt-focus", "统一焦点色，独立于 --mt-primary"],
+                ["--mt-accent-*", "可复用主题色：neutral、blue、green、orange、red、purple、teal；可通过 MtoneProvider tokens 覆盖。"],
               ].map(([k, v]) => (
                 <tr key={k}>
                   <td>

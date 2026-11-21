@@ -1,3 +1,5 @@
+import NavItemActions from "./inline-demos/nav-item-actions";
+import NavItemActionsSource from "./inline-demos/nav-item-actions.tsx?raw";
 import NavItemLink from "./inline-demos/nav-item-link";
 import NavItemLinkSource from "./inline-demos/nav-item-link.tsx?raw";
 import type { DocSection } from "./doc-section";
@@ -298,6 +300,7 @@ export const inlineDocSections: Readonly<
       source: source(Example12_0Raw),
     },
     { id: "link", title: "原生链接", Demo: NavItemLink, source: source(NavItemLinkSource) },
+    { id: "actions", title: "尾部操作", Demo: NavItemActions, source: source(NavItemActionsSource) },
   ],
   Segmented: [
     {

@@ -134,15 +134,37 @@ it('keeps breadcrumb hover neutral and underline-free without removing keyboard 
 
 it('spaces consecutive NavGroup items like sidebar menus without widening group boundaries', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
-  expect(css).toMatch(/\.mt-nav-group > \.mt-nav-item \+ \.mt-nav-item\s*\{\s*margin-top: 3px;\s*\}/);
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+  const spacing = rules.find((rule) => rule[1].includes('.mt-nav-item-row') &&
+    rule[1].includes('.mt-nav-group') && rule[2].trim() === 'margin-top: 3px;');
+  expect(spacing).toBeDefined();
+  const nav = document.createElement('div');
+  nav.innerHTML = ['mt-nav-group', 'mt-sidebar-content'].map((parent) =>
+    `<div class="${parent}"><button class="mt-nav-item">First</button><button class="mt-nav-item">Plain sibling</button><div class="mt-nav-item-row">Action row</div><div class="mt-nav-submenu">Submenu</div></div>`
+  ).join('');
+  expect([...nav.querySelectorAll(spacing![1].trim())].map((row) => row.textContent)).toEqual([
+    'Plain sibling', 'Action row', 'Submenu', 'Plain sibling', 'Action row', 'Submenu',
+  ]);
   const showcase = readFileSync('apps/docs/app-showcase.css', 'utf8');
   const item = showcase.slice(showcase.indexOf('.showcase .showcase-sidebar .mt-nav-item {')).split('}')[0];
   expect(item).not.toContain('margin-bottom');
   expect(showcase).toMatch(/\.showcase \.showcase-sidebar \.mt-nav-item \+ \.mt-nav-item\s*\{\s*margin-top: 3px;\s*\}/);
 });
 
+it("paints a single themed adjacent NavGroup divider without layout or pointer effects", () => {
+  const css = readFileSync("packages/mtone/src/styles.css", "utf8");
+  const boundary = ".mt-nav-group + .mt-nav-group:not([data-no-divider])::before";
+  const rule = css.split(boundary + " {")[1]?.split("}")[0] ?? "";
+  expect(rule).toContain("position: absolute");
+  expect(rule).toContain("1px solid var(--mt-border, #e9e9e7)");
+  expect(rule).toContain("pointer-events: none");
+  expect(css).toContain("@media (forced-colors: active) {\n  " + boundary);
+  const rail = css.split(".mt-nav-group-collapsed + .mt-nav-group-collapsed {")[1]?.split("}")[0];
+  expect(rail).toContain("padding-top: 9px");
+  expect(rail).not.toContain("border-top");
+});
+
 it.each([
-  ['styles.css', '.mt-sidebar-content > .mt-nav-item + .mt-nav-item'],
   ['interactive.css', '.mt-option + .mt-option'],
   ['interactive.css', '.mt-menu-item + .mt-menu-item'],
   ['mentions.css', '.mt-mentions-option + .mt-mentions-option'],

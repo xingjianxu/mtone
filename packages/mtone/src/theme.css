@@ -12,6 +12,17 @@
   }
 }
 
+/* Accents are reusable without a provider and reset at nested theme scopes. */
+:where(:root, .mt-scope, [data-mt-theme]) {
+  --mt-accent-neutral: #62605b;
+  --mt-accent-blue: #2563ad;
+  --mt-accent-green: #32774c;
+  --mt-accent-orange: #a45014;
+  --mt-accent-red: #b43e38;
+  --mt-accent-purple: #7951a3;
+  --mt-accent-teal: #157768;
+}
+
 /* Select colors at the scope boundary. WebKit can resolve light-dark()
  * through the document scheme after a live system preference change, even
  * for a nested light scope. Literal tokens keep opt-in scopes isolated. */
@@ -94,6 +105,13 @@
 }
 
 [data-mt-theme="dark"] {
+  --mt-accent-neutral: #c9c6be;
+  --mt-accent-blue: #86b5ed;
+  --mt-accent-green: #89d2a0;
+  --mt-accent-orange: #f2b575;
+  --mt-accent-red: #f68f8c;
+  --mt-accent-purple: #caa7ee;
+  --mt-accent-teal: #77d0bd;
   --mt-fg: #eeece8;
   --mt-bg: #20201f;
   --mt-primary: #eeece8;
@@ -173,6 +191,13 @@
 
 @media (prefers-color-scheme: dark) {
   [data-mt-theme="system"] {
+    --mt-accent-neutral: #c9c6be;
+    --mt-accent-blue: #86b5ed;
+    --mt-accent-green: #89d2a0;
+    --mt-accent-orange: #f2b575;
+    --mt-accent-red: #f68f8c;
+    --mt-accent-purple: #caa7ee;
+    --mt-accent-teal: #77d0bd;
     --mt-fg: #eeece8;
     --mt-bg: #20201f;
     --mt-primary: #eeece8;
