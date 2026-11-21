@@ -25,6 +25,51 @@ describe("Typography", () => {
     expect(screen.getByRole("link")).toHaveAttribute("href", "/docs");
     expect(Typography.Text).toBe(Text);
   });
+  it("adds a heading divider by default only to h2 and supports explicit overrides", () => {
+    const ref = React.createRef<HTMLHeadingElement>();
+    render(
+      <>
+        <Title>Default h1</Title>
+        {([1, 2, 3, 4, 5, 6] as const).map((level) => (
+          <Typography.Title key={level} level={level}>
+            Heading {level}
+          </Typography.Title>
+        ))}
+        <Title level={2} divider={false} underline>
+          Underlined text
+        </Title>
+        <Title level={3} divider copyable className="consumer" ref={ref}>
+          Divided heading
+        </Title>
+      </>,
+    );
+    const dividerClass = "mt-typography-title-divider";
+    expect(screen.getByRole("heading", { name: "Default h1" })).not.toHaveClass(
+      dividerClass,
+    );
+    for (const level of [1, 3, 4, 5, 6]) {
+      expect(
+        screen.getByRole("heading", { name: `Heading ${level}`, level }),
+      ).not.toHaveClass(dividerClass);
+    }
+    const h2 = screen.getByRole("heading", { name: "Heading 2", level: 2 });
+    expect(h2).toHaveClass(dividerClass);
+    expect(h2.querySelector("u")).toBeNull();
+    const off = screen.getByRole("heading", {
+      name: "Underlined text",
+      level: 2,
+    });
+    expect(off).not.toHaveClass(dividerClass);
+    expect(off.querySelector("u")).toHaveTextContent("Underlined text");
+    const on = screen.getByRole("heading", {
+      name: "Divided heading",
+      level: 3,
+    });
+    expect(on).toHaveClass(dividerClass, "consumer");
+    expect(on).not.toHaveAttribute("divider");
+    expect(ref.current).toBe(on);
+    expect(on.querySelector('button[aria-label="复制"]')).not.toBeNull();
+  });
   it("edits, commits and cancels plain text", () => {
     const onChange = vi.fn();
     render(<Paragraph editable={{ onChange }}>Original</Paragraph>);

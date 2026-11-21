@@ -2180,6 +2180,7 @@ export default function Demo() {
 
 - [Typography](https://xingjianxu.github.io/mtone/#/components/Typography): 统一的标题、正文、段落、链接与引用，按子组件独立演示，支持复制、纯文本编辑及省略展开。
 - Import: Typography from @bixlab/mtone
+- Title.divider: boolean (default: level === 2). 标题下方的整行分隔线，仅二级标题默认启用；不同于给文字添加下划线的 underline。
 - Blockquote: BlockquoteProps. 引用子组件；支持 cite 可见署名、citeUrl 来源 URL、icon、iconSize（默认 28）、color（CSS 色值）、radius（默认 4）、textWrap（默认 wrap）。它不支持 Text 的复制、编辑或省略属性；完整 API 见 Blockquote 条目。
 - muted / type: boolean / "secondary" | "success" | "warning" | "danger". muted 保留旧版次级文字颜色；type 提供语义字色。
 - strong / italic / underline / delete / mark / code / keyboard: boolean (default: false). 分别使用 strong/em/u/del/mark/code/kbd 语义标签，可组合使用。
@@ -2262,9 +2263,10 @@ export default function Demo() {
 
 ### Title
 
-- [Title](https://xingjianxu.github.io/mtone/#/components/Title): 遵循 mtone 字号与间距的语义标题，支持 h1 至 h6。
+- [Title](https://xingjianxu.github.io/mtone/#/components/Title): 遵循 mtone 字号与间距的语义标题，支持 h1 至 h6 与可选整行分隔线。
 - Import: Title from @bixlab/mtone
 - level: 1 | 2 | 3 | 4 | 5 | 6 (default: 1). 使用对应 h1-h6 标签。按文档结构选择标题层级。
+- divider: boolean (default: level === 2). 在标题下方绘制横贯标题整行的 1px 中性色分隔线。仅二级标题默认启用；可显式开启或关闭。与文字下划线 underline 独立。
 - muted / type: boolean / "secondary" | "success" | "warning" | "danger". muted 保留旧版次级文字颜色；type 提供语义字色。
 - strong / italic / underline / delete / mark / code / keyboard: boolean (default: false). 分别使用 strong/em/u/del/mark/code/kbd 语义标签，可组合使用。
 - disabled: boolean (default: false). 弱化文字并停用内置复制、编辑、展开按钮；不自动禁用 children 中的交互元素。
@@ -2283,7 +2285,11 @@ import { Title } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
-  return <Title level={2}>项目概览</Title>;
+  return <>
+    <Title level={2}>项目概览</Title>
+    <Title level={2} divider={false}>不带分隔线</Title>
+    <Title level={3} divider>带分隔线的三级标题</Title>
+  </>;
 }
 ```
 

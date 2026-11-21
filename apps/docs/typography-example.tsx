@@ -73,7 +73,9 @@ export function TypographyExample() {
       </nav>
       <DemoSection
         name="Title 标题"
-        code={"<Typography.Title level={2}>工作笔记</Typography.Title>"}
+        code={
+          "<Typography.Title level={2}>工作笔记</Typography.Title>\n<Typography.Title level={2} divider={false}>不带分隔线</Typography.Title>\n<Typography.Title level={3} divider>带分隔线的三级标题</Typography.Title>"
+        }
       >
         <p>level 对应 h1 到 h6；请选择符合页面结构的层级，而不只按字号选择。</p>
         {([1, 2, 3, 4, 5, 6] as const).map((level) => (
@@ -81,6 +83,16 @@ export function TypographyExample() {
             H{level} · 让内容清晰、有层次
           </Typography.Title>
         ))}
+        <p>
+          二级标题默认带整行分隔线。使用 divider
+          可为其他层级开启分隔线，或为二级标题关闭。它不改变文字本身的下划线。
+        </p>
+        <Typography.Title level={2} divider={false}>
+          H2 · 关闭分隔线
+        </Typography.Title>
+        <Typography.Title level={3} divider>
+          H3 · 开启分隔线
+        </Typography.Title>
       </DemoSection>
       <DemoSection
         name="Text 文本"

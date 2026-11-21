@@ -42,6 +42,20 @@ createRoot(document.getElementById("root")!).render(
       >
         اقتباس باللغة العربية
       </Typography.Blockquote>
+      <div
+        data-testid="title-divider-examples"
+        style={{ width: "100%", marginBlockStart: 24 }}
+      >
+        <Typography.Title level={2} data-testid="divider-default">
+          Section heading
+        </Typography.Title>
+        <Typography.Title level={2} divider={false} data-testid="divider-off">
+          Section heading
+        </Typography.Title>
+        <Typography.Title level={3} divider data-testid="divider-on">
+          A longer section heading that wraps at narrow widths
+        </Typography.Title>
+      </div>
     </main>
   </MtoneProvider>,
 );

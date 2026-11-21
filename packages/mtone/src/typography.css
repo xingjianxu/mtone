@@ -36,6 +36,10 @@
 .mt-typography-h6 {
   font-size: 14px;
 }
+.mt-typography-title-divider {
+  padding-block-end: 8px;
+  border-block-end: 1px solid var(--mt-border, #e9e9e7);
+}
 .mt-typography.mt-muted,
 .mt-typography-secondary {
   color: var(--mt-muted, #787774);

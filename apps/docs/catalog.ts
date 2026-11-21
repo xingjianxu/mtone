@@ -4517,6 +4517,7 @@ export default function Demo() {
   ],
   "code": "import { Typography } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <section>\n    <Typography.Title level={2}>工作笔记</Typography.Title>\n    <Typography.Paragraph copyable>让内容清晰、有层次。</Typography.Paragraph>\n    <Typography.Text muted>更新于今天</Typography.Text>\n    <Typography.Link href=\"/docs\">查看文档</Typography.Link>\n  </section>;\n}",
   "props": [
+    {"name":"Title.divider", "type":"boolean", "default":"level === 2", "description":"标题下方的整行分隔线，仅二级标题默认启用；不同于给文字添加下划线的 underline。"},
     {"name":"Blockquote", "type":"BlockquoteProps", "description":"引用子组件；支持 cite 可见署名、citeUrl 来源 URL、icon、iconSize（默认 28）、color（CSS 色值）、radius（默认 4）、textWrap（默认 wrap）。它不支持 Text 的复制、编辑或省略属性；完整 API 见 Blockquote 条目。"},
     {
       "name": "muted / type",
@@ -4679,17 +4680,23 @@ export default function Demo() {
   {
   "name": "Title",
   "category": "数据展示",
-  "description": "遵循 mtone 字号与间距的语义标题，支持 h1 至 h6。",
+  "description": "遵循 mtone 字号与间距的语义标题，支持 h1 至 h6 与可选整行分隔线。",
   "importNames": [
     "Title"
   ],
-  "code": "import { Title } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Title level={2}>项目概览</Title>;\n}",
+  "code": "import { Title } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <>\n    <Title level={2}>项目概览</Title>\n    <Title level={2} divider={false}>不带分隔线</Title>\n    <Title level={3} divider>带分隔线的三级标题</Title>\n  </>;\n}",
   "props": [
     {
       "name": "level",
       "type": "1 | 2 | 3 | 4 | 5 | 6",
       "default": "1",
       "description": "使用对应 h1-h6 标签。按文档结构选择标题层级。"
+    },
+    {
+      "name": "divider",
+      "type": "boolean",
+      "default": "level === 2",
+      "description": "在标题下方绘制横贯标题整行的 1px 中性色分隔线。仅二级标题默认启用；可显式开启或关闭。与文字下划线 underline 独立。"
     },
     {
       "name": "muted / type",

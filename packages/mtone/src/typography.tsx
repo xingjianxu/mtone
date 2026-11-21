@@ -45,6 +45,8 @@ export interface TextProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 export interface TitleProps extends TextProps {
   level?: 1 | 2 | 3 | 4 | 5 | 6;
+  /** Draws a full-width rule below the heading. Defaults to true only for h2. */
+  divider?: boolean;
 }
 export type ParagraphProps = TextProps;
 export interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -311,10 +313,11 @@ export const Text = React.forwardRef<HTMLSpanElement, TextProps>(
   (props, ref) => <Content {...props} tag="span" ref={ref} />,
 );
 export const Title = React.forwardRef<HTMLHeadingElement, TitleProps>(
-  ({ level = 1, ...props }, ref) => (
+  ({ level = 1, divider = level === 2, className, ...props }, ref) => (
     <Content
       {...props}
       tag={`h${[1, 2, 3, 4, 5, 6].includes(level) ? level : 1}` as "h1"}
+      className={cn(divider && "mt-typography-title-divider", className)}
       ref={ref}
     />
   ),

@@ -80,6 +80,44 @@ try {
         .getByTestId("quote-icon")
         .evaluate((el) => el.scrollWidth > el.clientWidth);
       assert(!overflow);
+      const dividerGroup = page.getByTestId("title-divider-examples");
+      const defaultTitle = page.getByTestId("divider-default");
+      const offTitle = page.getByTestId("divider-off");
+      const onTitle = page.getByTestId("divider-on");
+      for (const heading of [defaultTitle, onTitle]) {
+        await expect(heading).toHaveCSS("border-bottom-width", "1px");
+        await expect(heading).toHaveCSS(
+          "border-bottom-color",
+          "rgb(233, 233, 231)",
+        );
+        await expect(heading).toHaveCSS("padding-bottom", "8px");
+        await expect(heading).toHaveCSS("text-decoration-line", "none");
+        assert.equal(
+          (await heading.boundingBox()).width,
+          (await dividerGroup.boundingBox()).width,
+        );
+      }
+      await expect(offTitle).toHaveCSS("border-bottom-width", "0px");
+      await expect(offTitle).toHaveCSS("padding-bottom", "0px");
+      assert.equal(
+        (await defaultTitle.boundingBox()).height -
+          (await offTitle.boundingBox()).height,
+        9,
+      );
+      assert(
+        await onTitle.evaluate((heading) => {
+          const style = getComputedStyle(heading);
+          return (
+            heading.clientHeight >
+              Number.parseFloat(style.lineHeight) +
+                Number.parseFloat(style.paddingBottom) &&
+            heading.scrollWidth === heading.clientWidth
+          );
+        }),
+      );
+      await dividerGroup.screenshot({
+        path: `artifacts/typography-browser/${name}-title-divider.png`,
+      });
       await page.screenshot({
         path: `artifacts/typography-browser/${name}.png`,
         fullPage: true,
