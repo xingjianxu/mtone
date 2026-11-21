@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, test, expect, vi } from "vitest";
 import {
+  Alert,
   Button,
   Input,
   SearchInput,
@@ -85,4 +86,15 @@ test("Input and Input.Search share single-line styling while Textarea remains mu
   expect(container.querySelector('[aria-label="plain"]')).toHaveClass("mt-input-control");
   expect(container.querySelector('[aria-label="search"]')).toHaveClass("mt-input-control");
   expect(container.querySelector('[aria-label="multiline"]')).not.toHaveClass("mt-input-control");
+});
+
+it("keeps Alert close accessible, icon-only, and non-submitting", () => {
+  const close = vi.fn();
+  const submit = vi.fn((event) => event.preventDefault());
+  render(<form onSubmit={submit}><Alert title="Notice" onClose={close}>Details</Alert></form>);
+  const button = screen.getByRole("button", { name: "Close" });
+  expect(button).toHaveClass("mt-icon-btn");
+  fireEvent.click(button);
+  expect(close).toHaveBeenCalledOnce();
+  expect(submit).not.toHaveBeenCalled();
 });

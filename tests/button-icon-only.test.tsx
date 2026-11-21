@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { Button, IconButton, type ButtonProps } from "../packages/mtone/src";
+import { Button, type ButtonProps } from "../packages/mtone/src";
 
 interface ConsumerButtonProps extends ButtonProps {
   auditId: string;
@@ -18,17 +18,18 @@ function acceptedProps(dynamic: boolean) {
     { iconOnly: true, "aria-label": "Save" },
     { iconOnly: dynamic, "aria-labelledby": "save-name" },
   ];
-  // @ts-expect-error The compatibility wrapper still requires aria-label.
-  const wrapper: Parameters<typeof IconButton>[0] = {
-    "aria-labelledby": "save-name",
-  };
   return {
     examples,
-    wrapper,
     tracked: <ConsumerButton auditId="save" iconOnly aria-label="Save" />,
   };
 }
 void acceptedProps;
+
+it("exports Button without an IconButton alias", async () => {
+  const api = await import("../packages/mtone/src");
+  expect(api).toHaveProperty("Button");
+  expect(api).not.toHaveProperty("IconButton");
+});
 
 describe("Button iconOnly", () => {
   it("is explicit and supports both accessible name sources", () => {
@@ -67,21 +68,21 @@ describe("Button iconOnly", () => {
     );
   });
 
-  it("preserves the legacy wrapper ref, options and original button type", () => {
+  it("preserves the ref, options and native type in icon-only mode", () => {
     const ref = createRef<HTMLButtonElement>();
     const click = vi.fn();
     render(
-      <IconButton
+      <Button iconOnly
         ref={ref}
         aria-label="Archive"
         type="button"
         variant="solid"
         size="sm"
-        className="legacy"
+        className="custom"
         onClick={click}
       >
         <svg />
-      </IconButton>,
+      </Button>,
     );
     const button = screen.getByRole("button", { name: "Archive" });
     expect(button).toBe(ref.current);
@@ -90,7 +91,7 @@ describe("Button iconOnly", () => {
       "mt-btn-solid",
       "mt-icon-btn",
       "mt-size-sm",
-      "legacy",
+      "custom",
     );
     fireEvent.click(button);
     expect(click).toHaveBeenCalledOnce();

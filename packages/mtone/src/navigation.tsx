@@ -8,7 +8,7 @@ import {
   Circle,
 } from "lucide-react";
 import { Popover as BPopover } from "@base-ui/react/popover";
-import { cn, IconButton, MtoneScope, useMtone } from "./basic";
+import { Button, cn, MtoneScope, useMtone } from "./basic";
 import { Menu, type MenuProps, Tooltip } from "./interactive";
 const SidebarContext = React.createContext(false);
 const NavSubmenuSelectionContext = React.createContext<(() => void) | null>(null);
@@ -41,7 +41,7 @@ export function Sidebar({
   const isCollapsed = collapsible && (collapsed ?? internal);
   const contentId = React.useId();
   const toggle = collapsible && (
-    <IconButton
+    <Button iconOnly
       className="mt-sidebar-toggle"
       variant="ghost"
       aria-label={isCollapsed ? expandLabel : collapseLabel}
@@ -58,7 +58,7 @@ export function Sidebar({
       ) : (
         <PanelLeftClose size={16} aria-hidden="true" />
       )}
-    </IconButton>
+    </Button>
   );
   return (
     <SidebarContext.Provider value={isCollapsed}>
@@ -518,14 +518,14 @@ export function FilterChip({
   return (
     <span className="mt-filter-chip">
       <span className="mt-filter-chip-label">{children}</span>
-      <IconButton
+      <Button iconOnly
         size="sm"
         variant="ghost"
         aria-label={locale === "zh" ? "移除筛选" : "Remove filter"}
         onClick={onRemove}
       >
-        <X size={12} />
-      </IconButton>
+        <X size={12} aria-hidden="true" />
+      </Button>
     </span>
   );
 }

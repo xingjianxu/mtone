@@ -52,7 +52,7 @@ for an image or other React content. Supply image alternative text when the
 image conveys information; decorative images should use an empty `alt`.
 
 `actions` is an array of nodes rendered at the bottom. Use real `Button`,
-`IconButton` or link elements for actions. A string or icon alone does not become
+`Button iconOnly` or link elements for actions. A string or icon alone does not become
 an accessible button automatically. Give icon-only actions an accessible name.
 
 `size="small"` reduces spacing. `variant="borderless"` hides the visible border while preserving its outer geometry.

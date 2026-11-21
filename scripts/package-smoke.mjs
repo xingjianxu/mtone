@@ -74,6 +74,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { MtoneProvider, MtoneScope, Input, SearchInput, Textarea, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, PageLayout, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert.equal(Input.Search, SearchInput);
+assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
 assert.match(renderToStaticMarkup(createElement(List.SortHandle, {'aria-label':'Sort'})), /mt-list-sort-handle/);
 assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}],defaultValue:['one'],selectAll:true,expandable:false})), /aria-pressed="true"/);
 assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}]})), /Release tag/);

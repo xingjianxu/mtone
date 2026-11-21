@@ -125,6 +125,8 @@ import Menu0 from "./secondary-demos/menu-usage";
 import Menu0Source from "./secondary-demos/menu-usage.tsx?raw";
 import Menu1 from "./secondary-demos/menu-alignment";
 import Menu1Source from "./secondary-demos/menu-alignment.tsx?raw";
+import MenuTriggerMode from "./secondary-demos/menu-trigger-mode";
+import MenuTriggerModeSource from "./secondary-demos/menu-trigger-mode.tsx?raw";
 import Typography0 from "./secondary-demos/typography-title";
 import Typography0Source from "./secondary-demos/typography-title.tsx?raw";
 import Typography1 from "./secondary-demos/typography-text-status";
@@ -623,6 +625,13 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       title: "基础用法",
       Demo: Menu0,
       source: source(Menu0Source),
+    },
+    {
+      id: "trigger-mode",
+      title: "点击与悬停触发",
+      note: "默认点击打开。悬停模式支持桌面鼠标从触发按钮移动到菜单和子菜单，不抢占键盘焦点；点击、键盘与触屏操作仍可使用。",
+      Demo: MenuTriggerMode,
+      source: source(MenuTriggerModeSource),
     },
     {
       id: "alignment",

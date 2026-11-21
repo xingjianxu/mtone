@@ -2,12 +2,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import postcss from "postcss";
-import { Button, ButtonGroup, IconButton } from "../packages/mtone/src/basic";
+import { Button, ButtonGroup } from "../packages/mtone/src/basic";
 
 it("keeps separated groups as the default and supports connected groups without forwarding the prop", () => {
   const { rerender } = render(<ButtonGroup aria-label="Actions"><Button>Copy</Button></ButtonGroup>);
   expect(screen.getByRole("group")).not.toHaveClass("mt-button-group-connected");
-  rerender(<ButtonGroup connected aria-label="Actions" className="custom"><Button>Copy</Button><IconButton aria-label="More">+</IconButton></ButtonGroup>);
+  rerender(<ButtonGroup connected aria-label="Actions" className="custom"><Button>Copy</Button><Button iconOnly aria-label="More">+</Button></ButtonGroup>);
   expect(screen.getByRole("group")).toHaveClass("mt-button-group-connected", "custom");
   expect(screen.getByRole("group")).not.toHaveAttribute("connected");
   expect(screen.getAllByRole("button")).toHaveLength(2);

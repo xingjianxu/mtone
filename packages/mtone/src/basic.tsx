@@ -220,19 +220,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
-export const IconButton = React.forwardRef<
-  HTMLButtonElement,
-  Omit<ButtonProps, "iconOnly"> & { "aria-label": string }
->(function IconButton(p, r) {
-  return (
-    <Button
-      {...p}
-      ref={r}
-      iconOnly
-      className={cn("mt-icon-btn-legacy", p.className)}
-    />
-  );
-});
 export type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Join adjacent buttons, keeping only the outside corners rounded. */
   connected?: boolean;
@@ -385,9 +372,9 @@ export function Alert({
         {children && <div>{children}</div>}
       </div>
       {onClose && (
-        <IconButton aria-label="Close" variant="ghost" onClick={onClose}>
-          <X size={14} />
-        </IconButton>
+        <Button iconOnly aria-label="Close" variant="ghost" onClick={onClose}>
+          <X size={14} aria-hidden="true" />
+        </Button>
       )}
     </div>
   );

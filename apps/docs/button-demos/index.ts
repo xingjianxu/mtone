@@ -25,7 +25,7 @@ export const buttonDocSections = [
   {
     id: "icon-only",
     title: "纯图标按钮",
-    note: "使用 iconOnly 获得等宽高按钮，并通过 aria-label 或 aria-labelledby 提供明确的操作名称。IconButton 仍作为兼容导出。",
+    note: "使用 iconOnly 获得等宽高按钮，并通过 aria-label 或 aria-labelledby 提供明确的操作名称。",
     Demo: IconOnlyDemo,
     source: iconOnlySource.replace("../../../packages/mtone/src", "@bixlab/mtone"),
   },

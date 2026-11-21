@@ -29,11 +29,7 @@ import { ThemeSelect, useThemePreference } from "./theme-preference";
 export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "not-found" }
   | { kind: "component"; name: string; section?: string };
-const iconOnlyHref = "#/components/Button?section=icon-only";
-const legacyIconButtonRoute = /^#\/components\/IconButton(?:\?section=[A-Za-z][A-Za-z0-9-]*)?$/;
 export function parseRoute(hash: string): Route {
-  if (legacyIconButtonRoute.test(hash))
-    return { kind: "component", name: "Button", section: "icon-only" };
   if (hash === "#/components/SearchInput" || hash === "#/components/Textarea") return { kind: "component", name: "Input", section: hash.endsWith("SearchInput") ? "input-search" : "input-textarea" };
   const typography = hash.match(/^#\/components\/Typography\?section=([A-Za-z]+)$/);
   if (typography && isTypographySection(typography[1]))
@@ -62,7 +58,7 @@ export function searchDocs(query: string) {
   );
 }
 const groups = componentCategories;
-const componentDocHref = (name: string) => name === "IconButton" ? iconOnlyHref : aiSectionHref(name) ?? baseComponentDocHref(name);
+const componentDocHref = (name: string) => aiSectionHref(name) ?? baseComponentDocHref(name);
 function CodeBlock({ code }: { code: string }) {
   const [status, setStatus] = useState("");
   return (
@@ -366,7 +362,7 @@ export function DocsApp() {
   const [route, setRoute] = useState(() => parseRoute(window.location.hash));
   const [query, setQuery] = useState("");
   const [mobile, setMobile] = useState(false);
-  const results = searchDocs(query).filter((doc) => query.trim() || (!doc.sidebarParent && doc.name !== "IconButton"));
+  const results = searchDocs(query).filter((doc) => query.trim() || !doc.sidebarParent);
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobile(false);
@@ -509,7 +505,7 @@ export function DocsApp() {
             {groups.map((group) => {
                 // Preserve semantic group order, but make each component easy to find by name.
                 const members = componentDocs
-                  .filter((d) => d.category === group && !d.sidebarParent && !isTypographySection(d.name) && d.name !== "SearchInput" && d.name !== "Textarea" && d.name !== "IconButton")
+                  .filter((d) => d.category === group && !d.sidebarParent && !isTypographySection(d.name) && d.name !== "SearchInput" && d.name !== "Textarea")
                   .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
                 return (
                   members.length > 0 && (

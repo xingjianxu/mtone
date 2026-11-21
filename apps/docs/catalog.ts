@@ -2336,7 +2336,6 @@ export default function Demo() {
       },
     ],
     notes: [
-      "旧版 IconButton 仍可用且要求 aria-label；新代码使用 Button iconOnly。",
       "未开启 toggle 时保留普通按钮行为，不接管应用手动设置的 aria-pressed。开启时由 Button 提供 aria-pressed。保留前后状态一致的按钮名；纯图标使用固定 aria-label 或 aria-labelledby。",
       "图标模式不改变按钮背景，切换图标替代左侧 leftSection 与 icon，加载指示器优先，rightSection 保留。preset 和自定义图标对互斥；建议自定义图标两态同尺寸，且不要传入可交互内容。",
       "例如 <Button toggle>仅显示未读</Button> 或 <Button iconOnly aria-label=\"收藏\" toggle={{ mode: \"icon\", preset: \"star\" }} />。",
@@ -2344,21 +2343,6 @@ export default function Demo() {
       "左右内容按阅读方向排列，在 RTL 中自动对调。传入内容的一侧使用更紧凑的内边距；装饰图标可标记 aria-hidden。",
       "blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。",
     ],
-  },
-  {
-    name: "IconButton",
-    category: "操作命令",
-    description: "使用 Button iconOnly 的旧版兼容导出；新代码请使用 Button 的纯图标模式。",
-    importNames: ["IconButton"],
-    code: 'import { IconButton } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <IconButton aria-label="添加">＋</IconButton>;\n}',
-    props: [
-      {
-        name: "aria-label",
-        type: "string",
-        description: "使用兼容 IconButton 时必填；提供明确的操作名称。",
-      },
-    ],
-    notes: ["共享 Button 的尺寸、变体、加载和切换行为；新代码用 <Button iconOnly> 并提供 aria-label 或 aria-labelledby。"],
   },
   {
     name: "ButtonGroup",
@@ -4161,7 +4145,7 @@ export default function Demo() {
   {
     name: "Menu",
     category: "操作命令",
-    description: "点击打开的操作菜单，支持分组与多级子菜单。",
+    description: "默认点击打开的操作菜单，可启用悬停，支持分组与多级子菜单。",
     importNames: ["Menu", "Button"],
     code: 'import { Menu, Button } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu trigger={<Button>文档操作</Button>} items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
     props: [
@@ -4171,6 +4155,12 @@ export default function Demo() {
         name: "trigger",
         type: "ReactElement",
         description: "必填；触发元素。",
+      },
+      {
+        name: "triggerMode",
+        type: '"click" | "hover"',
+        default: "click",
+        description: "主菜单触发方式。hover 启用桌面鼠标悬停，仍支持点击、键盘和触屏；仅悬停打开时不移动键盘焦点。",
       },
       {
         name: "items",
@@ -4200,6 +4190,7 @@ export default function Demo() {
       },
     ],
     notes: [
+      "悬停时鼠标可以从触发器跨过间隙进入菜单并继续进入子菜单；离开菜单区域后关闭。受控 open / onOpenChange 与条目选择规则不变。",
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。",
       "Menu 复用 Dropdown 的浮层布局，但仍使用菜单语义、方向键与选择关闭。通用自定义内容使用 Dropdown。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。",
       "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",

@@ -12,7 +12,7 @@ try {
     try {
       const page=await browser.newPage({viewport:{width:700,height:500}});
       await page.goto('http://127.0.0.1:5198/tests/fixtures/menu.html');
-      const trigger=page.getByRole('button',{name:'Actions'});
+      const trigger=page.getByRole('button',{name:'Actions',exact:true});
       for(let iteration=0;iteration<2;iteration++){
         await trigger.click();
         await expect(page.getByRole('group',{name:'Files'})).toBeVisible();
@@ -44,6 +44,66 @@ try {
       await trigger.click(); await page.getByRole('menuitem',{name:'Locked',exact:true}).hover();
       await page.waitForTimeout(250); await expect(page.getByRole('menuitem',{name:'Secret',exact:true})).toHaveCount(0);
       await page.mouse.click(600,400); await expect(page.getByRole('menu')).toHaveCount(0);
+      const keepFocus = page.getByRole("textbox", { name: "Retained focus" });
+      const hoverTrigger = page.getByRole("button", { name: "Hover actions" });
+      const hoverMenu = page.getByRole("menu", { name: "Hover actions" });
+      await keepFocus.focus();
+      await hoverTrigger.hover();
+      await expect(hoverMenu).toBeVisible();
+      await expect(keepFocus).toBeFocused();
+      assert.equal(await hoverMenu.evaluate((node) => document.querySelector("main").contains(node)), false);
+      const triggerBox = await hoverTrigger.boundingBox();
+      const popupBox = await hoverMenu.boundingBox();
+      const gap = popupBox.y - triggerBox.y - triggerBox.height;
+      assert(gap > 1, "fixture must include a real portal gap");
+      await page.mouse.move(triggerBox.x + triggerBox.width / 2, popupBox.y - gap / 2, { steps: 6 });
+      await expect(hoverMenu).toBeVisible();
+      await page.getByRole("menuitem", { name: "Hover export" }).hover();
+      const hoverLeaf = page.getByRole("menuitem", { name: "Hover PDF" });
+      await expect(hoverLeaf).toBeVisible();
+      await hoverLeaf.hover();
+      await hoverLeaf.click();
+      await expect(page.getByRole("status")).toHaveText("hover-pdf");
+      await expect(hoverMenu).toHaveCount(0);
+
+      await keepFocus.focus();
+      await hoverTrigger.hover();
+      await expect(hoverMenu).toBeVisible();
+      // Leave upward instead of crossing through the popup's focusable rows.
+      await page.mouse.move(650, 24, { steps: 8 });
+      await expect(hoverMenu).toHaveCount(0);
+      await expect(keepFocus).toBeFocused();
+
+      await hoverTrigger.click();
+      await expect(hoverMenu).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(hoverMenu).toHaveCount(0);
+      await page.mouse.move(650, 420);
+      for (const key of ["Enter", "Space", "ArrowDown"]) {
+        await hoverTrigger.focus();
+        await page.keyboard.press(key);
+        await expect(hoverMenu).toBeVisible();
+        await expect(page.getByRole("menuitem", { name: "Hover open" })).toBeFocused();
+        await page.keyboard.press("Escape");
+        await expect(hoverMenu).toHaveCount(0);
+        await expect(hoverTrigger).toBeFocused();
+      }
+      const disabledHover = page.getByRole("button", { name: "Disabled hover" });
+      await disabledHover.hover();
+      await expect(disabledHover).toHaveAttribute("aria-expanded", "false");
+      await expect(page.getByRole("menuitem", { name: "Disabled item" })).toHaveCount(0);
+
+      const touch = await browser.newContext({ hasTouch: true });
+      try {
+        const touchPage = await touch.newPage();
+        await touchPage.goto('http://127.0.0.1:5198/tests/fixtures/menu.html');
+        await touchPage.getByRole("button", { name: "Hover actions" }).tap();
+        await expect(touchPage.getByRole("menu", { name: "Hover actions" })).toBeVisible();
+        await touchPage.getByRole("menuitem", { name: "Hover open" }).tap();
+        await expect(touchPage.getByRole("status")).toHaveText("hover-open");
+      } finally {
+        await touch.close();
+      }
       console.log(`${name}: Menu grouped alignment, thin border, pointer crossing, repeat cycles, keyboard and disabled submenu passed`);
     } finally {await browser.close();}
   }

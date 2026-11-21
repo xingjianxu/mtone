@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import {
   Button,
   ButtonGroup,
-  IconButton,
   MtoneProvider,
 } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
@@ -20,7 +19,7 @@ createRoot(document.getElementById("root")!).render(
           <Button variant="blue" danger toggle>
             Danger filter
           </Button>
-          <IconButton
+          <Button iconOnly
             aria-label="Star"
             toggle={{ mode: "icon", preset: "star" }}
           />

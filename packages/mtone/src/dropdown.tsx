@@ -32,11 +32,13 @@ export function DropdownSurface({
   align = "start",
   label,
   finalFocus,
+  initialFocus,
 }: DropdownLayoutProps & {
   children: React.ReactNode;
   kind?: "popover" | "menu" | "submenu" | "context";
   label?: string;
   finalFocus?: boolean | (() => boolean);
+  initialFocus?: boolean;
 }) {
   const direction = useDirection();
   const owner = React.useContext(DropdownOwnerContext);
@@ -69,6 +71,7 @@ export function DropdownSurface({
         >
           <Primitive.Popup
             finalFocus={finalFocus}
+            initialFocus={initialFocus}
             data-dropdown-owner={owner}
             className={cn(
               "mt-popup",

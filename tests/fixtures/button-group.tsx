@@ -2,7 +2,7 @@ import { ComponentExample } from "../../apps/docs/examples";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { ArrowRight, Download, Image } from "lucide-react";
-import { Button, ButtonGroup, IconButton, MtoneProvider } from "../../packages/mtone/src";
+import { Button, ButtonGroup, MtoneProvider } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 createRoot(document.getElementById("root")!).render(
   <MtoneProvider><main style={{ padding: 24, display: "grid", gap: 24, justifyItems: "start" }}>
@@ -26,7 +26,7 @@ createRoot(document.getElementById("root")!).render(
           Loading
         </Button>
         <Button icon={<Image size={14} aria-hidden="true" />}>Legacy</Button>
-        <IconButton aria-label="Only icon"><Image size={14} aria-hidden="true" /></IconButton>
+        <Button iconOnly aria-label="Only icon"><Image size={14} aria-hidden="true" /></Button>
       </ButtonGroup>
     ))}
     <section data-testid="docs"><ComponentExample name="ButtonGroup" /></section>

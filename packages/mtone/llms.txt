@@ -1003,7 +1003,6 @@ export default function Demo() {
 - disabled: boolean. 禁用按钮。
 - onClick: MouseEventHandler. 点击回调。
 - children: ReactNode. 组件内容。
-- 旧版 IconButton 仍可用且要求 aria-label；新代码使用 Button iconOnly。
 - 未开启 toggle 时保留普通按钮行为，不接管应用手动设置的 aria-pressed。开启时由 Button 提供 aria-pressed。保留前后状态一致的按钮名；纯图标使用固定 aria-label 或 aria-labelledby。
 - 图标模式不改变按钮背景，切换图标替代左侧 leftSection 与 icon，加载指示器优先，rightSection 保留。preset 和自定义图标对互斥；建议自定义图标两态同尺寸，且不要传入可交互内容。
 - 例如 <Button toggle>仅显示未读</Button> 或 <Button iconOnly aria-label="收藏" toggle={{ mode: "icon", preset: "star" }} />。
@@ -1039,22 +1038,6 @@ export default function Demo() {
       </Button>
     </div>
   );
-}
-```
-
-### IconButton
-
-- [IconButton](https://xingjianxu.github.io/mtone/#/components/IconButton): 使用 Button iconOnly 的旧版兼容导出；新代码请使用 Button 的纯图标模式。
-- Import: IconButton from @bixlab/mtone
-- aria-label: string. 使用兼容 IconButton 时必填；提供明确的操作名称。
-- 共享 Button 的尺寸、变体、加载和切换行为；新代码用 <Button iconOnly> 并提供 aria-label 或 aria-labelledby。
-
-```tsx
-import { IconButton } from "@bixlab/mtone";
-import "@bixlab/mtone/styles.css";
-
-export default function Demo() {
-  return <IconButton aria-label="添加">＋</IconButton>;
 }
 ```
 
@@ -1995,16 +1978,18 @@ export default function Demo() {
 
 ### Menu
 
-- [Menu](https://xingjianxu.github.io/mtone/#/components/Menu): 点击打开的操作菜单，支持分组与多级子菜单。
+- [Menu](https://xingjianxu.github.io/mtone/#/components/Menu): 默认点击打开的操作菜单，可启用悬停，支持分组与多级子菜单。
 - Import: Menu, Button from @bixlab/mtone
 - width: CSSProperties['width']. 主菜单默认按内容宽度（最小160px），不再与trigger等宽；可指定number像素或CSS宽度，受可用视口宽度限制。子菜单独立按内容宽度，不继承此值。
 - align: 'start' | 'end' | 'left' | 'right' (default: start). 主菜单与trigger对齐边；left/right是物理左右，start/end随DirectionProvider的RTL方向变化，碰撞时可自动调整。
 - trigger: ReactElement. 必填；触发元素。
+- triggerMode: "click" | "hover" (default: click). 主菜单触发方式。hover 启用桌面鼠标悬停，仍支持点击、键盘和触屏；仅悬停打开时不移动键盘焦点。
 - items: MenuEntry[]. 必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}；复选项 type: 'checkbox'；单选组 type: 'radio-group'。
 - onSelect: (key: string) => void. 选中叶子项时调用；展开子菜单不触发。先执行项自己的 onSelect，再执行此回调。
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
+- 悬停时鼠标可以从触发器跨过间隙进入菜单并继续进入子菜单；离开菜单区域后关闭。受控 open / onOpenChange 与条目选择规则不变。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - Menu 复用 Dropdown 的浮层布局，但仍使用菜单语义、方向键与选择关闭。通用自定义内容使用 Dropdown。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。
 - 同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。

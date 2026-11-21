@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { CreditCard, Mail } from "lucide-react";
-import { AdminLayout, Button, IconButton, MtoneProvider, Popover, NavGroup, NavItem, NavSubmenu, Sidebar } from "../../packages/mtone/src";
+import { AdminLayout, Button, MtoneProvider, Popover, NavGroup, NavItem, NavSubmenu, Sidebar } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 
 function Fixture() {
@@ -76,14 +76,14 @@ function ActionRows({ rtl }: { rtl: boolean }) {
         <NavGroup>
           <NavItem>Before</NavItem>
           <NavItem active href="#destination" actions={[
-            { content: <IconButton size="sm" variant="ghost" aria-label="Edit" onClick={() => setEditCount((n) => n + 1)}>E</IconButton> },
-            { visibility: "hover", content: <Popover trigger={<IconButton size="sm" variant="ghost" aria-label="More">M</IconButton>} content={<Button>Rename</Button>} /> },
-            { visibility: "active", content: <IconButton size="sm" variant="ghost" aria-label="Archive">A</IconButton> },
+            { content: <Button iconOnly size="sm" variant="ghost" aria-label="Edit" onClick={() => setEditCount((n) => n + 1)}>E</Button> },
+            { visibility: "hover", content: <Popover trigger={<Button iconOnly size="sm" variant="ghost" aria-label="More">M</Button>} content={<Button>Rename</Button>} /> },
+            { visibility: "active", content: <Button iconOnly size="sm" variant="ghost" aria-label="Archive">A</Button> },
           ]}>A very long folder name for documents</NavItem>
-          <NavItem actions={{ visibility: "active", content: <IconButton size="sm" variant="ghost" aria-label="Inactive archive">A</IconButton> }}>After</NavItem>
-          <NavItem disabled actions={{ visibility: "hover", content: <IconButton size="sm" variant="ghost" aria-label="Edit disabled row">E</IconButton> }}>Unavailable</NavItem>
+          <NavItem actions={{ visibility: "active", content: <Button iconOnly size="sm" variant="ghost" aria-label="Inactive archive">A</Button> }}>After</NavItem>
+          <NavItem disabled actions={{ visibility: "hover", content: <Button iconOnly size="sm" variant="ghost" aria-label="Edit disabled row">E</Button> }}>Unavailable</NavItem>
           <NavSubmenu label="Projects">
-            <NavItem actions={{ visibility: "hover", content: <IconButton size="sm" variant="ghost" aria-label="Edit project" onClick={() => setEditCount((n) => n + 1)}>E</IconButton> }}>Workspace</NavItem>
+            <NavItem actions={{ visibility: "hover", content: <Button iconOnly size="sm" variant="ghost" aria-label="Edit project" onClick={() => setEditCount((n) => n + 1)}>E</Button> }}>Workspace</NavItem>
           </NavSubmenu>
         </NavGroup>
       </Sidebar>

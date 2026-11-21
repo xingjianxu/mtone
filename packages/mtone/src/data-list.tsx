@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { Button, IconButton, cn, useMtone } from "./basic";
+import { Button, cn, useMtone } from "./basic";
 import { Pagination } from "./data";
 import { Input } from "./input";
 import { Checkbox } from "./interactive";
@@ -119,7 +119,7 @@ function DataListRow({
         {(actions != null || detail) && (
           <div className="mt-data-list-actions">
             {detail && (
-              <IconButton
+              <Button iconOnly
                 className="mt-data-list-disclosure"
                 variant="ghost"
                 type="button"
@@ -133,7 +133,7 @@ function DataListRow({
                 ) : (
                   <ChevronRight size={16} aria-hidden="true" />
                 )}
-              </IconButton>
+              </Button>
             )}
             {actions}
           </div>

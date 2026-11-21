@@ -14,7 +14,7 @@ test("sidebar preserves semantic groups and guide order while sorting component 
   expect(groups[0].querySelector(".mt-nav-label")).toHaveTextContent("开始使用");
   const headings = groups.slice(1).map((group) => group.querySelector(".mt-nav-label")!);
   expect(headings.map((heading) => heading.textContent)).toEqual([...componentCategories]);
-  const sectionOnly = new Set(["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea", "IconButton"]);
+  const sectionOnly = new Set(["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"]);
   const sidebarDocs = componentDocs.filter((doc) => !doc.sidebarParent && !sectionOnly.has(doc.name));
   for (const heading of headings) {
     const names = Array.from(heading.parentElement!.querySelectorAll("a"), (link) => link.textContent);

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { Button, Fieldset, IconButton } from "../packages/mtone/src";
+import { Button, Fieldset } from "../packages/mtone/src";
 
 describe("Button toggle", () => {
   it("opts into background state without modifying regular buttons", async () => {
@@ -63,7 +63,7 @@ describe("Button toggle", () => {
     "fills the %s and preserves its accessible name",
     (preset) => {
       render(
-        <IconButton aria-label="Save item" toggle={{ mode: "icon", preset }} />,
+        <Button iconOnly aria-label="Save item" toggle={{ mode: "icon", preset }} />,
       );
       const button = screen.getByRole("button", {
         name: "Save item",

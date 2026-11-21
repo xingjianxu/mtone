@@ -38,6 +38,8 @@ try {
     ["Medium icon", 34],
     ["Large icon", 36],
     ["Themed icon", 40],
+    ["Close", 34],
+    ["移除筛选", 24],
   ]) {
     assert.deepEqual(
       await geometry(name),
@@ -45,18 +47,6 @@ try {
       name,
     );
   }
-  assert.deepEqual(await geometry("Legacy small"), {
-    width: 34,
-    height: 24,
-    start: "6px",
-    end: "6px",
-  });
-  assert.deepEqual(await geometry("Legacy large"), {
-    width: 34,
-    height: 36,
-    start: "14px",
-    end: "14px",
-  });
   for (const [name, height, start, end] of [
     ["Text with start", 24, "4px", "6px"],
     ["Text with end", 36, "14px", "12px"],
@@ -70,7 +60,7 @@ try {
     );
   }
   console.log(
-    `${engine}: named icon-only squares and legacy dimensions; ordinary RTL section geometry preserved`,
+    `${engine}: named icon-only squares, Alert close and FilterChip remove; ordinary RTL section geometry preserved`,
   );
 } finally {
   await browser?.close();

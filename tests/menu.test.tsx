@@ -39,6 +39,144 @@ describe("Menu", () => {
     expect(Menu).toBeTypeOf("function");
     expect(DropdownMenu).toBe(Menu);
   });
+  it("keeps hover opt-in and does not move focus when the pointer opens it", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <button>Keep focus</button>
+        <Menu trigger={<button>Click only</button>} items={items} />
+        <Menu
+          triggerMode="hover"
+          trigger={<button>Hover actions</button>}
+          items={items}
+        />
+      </>,
+    );
+    const focus = screen.getByRole("button", { name: "Keep focus" });
+    focus.focus();
+    const click = screen.getByRole("button", { name: "Click only" });
+    const hover = screen.getByRole("button", { name: "Hover actions" });
+    await user.hover(click);
+    await new Promise((resolve) => setTimeout(resolve, 130));
+    expect(click).toHaveAttribute("aria-expanded", "false");
+    await user.hover(hover);
+    expect(
+      await screen.findByRole("menu", { name: "Hover actions" }),
+    ).toBeVisible();
+    expect(click).toHaveAttribute("aria-expanded", "false");
+    expect(focus).toHaveFocus();
+  });
+
+  it("reports hover intent without overriding a controlled parent or a disabled trigger", async () => {
+    const user = userEvent.setup();
+    const change = vi.fn();
+    render(
+      <>
+        <Menu
+          triggerMode="hover"
+          trigger={<button>Controlled actions</button>}
+          items={items}
+          open={false}
+          onOpenChange={change}
+        />
+        <Menu
+          triggerMode="hover"
+          trigger={<button disabled>Unavailable actions</button>}
+          items={items}
+        />
+      </>,
+    );
+    const disabled = screen.getByRole("button", {
+      name: "Unavailable actions",
+    });
+    await user.hover(disabled);
+    await user.hover(
+      screen.getByRole("button", { name: "Controlled actions" }),
+    );
+    await waitFor(() => expect(change.mock.lastCall?.[0]).toBe(true));
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(disabled).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("retains focus when a controlled parent accepts a hover open", async () => {
+    const user = userEvent.setup();
+    function ControlledMenu() {
+      const [open, setOpen] = React.useState(false);
+      return (
+        <>
+          <button>Before accepted</button>
+          <Menu
+            triggerMode="hover"
+            trigger={<button>Accepted actions</button>}
+            items={items}
+            open={open}
+            onOpenChange={setOpen}
+          />
+        </>
+      );
+    }
+    render(<ControlledMenu />);
+    const before = screen.getByRole("button", { name: "Before accepted" });
+    before.focus();
+    await user.hover(screen.getByRole("button", { name: "Accepted actions" }));
+    expect(
+      await screen.findByRole("menu", { name: "Accepted actions" }),
+    ).toBeVisible();
+    expect(before).toHaveFocus();
+  });
+
+  it("does not keep a rejected hover intent for a later controlled open", async () => {
+    const user = userEvent.setup();
+    const change = vi.fn();
+    const controlled = (open: boolean) => (
+      <>
+        <button>Before controlled</button>
+        <Menu
+          triggerMode="hover"
+          trigger={<button>Deferred actions</button>}
+          items={items}
+          open={open}
+          onOpenChange={change}
+        />
+      </>
+    );
+    const { rerender } = render(controlled(false));
+    const before = screen.getByRole("button", { name: "Before controlled" });
+    before.focus();
+    await user.hover(screen.getByRole("button", { name: "Deferred actions" }));
+    await waitFor(() => expect(change.mock.lastCall?.[0]).toBe(true));
+    expect(before).toHaveFocus();
+    rerender(controlled(true));
+    const popup = await screen.findByRole("menu", { name: "Deferred actions" });
+    await waitFor(() => expect(popup).toHaveFocus());
+  });
+
+  it("keeps an aria-disabled trigger in Tab order without opening it", async () => {
+    const user = userEvent.setup();
+    const change = vi.fn();
+    render(
+      <Menu
+        triggerMode="hover"
+        trigger={
+          <button aria-disabled="true">Unavailable but focusable</button>
+        }
+        items={items}
+        onOpenChange={change}
+      />,
+    );
+    const trigger = screen.getByRole("button", {
+      name: "Unavailable but focusable",
+    });
+    await user.tab();
+    expect(trigger).toHaveFocus();
+    expect(trigger).not.toBeDisabled();
+    await user.keyboard("{Enter}");
+    await user.hover(trigger);
+    await new Promise((resolve) => setTimeout(resolve, 130));
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(change).not.toHaveBeenCalled();
+  });
+
   it("renders named groups and separators without selectable headings", async () => {
     render(<Menu trigger={<button>Actions</button>} items={items} />);
     await userEvent.click(screen.getByRole("button", { name: "Actions" }));

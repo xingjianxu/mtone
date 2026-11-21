@@ -4,7 +4,7 @@ Reference groups 01–09, 11–12 are implemented. Group10 block editor was expl
 
 | Reference group | Exports                                                                            |
 | --------------- | ---------------------------------------------------------------------------------- |
-| Buttons         | Button, IconButton, ButtonGroup                                                    |
+| Buttons         | Button (including iconOnly), ButtonGroup                                          |
 | Forms           | Input, SearchInput, Textarea, Form, FormField                                      |
 | Selection       | Checkbox, RadioGroup, Switch, Select, MultiSelect, Slider, NumberInput, DatePicker |
 | Navigation      | Sidebar, NavItem, NavGroup, Tree, Breadcrumb                                       |

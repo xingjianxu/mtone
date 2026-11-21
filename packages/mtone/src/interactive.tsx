@@ -446,6 +446,8 @@ export type MenuEntry =
   MenuItem | MenuGroup | MenuDivider | MenuCheckboxItem | MenuRadioGroup;
 export interface MenuProps extends OpenProps, DropdownLayoutProps {
   trigger: React.ReactElement;
+  /** Whether a mouse hover can open the menu in addition to normal presses. */
+  triggerMode?: "click" | "hover";
   items: MenuEntry[];
   onSelect?: (key: string) => void;
 }
@@ -574,16 +576,59 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
 }
 export function Menu({
   trigger,
+  triggerMode = "click",
   items,
+  onOpenChange,
   onSelect,
   width,
   align,
   ...props
 }: MenuProps) {
+  const hover = triggerMode === "hover";
+  // Base UI normally focuses the popup; a mouse hover must not move focus.
+  const [openedByHover, setOpenedByHover] = useState(false);
+  const triggerProps = trigger.props as {
+    disabled?: boolean;
+    "aria-disabled"?: boolean | string;
+  };
+  const disabled = useFieldsetDisabled(triggerProps.disabled);
+  const ariaDisabled =
+    triggerProps["aria-disabled"] === true ||
+    triggerProps["aria-disabled"] === "true";
+  React.useEffect(() => {
+    // A refused controlled intent must not affect a later programmatic open.
+    if (openedByHover && (!hover || props.open === false)) setOpenedByHover(false);
+  }, [hover, openedByHover, props.open]);
+  const notifyOpenChange: BMenu.Root.Props["onOpenChange"] = onOpenChange;
+  const handleHoverOpenChange: BMenu.Root.Props["onOpenChange"] = (next, details) => {
+    if (
+      next && (disabled || ariaDisabled ||
+        details.trigger?.matches(':disabled, [aria-disabled="true"]'))
+    ) {
+      details.cancel();
+      return;
+    }
+    notifyOpenChange?.(next, details);
+    if (!details.isCanceled) {
+      setOpenedByHover(next && details.reason === "trigger-hover");
+    }
+  };
   return (
-    <BMenu.Root {...props}>
-      <BMenu.Trigger render={trigger} />
-      <DropdownSurface kind="menu" width={width} align={align}>
+    <BMenu.Root
+      {...props}
+      onOpenChange={hover ? handleHoverOpenChange : onOpenChange}
+    >
+      <BMenu.Trigger
+        render={trigger}
+        openOnHover={hover ? !ariaDisabled : undefined}
+        disabled={hover ? disabled : undefined}
+      />
+      <DropdownSurface
+        kind="menu"
+        width={width}
+        align={align}
+        initialFocus={hover && openedByHover ? false : undefined}
+      >
         <MenuItems items={items} onSelect={onSelect} />
       </DropdownSurface>
     </BMenu.Root>
