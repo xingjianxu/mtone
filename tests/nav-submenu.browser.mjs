@@ -25,6 +25,16 @@ try {
     await expect(current).toHaveAttribute("aria-current", "page");
     await expect(parent).toHaveAttribute("aria-expanded", "true");
     await expect(parent).not.toHaveAttribute("aria-current");
+    const parentTypography = () => parent.evaluate((row) => ({
+      label: Number(getComputedStyle(row.querySelector(".mt-nav-item-label")).fontWeight),
+      row: Number(getComputedStyle(row).fontWeight),
+      icon: Number(getComputedStyle(row.querySelector(".mt-nav-submenu-icon")).fontWeight),
+      height: row.getBoundingClientRect().height,
+      marker: getComputedStyle(row, "::before").content,
+    }));
+    const activeTypography = await parentTypography();
+    assert(activeTypography.label > activeTypography.row);
+    assert.deepEqual([activeTypography.icon, activeTypography.height, activeTypography.marker], [activeTypography.row, 34, "none"]);
     const paint = await current.evaluate((button) => {
       const marker = getComputedStyle(button, "::before");
       const probe = document.createElement("span");
@@ -105,6 +115,11 @@ try {
     await expect(leaf("Overview")).toHaveAttribute("aria-current", "page");
     await page.locator(".mt-sidebar-toggle").click();
     await expect(parent).toHaveAttribute("aria-expanded", "false");
+    await leaf("Email").click();
+    await page.locator(".mt-sidebar-toggle").click();
+    await expect(leaf("Email")).toHaveAttribute("aria-current", "page");
+    const inactiveTypography = await parentTypography();
+    assert.deepEqual(inactiveTypography, { ...activeTypography, label: activeTypography.row });
     assert.deepEqual(errors, []);
     await context.close();
   }

@@ -182,6 +182,14 @@ export interface NavSubmenuProps {
   disabled?: boolean;
 }
 
+function hasActiveNavItem(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement<{ active?: boolean; children?: React.ReactNode }>(child)) return false;
+    if (child.type === React.Fragment) return hasActiveNavItem(child.props.children);
+    return child.type === NavItem && child.props.active === true;
+  });
+}
+
 export function NavSubmenu({
   label,
   children,
@@ -237,7 +245,10 @@ export function NavSubmenu({
     >
       {icon != null ? <span className="mt-nav-submenu-icon" aria-hidden="true">{icon}</span>
         : collapsed ? <Circle size={16} aria-hidden="true" /> : null}
-      <span className={collapsed ? "mt-sidebar-sr-only" : "mt-nav-item-label"}>{label}</span>
+      <span className={cn(
+        collapsed ? "mt-sidebar-sr-only" : "mt-nav-item-label",
+        hasActiveNavItem(children) && "mt-nav-submenu-label-active",
+      )}>{label}</span>
       {!collapsed && <ChevronDown size={14} className="mt-nav-submenu-chevron" aria-hidden="true" />}
     </button>
   );

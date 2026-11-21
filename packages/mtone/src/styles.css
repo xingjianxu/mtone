@@ -619,6 +619,9 @@
   display: inline-flex;
   flex: none;
 }
+.mt-nav-submenu-label-active {
+  font-weight: 600;
+}
 .mt-nav-submenu-chevron {
   margin-inline-start: auto;
 }

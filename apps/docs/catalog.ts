@@ -3518,7 +3518,7 @@ export default function Demo() {
       { name: "disabled", type: "boolean", default: "false", description: "禁用分支触发按钮。" },
     ],
     notes: [
-      "只提供一层子导航。静态分组用 NavGroup；当前页状态设置在 NavItem 的 active 上。",
+      "只提供一层子导航。静态分组用 NavGroup；当前页状态设置在 NavItem 的 active 上，有当前子项时父项仅加粗标题。",
       "Sidebar 或 AdminLayout.Sider 收起时，子项在可键盘操作的侧向浮层中展示，选中子项关闭浮层。切回宽栏后还原内联展开状态。",
     ],
   },

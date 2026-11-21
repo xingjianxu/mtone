@@ -67,3 +67,24 @@ test("compact popup provides full leaf buttons, closes on selection, and preserv
   rerender(view(true));
   expect(screen.getByRole("button", { name: "Billing" })).toHaveAttribute("aria-expanded", "false");
 });
+
+test("marks only the parent label when a child NavItem is current", () => {
+  const view = (active: boolean) => (
+    <M.NavSubmenu label="Billing">
+      <>
+        <M.NavItem active={active}>Usage</M.NavItem>
+        <M.NavItem>History</M.NavItem>
+      </>
+    </M.NavSubmenu>
+  );
+  const { rerender } = render(view(true));
+  const parent = screen.getByRole("button", { name: "Billing" });
+  const label = screen.getByText("Billing");
+  expect(label).toHaveClass("mt-nav-submenu-label-active");
+  expect(parent).not.toHaveClass("mt-active");
+  expect(parent).not.toHaveAttribute("aria-current");
+  expect(parent).toHaveAttribute("aria-expanded", "false");
+
+  rerender(view(false));
+  expect(label).not.toHaveClass("mt-nav-submenu-label-active");
+});
