@@ -100,6 +100,17 @@ try {
             }
             const tab = region.getByRole("tab", {name:"Icon tab", exact:true});
             await expect(tab).toHaveCSS("font-size", `${font}px`);
+            const label = tab.locator(".mt-tab-label");
+            const margin = variant === "editable-card" ? "3px" : "0px";
+            const padding = variant === "editable-card" ? "7px" : "10px";
+            await expect(label).toHaveCSS("margin-inline-start", margin);
+            await expect(label).toHaveCSS("margin-inline-end", margin);
+            await expect(tab).toHaveCSS("padding-inline-start", padding);
+            await expect(tab).toHaveCSS("padding-inline-end", padding);
+            for (const frame of await frames.all()) {
+              await expect(frame).toHaveCSS("margin-inline-start", "0px");
+              await expect(frame).toHaveCSS("margin-inline-end", "0px");
+            }
             await expect(tab).toHaveCSS("gap", "6px");
             await expect(tab).toHaveCSS("border-bottom-left-radius", "0px");
             await expect(tab.locator("svg")).toHaveCSS("height", "14px");

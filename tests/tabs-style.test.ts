@@ -26,3 +26,10 @@ it("includes card borders in the requested height and keeps square bottom corner
   expect(tab["font-size"]).toBe("var(--mt-tabs-card-font-size)");
   expect(tab["line-height"]).toBe("20px");
 });
+
+it("moves 3px of existing editable trigger padding onto the text label", () => {
+  const editable = '.mt-tabs[data-variant="editable-card"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item';
+  expect(declarations(editable)["margin-inline"]).toBeUndefined();
+  expect(declarations(editable + " > .mt-tab")["padding-inline"]).toBe("7px");
+  expect(declarations(editable + " > .mt-tab > .mt-tab-label")["margin-inline"]).toBe("3px");
+});

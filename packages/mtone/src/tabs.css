@@ -266,6 +266,14 @@
   border-radius: 4px 4px 0 0;
 }
 
+/* Redistribute existing trigger padding to the editable label without widening its card. */
+.mt-tabs[data-variant="editable-card"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab {
+  padding-inline: 7px;
+}
+.mt-tabs[data-variant="editable-card"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab > .mt-tab-label {
+  margin-inline: 3px;
+}
+
 /* The active top card's one-pixel seam is white at rest. Carry the hovered
    tab fill through that seam without moving or recoloring the card border. */
 .mt-tabs[data-variant="editable-card"][data-placement="top"]
