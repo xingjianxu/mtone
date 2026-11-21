@@ -101,6 +101,13 @@ try {
               return isVertical ? second.top - first.bottom : second.left - first.right;
             }, vertical);
             expect(spacing).toBeCloseTo(variant === "line" ? 6 : 4);
+            const secondOffset = await frames.evaluateAll(([a, b]) =>
+              b.getBoundingClientRect().top - a.getBoundingClientRect().top);
+            if (!vertical) expect(secondOffset).toBeCloseTo(variant !== "line" && placement === "top" ? 1 : 0);
+            await expect(region.getByRole("tablist")).toHaveCSS(
+              "overflow-y", variant !== "line" && placement === "top" ? "hidden" : "auto",
+            );
+
 
             for (const frame of await frames.all()) {
               await expect(frame).toHaveCSS("height", "34px");
@@ -153,7 +160,7 @@ try {
       }
       await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
       await expect(page.getByRole("tablist", {name:"Explicit zero gap", exact:true})).toHaveCSS("gap", "0px");
-      async function lowerRows(frame) {
+      async function lowerRows(frame, offset = 20) {
         const rect = await frame.boundingBox();
         // Locator screenshots can capture a neighboring row because of
         // clip rounding. Sample the two pixels inside the frame
@@ -168,7 +175,7 @@ try {
           context.drawImage(image, 0, 0);
           const pixel = (y) => [...context.getImageData(x, y, 1, 1).data];
           return [pixel(bottom - 1), pixel(bottom - 2)];
-        }, { data, x: Math.floor(rect.x + 20), bottom: Math.round(rect.y + rect.height) });
+        }, { data, x: Math.floor(rect.x + offset), bottom: Math.round(rect.y + rect.height) });
       }
       for (const variant of ["card", "editable-card"]) {
         const region = page.getByTestId(`${variant}-medium-top`);
@@ -194,16 +201,30 @@ try {
         const inactiveTab = inactiveFrame.getByRole("tab");
         await inactiveTab.hover();
         const [inactiveEdge, inactiveFill] = await lowerRows(inactiveFrame);
-        const [border, fill] = await inactiveTab.evaluate((tab) => [
-          getComputedStyle(tab.parentElement).borderBottomColor,
-          getComputedStyle(tab).backgroundColor,
-        ].map(color => color.match(/\d+/g).map(Number)));
-        // Gray hover reaches the unchanged stroke without a white seam.
-        expect(inactiveEdge).toEqual([...border, 255]);
+        const fill = await inactiveTab.evaluate(tab => getComputedStyle(tab).backgroundColor.match(/\d+/g).map(Number));
+        // The frame bottom now lands on the uninterrupted list divider.
+        // Its own border is transparent; gray reaches the only visible stroke.
+        await expect(inactiveFrame).toHaveCSS("border-bottom-color", "rgba(0, 0, 0, 0)");
+        const divider = await inactiveFrame.evaluate(frame =>
+          getComputedStyle(frame.parentElement).borderBottomColor.match(/\d+/g).map(Number));
+        expect(inactiveEdge).toEqual([...divider, 255]);
+        const [gapEdge] = await lowerRows(inactiveFrame, -2);
+        expect(gapEdge).toEqual(inactiveEdge);
+        expect(await inactiveFrame.evaluate(frame =>
+          frame.getBoundingClientRect().bottom - frame.parentElement.getBoundingClientRect().bottom
+        )).toBeCloseTo(0);
         expect(inactiveFill).toEqual([...fill, 255]);
         expect(inactiveFill).not.toEqual(activeIdle[1]);
         await expect(inactiveFrame).toHaveCSS("border-bottom-width", "1px");
         await region.screenshot({path:`artifacts/tabs-browser/${name}-${variant}-hover.png`});
+        await region.evaluate(node => { node.style.width = "145px"; });
+        const list = region.getByRole("tablist");
+        await expect.poll(() => list.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
+        await activeTab.focus();
+        await page.keyboard.press("ArrowRight");
+        await expect(inactiveTab).toBeFocused();
+        await expect.poll(() => list.evaluate(el => el.scrollTop)).toBe(0);
+
         await region.evaluate((node) => {
           for (const prop of ["position", "top", "left", "width", "z-index"]) node.style.removeProperty(prop);
         });

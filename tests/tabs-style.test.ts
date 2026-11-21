@@ -50,3 +50,15 @@ it("keeps the tab trigger transparent on active card hover", () => {
   const active = root + " > .mt-tab-bar > .mt-tab-list > .mt-tab-item[data-active]";
   expect(declarations(active + " > .mt-tab:hover")).toEqual({"background-color": "transparent"});
 });
+
+it("moves only inactive top cards down 1px without painting a second bottom edge", () => {
+  const list = root + '[data-placement="top"] > .mt-tab-bar > .mt-tab-list';
+  expect(declarations(list)["overflow-y"]).toBe("hidden");
+  const inactive = list + " > .mt-tab-item:not([data-active])";
+  const rule = declarations(inactive);
+  expect(rule["border-bottom-color"]).toBe("transparent");
+  expect(rule["background-clip"]).toBe("padding-box");
+  expect(rule.position).toBe("relative");
+  expect(rule.top).toBe("1px");
+  expect(rule.height).toBeUndefined();
+});

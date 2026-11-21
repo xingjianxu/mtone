@@ -276,6 +276,20 @@
   margin-inline: 3px;
 }
 
+/* Keep horizontal scrolling, but do not scroll the one-pixel decorative overlap. */
+.mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list {
+  overflow-y: hidden;
+}
+
+/* Only top tabs meet a divider below their frames. Preserve the border's
+   geometry, but let the list divider show through the unpainted bottom. */
+.mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item:not([data-active]) {
+  position: relative;
+  top: 1px;
+  border-bottom-color: transparent;
+  background-clip: padding-box;
+}
+
 /* Keep the selected card's own background visible through the tab trigger. */
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"]) > .mt-tab-bar > .mt-tab-list > .mt-tab-item[data-active] > .mt-tab:hover {
   background-color: transparent;
