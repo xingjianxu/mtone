@@ -265,3 +265,13 @@
   line-height: 20px;
   border-radius: 4px 4px 0 0;
 }
+
+/* The active top card's one-pixel seam is white at rest. Carry the hovered
+   tab fill through that seam without moving or recoloring the card border. */
+.mt-tabs[data-variant="editable-card"][data-placement="top"]
+  > .mt-tab-bar
+  > .mt-tab-list
+  > .mt-tab-item[data-active]
+  > .mt-tab:hover:not(:disabled):not([data-disabled]) {
+  box-shadow: 0 1px 0 var(--mt-hover, #f1f1ef);
+}

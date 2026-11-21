@@ -112,7 +112,42 @@ try {
       await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "28px");
       await expect(page.getByRole("tab", {name:"Line tab", exact:true})).toHaveCSS("padding-top", "9px");
       await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
-      await page.getByTestId("editable-card-medium-top").screenshot({path:`artifacts/tabs-browser/${name}-compact-card.png`});
+      const editable = page.getByTestId("editable-card-medium-top");
+      // Pixel sampling needs an integer origin; this fixture follows many
+      // fractional-height sections that can otherwise include the list's line.
+      await editable.evaluate((node) => Object.assign(node.style, {
+        position: "fixed", top: "24px", left: "24px", width: "380px", zIndex: "10",
+      }));
+      async function lowerRows(frame) {
+        return page.evaluate(async (data) => {
+          const image = await createImageBitmap(await (await fetch("data:image/png;base64," + data)).blob());
+          const canvas = document.createElement("canvas");
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const context = canvas.getContext("2d");
+          context.drawImage(image, 0, 0);
+          const pixel = (y) => [...context.getImageData(20, y, 1, 1).data];
+          return [pixel(image.height - 1), pixel(image.height - 2)];
+        }, (await frame.screenshot()).toString("base64"));
+      }
+      const activeFrame = editable.locator(".mt-tab-item[data-active]");
+      const inactiveFrame = editable.locator(".mt-tab-item:not([data-active])").first();
+      await page.mouse.move(0, 0);
+      const [idleEdge] = await lowerRows(activeFrame);
+      await activeFrame.getByRole("tab").hover();
+      const [activeEdge, activeFill] = await lowerRows(activeFrame);
+      expect(activeEdge).toEqual(activeFill);
+      expect(activeEdge).not.toEqual(idleEdge);
+      await editable.screenshot({path:`artifacts/tabs-browser/${name}-compact-card.png`});
+      await inactiveFrame.getByRole("tab").hover();
+      const [inactiveEdge, inactiveFill] = await lowerRows(inactiveFrame);
+      // The inactive stroke should stay visible; the gray hover reaches it directly.
+      const expectedBorder = await inactiveFrame.evaluate((node) =>
+        getComputedStyle(node).borderBottomColor.match(/\d+/g).map(Number),
+      );
+      expect(inactiveEdge).toEqual([...expectedBorder, 255]);
+      expect(inactiveFill).toEqual(activeFill);
+      await expect(inactiveFrame).toHaveCSS("border-bottom-width", "1px");
       if (errors.length) throw Error(errors.join("\n"));
       console.log(`${name}: Tabs passed`);
     } catch (e) {
