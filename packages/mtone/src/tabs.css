@@ -281,11 +281,14 @@
   overflow-y: hidden;
 }
 
-/* Only top tabs meet a divider below their frames. Preserve the border's
-   geometry, but let the list divider show through the unpainted bottom. */
-.mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item:not([data-active]) {
+/* Align both states one pixel down where the divider meets the top cards. */
+.mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item {
   position: relative;
   top: 1px;
+}
+
+/* Preserve the inactive border geometry without painting a second stroke. */
+.mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item:not([data-active]) {
   border-bottom-color: transparent;
   background-clip: padding-box;
 }

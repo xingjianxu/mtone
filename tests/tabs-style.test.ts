@@ -51,14 +51,16 @@ it("keeps the tab trigger transparent on active card hover", () => {
   expect(declarations(active + " > .mt-tab:hover")).toEqual({"background-color": "transparent"});
 });
 
-it("moves only inactive top cards down 1px without painting a second bottom edge", () => {
+it("aligns selected and inactive top cards 1px down and preserves inactive border treatment", () => {
   const list = root + '[data-placement="top"] > .mt-tab-bar > .mt-tab-list';
   expect(declarations(list)["overflow-y"]).toBe("hidden");
   const inactive = list + " > .mt-tab-item:not([data-active])";
   const rule = declarations(inactive);
   expect(rule["border-bottom-color"]).toBe("transparent");
   expect(rule["background-clip"]).toBe("padding-box");
-  expect(rule.position).toBe("relative");
-  expect(rule.top).toBe("1px");
+  const item = declarations(list + " > .mt-tab-item");
+  expect(item).toEqual({position:"relative",top:"1px"});
+  expect(rule.position).toBeUndefined();
+  expect(rule.top).toBeUndefined();
   expect(rule.height).toBeUndefined();
 });

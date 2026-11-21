@@ -103,7 +103,12 @@ try {
             expect(spacing).toBeCloseTo(variant === "line" ? 6 : 4);
             const secondOffset = await frames.evaluateAll(([a, b]) =>
               b.getBoundingClientRect().top - a.getBoundingClientRect().top);
-            if (!vertical) expect(secondOffset).toBeCloseTo(variant !== "line" && placement === "top" ? 1 : 0);
+            if (!vertical) expect(secondOffset).toBeCloseTo(0);
+            if (placement === "top") {
+              const selectedOffset = await frames.first().evaluate(frame =>
+                frame.getBoundingClientRect().top - frame.parentElement.getBoundingClientRect().top);
+              expect(selectedOffset).toBeCloseTo(variant === "line" ? 0 : 1);
+            }
             await expect(region.getByRole("tablist")).toHaveCSS(
               "overflow-y", variant !== "line" && placement === "top" ? "hidden" : "auto",
             );
@@ -208,6 +213,8 @@ try {
         const divider = await inactiveFrame.evaluate(frame =>
           getComputedStyle(frame.parentElement).borderBottomColor.match(/\d+/g).map(Number));
         expect(inactiveEdge).toEqual([...divider, 255]);
+        expect(activeIdle[0]).toEqual(inactiveEdge);
+        expect(activeIdle[1]).not.toEqual(inactiveFill);
         const [gapEdge] = await lowerRows(inactiveFrame, -2);
         expect(gapEdge).toEqual(inactiveEdge);
         expect(await inactiveFrame.evaluate(frame =>
