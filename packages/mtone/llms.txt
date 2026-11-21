@@ -11,7 +11,7 @@ This file describes this package checkout, not necessarily the latest published 
 - Named imports: import { Button, MtoneProvider } from "@bixlab/mtone";
 - Import precompiled CSS once: import "@bixlab/mtone/styles.css";
 - Consumers do not need to install/configure Tailwind or copy component source. Base UI and Lucide are package dependencies.
-- Optional provider: <MtoneProvider locale="zh"><Button>保存</Button></MtoneProvider>. Locale: zh | en. Default single-line controls use a unified 34px baseline; density is no longer a provider prop. Independent size variants and CSS token customization remain available. Provider tokens are CSS custom properties.
+- Optional provider: <MtoneProvider locale="zh"><Button>保存</Button></MtoneProvider>. Locale: zh | en. Default single-line controls use a unified 32px baseline; density is no longer a provider prop. Independent size variants and CSS token customization remain available. Provider tokens are CSS custom properties.
 - Color theme: <MtoneProvider theme="system">…</MtoneProvider> follows the OS in real time. Use light or dark to override. Without an explicit theme, top-level providers remain light; nested MtoneScope can override and floats inherit their React scope. The library does not store the choice.
 - Interactive components need a client boundary in React Server Component frameworks.
 
@@ -136,7 +136,7 @@ import { Questionnaire } from "@bixlab/mtone";
 - showLine / showIcon: boolean / boolean (default: false). 树连接线和节点图标；图标来自节点 icon。
 - titleRender: (node: TreeItem) => ReactNode. 自定义树节点标题。
 - height / virtual: number / boolean. 树面板高度和窗口化渲染开关；高度默认 256px，virtual 默认 true。
-- size: "sm" | "md" | "lg" (default: "md"). 触发器高度为 24 / 34 / 34px。
+- size: "sm" | "md" | "lg" (default: "md"). 触发器高度为 24 / 32 / 34px。
 - status: "error" | "warning". 校验边框状态。
 - placement: "bottom-start" | "bottom-end" | "top-start" | "top-end" (default: "bottom-start"). 弹层的方向与逻辑对齐。
 - dropdownWidth: CSSProperties["width"]. 指定弹层宽度；默认跟随触发器，最小 180px 且受视口约束。
@@ -278,7 +278,7 @@ export default function Demo() {
 - disabled / readOnly: boolean (default: false). 禁用或只读；不允许修改值。弹出式 Cascader 不打开弹层
 - open / defaultOpen / onOpenChange: boolean / boolean / (open:boolean)=>void (default: false). 仅 Cascader：控制弹层
 - placeholder / allowClear / onClear: string / boolean / ()=>void (default: 本地化提示 / false). 仅 Cascader：提示文字、清除按钮及清除回调
-- size / status: "sm" | "md" | "lg" / "error" | "warning" (default: md). 仅 Cascader：高度 24 / 34 / 34px，及校验状态
+- size / status: "sm" | "md" | "lg" / "error" | "warning" (default: md). 仅 Cascader：高度 24 / 32 / 34px，及校验状态
 - placement: "bottom-start" | "bottom-end" | "top-start" | "top-end" (default: bottom-start). 仅 Cascader：弹层位置
 - showCheckedStrategy: "parent" | "leaf" (default: parent). 仅 Cascader：多选标签合并父级或展示叶级，不改变回调的叶路径数组
 - maxTagCount: number (default: 3). 仅 Cascader：最大可见标签数，其余显示计数
@@ -380,7 +380,7 @@ export default function Demo() {
 - autoHighlight / backfill: boolean (default: false). 自动首项高亮 / 键盘临时回填
 - allowClear / onClear: boolean / ()=>void (default: false). 清除按钮及回调
 - loading / notFoundContent: boolean / ReactNode (default: false / 本地化空状态). 加载状态和无结果内容
-- size / status: sm | md | lg / error | warning (default: md). 高度24/34/34px和校验状态
+- size / status: sm | md | lg / error | warning (default: md). 高度24/32/34px和校验状态
 - prefix / suffix: ReactNode (default: —). 输入前后装饰
 - placement / popupWidth: top | bottom / number (default: bottom / 跟随输入). 浮层方向/像素宽度
 - popupClassName / popupStyle: string / CSSProperties (default: —). 浮层样式
@@ -939,7 +939,7 @@ export default function Demo() {
 - children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes. 各区域均可嵌套内容和覆盖样式；默认不生成主体 Footer，显式组合 AdminLayout.Footer 时显示，默认高度 42px。
 - 主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。
 - 使用 AdminLayout.Sider、AdminLayout.Header、AdminLayout.Content、AdminLayout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。
-- AdminLayout.Sider 复用本库 Sidebar 的状态、34px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。
+- AdminLayout.Sider 复用本库 Sidebar 的状态、32px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。
 - 默认头部 48px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌、侧栏底部版本/折叠行与顶部操作保持可见。
 - 响应式收起为图标窄栏，不是弹出式抽屉。breakpoint 按浏览器视口判断，不按示例容器宽度判断；希望自定义手机抽屉时可组合已有 Drawer。
 - 受控状态必须在 onCollapsedChange 中更新，否则切换只发出请求。导航、路由、数据保存、账号菜单与持久化由应用实现。
@@ -990,7 +990,7 @@ export default function Demo() {
 - [Button](https://xingjianxu.github.io/mtone/#/components/Button): 带完整样式的基础操作按钮，支持可选的按下状态。
 - Import: Button from @bixlab/mtone
 - variant: "blue" | "solid" | "outline" | "soft" | "ghost" (default: outline). 按钮外观。
-- size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
+- size: ButtonSize (default: normal). small / normal / large 分别高 28 / 32 / 36px；接受旧别名 sm / md / lg。未设置时继承 ButtonGroup，组外为 normal。
 - iconOnly: boolean (default: false). 仅图标的等宽高模式；必须通过 aria-label 或 aria-labelledby 提供操作名称。复用 Button 的尺寸、变体、加载与切换行为。
 - danger: boolean. 危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。
 - loading: boolean. 显示加载图标并禁用点击。
@@ -1004,6 +1004,7 @@ export default function Demo() {
 - disabled: boolean. 禁用按钮。
 - onClick: MouseEventHandler. 点击回调。
 - children: ReactNode. 组件内容。
+- 文字按钮行高为 20px，标准带边框样式的上下内边距为 3 / 5 / 7px；纯图标按钮与高度等宽，不添加内边距。normal 可用 --mt-height 覆盖。
 - 未开启 toggle 时保留普通按钮行为，不接管应用手动设置的 aria-pressed。开启时由 Button 提供 aria-pressed。保留前后状态一致的按钮名；纯图标使用固定 aria-label 或 aria-labelledby。
 - 图标模式不改变按钮背景，切换图标替代左侧 leftSection 与 icon，加载指示器优先，rightSection 保留。preset 和自定义图标对互斥；建议自定义图标两态同尺寸，且不要传入可交互内容。
 - 例如 <Button toggle>仅显示未读</Button> 或 <Button iconOnly aria-label="收藏" toggle={{ mode: "icon", preset: "star" }} />。
@@ -1046,11 +1047,12 @@ export default function Demo() {
 
 - [ButtonGroup](https://xingjianxu.github.io/mtone/#/components/ButtonGroup): 将关联按钮组织为一个操作组，支持默认分开排列或相连组合。
 - Import: ButtonGroup, Button, Menu from @bixlab/mtone
+- size: ButtonSize. 未单独设置尺寸的 Button 会继承，含 Menu 的 Button 触发器；支持 small / normal / large 与 sm / md / lg，外层未设置时为 normal。
 - connected: boolean (default: false). 相连样式：移除间距、共享边框，仅保留外侧圆角。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
 - Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。
-- 默认保留 4px 间距。相连模式请直接放置同尺寸的 Button（可使用 iconOnly），不要增加包裹元素。
+- 默认保留 4px 间距。相连模式请直接放置 Button（可使用 iconOnly）；在 ButtonGroup 设置 size 可统一尺寸，子按钮显式 size 会覆盖继承值。
 - 使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。
 - 危险实心按钮使用 <Button danger variant="solid">删除</Button>。
 
@@ -1102,7 +1104,7 @@ export default function Demo() {
 - Input.OTP: length / mask / separator: number / boolean / ReactNode. 默认6格，限制1–32；mask 使用原生密码显示，separator 在格间显示装饰。
 - Input.OTP: inputMode / name / form / disabled / readOnly: native attributes. inputMode 默认 numeric，仅作为键盘提示，不限制内容；name 通过隐藏字段提交整串值。
 - Input.OTP: controlSize / ref / aria-label: 'sm' | 'md' | 'lg' / Ref<HTMLInputElement> / string. ref 指向第一格；为验证码组提供可访问名称。
-- 默认单行34px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。
+- 默认单行32px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。
 - Input.Search 是搜索子组件；SearchInput 是同一组件的兼容导出。Input.TextArea 与 Textarea 也是同一组件；新代码推荐子组件写法。
 - 原生 size、type、name、form、aria-* 和原生 ref 保留。className/style 面向原生输入，不代表外层容器。
 - Input.OTP 支持粘贴、组合输入、方向键与删除；删除会将后续字符前移，不保留空格占位。空白字符会移除。mask 不提供任意字符替换。
@@ -1134,7 +1136,7 @@ export default function Demo() {
 - disabled / readOnly: boolean. 禁用或只读。
 - aria-label / id: string. 可访问名称或与 label 关联的标识。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 默认单行外框高度为 34px（含边框），搜索图标垂直居中，可通过 --mt-height 定制。
+- 默认单行外框高度为 32px（含边框），搜索图标垂直居中，可通过 --mt-height 定制。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 支持对应原生输入元素属性和 ref。占位提示不能替代标签。
 
@@ -1411,7 +1413,7 @@ export default function Demo() {
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
-- 默认单行外框高度为 34px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。
+- 默认单行外框高度为 32px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 支持键盘选择、禁用选项和焦点恢复。
 - 选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。
@@ -1441,7 +1443,7 @@ export default function Demo() {
 - expanded / defaultExpanded: boolean. 受控展开状态或初始展开状态，默认折叠。
 - onExpandedChange: (expanded: boolean) => void. 请求切换展开状态时触发。
 - expandLabel / collapseLabel: string. 展开与收起按钮文字，默认「展开」与「收起」。
-- 选项按钮、展开按钮及单行折叠视口统一采用 34px 基准高度。建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。
+- 选项按钮、展开按钮及单行折叠视口统一采用 32px 基准高度。建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。
 
 ```tsx
 import { TagSelect } from "@bixlab/mtone";
@@ -1472,7 +1474,7 @@ export default function Demo() {
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
-- 默认单行外框最小高度为 34px（含边框）；多个标签换行时自动增高，不强制裁剪为 34px；可用 className 定制。
+- 默认单行外框最小高度为 32px（含边框）；多个标签换行时自动增高，不强制裁剪为 32px；可用 className 定制。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。
 
@@ -1526,7 +1528,7 @@ export default function Demo() {
 - onValueChange: (value: number | null) => void. 值变化回调。
 - min / max: number. 数值下限与上限。
 - step: number. 步进大小。
-- 默认整体外框高度为 34px（含边框），增减按钮位于边框内。可用 className 定制尺寸。
+- 默认整体外框高度为 32px（含边框），增减按钮位于边框内。可用 className 定制尺寸。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 清空时 value 可为 null；defaultValue 应传 number。
 
@@ -1555,7 +1557,7 @@ export default function Demo() {
 - min / max: string. ISO YYYY-MM-DD 日期边界。
 - disabledDate: (date: string) => boolean. 返回 true 的日期在选择后被拒绝。
 - clearable: boolean (default: true). 显示清除按钮。
-- 默认单行输入外框高度为 34px（含边框），可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。
+- 默认单行输入外框高度为 32px（含边框），可通过 --mt-height 定制。原生日历弹层尺寸由浏览器决定。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
 - 值为 YYYY-MM-DD，清空返回空字符串，不进行 UTC 转换。
 - 日历外观和键盘操作由浏览器决定；disabledDate 不会在原生日历中绘制禁用状态。
@@ -1587,7 +1589,7 @@ export default function Demo() {
 - collapseLabel / expandLabel: string (default: 收起侧边栏 / 展开侧边栏). 切换按钮的可访问名称和提示，可本地化。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- NavItem 默认行高为 34px，图标与文字垂直居中。相邻项间距不变，分组标题和分隔线不受行高影响。
+- NavItem 默认行高为 32px，图标与文字垂直居中。相邻项间距不变，分组标题和分隔线不受行高影响。
 - 收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题与标题操作，保留默认分组分隔（可用 divider={false} 关闭）。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。
 - 收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。
 - 受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。
@@ -1617,7 +1619,7 @@ export default function Demo() {
 - children: ReactNode. 组件内容。
 - 原生属性: ButtonHTMLAttributes | AnchorHTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
 - 当前页使用灰色圆角底和逻辑起始侧蓝色竖标；悬停不显示竖标。
-- 默认行高 34px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。
+- 默认行高 32px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。
 - 尾部操作不触发导航。建议使用提供可访问名称的 Button iconOnly；Sidebar 的图标窄栏隐藏尾部操作，窄栏子菜单弹层中的完整行仍显示。
 - 不提供 href 时仍为按钮。ref 指向实际 button 或 a；组件不接管路由。
 
@@ -1664,7 +1666,7 @@ export default function Demo() {
 - actions: ReactNode. 标题行末端的独立操作。可传入一个控件，或用片段组合多个控件；无标题时仍可单独显示。收起的 Sidebar 隐藏此操作区。
 - children: ReactNode. 组件内容。
 - 组前分隔线是装饰，不会出现在无障碍树中。独立导航和 Sidebar 展开、收起时均支持相邻组分隔；有其它导航项隔开时不画线。
-- 组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距。首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。
+- 组内 NavItem 默认行高 32px，相邻项仍保留 3px 间距。首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。
 - 标题操作不触发导航项；建议使用 size="sm"、variant="ghost" 的 Button iconOnly 并提供可访问名称。操作区与标题分开布局，过长的标题会截断。
 
 ```tsx
@@ -1815,16 +1817,16 @@ export default function Demo() {
 
 ### Tabs
 
-- [Tabs](https://xingjianxu.github.io/mtone/#/components/Tabs): 中性风格的标签切换，支持卡片编辑、多方向布局和溢出导航。
+- [Tabs](https://xingjianxu.github.io/mtone/#/components/Tabs): 中性风格的标签切换，支持顶部贴合、卡片编辑、多方向布局和溢出导航。
 - Import: Tabs from @bixlab/mtone
 - items: TabItem[]. 必填；value、label、content，另可设 disabled、icon、closable、closeLabel、forceRender、destroyOnHidden。
 - value / defaultValue: string. 受控/初始值；省略时选择首个未禁用项。
 - onValueChange: (value: string) => void. 用户切换及非受控有效回退时触发。
 - placement: "top" | "bottom" | "start" | "end". 默认 top；start/end 为逻辑方向。
-- variant: "line" | "card" | "editable-card". 默认 line。
-- size: "small" | "medium" | "large". 默认 medium。所有变体、尺寸和位置的标签项外高均为 34px（含边框）；size 仍区分字号。
-- indicatorColor: TabsIndicatorColor (default: currentColor). 仅 line 的选中指示线颜色。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。
-- centered / gap: boolean / number. 居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认 line 为 6px，card/editable-card 为 4px。
+- variant: "line" | "card" | "editable-card" | "attached". 默认 line。attached 的顶部选中项与内容区相接；bottom/start/end 保留指定位置并使用 line 样式。
+- size: "small" | "medium" | "large". 默认 medium。所有变体、尺寸和位置的标签项外高均为 32px（含边框）；size 仍区分字号。
+- indicatorColor: TabsIndicatorColor (default: currentColor). 使用 line 样式时的选中指示线颜色，包含 attached 在非顶部位置的线型回退。支持主题预设 neutral/blue/green/orange/red/purple/teal，或任意有效 CSS 颜色；不改变基准线和文字颜色。
+- centered / gap: boolean / number. 居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认线型为 6px，card/editable-card 和顶部 attached 为 4px。
 - extraStart / extraEnd: ReactNode. 导航栏前后附加内容。
 - activateOnFocus: boolean. 默认 false，方向键移动焦点不立即切换。
 - destroyOnHidden: boolean. 默认 true，卸载隐藏面板；false 保留已访问面板状态。
@@ -1840,6 +1842,7 @@ export default function Demo() {
 - 非受控选中项被删除或禁用时切换到首个可用项；无可用项时不选中且不发送字符串 null。受控模式由应用更新 value，非法或禁用 value 不自动纠正。
 - editable-card 的增删只发送回调，不修改 items；应用需更新列表，并在受控模式下选中有效新值。关闭按钮不会选择被关闭标签。
 - 主题通过 --mt-accent-* 为指示线和其他组件提供共享色；可在 MtoneProvider tokens 内覆盖。强制色彩模式保留系统可见线条。
+- 顶部 attached 使用淡底导航栏和单条分隔线。选中项保留上边与左右边，悬停仍使用面板底色；未选中项透明无描边。
 - 线型标签文字两侧各保留 6px 外边距。卡片式与可编辑卡片式的选中标签悬停时保持原背景。
 - 溢出时保留原生滚动条并提供更多菜单（列出全部标签）；垂直导航默认最大高度320px，可用 --mt-tabs-max-height 调整。
 - 默认方向键只移动焦点，Enter/Space 激活；activateOnFocus 可改为自动激活。启用排序后 Alt+Shift+方向键请求相邻排序，原生拖放不支持触摸；回调由应用更新 items。
@@ -1879,7 +1882,7 @@ export default function Demo() {
 - Import: FilterChip from @bixlab/mtone
 - children: ReactNode. 组件内容。
 - onRemove: () => void. 必填；移除请求，由应用更新条件。
-- 默认单行外框高度为 34px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。
+- 默认单行外框高度为 32px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。
 - 点击移除不会自行隐藏，应用负责更新状态。
 
 ```tsx

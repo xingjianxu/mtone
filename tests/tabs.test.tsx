@@ -195,3 +195,14 @@ describe("line indicator color", () => {
     expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("");
   });
 });
+
+it.each(["bottom", "start", "end"] as const)(
+  "attached uses line presentation at %s without changing placement or orientation",
+  (placement) => {
+    const { container } = render(<Tabs variant="attached" placement={placement} items={items} />);
+    expect(container.firstChild).toHaveAttribute("data-variant", "line");
+    expect(container.firstChild).toHaveAttribute("data-placement", placement);
+    const orientation = screen.getByRole("tablist").getAttribute("aria-orientation") ?? "horizontal";
+    expect(orientation).toBe(placement === "bottom" ? "horizontal" : "vertical");
+  },
+);

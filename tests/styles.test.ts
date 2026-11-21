@@ -86,16 +86,19 @@ it('uses border color only for all bordered input focus surfaces', () => {
 it('uses border-box standard single-line surfaces without fixing multiline chips', () => {
  const css=readFileSync('packages/mtone/src/interactive.css','utf8');
  const select=css.slice(css.indexOf('.mt-select {')).split('}')[0];
- expect(select).toContain('height: var(--mt-height, 34px)');
- const group=css.slice(css.indexOf('.mt-number-group {')).split('}')[0];
- expect(group).toContain('height: var(--mt-height, 34px)');
+ expect(select).toContain('height: var(--mt-height, 32px)');
+ const group=css.slice(css.lastIndexOf('.mt-number-group {')).split('}')[0];
+ expect(group).toContain('height: var(--mt-height, 32px)');
+ expect(css.slice(css.indexOf('.mt-number-input {')).split('}')[0]).toContain('line-height: 20px');
  const step=css.slice(css.indexOf('.mt-number-step {')).split('}')[0];
- expect(step).toContain('height: calc(var(--mt-height, 34px) - 2px)');
+ expect(step).toContain('height: calc(var(--mt-height, 32px) - 2px)');
  const multi=css.slice(css.indexOf('.mt-multiselect {')).split('}')[0];
- expect(multi).toContain('flex-wrap: wrap');expect(multi).not.toContain('height:');
+ expect(multi).toContain('flex-wrap: wrap');
+ expect(multi).toContain('min-height: var(--mt-height, 32px)');
+ expect(multi).not.toMatch(/^\s*height:/m);
  const base=readFileSync('packages/mtone/src/styles.css','utf8');
  const filter=base.slice(base.indexOf('.mt-filter-chip {')).split('}')[0];
- expect(filter).toContain('height: var(--mt-height, 34px)');expect(filter).toContain('box-sizing: border-box');
+ expect(filter).toContain('height: var(--mt-height, 32px)');expect(filter).toContain('box-sizing: border-box');
 });
 
 it('reserves menu icon columns for all grouped rows of a panel with rendered icons',()=>{

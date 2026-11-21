@@ -34,7 +34,7 @@ try {
     }));
     const activeTypography = await parentTypography();
     assert(activeTypography.label > activeTypography.row);
-    assert.deepEqual([activeTypography.icon, activeTypography.height, activeTypography.marker], [activeTypography.row, 34, "none"]);
+    assert.deepEqual([activeTypography.icon, activeTypography.height, activeTypography.marker], [activeTypography.row, 32, "none"]);
     const paint = await current.evaluate((button) => {
       const marker = getComputedStyle(button, "::before");
       const probe = document.createElement("span");
@@ -52,7 +52,7 @@ try {
         bg: getComputedStyle(button).backgroundColor,
       };
     });
-    assert.deepEqual([paint.height, paint.radius, paint.direction], [34, "6px", scenario.rtl ? "rtl" : "ltr"]);
+    assert.deepEqual([paint.height, paint.radius, paint.direction], [32, "6px", scenario.rtl ? "rtl" : "ltr"]);
     assert(paint.marker === paint.blue && parseFloat(paint.start) < 0 && paint.bg !== "rgba(0, 0, 0, 0)", JSON.stringify(paint));
     if (!scenario.touch && engine === chromium) {
       await page.emulateMedia({ forcedColors: "active" });
@@ -222,9 +222,9 @@ try {
       archive: await archive.boundingBox(),
     });
     const normal = await boxes();
-    assert.equal(normal.row.height, 34);
-    assert.equal(normal.row.y - (await actionsPage.getByRole("button", { name: "Before" }).boundingBox()).y, 37);
-    assert.equal((await actionsPage.getByRole("button", { name: "After" }).boundingBox()).y - normal.row.y, 37);
+    assert.equal(normal.row.height, 32);
+    assert.equal(normal.row.y - (await actionsPage.getByRole("button", { name: "Before" }).boundingBox()).y, normal.row.height + 3);
+    assert.equal((await actionsPage.getByRole("button", { name: "After" }).boundingBox()).y - normal.row.y, normal.row.height + 3);
     assert(rtl ? normal.edit.x < normal.item.x : normal.edit.x > normal.item.x);
     assert(rtl ? normal.archive.x < normal.edit.x : normal.archive.x > normal.edit.x);
     assert(await destination.locator(".mt-nav-item-label").evaluate((label) => label.scrollWidth > label.clientWidth));

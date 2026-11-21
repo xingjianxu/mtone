@@ -17,7 +17,7 @@ export default function Demo() {
 
   return (
     <div style={stackStyle}>
-      <M.ButtonGroup connected aria-label="相连文档操作">
+      <M.ButtonGroup connected size="small" aria-label="相连文档操作">
         <M.Button onClick={() => setNotice("已选择复制")}>复制</M.Button>
         <M.Button onClick={() => setNotice("已选择粘贴")}>粘贴</M.Button>
         <M.Button onClick={() => setNotice("已选择归档")}>归档</M.Button>

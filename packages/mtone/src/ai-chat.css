@@ -164,7 +164,7 @@
 .mt-ai-suggestion {
   white-space: normal;
   height: auto;
-  min-height: var(--mt-height, 34px);
+  min-height: var(--mt-height, 32px);
   overflow-wrap: anywhere;
   text-align: start;
   max-width: 100%;

@@ -20,7 +20,7 @@ const lines = [
 '- Named imports: import { Button, MtoneProvider } from "@bixlab/mtone";',
 '- Import precompiled CSS once: import "@bixlab/mtone/styles.css";',
 "- Consumers do not need to install/configure Tailwind or copy component source. Base UI and Lucide are package dependencies.",
-'- Optional provider: <MtoneProvider locale="zh"><Button>保存</Button></MtoneProvider>. Locale: zh | en. Default single-line controls use a unified 34px baseline; density is no longer a provider prop. Independent size variants and CSS token customization remain available. Provider tokens are CSS custom properties.',
+'- Optional provider: <MtoneProvider locale="zh"><Button>保存</Button></MtoneProvider>. Locale: zh | en. Default single-line controls use a unified 32px baseline; density is no longer a provider prop. Independent size variants and CSS token customization remain available. Provider tokens are CSS custom properties.',
 '- Color theme: <MtoneProvider theme="system">…</MtoneProvider> follows the OS in real time. Use light or dark to override. Without an explicit theme, top-level providers remain light; nested MtoneScope can override and floats inherit their React scope. The library does not store the choice.',
 "- Interactive components need a client boundary in React Server Component frameworks.",
 "",

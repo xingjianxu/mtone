@@ -97,13 +97,21 @@ export type ButtonToggleOptions =
       onIcon: React.ReactNode;
     };
 
+export type ButtonSize = "small" | "normal" | "large" | "sm" | "md" | "lg";
+
+const buttonSizeClass = {
+  small: "sm", normal: "md", large: "lg",
+  sm: "sm", md: "md", lg: "lg",
+} as const satisfies Record<ButtonSize, string>;
+const ButtonSizeContext = React.createContext<ButtonSize>("normal");
+
 export type ButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof BaseButton>,
   "className"
 > & {
   className?: string;
   variant?: "blue" | "solid" | "outline" | "soft" | "ghost";
-  size?: "sm" | "md" | "lg";
+  size?: ButtonSize;
   /** Square icon-only mode. Provide aria-label or aria-labelledby for its accessible name. */
   iconOnly?: boolean;
   danger?: boolean;
@@ -127,7 +135,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
       variant = "outline",
-      size = "md",
+      size,
       iconOnly,
       danger,
       loading,
@@ -146,6 +154,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) {
+    const groupSize = React.useContext(ButtonSizeContext);
     const [localPressed, setLocalPressed] = React.useState(defaultPressed);
     const isPressed = pressed ?? localPressed;
     const effectiveDisabled = useFieldsetDisabled(disabled) || loading;
@@ -197,7 +206,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           "mt-btn",
           `mt-btn-${variant}`,
-          `mt-size-${size}`,
+          `mt-size-${buttonSizeClass[size ?? groupSize]}`,
           iconOnly && "mt-icon-btn",
           danger && "mt-danger",
           className,
@@ -223,14 +232,22 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 export type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Join adjacent buttons, keeping only the outside corners rounded. */
   connected?: boolean;
+  /** Default size for Buttons without their own size, including composed triggers. */
+  size?: ButtonSize;
 };
-export const ButtonGroup = ({
+export function ButtonGroup({
   className,
   connected = false,
+  size,
   ...p
-}: ButtonGroupProps) => (
-  <div role="group" {...p} className={cn("mt-button-group", connected && "mt-button-group-connected", className)} />
-);
+}: ButtonGroupProps) {
+  const inheritedSize = React.useContext(ButtonSizeContext);
+  return (
+    <ButtonSizeContext.Provider value={size ?? inheritedSize}>
+      <div role="group" {...p} className={cn("mt-button-group", connected && "mt-button-group-connected", className)} />
+    </ButtonSizeContext.Provider>
+  );
+}
 export { Input, SearchInput, Textarea } from "./input";
 export type { InputProps, InputSearchProps, InputPasswordProps, InputTextAreaProps, InputOTPProps, InputVariant, InputControlSize } from "./input";
 export { Form, FormField } from "./form";

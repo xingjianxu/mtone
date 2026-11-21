@@ -9,9 +9,9 @@ const icon = <Search size={14} aria-hidden="true" />;
 createRoot(document.getElementById("root")!).render(
   <MtoneProvider>
     <div style={{ display: "flex", gap: 12, direction: "rtl" }}>
-      <Button iconOnly aria-label="Small icon" size="sm" leftSection={icon} />
+      <Button iconOnly aria-label="Small icon" size="small" leftSection={icon} />
       <Button iconOnly aria-label="Medium icon" icon={icon} />
-      <Button iconOnly aria-label="Large icon" size="lg" rightSection={icon} />
+      <Button iconOnly aria-label="Large icon" size="large" rightSection={icon} />
       <Button size="sm" leftSection={icon}>
         Text with start
       </Button>
@@ -19,6 +19,7 @@ createRoot(document.getElementById("root")!).render(
         Text with end
       </Button>
     </div>
+    <Button size="normal">Normal text</Button>
     <Alert title="Review" onClose={() => {}}>A message</Alert>
     <FilterChip onRemove={() => {}}>Project</FilterChip>
     <div style={{ "--mt-height": "40px" } as React.CSSProperties}>

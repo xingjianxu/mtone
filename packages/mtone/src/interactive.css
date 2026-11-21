@@ -82,7 +82,6 @@
   font: inherit;
   font-size: 14px;
   box-sizing: border-box;
-  min-height: var(--mt-height, 34px);
   line-height: 20px;
   border: 1px solid var(--mt-border, #e9e9e7);
   border-radius: 4px;
@@ -91,10 +90,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 3px 9px;
+  padding-inline: 9px;
+  padding-block: clamp(0px, calc((var(--mt-height, 32px) - 22px) / 2), 5px);
 }
 .mt-select {
-  height: var(--mt-height, 34px);
+  height: var(--mt-height, 32px);
   min-width: 160px;
   justify-content: space-between;
 }
@@ -165,11 +165,12 @@
   cursor: not-allowed;
 }
 .mt-multiselect {
+  min-height: var(--mt-height, 32px);
   max-width: 100%;
   flex-wrap: wrap;
   min-width: min(200px, 100%);
   gap: 4px;
-  padding: 3px 6px;
+  padding-inline: 6px;
 }
 .mt-chip {
   box-sizing: border-box;
@@ -214,7 +215,7 @@
   display: none;
 }
 .mt-number-group {
-  height: var(--mt-height, 34px);
+  height: var(--mt-height, 32px);
   padding: 0;
   gap: 0;
   overflow: hidden;
@@ -223,6 +224,7 @@
   width: 72px;
   text-align: center;
   font: inherit;
+  line-height: 20px;
   color: inherit;
   background: none;
   border: 0;
@@ -234,7 +236,7 @@
   color: inherit;
   cursor: pointer;
   width: 28px;
-  height: calc(var(--mt-height, 34px) - 2px);
+  height: calc(var(--mt-height, 32px) - 2px);
 }
 .mt-number-step:hover {
   background: var(--mt-hover, #f1f1ef);
@@ -397,8 +399,10 @@
 .mt-action {
   font: inherit;
   font-size: 14px;
-  min-height: var(--mt-height, 34px);
-  padding: 3px 10px;
+  min-height: var(--mt-height, 32px);
+  line-height: 20px;
+  padding-inline: 10px;
+  padding-block: clamp(0px, calc((var(--mt-height, 32px) - 22px) / 2), 5px);
   border: 1px solid var(--mt-border, #e9e9e7);
   border-radius: 4px;
   background: var(--mt-bg, #fff);
@@ -590,13 +594,15 @@
   justify-content: center;
   gap: 6px;
   flex: 0 0 auto;
-  height: var(--mt-height, 34px);
-  padding: 0 9px;
+  height: var(--mt-height, 32px);
+  padding-inline: 9px;
+  padding-block: clamp(0px, calc((var(--mt-height, 32px) - 22px) / 2), 5px);
   border: 1px solid transparent;
   border-radius: var(--mt-radius, 4px);
   color: var(--mt-fg, #37352f);
   background: transparent;
   font: inherit;
+  line-height: 20px;
   white-space: nowrap;
   cursor: pointer;
 }

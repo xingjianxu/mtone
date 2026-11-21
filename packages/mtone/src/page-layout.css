@@ -73,13 +73,7 @@
   min-inline-size: 0;
   max-inline-size: 100%;
   height: auto;
-  min-height: var(--mt-height, 34px);
+  min-height: var(--_mt-button-height);
   white-space: normal;
   overflow-wrap: anywhere;
-}
-:is(.mt-page-layout-actions, .mt-page-layout-extra) > .mt-btn.mt-size-sm:not(.mt-icon-btn) {
-  min-height: 24px;
-}
-:is(.mt-page-layout-actions, .mt-page-layout-extra) > .mt-btn.mt-size-lg:not(.mt-icon-btn) {
-  min-height: 36px;
 }

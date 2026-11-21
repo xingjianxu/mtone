@@ -115,12 +115,13 @@ try {
 
 
             for (const frame of await frames.all()) {
-              await expect(frame).toHaveCSS("height", "34px");
+              await expect(frame).toHaveCSS("height", "32px");
               await expect(frame).toHaveCSS("border-bottom-left-radius", "0px");
               await expect(frame).toHaveCSS("border-bottom-right-radius", "0px");
             }
             const tab = region.getByRole("tab", {name:"Icon tab", exact:true});
             await expect(tab).toHaveCSS("font-size", `${font}px`);
+            await expect(tab).toHaveCSS("line-height", "20px");
             const label = tab.locator(".mt-tab-label");
             const margin = variant === "card" ? "0px" : variant === "line" ? "6px" : "3px";
             const padding = variant === "editable-card" ? "7px" : variant === "card" || ["start", "end"].includes(placement) ? "10px" : size === "large" ? "4px" : "2px";
@@ -141,7 +142,7 @@ try {
           }
         }
       }
-      await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "34px");
+      await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "32px");
       const lineTab = page.getByRole("tab", {name:"Line tab", exact:true});
       const lineLabel = lineTab.locator("span.mt-tab-label");
       await expect(lineLabel).toHaveCSS("margin-inline-start", "6px");
@@ -163,7 +164,7 @@ try {
         }, placement === "start");
         expect(spacing).toBeCloseTo(9);
       }
-      await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
+      await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "32px");
       await expect(page.getByRole("tablist", {name:"Explicit zero gap", exact:true})).toHaveCSS("gap", "0px");
       async function lowerRows(frame, offset = 20, count = 2) {
         const rect = await frame.boundingBox();
@@ -247,8 +248,8 @@ try {
       const topList = line.getByRole("tablist");
       const selected = topList.getByRole("tab", {name:"Icon tab", exact:true});
       const adjacent = topList.getByRole("tab", {name:"Plain tab", exact:true});
-      await expect(topList).toHaveCSS("height", "35px");
-      await expect(selected).toHaveCSS("height", "34px");
+      await expect(topList).toHaveCSS("height", "33px");
+      await expect(selected).toHaveCSS("height", "32px");
       const firstBox = await selected.boundingBox();
       const nextBox = await adjacent.boundingBox();
       const barBox = await topList.boundingBox();
@@ -270,7 +271,7 @@ try {
       if (name === "chromium") {
         await page.emulateMedia({forcedColors:"active"});
         await expect(topList).toHaveCSS("border-bottom-width", "1px");
-        await expect(topList).toHaveCSS("height", "35px");
+        await expect(topList).toHaveCSS("height", "33px");
         await expect(selected).toHaveCSS("border-bottom-width", "2px");
         expect(await selected.evaluate(el => getComputedStyle(el, "::after").content)).toBe("none");
         await page.emulateMedia({forcedColors:"none"});

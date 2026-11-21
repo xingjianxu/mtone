@@ -25,6 +25,11 @@ export default function Demo() {
           ),
         )}
       </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <Button size="small">小</Button>
+        <Button size="normal">标准</Button>
+        <Button size="large">大</Button>
+      </div>
       {notice && (
         <Text role="status" muted>
           {notice}
