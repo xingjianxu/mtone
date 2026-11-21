@@ -173,3 +173,25 @@ describe("Tabs extensions", () => {
     );
   });
 });
+
+describe("line indicator color", () => {
+  it("maps preset names to shared theme tokens and accepts arbitrary CSS colors", () => {
+    const {container, rerender} = render(<Tabs items={items} indicatorColor="teal" />);
+    const root = () => container.querySelector<HTMLElement>(".mt-tabs")!;
+    expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("var(--mt-accent-teal)");
+    rerender(<Tabs items={items} indicatorColor="oklch(62% .16 33)" />);
+    expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("oklch(62% .16 33)");
+    rerender(<Tabs items={items} indicatorColor="var(--custom-color)" />);
+    expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("var(--custom-color)");
+    rerender(<Tabs items={items} />);
+    expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("");
+  });
+
+  it("does not apply line indicator props to either card variant", () => {
+    const {container, rerender} = render(<Tabs items={items} variant="card" indicatorColor="red" />);
+    const root = () => container.querySelector<HTMLElement>(".mt-tabs")!;
+    expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("");
+    rerender(<Tabs items={items} variant="editable-card" indicatorColor="red" />);
+    expect(root().style.getPropertyValue("--mt-tabs-indicator-color")).toBe("");
+  });
+});

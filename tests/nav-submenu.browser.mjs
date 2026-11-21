@@ -163,7 +163,117 @@ try {
     await expect(groups.first().locator(".mt-nav-item").nth(1)).toHaveCSS("margin-top", "3px");
   }
   await expect(spacing.getByTestId("sidebar")).toHaveCSS("padding-top", "12px");
+  const wrappedGroups = spacing.getByTestId("wrapped").locator(":scope > .mt-nav-group");
+  const standaloneGroups = spacing.getByTestId("standalone").locator(":scope > .mt-nav-group");
+  const afterItemGroup = spacing.getByTestId("after-item").locator(":scope > .mt-nav-group");
+  const divider = (group) => group.evaluate((node) => {
+    const rule = getComputedStyle(node, "::before");
+    return rule.content === "none" ? [false, null] : [true, rule.borderBlockStartWidth];
+  });
+  assert.deepEqual(await divider(standaloneGroups.first()), [false, null]);
+  assert.deepEqual(await divider(standaloneGroups.last()), [true, "1px"]);
+  assert.deepEqual(await divider(afterItemGroup), [false, null]);
+  const wrappedGroup = wrappedGroups.last();
+  assert.deepEqual(await divider(wrappedGroup), [true, "1px"]);
+  const action = spacing.getByRole("button", { name: "Add view" });
+  await action.focus();
+  await spacing.keyboard.press("Enter");
+  await expect(spacing.getByRole("button", { name: "View count: 1" })).toBeVisible();
+  assert(await wrappedGroup.evaluate((node) => {
+    const label = node.querySelector(".mt-nav-label");
+    const actions = node.querySelector(".mt-nav-group-actions");
+    const title = label.getBoundingClientRect();
+    const buttons = actions.getBoundingClientRect();
+    return label.scrollWidth > label.clientWidth && buttons.right <= title.left;
+  }), "the RTL heading action follows the truncated title at inline-end");
+  const lowerRow = spacing.getByRole("button", { name: "View count: 1" });
+  const before = (await lowerRow.boundingBox()).y;
+  const toggleDivider = spacing.getByRole("button", { name: "Toggle group divider" });
+  await toggleDivider.click();
+  assert.deepEqual(await divider(wrappedGroup), [false, null]);
+  assert.equal((await lowerRow.boundingBox()).y, before);
+  await toggleDivider.click();
+  await spacing.getByTestId("sidebar").locator(".mt-sidebar-toggle").click();
+  await expect(action).toHaveCount(0);
+  assert.deepEqual(await divider(wrappedGroup), [true, "1px"]);
+  const railBefore = (await lowerRow.boundingBox()).y;
+  await toggleDivider.click();
+  assert.deepEqual(await divider(wrappedGroup), [false, null]);
+  assert.equal((await lowerRow.boundingBox()).y, railBefore);
   await spacing.close();
+  for (const rtl of [false, true]) {
+    const actionsPage = await browser.newPage({ viewport: { width: rtl ? 320 : 640, height: 500 }, hasTouch: rtl });
+    await actionsPage.goto(`http://127.0.0.1:5286/tests/fixtures/nav-submenu.html?actions${rtl ? "&rtl" : ""}`);
+    const destination = actionsPage.getByRole("link", { name: "A very long folder name for documents" });
+    const row = destination.locator("..");
+    const edit = actionsPage.getByRole("button", { name: "Edit", exact: true });
+    const archive = actionsPage.getByRole("button", { name: "Archive", exact: true });
+    const more = actionsPage.locator("[aria-label=More]");
+    const outside = actionsPage.getByRole("button", { name: "Outside" });
+    await outside.focus();
+    await expect(edit).toBeVisible();
+    await expect(archive).toBeVisible();
+    await expect(actionsPage.getByRole("button", { name: "Edit disabled row" })).toBeVisible();
+    await expect(actionsPage.locator("[aria-label='Inactive archive']")).toBeHidden();
+    const boxes = async () => ({
+      row: await row.boundingBox(),
+      item: await destination.boundingBox(),
+      edit: await edit.boundingBox(),
+      archive: await archive.boundingBox(),
+    });
+    const normal = await boxes();
+    assert.equal(normal.row.height, 34);
+    assert.equal(normal.row.y - (await actionsPage.getByRole("button", { name: "Before" }).boundingBox()).y, 37);
+    assert.equal((await actionsPage.getByRole("button", { name: "After" }).boundingBox()).y - normal.row.y, 37);
+    assert(rtl ? normal.edit.x < normal.item.x : normal.edit.x > normal.item.x);
+    assert(rtl ? normal.archive.x < normal.edit.x : normal.archive.x > normal.edit.x);
+    assert(await destination.locator(".mt-nav-item-label").evaluate((label) => label.scrollWidth > label.clientWidth));
+    const activePaint = await row.evaluate((element) => {
+      const probe = document.createElement("span");
+      probe.style.background = "var(--mt-nav-selected)";
+      element.append(probe);
+      const matches = getComputedStyle(element).backgroundColor === getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return matches;
+    });
+    assert(activePaint);
+    if (!rtl) {
+      await expect(more).toBeHidden();
+      await row.hover();
+      await expect(more).toBeVisible();
+      assert.deepEqual(await boxes(), normal);
+      await actionsPage.mouse.move(0, 0);
+      await expect(more).toBeHidden();
+    } else {
+      await expect(more).toBeVisible();
+    }
+    await destination.focus();
+    await actionsPage.keyboard.press("Tab");
+    await expect(edit).toBeFocused();
+    await actionsPage.keyboard.press("Enter");
+    await expect(actionsPage.getByTestId("edit-count")).toHaveText("1");
+    assert(!actionsPage.url().endsWith("#destination"));
+    await actionsPage.keyboard.press("Tab");
+    await expect(more).toBeFocused();
+    await actionsPage.keyboard.press("Enter");
+    const rename = actionsPage.getByRole("button", { name: "Rename" });
+    await expect(rename).toBeVisible();
+    await rename.focus();
+    await expect(more).toBeVisible();
+    await actionsPage.keyboard.press("Escape");
+    await expect(rename).toBeHidden();
+
+    await actionsPage.locator(".mt-sidebar-toggle").click();
+    await expect(edit).toHaveCount(0);
+    await expect(destination).toHaveAttribute("href", "#destination");
+    await actionsPage.getByRole("button", { name: "Projects" }).click();
+    const popup = actionsPage.getByRole("dialog", { name: "Projects" });
+    await expect(popup.getByRole("button", { name: "Workspace" })).toBeFocused();
+    await popup.getByRole("button", { name: "Edit project" }).click();
+    await expect(actionsPage.getByTestId("edit-count")).toHaveText("2");
+    await expect(popup).toBeVisible();
+    await actionsPage.close();
+  }
   console.log("NavSubmenu inline/rail behavior, positioning, focus, touch, and selected marker passed");
 } finally {
   await browser?.close();

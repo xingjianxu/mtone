@@ -7,6 +7,7 @@ import { Tabs as BTabs } from "@base-ui/react/tabs";
 import { Menu } from "@base-ui/react/menu";
 import { Plus, X, Ellipsis } from "lucide-react";
 import { cn, useMtone, MtoneScope } from "./basic";
+import { resolveAccentColor, type MtoneAccent } from "./accent-colors";
 
 export interface TabItem {
   value: string;
@@ -19,6 +20,9 @@ export interface TabItem {
   forceRender?: boolean;
   destroyOnHidden?: boolean;
 }
+/** A theme accent preset, or any valid CSS color value. */
+export type TabsIndicatorColor = MtoneAccent | (string & {});
+
 export interface TabsProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "defaultValue" | "onChange" | "children"
@@ -31,6 +35,8 @@ export interface TabsProps extends Omit<
   placement?: "top" | "bottom" | "start" | "end";
   variant?: "line" | "card" | "editable-card";
   size?: "small" | "medium" | "large";
+  /** Color of the selected line indicator; defaults to currentColor. */
+  indicatorColor?: TabsIndicatorColor;
   centered?: boolean;
   gap?: number;
   extraStart?: React.ReactNode;
@@ -60,6 +66,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     placement = "top",
     variant = "line",
     size = "medium",
+    indicatorColor,
     centered = false,
     gap,
     extraStart,
@@ -222,6 +229,9 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
         style={
           {
             ...style,
+            ...(variant === "line" && indicatorColor !== undefined
+              ? { "--mt-tabs-indicator-color": resolveAccentColor(indicatorColor) }
+              : {}),
             ...(gap !== undefined
               ? { "--mt-tabs-gap": `${Math.max(0, gap)}px` }
               : {}),

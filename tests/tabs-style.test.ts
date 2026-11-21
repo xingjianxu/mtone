@@ -83,6 +83,6 @@ it("moves only the top line indicator down while preserving the baseline row", (
   expect(declarations(active)).toEqual({position:"relative","border-bottom-color":"transparent"});
   expect(declarations(active + "::after")).toEqual({
     content: '""', position: "absolute", "inset-inline": "0", bottom: "-3px",
-    height: "2px", background: "currentColor", "pointer-events": "none",
+    height: "2px", background: "var(--mt-tabs-indicator-color, currentColor)", "pointer-events": "none",
   });
 });

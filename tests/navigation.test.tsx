@@ -89,6 +89,58 @@ it('keeps grouped items as adjacent siblings in nested and collapsed navigation'
   expect(screen.getByRole('button', { name: 'Archive' })).toBeInTheDocument();
 });
 
+it("opts out of only a NavGroup's preceding divider without adding separator nodes", () => {
+  const { container } = render(
+    <nav>
+      <NavGroup label="Workspace"><NavItem>Inbox</NavItem></NavGroup>
+      <NavGroup divider={false} label="Projects"><NavItem>Alpha</NavItem></NavGroup>
+      <NavGroup divider label="People"><NavItem>Billing</NavItem></NavGroup>
+      <NavItem>Independent link</NavItem>
+      <NavGroup label="Archive"><NavItem>Records</NavItem></NavGroup>
+    </nav>,
+  );
+  const groups = container.querySelectorAll("nav > .mt-nav-group");
+  const boundaries = container.querySelectorAll(".mt-nav-group + .mt-nav-group:not([data-no-divider])");
+  expect(groups[1]).toHaveAttribute("data-no-divider");
+  expect(Array.from(boundaries)).toEqual([groups[2]]);
+  expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+});
+
+it("keeps heading actions independent, keyboard reachable and hidden in the collapsed sidebar", async () => {
+  const create = vi.fn();
+  const select = vi.fn();
+  const user = userEvent.setup();
+  const content = (collapsed: boolean) => (
+    <Sidebar collapsible collapsed={collapsed}>
+      <NavGroup label="Workspace" actions={<>
+        <button type="button" onClick={create} aria-label="Create project">+</button>
+        <button type="button" aria-label="More workspace actions">…</button>
+      </>}>
+        <NavItem onClick={select}>Inbox</NavItem>
+      </NavGroup>
+      <NavGroup actions={<button type="button">Import</button>}>
+        <NavItem>Records</NavItem>
+      </NavGroup>
+    </Sidebar>
+  );
+  const { rerender } = render(content(false));
+  const action = screen.getByRole("button", { name: "Create project" });
+  expect(action.closest(".mt-nav-item")).toBeNull();
+  expect(action.closest(".mt-nav-group-header")).toContainElement(screen.getByText("Workspace"));
+  action.focus();
+  await user.keyboard("{Enter}{Tab}");
+  expect(create).toHaveBeenCalledOnce();
+  expect(select).not.toHaveBeenCalled();
+  expect(screen.getByRole("button", { name: "More workspace actions" })).toHaveFocus();
+  expect(screen.getByRole("button", { name: "Import" })).toBeVisible();
+  rerender(content(true));
+  expect(screen.queryByRole("button", { name: "Create project" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Import" })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Inbox" })).toBeInTheDocument();
+  rerender(content(false));
+  expect(screen.getByRole("button", { name: "Create project" })).toBeVisible();
+});
+
 it.each([false, true])('spaces plain Sidebar siblings with collapsible=%s', (collapsible) => {
   const { container } = render(<Sidebar collapsible={collapsible}><NavItem>First</NavItem><NavItem>Second</NavItem><NavGroup label="Group"><NavItem>Nested</NavItem></NavGroup></Sidebar>);
   const selector = '.mt-sidebar > .mt-nav-item + .mt-nav-item, .mt-sidebar-content > .mt-nav-item + .mt-nav-item';
@@ -131,4 +183,37 @@ it("keeps a collapsed native link named and shows its tooltip on keyboard focus"
   const tooltip = await screen.findByRole("tooltip");
   expect(tooltip).toHaveTextContent("Billing details");
   expect(link).toHaveFocus();
+});
+
+it("keeps trailing actions separate from NavItem link and button activation", () => {
+  const navigate = vi.fn((event: React.MouseEvent) => event.preventDefault());
+  const edit = vi.fn();
+  const archive = vi.fn();
+  const linkRef = React.createRef<HTMLAnchorElement>();
+  const buttonRef = React.createRef<HTMLButtonElement>();
+  render(<>
+    <NavItem active href="/notes" ref={linkRef} onClick={navigate} actions={[
+      { content: <button onClick={edit}>Edit</button> },
+      { content: <button onClick={archive}>Archive</button>, visibility: "active" },
+    ]}>Notes</NavItem>
+    <NavItem ref={buttonRef} onClick={navigate} actions={{ content: <button>Options</button>, visibility: "hover" }}>Drafts</NavItem>
+  </>);
+  const link = screen.getByRole("link", { name: "Notes" });
+  const button = screen.getByRole("button", { name: "Drafts" });
+  const editAction = screen.getByRole("button", { name: "Edit" });
+  expect(linkRef.current).toBe(link);
+  expect(buttonRef.current).toBe(button);
+  expect(link).toHaveAttribute("href", "/notes");
+  expect(link).toHaveAttribute("aria-current", "page");
+  expect(editAction).not.toHaveAttribute("aria-current");
+  expect(link).not.toContainElement(editAction);
+  expect(button).not.toContainElement(screen.getByText("Options"));
+  fireEvent.click(editAction);
+  fireEvent.click(screen.getByRole("button", { name: "Archive" }));
+  expect(edit).toHaveBeenCalledOnce();
+  expect(archive).toHaveBeenCalledOnce();
+  expect(navigate).not.toHaveBeenCalled();
+  fireEvent.click(link);
+  fireEvent.click(button);
+  expect(navigate).toHaveBeenCalledTimes(2);
 });

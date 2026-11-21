@@ -1,5 +1,6 @@
 "use client";
 export * from "./basic";
+export type { MtoneAccent } from "./accent-colors";
 export * from "./navigation";
 export * from "./interactive";
 export * from "./data";

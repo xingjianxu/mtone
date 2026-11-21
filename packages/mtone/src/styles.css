@@ -618,25 +618,97 @@ a.mt-nav-item {
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* Keep the interactive targets siblings; the wrapper paints a continuous row. */
+.mt-nav-item-row {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  border-radius: 6px;
+}
+.mt-nav-item-row:hover:has(> .mt-nav-item:not(:disabled):not([aria-disabled="true"])) {
+  background: var(--mt-nav-hover, #efefef);
+}
+.mt-nav-item-row[data-active="true"] {
+  background: var(--mt-nav-selected, #e5e5e5);
+  color: var(--mt-nav-current-text, #262626);
+}
+.mt-nav-item-row > .mt-nav-item {
+  inline-size: auto;
+  min-inline-size: 0;
+  flex: 1 1 0;
+  padding-inline-end: 0;
+}
+.mt-nav-item-row > .mt-nav-item:is(:hover, .mt-active) {
+  background: transparent;
+}
+.mt-nav-item-actions {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 2px;
+  padding-inline: 4px 6px;
+}
+.mt-nav-item-action {
+  display: flex;
+  align-items: center;
+}
+.mt-nav-item-row:not([data-active="true"]) .mt-nav-item-action[data-visibility="active"] {
+  visibility: hidden;
+}
+@media (hover: hover) {
+  /* Keep independent actions reachable if the navigation control cannot take Tab focus. */
+  .mt-nav-item-row:not(:hover):not(:focus-within):not(:has(> .mt-nav-item:is(:disabled, [aria-disabled="true"], [tabindex="-1"])))
+    .mt-nav-item-action[data-visibility="hover"]:not(:has([aria-expanded="true"], [data-popup-open])) {
+    visibility: hidden;
+  }
+}
 .mt-nav-group {
+  position: relative;
   margin-top: 12px;
 }
 .mt-nav-group:first-child {
   margin-top: 0;
 }
-.mt-sidebar > .mt-nav-item + .mt-nav-item,
-.mt-sidebar-content > .mt-nav-item + .mt-nav-item,
-.mt-nav-group > .mt-nav-item + .mt-nav-item {
-  margin-top: 3px;
+.mt-nav-group + .mt-nav-group:not([data-no-divider])::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -6px;
+  inset-inline: 0;
+  border-block-start: 1px solid var(--mt-border, #e9e9e7);
+  pointer-events: none;
 }
-.mt-sidebar > :is(.mt-nav-item, .mt-nav-submenu) + .mt-nav-submenu,
-.mt-sidebar-content > :is(.mt-nav-item, .mt-nav-submenu) + .mt-nav-submenu,
-.mt-nav-group > :is(.mt-nav-item, .mt-nav-submenu) + .mt-nav-submenu,
-.mt-sidebar > .mt-nav-submenu + .mt-nav-item,
-.mt-sidebar-content > .mt-nav-submenu + .mt-nav-item,
-.mt-nav-group > .mt-nav-submenu + .mt-nav-item,
-.mt-nav-submenu-children > .mt-nav-item + .mt-nav-item,
-.mt-nav-submenu-popup > .mt-nav-item + .mt-nav-item {
+@media (forced-colors: active) {
+  .mt-nav-group + .mt-nav-group:not([data-no-divider])::before {
+    forced-color-adjust: none;
+    border-block-start-color: GrayText;
+  }
+}
+.mt-nav-group-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mt-nav-group-header > .mt-nav-label {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  padding-inline-end: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-nav-group-actions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin-inline-start: auto;
+  margin-inline-end: 4px;
+}
+:is(.mt-sidebar, .mt-sidebar-content, .mt-nav-group)
+  > :is(.mt-nav-item, .mt-nav-item-row, .mt-nav-submenu)
+  + :is(.mt-nav-item, .mt-nav-item-row, .mt-nav-submenu),
+:is(.mt-nav-submenu-children, .mt-nav-submenu-popup)
+  > :is(.mt-nav-item, .mt-nav-item-row)
+  + :is(.mt-nav-item, .mt-nav-item-row) {
   margin-top: 3px;
 }
 .mt-nav-submenu {
@@ -747,8 +819,11 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
   padding-inline: 0;
 }
 .mt-nav-group-collapsed + .mt-nav-group-collapsed {
-  border-top: 1px solid var(--mt-border, #e9e9e7);
-  padding-top: 8px;
+  /* Keep the original 8px padding plus the removed 1px layout border. */
+  padding-top: 9px;
+}
+.mt-nav-group-collapsed + .mt-nav-group-collapsed:not([data-no-divider])::before {
+  inset-block-start: 0;
 }
 
 /* Non-field controls retain a distinct keyboard focus indicator. */

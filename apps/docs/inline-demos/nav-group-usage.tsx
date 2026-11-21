@@ -1,25 +1,51 @@
-import React, { useState } from "react";
-import * as M from "../../../packages/mtone/src";
+import { useState } from "react";
+import { Ellipsis, Plus } from "lucide-react";
+import { IconButton, NavGroup, NavItem } from "../../../packages/mtone/src";
 
 export default function Demo() {
-  const [value, setValue] = useState<string | null>("design");
+  const [viewCount, setViewCount] = useState(0);
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <div style={{ width: 220 }}>
-      <M.NavGroup label="个人空间">
-        <M.NavItem
-          active={value === "design"}
-          onClick={() => setValue("design")}
-        >
-          设计资料
-        </M.NavItem>
-        <M.NavItem
-          active={value === "research"}
-          onClick={() => setValue("research")}
-        >
-          研究资料
-        </M.NavItem>
-      </M.NavGroup>
-    </div>
+    <nav aria-label="工作空间示例" style={{ width: 220 }}>
+      <NavGroup label="个人空间">
+        <NavItem active>设计资料</NavItem>
+        <NavItem>研究资料</NavItem>
+      </NavGroup>
+      <NavGroup
+        label="保存的视图"
+        actions={
+          <>
+            <IconButton
+              variant="ghost"
+              size="sm"
+              aria-label="新增视图"
+              onClick={() => setViewCount((n) => n + 1)}
+            >
+              <Plus size={14} aria-hidden="true" />
+            </IconButton>
+            <IconButton
+              variant="ghost"
+              size="sm"
+              aria-label="视图详情"
+              aria-expanded={showDetails}
+              onClick={() => setShowDetails((open) => !open)}
+            >
+              <Ellipsis size={14} aria-hidden="true" />
+            </IconButton>
+          </>
+        }
+      >
+        {viewCount ? (
+          <NavItem>视图 {viewCount}</NavItem>
+        ) : (
+          <NavItem disabled>暂无保存的视图</NavItem>
+        )}
+        {showDetails && <NavItem disabled>已保存 {viewCount} 个视图</NavItem>}
+      </NavGroup>
+      <NavGroup label="工具" divider={false}>
+        <NavItem>设置</NavItem>
+      </NavGroup>
+    </nav>
   );
 }

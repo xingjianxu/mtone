@@ -72,7 +72,7 @@
   padding: 12px 8px;
   scrollbar-width: thin;
 }
-.mt-layout-sider .mt-nav-item {
+.mt-layout-sider :is(.mt-nav-item:not(.mt-nav-item-row > .mt-nav-item), .mt-nav-item-row) {
   margin-bottom: 3px;
 }
 .mt-layout-header {

@@ -1,5 +1,6 @@
 .mt-tabs {
   --mt-tabs-gap: initial;
+  --mt-tabs-indicator-color: initial;
   min-width: 0;
 }
 .mt-tab-bar {
@@ -133,11 +134,14 @@
   inset-inline: 0;
   bottom: -3px;
   height: 2px;
-  background: currentColor;
+  background: var(--mt-tabs-indicator-color, currentColor);
   pointer-events: none;
 }
 /* Forced colors removes shadows; keep the native divider and selection stroke. */
 @media (forced-colors: active) {
+  .mt-tabs[data-variant="line"] {
+    --mt-tabs-indicator-color: currentColor !important;
+  }
   .mt-tabs[data-variant="line"][data-placement="top"] > .mt-tab-bar > .mt-tab-list {
     border-bottom: 1px solid CanvasText;
     padding-bottom: 0;
@@ -277,6 +281,17 @@
   > .mt-tab[data-active] {
   border-inline-start-color: currentColor;
 }
+/* Other placements already use a native 2px border as the indicator. */
+.mt-tabs[data-variant="line"][data-placement="bottom"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active] {
+  border-top-color: var(--mt-tabs-indicator-color, currentColor);
+}
+.mt-tabs[data-variant="line"][data-placement="start"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active] {
+  border-inline-end-color: var(--mt-tabs-indicator-color, currentColor);
+}
+.mt-tabs[data-variant="line"][data-placement="end"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[data-active] {
+  border-inline-start-color: var(--mt-tabs-indicator-color, currentColor);
+}
+
 .mt-tabs-menu {
   max-height: 280px;
   overflow: auto;
