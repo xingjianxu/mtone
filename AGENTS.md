@@ -36,6 +36,11 @@ The package build regenerates the file. Review and commit any generated diff.
 The docs Vite build emits that same file as `dist/docs/llms.txt`; do not maintain
 a separate manually copied website reference.
 
+Before an authorized merge, follow [the Documentation CI workflow](docs/CONTRIBUTING-CI.md):
+verify full regression on the exact same-repository release candidate, then
+promote only the validated Git tree. Master automatically builds and deploys
+Pages after checking that evidence; it does not repeat the regression suite.
+
 The real npm tarball must contain `package/llms.txt`, and the installed file must
 be available as `node_modules/@bixlab/mtone/llms.txt` (also exported through
 `@bixlab/mtone/llms.txt`). The package smoke test checks inclusion and exact
