@@ -37,9 +37,12 @@ The docs Vite build emits that same file as `dist/docs/llms.txt`; do not maintai
 a separate manually copied website reference.
 
 Before an authorized merge, follow [the Documentation CI workflow](docs/CONTRIBUTING-CI.md):
-verify full regression on the exact same-repository release candidate, then
-promote only the validated Git tree. Master automatically builds and deploys
-Pages after checking that evidence; it does not repeat the regression suite.
+use `node scripts/merge-verified.mjs --expect-master <exact-remote-SHA> [candidate]`
+for an authorized fast-forward. The entry requires a clean committed candidate,
+validates it on a same-repository release-candidate branch, and promotes only
+after that full regression succeeds. For a protected-branch PR, follow the
+equivalent exact-tree gate in the linked workflow. Master automatically builds
+and deploys Pages after checking the evidence; it does not repeat regression.
 
 The real npm tarball must contain `package/llms.txt`, and the installed file must
 be available as `node_modules/@bixlab/mtone/llms.txt` (also exported through

@@ -1,3 +1,4 @@
+import NavSubmenuExample from "./secondary-demos/nav-submenu-usage";
 import PageLayoutExample from "./secondary-demos/page-layout-usage";
 import CheckCardExample from "./secondary-demos/check-card-usage";
 import { CardGroupExample } from "./card-group-example";
@@ -430,6 +431,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           </M.NavGroup>
         </M.Sidebar>
       );
+    case "NavSubmenu":
+      return <NavSubmenuExample />;
     case "NavGroup":
       return (
         <div style={{ width: 220 }}>

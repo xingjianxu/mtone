@@ -29,6 +29,7 @@ const expected: Record<string, string[]> = {
     "TableOfContents",
     "Sidebar",
     "NavItem",
+    "NavSubmenu",
     "NavGroup",
     "Breadcrumb",
     "Tabs",

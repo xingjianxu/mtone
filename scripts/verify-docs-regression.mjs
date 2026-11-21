@@ -20,6 +20,85 @@ function arrayField(response, key) {
   return values;
 }
 
+function qualifyingRun(run, repository, repositoryId) {
+  const sameRepository = (entry) =>
+    entry?.id === repositoryId &&
+    entry.full_name?.toLowerCase() === repository.toLowerCase();
+  return (
+    (run.event === "push" || run.event === "workflow_dispatch") &&
+    typeof run.head_branch === "string" &&
+    run.head_branch.startsWith(candidatePrefix) &&
+    run.head_branch.length > candidatePrefix.length &&
+    [
+      workflowPath,
+      `${workflowPath}@${run.head_branch}`,
+      `${workflowPath}@refs/heads/${run.head_branch}`,
+    ].includes(run.path) &&
+    sameRepository(run.repository) &&
+    sameRepository(run.head_repository) &&
+    shaPattern.test(run.head_sha) &&
+    positiveInteger(run.id) &&
+    positiveInteger(run.run_attempt)
+  );
+}
+
+async function completedFullJob(request, root, run) {
+  // Use the reported attempt, never mix separately rerun jobs.
+  const jobsPath = `${root}/actions/runs/${run.id}/attempts/${run.run_attempt}/jobs`;
+  const jobs = arrayField(await request(jobsPath, { per_page: 100 }), "jobs");
+  const full = jobs.find((job) => job.name === "Full regression");
+  if (
+    successful(full) &&
+    full.run_id === run.id &&
+    full.head_sha === run.head_sha &&
+    proofSteps.every((name) =>
+      full.steps?.some((step) => step.name === name && successful(step)),
+    )
+  ) {
+    return {
+      runId: run.id,
+      runAttempt: run.run_attempt,
+      testedSha: run.head_sha,
+    };
+  }
+}
+
+export async function verifiedCandidateRun({
+  request,
+  repository,
+  repositoryId,
+  branch,
+  sha,
+}) {
+  const root = `/repos/${repository}`;
+  const runs = arrayField(
+    await request(`${root}/actions/workflows/docs.yml/runs`, {
+      branch,
+      head_sha: sha,
+      per_page: 100,
+    }),
+    "workflow_runs",
+  );
+  const run = runs.find(
+    (entry) =>
+      entry.head_branch === branch &&
+      entry.head_sha === sha &&
+      qualifyingRun(entry, repository, repositoryId),
+  );
+  if (!run || run.status !== "completed") return;
+  const link = `https://github.com/${repository}/actions/runs/${run.id}`;
+  if (!successful(run))
+    throw new Error(
+      `Candidate Documentation run finished as ${run.conclusion}: ${link}.`,
+    );
+  const proof = await completedFullJob(request, root, run);
+  if (!proof)
+    throw new Error(
+      `Candidate run lacks successful Full regression proof: ${link}.`,
+    );
+  return proof;
+}
+
 export async function findRegressionProof({
   request,
   repository,
@@ -40,32 +119,14 @@ export async function findRegressionProof({
 
   const root = `/repos/${repository}`;
   const runsPath = `${root}/actions/workflows/docs.yml/runs`;
-  const sameRepository = (entry) =>
-    entry?.id === repositoryId &&
-    entry.full_name?.toLowerCase() === repository.toLowerCase();
-  const qualifyingRun = (run) =>
-    successful(run) &&
-    (run.event === "push" || run.event === "workflow_dispatch") &&
-    typeof run.head_branch === "string" &&
-    run.head_branch.startsWith(candidatePrefix) &&
-    run.head_branch.length > candidatePrefix.length &&
-    [
-      workflowPath,
-      `${workflowPath}@${run.head_branch}`,
-      `${workflowPath}@refs/heads/${run.head_branch}`,
-    ].includes(run.path) &&
-    sameRepository(run.repository) &&
-    sameRepository(run.head_repository) &&
-    shaPattern.test(run.head_sha) &&
-    positiveInteger(run.id) &&
-    positiveInteger(run.run_attempt);
 
   const inspected = new Set();
   const trees = new Map();
   const query = { status: "success", per_page: 100 };
   async function inspect(runs) {
     for (const run of runs) {
-      if (!qualifyingRun(run)) continue;
+      if (!successful(run) || !qualifyingRun(run, repository, repositoryId))
+        continue;
       const key = `${run.id}:${run.run_attempt}`;
       if (inspected.has(key)) continue;
       inspected.add(key);
@@ -94,26 +155,8 @@ export async function findRegressionProof({
 
       // The run's aggregate result alone is not sufficient: a job can be skipped.
       // Bind evidence to the reported attempt instead of mixing separately rerun jobs.
-      const jobsPath = `${root}/actions/runs/${run.id}/attempts/${run.run_attempt}/jobs`;
-      const jobs = arrayField(
-        await request(jobsPath, { per_page: 100 }),
-        "jobs",
-      );
-      const full = jobs.find((job) => job.name === "Full regression");
-      if (
-        successful(full) &&
-        full.run_id === run.id &&
-        full.head_sha === run.head_sha &&
-        proofSteps.every((name) =>
-          full.steps?.some((step) => step.name === name && successful(step)),
-        )
-      ) {
-        return {
-          runId: run.id,
-          runAttempt: run.run_attempt,
-          testedSha: run.head_sha,
-        };
-      }
+      const proof = await completedFullJob(request, root, run);
+      if (proof) return proof;
     }
     return undefined;
   }

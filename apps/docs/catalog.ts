@@ -3497,8 +3497,29 @@ export default function Demo() {
       },
     ],
     notes: [
+      "当前页使用灰色圆角底和逻辑起始侧蓝色竖标；悬停不显示竖标。",
       "默认行高 34px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。",
       "底层为 button，不是链接；应用负责与路由集成。",
+    ],
+  },
+  {
+    name: "NavSubmenu",
+    category: "导航切换",
+    description: "有子项的侧边栏导航；展开时内联，收起时侧向弹出。",
+    importNames: ["NavSubmenu", "NavItem", "Sidebar"],
+    code: 'import { NavSubmenu, NavItem, Sidebar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Sidebar collapsible><NavSubmenu label="账单与许可" defaultExpanded><NavItem active>用量</NavItem><NavItem>许可</NavItem></NavSubmenu></Sidebar>;\n}',
+    props: [
+      { name: "label", type: "ReactNode", description: "必填分支名称，窄栏下仍作为按钮的可访问名称。" },
+      { name: "children", type: "ReactNode", description: "必填子导航，使用 NavItem。" },
+      { name: "icon", type: "ReactNode", description: "可选图标；窄栏中省略时显示圆形占位。" },
+      { name: "defaultExpanded", type: "boolean", default: "false", description: "非受控内联初始状态。" },
+      { name: "expanded", type: "boolean", description: "受控内联状态，不控制窄栏弹出层。" },
+      { name: "onExpandedChange", type: "(expanded: boolean) => void", description: "用户切换内联展开状态时调用。" },
+      { name: "disabled", type: "boolean", default: "false", description: "禁用分支触发按钮。" },
+    ],
+    notes: [
+      "只提供一层子导航。静态分组用 NavGroup；当前页状态设置在 NavItem 的 active 上。",
+      "Sidebar 或 AdminLayout.Sider 收起时，子项在可键盘操作的侧向浮层中展示，选中子项关闭浮层。切回宽栏后还原内联展开状态。",
     ],
   },
   {

@@ -534,6 +534,7 @@
   border-radius: 4px;
 }
 .mt-nav-item {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -543,8 +544,8 @@
   background: transparent;
   color: inherit;
   font: inherit;
-  text-align: left;
-  border-radius: 4px;
+  text-align: start;
+  border-radius: 6px;
   padding: 0 8px;
   cursor: pointer;
   height: var(--mt-height, 34px);
@@ -565,6 +566,22 @@
   background: var(--mt-nav-selected, #e5e5e5);
   color: var(--mt-nav-current-text, #262626);
 }
+.mt-nav-item.mt-active::before {
+  content: "";
+  position: absolute;
+  inset-block: 4px;
+  inset-inline-start: -5px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--mt-blue, #2383e2);
+  pointer-events: none;
+}
+@media (forced-colors: active) {
+  .mt-nav-item.mt-active::before {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
 .mt-nav-item:focus-visible {
   outline: 1px solid var(--mt-focus, #93b4dc);
   outline-offset: -1px;
@@ -584,6 +601,38 @@
 .mt-sidebar-content > .mt-nav-item + .mt-nav-item,
 .mt-nav-group > .mt-nav-item + .mt-nav-item {
   margin-top: 3px;
+}
+.mt-sidebar > :is(.mt-nav-item, .mt-nav-submenu) + .mt-nav-submenu,
+.mt-sidebar-content > :is(.mt-nav-item, .mt-nav-submenu) + .mt-nav-submenu,
+.mt-nav-group > :is(.mt-nav-item, .mt-nav-submenu) + .mt-nav-submenu,
+.mt-sidebar > .mt-nav-submenu + .mt-nav-item,
+.mt-sidebar-content > .mt-nav-submenu + .mt-nav-item,
+.mt-nav-group > .mt-nav-submenu + .mt-nav-item,
+.mt-nav-submenu-children > .mt-nav-item + .mt-nav-item,
+.mt-nav-submenu-popup > .mt-nav-item + .mt-nav-item {
+  margin-top: 3px;
+}
+.mt-nav-submenu {
+  min-inline-size: 0;
+}
+.mt-nav-submenu-icon {
+  display: inline-flex;
+  flex: none;
+}
+.mt-nav-submenu-chevron {
+  margin-inline-start: auto;
+}
+.mt-nav-submenu-trigger[aria-expanded="true"] .mt-nav-submenu-chevron {
+  transform: rotate(180deg);
+}
+.mt-nav-submenu-children {
+  padding-inline-start: 20px;
+  margin-block-start: 3px;
+}
+.mt-popup.mt-nav-submenu-popup {
+  min-width: min(160px, var(--available-width, 100vw), calc(100vw - 16px));
+  max-width: min(280px, var(--available-width, 100vw), calc(100vw - 16px));
+  padding: 5px 8px;
 }
 .mt-nav-label {
   font-size: 11px;

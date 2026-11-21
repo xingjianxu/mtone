@@ -117,6 +117,11 @@ jobs:
           for browser in chromium firefox webkit; do
             BROWSER=$browser node tests/page-layout.browser.mjs || exit 1
           done
+      - name: NavSubmenu browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/nav-submenu.browser.mjs || exit 1
+          done
       - run: node tests/showcase.browser.mjs
       - name: Assert tracked files unchanged
         run: git diff --exit-code HEAD --

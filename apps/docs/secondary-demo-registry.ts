@@ -1,3 +1,7 @@
+import NavSubmenuUsage from "./secondary-demos/nav-submenu-usage";
+import NavSubmenuUsageSource from "./secondary-demos/nav-submenu-usage.tsx?raw";
+import NavSubmenuRail from "./secondary-demos/nav-submenu-rail";
+import NavSubmenuRailSource from "./secondary-demos/nav-submenu-rail.tsx?raw";
 import PageLayoutUsage from "./secondary-demos/page-layout-usage";
 import PageLayoutUsageSource from "./secondary-demos/page-layout-usage.tsx?raw";
 import PageLayoutComposed from "./secondary-demos/page-layout-composed";
@@ -283,6 +287,10 @@ const source = (tsx: string) =>
 const standaloneSource = (tsx: string) =>
   'import "@bixlab/mtone/styles.css";\n' + source(tsx);
 export const secondaryDocSections: Record<string, readonly DocSection[]> = {
+  NavSubmenu: [
+    { id: "usage", title: "内联展开", Demo: NavSubmenuUsage, source: source(NavSubmenuUsageSource) },
+    { id: "collapsed-rail", title: "图标窄栏", Demo: NavSubmenuRail, source: source(NavSubmenuRailSource) },
+  ],
   CheckCard: [
     { id: "usage", title: "基础勾选", Demo: CheckCardUsage, source: standaloneSource(CheckCardUsageSource), note: "独立卡片是复选框；点击卡片内容或按空格可切换。" },
     { id: "single", title: "单选卡片组", Demo: CheckCardSingle, source: standaloneSource(CheckCardSingleSource), note: "使用 options 配置选项；受控单选返回一个字符串，支持原生方向键切换。" },
