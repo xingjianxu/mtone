@@ -593,8 +593,7 @@
 .mt-nav-group {
   margin-top: 12px;
 }
-.mt-sidebar > .mt-nav-group:first-child,
-.mt-sidebar > .mt-sidebar-content > .mt-nav-group:first-child {
+.mt-nav-group:first-child {
   margin-top: 0;
 }
 .mt-sidebar > .mt-nav-item + .mt-nav-item,

@@ -6,6 +6,7 @@ import "../../packages/mtone/dist/styles.css";
 
 function Fixture() {
   const scenario = new URLSearchParams(window.location.search);
+  if (scenario.has("groups")) return <GroupSpacing />;
   const admin = scenario.has("admin");
   const rtl = scenario.has("rtl");
   const [current, setCurrent] = useState("Usage");
@@ -31,6 +32,28 @@ function Fixture() {
         )}
       </div>
     </MtoneProvider>
+  );
+}
+
+function GroupSpacing() {
+  const group = (label: string) => <NavGroup label={label}><NavItem>First item</NavItem><NavItem>Second item</NavItem></NavGroup>;
+  return (
+    <>
+      <nav data-testid="standalone">
+        {group("First group")}
+        {group("Second group")}
+      </nav>
+      <Sidebar data-testid="sidebar" collapsible>
+        <nav data-testid="wrapped">
+          {group("First wrapped group")}
+          {group("Second wrapped group")}
+        </nav>
+      </Sidebar>
+      <nav data-testid="after-item">
+        <NavItem>Independent page</NavItem>
+        {group("After actual item")}
+      </nav>
+    </>
   );
 }
 

@@ -153,6 +153,17 @@ try {
   await expect(branch).toHaveAttribute("aria-expanded", "false");
   await expect(branch).toBeFocused();
   await responsive.close();
+  const spacing = await browser.newPage();
+  await spacing.goto("http://127.0.0.1:5286/tests/fixtures/nav-submenu.html?groups");
+  for (const [parent, expected] of [["standalone", ["0px", "12px"]], ["wrapped", ["0px", "12px"]], ["after-item", ["12px"]]]) {
+    const groups = spacing.getByTestId(parent).locator(":scope > .mt-nav-group");
+    await expect(groups).toHaveCount(expected.length);
+    const margins = await groups.evaluateAll((elements) => elements.map((group) => getComputedStyle(group).marginTop));
+    assert.deepEqual(margins, expected, parent);
+    await expect(groups.first().locator(".mt-nav-item").nth(1)).toHaveCSS("margin-top", "3px");
+  }
+  await expect(spacing.getByTestId("sidebar")).toHaveCSS("padding-top", "12px");
+  await spacing.close();
   console.log("NavSubmenu inline/rail behavior, positioning, focus, touch, and selected marker passed");
 } finally {
   await browser?.close();
