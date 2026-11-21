@@ -3,52 +3,52 @@ import { Menu as BMenu } from "@base-ui/react/menu";
 import { ContextMenu as BContextMenu } from "@base-ui/react/context-menu";
 import { Popover as BPopover } from "@base-ui/react/popover";
 import { useDirection } from "@base-ui/react/direction-provider";
-import { MtoneScope, useMtone, cn } from "./basic";
-import type { OpenProps } from "./interactive";
+import { MtoneScope, cn } from "./basic";
 
-export const DropdownOwnerContext = React.createContext<string | undefined>(
+export const MenuSurfaceOwnerContext = React.createContext<string | undefined>(
   undefined,
 );
 
-export type DropdownAlign = "start" | "end" | "left" | "right";
-export interface DropdownLayoutProps {
+type FloatingAlign = "start" | "end" | "left" | "right";
+export interface FloatingLayoutProps {
   /** Content-sized by default. Numbers are CSS pixels; strings are CSS widths. */
   width?: React.CSSProperties["width"];
   /** start/end are logical; left/right are physical even in RTL. */
-  align?: DropdownAlign;
+  align?: FloatingAlign;
 }
-export interface DropdownProps extends OpenProps, DropdownLayoutProps {
-  trigger: React.ReactElement;
-  content: React.ReactNode;
-  /** Accessible name for the nonmodal dialog. */
-  label?: string;
-}
-
 /** Internal surface shared without wrapping Menu in a second interactive root. */
-export function DropdownSurface({
+export function FloatingSurface({
   children,
   kind = "popover",
   width,
   align = "start",
+  side = "bottom",
   label,
+  unstyled,
   finalFocus,
   initialFocus,
-}: DropdownLayoutProps & {
+}: Omit<FloatingLayoutProps, "align"> & {
   children: React.ReactNode;
   kind?: "popover" | "menu" | "submenu" | "context";
+  align?: FloatingAlign | "center";
+  side?: "top" | "bottom" | "left" | "right";
+  unstyled?: boolean;
   label?: string;
   finalFocus?: boolean | (() => boolean);
   initialFocus?: boolean;
 }) {
   const direction = useDirection();
-  const owner = React.useContext(DropdownOwnerContext);
+  const owner = React.useContext(MenuSurfaceOwnerContext);
+  const rtl =
+    direction === "rtl" &&
+    !(kind === "popover" && (side === "left" || side === "right"));
   const resolvedAlign =
     align === "left"
-      ? direction === "rtl"
+      ? rtl
         ? "end"
         : "start"
       : align === "right"
-        ? direction === "rtl"
+        ? rtl
           ? "start"
           : "end"
         : align;
@@ -64,19 +64,22 @@ export function DropdownSurface({
               ? undefined
               : kind === "submenu"
                 ? "inline-end"
-                : "bottom"
+                : side
           }
-          sideOffset={kind === "context" ? undefined : 4}
+          sideOffset={
+            kind === "context" ? undefined : kind === "popover" ? 6 : 4
+          }
           align={kind === "submenu" ? "start" : resolvedAlign}
         >
           <Primitive.Popup
             finalFocus={finalFocus}
             initialFocus={initialFocus}
-            data-dropdown-owner={owner}
+            data-menu-owner={kind === "popover" ? undefined : owner}
             className={cn(
               "mt-popup",
-              "mt-dropdown-popup",
-              kind !== "popover" && "mt-menu-popup",
+              "mt-floating-popup",
+              kind === "popover" ? "mt-popover" : "mt-menu-popup",
+              kind === "popover" && unstyled && "mt-popover-unstyled",
             )}
             style={{
               width: width ?? "max-content",
@@ -89,28 +92,5 @@ export function DropdownSurface({
         </Primitive.Positioner>
       </MtoneScope>
     </Primitive.Portal>
-  );
-}
-
-export function Dropdown({
-  trigger,
-  content,
-  width,
-  align,
-  label,
-  ...props
-}: DropdownProps) {
-  const { locale } = useMtone();
-  return (
-    <BPopover.Root {...props} modal={false}>
-      <BPopover.Trigger render={trigger} />
-      <DropdownSurface
-        width={width}
-        align={align}
-        label={label ?? (locale === "zh" ? "下拉内容" : "Dropdown content")}
-      >
-        {content}
-      </DropdownSurface>
-    </BPopover.Root>
   );
 }

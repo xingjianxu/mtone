@@ -21,9 +21,9 @@ export default function Demo() {
                 },
                 {
                   key: "dropdown",
-                  label: "Dropdown",
+                  label: "Popover",
                   onSelect: () => {
-                    window.location.hash = "/components/Dropdown";
+                    window.location.hash = "/components/Popover";
                   },
                 },
               ],

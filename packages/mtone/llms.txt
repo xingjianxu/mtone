@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.8.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.9.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 
@@ -250,7 +250,7 @@ export default function Demo() {
 - width: CSSProperties[width] (default: 280). 卡片宽度，受可用视口宽度限制，不强制匹配触发宽度
 - withArrow / disabled: boolean (default: false). 显示箭头 / 禁用预览但保留触发元素原本行为
 - 复用 Base UI PreviewCard 的悬停安全区域、延迟与键盘聚焦行为。鼠标从触发元素移动到卡片时保持显示；Escape 或点击外部关闭。不会自动把焦点移入卡片。
-- HoverCard 用于补充预览，不替代点击式 Popover 或 Dropdown；表单和必须完成的操作应使用后者。触摸设备不依赖悬停打开，也不拦截触发链接原本点击。
+- HoverCard 用于补充预览，不替代点击式 Popover；表单和必须完成的操作应使用 Popover。触摸设备不依赖悬停打开，也不拦截触发链接原本点击。
 - 提供可聚焦 trigger 以支持键盘；预览信息不应是完成任务的唯一入口。API 不兼容 Mantine，不提供复合子组件、delay group 或触摸开关。
 
 ```tsx
@@ -932,11 +932,13 @@ export default function Demo() {
 - AdminLayout.Sider.breakpoint: number. 可选视口断点（px），例如 768。低于断点请求收起，恢复宽屏请求展开；未设置时不自动响应。
 - AdminLayout.Sider.onBreakpoint: (broken: boolean) => void. 监听断点状态；true 表示视口低于设定断点。
 - AdminLayout.Sider.collapseLabel / expandLabel: string (default: 收起侧边栏 / 展开侧边栏). 继承 Sidebar 的切换按钮可访问名称。
+- notice: ReactNode. 可选全宽通知插槽，位于外层布局的侧栏与主栏上方。可放入 GlobalNotice；不随应用内容区切换或滚动。
 - AdminLayout.Header.breadcrumb: ReactNode. 顶部左侧插槽；建议传入已有 Breadcrumb 组件。
 - AdminLayout.Header.extra: ReactNode. 顶部右对齐操作插槽，可组合 Button、Menu、Avatar 等。
 - AdminLayout.Header.children: ReactNode. 顶部左侧补充内容；窄屏允许换行。
 - AdminLayout.Content.as: "main" | "section" | "div" (default: main). 主体语义标签。一个页面通常只使用一个 main；嵌入其他主体时改为 section 或 div。
 - children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes. 各区域均可嵌套内容和覆盖样式；默认不生成主体 Footer，显式组合 AdminLayout.Footer 时显示，默认高度 42px。
+- 将跨页面的状态通知放在持续挂载的外层 AdminLayout.notice，不要放在会随路由切换的 Content 子页面。应用负责状态、异步操作和关闭后的焦点。
 - 主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。
 - 使用 AdminLayout.Sider、AdminLayout.Header、AdminLayout.Content、AdminLayout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。
 - AdminLayout.Sider 复用本库 Sidebar 的状态、32px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。
@@ -1924,32 +1926,6 @@ export default function Demo() {
 }
 ```
 
-### Dropdown
-
-- [Dropdown](https://xingjianxu.github.io/mtone/#/components/Dropdown): 独立的触发式下拉容器，承载任意自定义内容，默认按内容宽度。
-- Import: Dropdown, Button from @bixlab/mtone
-- trigger: ReactElement. 必填；触发元素，需转发 ref 与 DOM props。
-- content: ReactNode. 必填；任意下拉内容。点击内部内容不会自动关闭。
-- label: string. 非模态 dialog 的可访问名称；默认中文为下拉内容，英文为 Dropdown content。
-- width: CSSProperties['width']. 默认按内容宽度，最小 160px，不跟随 trigger；number 为 px，也可用 rem/ch/vw 等 CSS 宽度。显式宽度允许小于 160px；最终受可用视口宽度约束。
-- align: 'start' | 'end' | 'left' | 'right' (default: start). 首选与 trigger 的对齐边。left/right 是物理左右；start/end 在 RTL 中反转。空间不足时自动避让、移位或翻转。
-- open: boolean. 受控开关。
-- defaultOpen: boolean. 非受控初始开关。
-- onOpenChange: (open: boolean) => void. 开关变化回调。
-- Dropdown 是非模态 dialog，使用 Tab 导航自定义交互内容。操作菜单请使用 Menu，它保留菜单语义与方向键导航；两者共享浮层实现而不是嵌套浮层。
-- Escape、外部点击可关闭并由 Base UI 管理焦点返回。内部保存/取消动作需要关闭时，使用 open/onOpenChange 自行控制。
-- LTR 下 start 是左边、end 是右边；RTL 下相反。left/right 始终表示物理左右。RTL 交互需由 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 提供方向上下文，并设置相应 DOM dir。
-- 默认宽度 max-content，最小宽度 160px；窄屏时最小宽度也会收缩。超长文本折行，超过最大高度的内容滚动。百分比宽度相对于定位容器，不是 trigger，优先使用像素或 rem/ch 等明确长度。
-
-```tsx
-import { Dropdown, Button } from "@bixlab/mtone";
-import "@bixlab/mtone/styles.css";
-
-export default function Demo() {
-  return <Dropdown trigger={<Button>查看信息</Button>} align="right" width={240} label="文档信息" content={<div style={{padding:8}}>这里可以放置说明、表单或自定义内容。</div>} />;
-}
-```
-
 ### Menubar
 
 - [Menubar](https://xingjianxu.github.io/mtone/#/components/Menubar): 桌面应用式菜单栏，协调多个操作菜单，支持子菜单、分组及键盘导航。
@@ -1965,7 +1941,7 @@ export default function Demo() {
 - align: 'start' | 'end' | 'left' | 'right' (default: start). 顶层浮层首选对齐边；单个菜单 align 优先。start/end 随 RTL 变化，left/right 是物理左右，受视口碰撞处理约束。
 - HTML div attributes: HTMLAttributes<HTMLDivElement>. 支持 aria-label、className、style 等根元素属性；不接受 children，通过 menus 定义菜单。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
-- Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一操作入口用 Menu，任意自定义浮层内容用 Dropdown。三者共享浮层样式，Menubar 与 Menu 保留菜单语义，不嵌套额外 dialog。
+- Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一操作入口用 Menu，任意自定义浮层内容用 Popover。三者共享浮层样式，Menubar 与 Menu 保留菜单语义，不嵌套额外 dialog。
 - 菜单栏作为一个 Tab 停靠点，左右方向键移动顶层焦点；Enter、Space 或向下键进入菜单，Escape 退出并返回触发项。键盘逻辑由 Base UI 管理。快捷键文字仅展示，不注册全局快捷键。
 - RTL 同时提供 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 与 DOM dir=rtl；start/end 和左右方向键按方向上下文工作。
 - 菜单栏保持单行，窄屏时横向滚动；浮层受可用视口宽高限制。保留 mtone 紧凑高度、灰色背景与淡蓝色细边框。
@@ -1996,7 +1972,7 @@ export default function Demo() {
 - onOpenChange: (open: boolean) => void. 开关变化回调。
 - 悬停时鼠标可以从触发器跨过间隙进入菜单并继续进入子菜单；离开菜单区域后关闭。受控 open / onOpenChange 与条目选择规则不变。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
-- Menu 复用 Dropdown 的浮层布局，但仍使用菜单语义、方向键与选择关闭。通用自定义内容使用 Dropdown。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。
+- Menu 与 Popover 共用浮层定位和外观基础，但 Menu 保留菜单语义、方向键与选择关闭。通用自定义内容使用 Popover。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。
 - 同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。
 - 快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。
 - 复选项 type: checkbox 支持 checked/defaultChecked、onCheckedChange 与 closeOnClick（默认 false）。单选组 type: radio-group 支持 label、value/defaultValue、onValueChange 与 children，子项 key 是选择值；选择后保持打开。两类选择使用各自变更回调，不调用 Menu 的 onSelect。
@@ -2043,24 +2019,28 @@ export default function Demo() {
 
 ### Popover
 
-- [Popover](https://xingjianxu.github.io/mtone/#/components/Popover): 点击展开的轻量信息或操作浮层。
-- Import: Popover, Button from @bixlab/mtone
-- trigger: ReactElement. 必填；触发元素。
+- [Popover](https://xingjianxu.github.io/mtone/#/components/Popover): 点击打开的非模态浮层，适合信息、表单和自定义卡片。
+- Import: Popover from @bixlab/mtone
+- trigger: string | ReactElement. 必填；字符串使用 Button 的 dropdown 预设，自定义触发器可传 React 元素。
 - content: ReactNode. 必填；浮层内容。
 - title: ReactNode. 浮层标题。
+- label: string. 浮层的可访问名称，优先于可见 title。无 title 和 label 时默认使用浮层内容 / Popover content。
+- width: number | string. 浮层宽度，数字为 px；默认随内容而非触发按钮，且自动约束在视口内。
+- align: "start" | "center" | "end" | "left" | "right" (default: center). 沿边对齐。上下浮层的 start/end 随布局方向，left/right 为物理边；左右浮层用 start/end 对齐上/下边。
+- unstyled: boolean (default: false). 去除浮层自身的背景、边框、阴影和内边距，保留定位及非模态行为；适合让 Card 绘制外框。
 - side: "top" | "bottom" | "left" | "right" (default: bottom). 优先显示位置。
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
-- 自定义触发器需转发 ref 与 DOM props。浮层自动继承 MtoneProvider 上下文。
+- Popover 是非模态 dialog，可使用 Tab 操作表单，Escape 关闭并恢复焦点；命令菜单请使用 Menu。自定义触发器需转发 ref 与 DOM props，浮层继承 MtoneProvider 上下文。
 
 ```tsx
-import { Popover, Button } from "@bixlab/mtone";
+import { Popover } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <Popover trigger={<Button>查看说明</Button>} title="提示" content="这里放置相关内容。" />
+    <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />
   );
 }
 ```
@@ -2189,6 +2169,7 @@ export default function Demo() {
 - [Typography](https://xingjianxu.github.io/mtone/#/components/Typography): 统一的标题、正文、段落、链接、引用与代码，按子组件独立演示，支持复制、纯文本编辑及省略展开。
 - Import: Typography from @bixlab/mtone
 - Title.divider: boolean (default: level === 2). 标题下方的整行分隔线，仅二级标题默认启用；不同于给文字添加下划线的 underline。
+- Code.language: string. 可选语法高亮语言。仅代码块的字符串内容启用；支持 js、ts、jsx、tsx、json、html、css、bash。默认、行内、其他语言及加载失败均保持纯文本或原有子内容。
 - Code.block: boolean (default: false). Typography.Code 默认渲染行内 <code>；block 渲染 <pre><code> 并保留缩进和换行。长行在块内滚动，溢出时可用 Tab 聚焦并按左右方向键滚动。
 - Blockquote: BlockquoteProps. 引用子组件；支持 cite 可见署名、citeUrl 来源 URL、icon、iconSize（默认 28）、color（CSS 色值）、radius（默认 4）、textWrap（默认 wrap）。它不支持 Text 的复制、编辑或省略属性；完整 API 见 Blockquote 条目。
 - muted / type: boolean / "secondary" | "success" | "warning" | "danger". muted 保留旧版次级文字颜色；type 提供语义字色。
@@ -2199,7 +2180,7 @@ export default function Demo() {
 - ellipsis: boolean | TypographyEllipsis (default: false). CSS 单行或多行省略。对象支持 rows?: number（默认 1）、expandable?: boolean、expanded?: boolean、defaultExpanded?: boolean、onExpandedChange(expanded): void、expandLabel?: string、collapseLabel?: string。
 - children / ref / 原生属性: ReactNode / 对应 HTML 元素 ref / HTMLAttributes. 支持 className、style、title 与适用的 DOM 属性；Text 为 span，Title 为 heading，Paragraph 为 p。
 - 保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。
-- Typography.Code 只从 Typography 命名空间使用，支持原生属性和 ref（指向外层 code 或 pre）；可用 tabIndex 覆盖默认 Tab 顺序。不提供语法高亮或复制按钮；Typography.Text 的 code 用法保持不变。
+- Typography.Code 只从 Typography 命名空间使用，支持原生属性和 ref（指向外层 code 或 pre）；可用 tabIndex 覆盖默认 Tab 顺序。使用 block language="tsx" 等可按需启用 Shiki。服务端和首次显示保留原文，浏览器按需着色并随最近主题切换，文本、缩进和换行不变。不内置复制按钮；Typography.Text 的 code 用法保持不变。
 - 编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。
 - 复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。
 - 省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。
@@ -2840,6 +2821,33 @@ export default function Demo() {
   return (
     <Alert tone="success" title="已保存">你的更改已保存。</Alert>
   );
+}
+```
+
+### GlobalNotice
+
+- [GlobalNotice](https://xingjianxu.github.io/mtone/#/components/GlobalNotice): 持续可见的全局警示通知，可独立使用或通过 AdminLayout 的 notice 插槽跨页面展示。
+- Import: GlobalNotice from @bixlab/mtone
+- title: ReactNode. 必填；简短通知标题。
+- children: ReactNode. 可选详情；窄屏可自然换行。
+- icon: ReactNode | false. 默认显示装饰性警示图标。设为 false 隐藏图标。
+- onAction: () => void. 提供时渲染操作按钮；操作请求、关闭与持久状态由应用负责。
+- actionLabel: string. 可选可见操作文字；没有文字时显示本地化无障碍名称的关闭按钮。
+- actionRef: Ref<HTMLButtonElement>. 操作按钮引用，便于错误后返回重试按钮。
+- loading: boolean (default: false). 显示加载图标并禁用按钮。异步处理建议应用另外设置立即生效的请求锁。
+- error: ReactNode. 可选操作失败反馈，以警报语义公布；应用决定何时清除。
+- 原生 div 属性和 ref: HTMLAttributes<HTMLDivElement>. 支持 className、style 与 DOM 属性，title 使用通知标题。
+- 通知不会自动关闭，不执行权限、导航或网络操作。成功后由应用移除通知，并把焦点恢复到仍存在的控件。
+- 用于持续全局状态；局部反馈使用 Alert。警示颜色沿用语义警告样式，不是装饰性颜色预设。
+
+```tsx
+import { GlobalNotice } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <GlobalNotice title="管理员模式" actionLabel="退出管理模式" onAction={() => {/* 由应用处理 */}}>
+    完成管理操作后请退出。
+  </GlobalNotice>;
 }
 ```
 

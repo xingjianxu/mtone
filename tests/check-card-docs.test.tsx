@@ -7,7 +7,7 @@ import { secondaryDocSections } from "../apps/docs/secondary-demo-registry";
 
 test("CheckCard is discoverable as input and documents selection versus layout", () => {
   const doc = componentDocs.find((entry) => entry.name === "CheckCard");
-  expect(doc?.category).toBe("数据录入");
+  expect(doc?.category).toBe("表单输入");
   expect(doc?.props.map((prop) => prop.name)).toContain(
     "CheckCard.Group.multiple",
   );

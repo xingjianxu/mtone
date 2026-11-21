@@ -122,7 +122,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 ## Navigation
 
 - [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): single-page frame with a required `title`, optional `headingLevel` (default 1), `icon`, `subtitle`, `actions`, `description`, `extra`, `tabs`, and body children. Pass a complete `Tabs` instance to render its own panels after the header. PageLayout does not manage navigation or tab state; it can sit inside `AdminLayout.Content`.
-- AdminLayout: application shell; compose `AdminLayout.Sider`, `AdminLayout.Header`, `AdminLayout.Content`, and optional `AdminLayout.Footer`. This replaces `Layout` starting with 0.6.0, without a compatibility alias.
+- AdminLayout: application shell; compose `AdminLayout.Sider`, `AdminLayout.Header`, `AdminLayout.Content`, and optional `AdminLayout.Footer`. The root `notice?: ReactNode` slot spans the shell above the sidebar and main column; keep the shell mounted for cross-route notices. This replaces `Layout` starting with 0.6.0, without a compatibility alias.
 - Sidebar, NavGroup(label), NavItem(active, icon, optional href and actions): layout and navigation. NavItem is a button by default; an href renders a native anchor with corresponding props and ref. Native anchor navigation is unchanged. Pass one or more `{ content, visibility? }` descriptors for independent trailing actions. Visibility can be `always` (default), `hover` (also keyboard focus or touch-only), or `active`. The collapsed icon rail hides actions; the full rows in a submenu popup retain them.
 - NavSubmenu: a navigation branch with required `label` and NavItem children, optional `icon` and `disabled`, and `defaultExpanded` / `expanded` / `onExpandedChange` for inline disclosure. A collapsed Sidebar or AdminLayout.Sider opens a side popup; set active leaf state on NavItem.
 - Breadcrumb: items `{label,href?}`; final item is current page.
@@ -140,6 +140,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - Tooltip: child trigger element, content, side. Supply accessible names on icon-only children.
 - Dialog/Drawer: title, description, children, footer, optional trigger; open/defaultOpen/onOpenChange. Escape and close button restore focus. Drawer has right-edge interaction.
 - ConfirmDialog: same basic dialog properties, onConfirm (sync/async), confirmText/cancelText/danger. Async failures remain open with error; pending action disables buttons.
+- [GlobalNotice](https://xingjianxu.github.io/mtone/#/components/GlobalNotice): persistent warning banner with required `title`, optional `children`, `icon` (`false` hides the decorative default), `onAction`, `actionLabel`, `actionRef`, `loading`, `error`, and native div attributes/ref. `onAction` adds a button; with no visible label it uses a localized accessible dismiss name. Loading disables the action, and errors use alert semantics. The app owns retries, visibility and restoring focus to a stable control after dismissal. Use standalone or in the outer `AdminLayout.notice` slot, not inside a route page when it must persist across routes.
 - ToastProvider (alias Toast): wraps application, timeout and limit. `useToast().add({title,description})` creates a dismissible toast. Place inside MtoneProvider.
 
 Triggers use Base UI's `render` composition. Custom trigger components must forward ref and DOM props; standard mtone Button does this.
@@ -153,6 +154,17 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 - `Progress`: line, circle or dashboard progress, status, success segments, steps and custom information; see [Progress](#progress). PropertyList and PropertyItem(label): definition-list display.
 - Alert: tone info/success/warning/error, title, children, onClose.
 - Empty(title,description,action), Skeleton(native div props), Spinner(label).
+
+## Typography.Code
+
+Use `<Typography.Code>` inline or `<Typography.Code block>` for a semantic preformatted block.
+Add `language="tsx"` (or `js`, `ts`, `jsx`, `json`, `html`, `css`, `bash`) to opt into
+Shiki syntax highlighting for a string child. The engine and individual grammars
+load only when such a block is used. SSR, the initial client view, unsupported
+languages, and loading failures all retain plain text. Inline code and element
+children keep their previous rendering. Colors follow the current light, dark, or
+system mtone theme without changing the underlying code text.
+See [Code examples](https://xingjianxu.github.io/mtone/#/components/Typography?section=Code).
 
 ## Input family
 

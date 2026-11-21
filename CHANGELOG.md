@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.9.0
+
+### Breaking and migration
+- Replace the removed `IconButton` export with `Button iconOnly` and provide an accessible name. Replace the removed `Dropdown` export with `Popover`; `DropdownMenu` remains the Menu alias.
+- The default single-line controls, sidebar navigation and Tabs items now use a 32px outer height. Button sizes are 28/32/36px and can inherit from ButtonGroup; existing size aliases remain accepted. MultiSelect and other multiline controls still grow as needed. See [upgrade notes](docs/MIGRATION.md).
+
+### Added
+- DataList, CardGroup and collapsible cards, Questionnaire, CheckCard, and the AI messaging, activity and evidence components.
+- NavSubmenu, independent NavItem and NavGroup actions, NavGroup dividers, and native navigation links. PageLayout supports centered maximum widths; the standalone GlobalNotice can also sit above both AdminLayout columns without scrolling with the content.
+- Button leading/trailing content, opt-in pressed states, icon-only mode and the visual dropdown preset. Menu accepts string triggers and offers optional hover opening without replacing keyboard, click, or touch interaction.
+- Top attached Tabs with a themed panel seam, custom line-indicator colors, and a new coral accent shared by the theme palette. Card and editable-card alignment and native overflow navigation are preserved.
+- Typography title dividers and inline or block Code. Explicit block languages can opt into lazy syntax highlighting without loading rules for plain text.
+- Popover now supports width and horizontal alignment from Dropdown, plus optional unstyled presentation.
+
+### Fixed and documented
+- Keep the joined outline for ButtonGroup while a popup is open. Refine navigation spacing, narrow layouts, and Tabs hover and scroll seams.
+- Add an independent color-preset guide and keep the packaged AI reference and documentation synchronized.
+- Organize the documentation sidebar by component families and reading order while preserving component links and search.
+
 ## 0.8.0
 
 ### Breaking

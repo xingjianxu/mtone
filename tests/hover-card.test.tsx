@@ -233,8 +233,8 @@ it("does not treat an unrelated portal as its own", async () => {
   );
 });
 
-it("keeps the preview while a real nested Dropdown closes with Escape", async () => {
-  const { Dropdown } = await import("../packages/mtone/src");
+it("keeps the preview while a real nested Popover closes with Escape", async () => {
+  const { Popover } = await import("../packages/mtone/src");
   const { act } = await import("@testing-library/react");
   render(
     <HoverCard
@@ -244,16 +244,16 @@ it("keeps the preview while a real nested Dropdown closes with Escape", async ()
       content={
         <>
           <span>Nested parent content</span>
-          <Dropdown
+          <Popover
             defaultOpen
-            trigger={<button>Dropdown trigger</button>}
-            content={<button>Dropdown action</button>}
+            trigger={<button>Popover trigger</button>}
+            content={<button>Popover action</button>}
           />
         </>
       }
     />,
   );
-  const nested = await screen.findByText("Dropdown action");
+  const nested = await screen.findByText("Popover action");
   act(() => {
     screen.getByText("Nested owner").focus();
     nested.focus();
@@ -264,7 +264,7 @@ it("keeps the preview while a real nested Dropdown closes with Escape", async ()
   expect(screen.getByText("Nested parent content")).toBeVisible();
   await userEvent.keyboard("{Escape}");
   await waitFor(() =>
-    expect(screen.queryByText("Dropdown action")).not.toBeInTheDocument(),
+    expect(screen.queryByText("Popover action")).not.toBeInTheDocument(),
   );
   expect(screen.getByText("Nested parent content")).toBeVisible();
   await userEvent.keyboard("{Escape}");

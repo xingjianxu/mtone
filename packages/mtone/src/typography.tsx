@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Check, Copy, Pencil } from "lucide-react";
 import { cn, useMtone } from "./basic";
+import { CodeTokens, codeLanguages, type CodeLanguage, type CodeToken } from "./typography-code-tokens";
 
 export type TypographyTone = "secondary" | "success" | "warning" | "danger";
 export interface TypographyCopyable {
@@ -435,9 +436,11 @@ export interface TypographyCodeProps extends Omit<
 > {
   /** Render a preformatted block instead of inline code. */
   block?: boolean;
+  /** Highlight a supported language in multiline string blocks. */
+  language?: string;
 }
 const Code = React.forwardRef<HTMLElement, TypographyCodeProps>(function Code(
-  { block = false, children, className, tabIndex, ...props },
+  { block = false, language, children, className, tabIndex, ...props },
   ref,
 ) {
   const element = React.useRef<HTMLElement | null>(null);
@@ -445,6 +448,28 @@ const Code = React.forwardRef<HTMLElement, TypographyCodeProps>(function Code(
     element.current = node;
   }, []);
   const [overflows, setOverflows] = React.useState(false);
+  const [highlight, setHighlight] = React.useState<{
+    text: string;
+    language: CodeLanguage;
+    tokens: CodeToken[];
+  }>();
+  const candidateLanguage = language?.trim().toLowerCase();
+  const supported = block && codeLanguages.find((value) => value === candidateLanguage);
+  const text = typeof children === "string" ? children : undefined;
+  React.useEffect(() => {
+    if (!supported || !text) return;
+    let active = true;
+    import("./typography-highlight")
+      .then(({ highlightCode }) => highlightCode(text, supported))
+      .then((tokens) => {
+        if (active) setHighlight({ text, language: supported, tokens });
+      })
+      .catch(() => {
+        // Plain code already displays the exact input if the lazy module fails.
+      });
+    return () => { active = false; };
+  }, [supported, text]);
+  const tokens = supported && highlight?.language === supported && highlight.text === text ? highlight.tokens : undefined;
   React.useImperativeHandle(ref, () => element.current!, [block]);
   React.useLayoutEffect(() => {
     const node = element.current;
@@ -459,7 +484,7 @@ const Code = React.forwardRef<HTMLElement, TypographyCodeProps>(function Code(
       observer?.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [block, children, tabIndex]);
+  }, [block, children, tabIndex, tokens]);
 
   if (block) {
     return (
@@ -468,7 +493,7 @@ const Code = React.forwardRef<HTMLElement, TypographyCodeProps>(function Code(
         ref={setElement}
         tabIndex={tabIndex ?? (overflows ? 0 : undefined)}
         className={cn("mt-typography-code-block", className)}
-      ><code>{children}</code></pre>
+      ><code>{tokens ? <CodeTokens tokens={tokens} /> : children}</code></pre>
     );
   }
   return (

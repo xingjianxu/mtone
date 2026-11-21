@@ -5,17 +5,64 @@ export type PropDoc = {
   default?: string;
   description: string;
 };
-/** Classify by primary responsibility, never by incidental presentation (e.g. a menu is an action even when rendered in a popup).
- * Layout owns spatial structure; actions invoke commands; navigation changes location/view;
- * input collects values and filters; display presents records; overlays host contextual content;
- * feedback reports task/data state; configuration provides cross-component settings.
- * Keep related components and aliases together. Order is intentional, not catalog insertion order.
+/** Group by primary use; lists are in reading order, with base components before variants.
+ * Keep companion utilities together (e.g. Card/CardGroup, Popover/Menu, and Select/MultiSelect).
+ * This is the shared taxonomy for sidebar, catalog categories, and category search.
  */
-export const componentCategories = [
-  "布局容器", "操作命令", "导航切换", "数据录入",
-  "数据展示", "AI 界面", "浮层对话", "状态反馈", "全局配置",
-] as const;
-export type ComponentCategory = (typeof componentCategories)[number];
+const taxonomy = {
+  "布局容器": [
+    "AdminLayout", "PageLayout", "Splitter", "Affix", "Divider",
+  ],
+  "基础组件": [
+    "Button", "ButtonGroup", "Typography", "Title", "Text",
+    "Paragraph", "Link", "Blockquote",
+  ],
+  "导航切换": [
+    "Sidebar", "NavGroup", "NavItem", "NavSubmenu", "Breadcrumb",
+    "TableOfContents", "Tabs", "Segmented", "Pagination",
+  ],
+  "表单输入": [
+    "Form", "FormField", "Fieldset", "Input", "SearchInput",
+    "Textarea", "Mentions", "NumberInput", "AutoComplete", "Select",
+    "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
+    "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
+    "Slider", "Rate", "DatePicker", "FilterBar", "FilterChip",
+    "Upload", "Dropzone", "Questionnaire",
+  ],
+  "数据展示": [
+    "Card", "CardGroup", "List", "ListItem", "DataList",
+    "DocumentList", "DocumentCard", "Table", "Tree", "DirectoryTree",
+    "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
+    "Avatar", "AvatarGroup", "Badge", "Calendar", "Timeline",
+  ],
+  "弹层与菜单": [
+    "Popover", "Menu", "ContextMenu", "Menubar", "HoverCard",
+    "Tooltip", "Spotlight", "Dialog", "ConfirmDialog", "Popconfirm",
+    "Drawer",
+  ],
+  "状态反馈": [
+    "Alert", "GlobalNotice", "ToastProvider", "Toast", "Status",
+    "Progress", "Spinner", "LoadingOverlay", "Skeleton", "Empty",
+    "Result",
+  ],
+  "AI 界面": [
+    "AiChat", "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
+    "AiPlan", "AiChainOfThought", "AiReasoning", "AiTask", "AiQueue",
+    "AiSubagent", "AiTool", "AiCheckpoint", "AiConfirmation", "AiSources",
+    "AiInlineCitation", "AiContext", "AiFileTree", "AiStackTrace", "AiTerminal",
+    "AiTestResults",
+  ],
+  "全局配置": [
+    "MtoneProvider", "MtoneScope",
+  ],
+} as const;
+export type ComponentCategory = keyof typeof taxonomy;
+type DocumentedComponentName = (typeof taxonomy)[ComponentCategory][number];
+export const componentCategories = Object.keys(taxonomy) as ComponentCategory[];
+const categoryByName = new Map<string, ComponentCategory>();
+for (const category of componentCategories) {
+  for (const name of taxonomy[category]) categoryByName.set(name, category);
+}
 export type ComponentDoc = {
   name: string;
   category: ComponentCategory;
@@ -27,10 +74,9 @@ export type ComponentDoc = {
   sidebarParent?: string;
   demoLabel?: string;
 };
-export const componentDocs: ComponentDoc[] = [
+const componentReferences: (Omit<ComponentDoc, "category"> & { name: DocumentedComponentName })[] = [
   {
     name: "CheckCard",
-    category: "数据录入",
     description: "以卡片呈现可选项。独立使用可勾选，CheckCard.Group 管理单选或多选，CardGroup 负责响应式排列。",
     importNames: ["CheckCard", "CardGroup"],
     code: `import { CheckCard, CardGroup } from "@bixlab/mtone";
@@ -75,7 +121,6 @@ export default function Demo() {
   },
 {
   "name": "Questionnaire",
-  "category": "数据录入",
   "description": "逐题填写的多步问卷，支持单选、多选、自由文本、其他答案、必答校验和跳过。",
   "importNames": [
     "Questionnaire"
@@ -117,7 +162,6 @@ export default function Demo() {
 },
 {
   "name": "TreeSelect",
-  "category": "数据录入",
   "description": "在紧凑输入框中选择树形数据，支持单选、多选勾选、搜索和异步展开。",
   "importNames": [
     "TreeSelect"
@@ -316,7 +360,6 @@ export default function Demo() {
 },
 {
   "name": "Fieldset",
-  "category": "数据录入",
   "description": "用原生 fieldset 与 legend 为相关表单控件分组，支持统一禁用。",
   "importNames": [
     "Fieldset"
@@ -361,7 +404,6 @@ export default function Demo() {
 },
 {
   "name": "LoadingOverlay",
-  "category": "状态反馈",
   "description": "覆盖局部区域的紧凑加载遮罩，支持模糊、圆角和自定义加载内容。",
   "importNames": [
     "LoadingOverlay"
@@ -435,7 +477,6 @@ export default function Demo() {
 },
   {
     name: "HoverCard",
-    category: "浮层对话",
     description: "悬停或键盘聚焦显示的富内容预览卡片。",
     importNames: ["HoverCard", "Button"],
     code: '<HoverCard trigger={<Button>作者</Button>} title="mtone" withArrow content="简约紧凑的 React 组件库" />',
@@ -453,13 +494,12 @@ export default function Demo() {
     ],
     notes: [
       "复用 Base UI PreviewCard 的悬停安全区域、延迟与键盘聚焦行为。鼠标从触发元素移动到卡片时保持显示；Escape 或点击外部关闭。不会自动把焦点移入卡片。",
-      "HoverCard 用于补充预览，不替代点击式 Popover 或 Dropdown；表单和必须完成的操作应使用后者。触摸设备不依赖悬停打开，也不拦截触发链接原本点击。",
+      "HoverCard 用于补充预览，不替代点击式 Popover；表单和必须完成的操作应使用 Popover。触摸设备不依赖悬停打开，也不拦截触发链接原本点击。",
       "提供可聚焦 trigger 以支持键盘；预览信息不应是完成任务的唯一入口。API 不兼容 Mantine，不提供复合子组件、delay group 或触摸开关。",
     ],
   },
   {
     name: "Cascader",
-    category: "数据录入",
     description:
       "路径式级联选择，支持单选、多选联动、搜索、异步加载与独立面板。",
     importNames: ["Cascader"],
@@ -627,7 +667,6 @@ export default function Demo() {
   },
   {
     name: "CascaderPanel",
-    category: "数据录入",
     description:
       "常驻页面的级联选择面板，复用路径选择、多选联动、搜索与异步加载交互。",
     importNames: ["CascaderPanel"],
@@ -739,7 +778,6 @@ export default function Demo() {
   },
 {
   "name": "Transfer",
-  "category": "数据录入",
   "description": "双栏穿梭选择，支持搜索、分页、单向移动和自定义列表。",
   "importNames": [
     "Transfer"
@@ -851,7 +889,6 @@ export default function Demo() {
 },
 {
   "name": "AutoComplete",
-  "category": "数据录入",
   "description": "允许自由输入的自动补全，支持分组建议、远程搜索与完整键盘交互。",
   "importNames": [
     "AutoComplete"
@@ -969,7 +1006,6 @@ export default function Demo() {
 },
 {
   "name": "TableOfContents",
-  "category": "导航切换",
   "description": "自动采集文章标题、跟随滚动高亮并跳转的页内目录，适合文档与知识库。",
   "importNames": [
     "TableOfContents"
@@ -1094,7 +1130,6 @@ export default function Demo() {
 },
 {
   "name": "Image",
-  "category": "数据展示",
   "description": "带加载占位、失败备用图和模态大图预览的图片。",
   "importNames": [
     "Image"
@@ -1176,7 +1211,6 @@ export default function Demo() {
 },
 {
   "name": "ImageGroup",
-  "category": "数据展示",
   "description": "使用显式图片数组展示缩略图，并在同一个预览器中前后切换。",
   "importNames": [
     "ImageGroup"
@@ -1232,7 +1266,6 @@ export default function Demo() {
 },
 {
   "name": "ImagePreview",
-  "category": "数据展示",
   "description": "独立、受控的模态图片预览器，可由任意业务按钮打开而不渲染缩略图。",
   "importNames": [
     "ImagePreview"
@@ -1292,7 +1325,6 @@ export default function Demo() {
 },
 {
   "name": "Timeline",
-  "category": "数据展示",
   "description": "紧凑的时间线，支持横向、纵向、交替排列、标题、加载节点及倒序。",
   "importNames": [
     "Timeline"
@@ -1359,7 +1391,7 @@ export default function Demo() {
   ]
 },
 {
- name: "Affix", category: "布局容器", description: "将操作栏固定到窗口或滚动容器的顶部、底部，并保留原位置占位。",
+ name: "Affix", description: "将操作栏固定到窗口或滚动容器的顶部、底部，并保留原位置占位。",
  importNames: ["Affix", "Button"],
  code: 'import { Affix, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() { return <Affix offsetTop={16}><Button>保存</Button></Affix>; }',
  props: [
@@ -1375,7 +1407,6 @@ export default function Demo() {
 
 {
   "name": "Result",
-  "category": "状态反馈",
   "description": "操作结果页：状态图标、标题、说明、动作与详细内容，沿用 mtone 紧凑风格。",
   "importNames": [
     "Result",
@@ -1424,7 +1455,6 @@ export default function Demo() {
 },
 {
   "name": "Popconfirm",
-  "category": "浮层对话",
   "description": "轻量的锚定确认浮层，支持异步确认、失败重试、键盘操作和边界避让。",
   "importNames": [
     "Popconfirm",
@@ -1513,7 +1543,6 @@ export default function Demo() {
 },
 {
   "name": "Rate",
-  "category": "数据录入",
   "description": "紧凑的星级评分，支持半星、受控值、键盘操作与自定义字符。",
   "importNames": [
     "Rate"
@@ -1614,7 +1643,6 @@ export default function Demo() {
 },
 {
   "name": "Calendar",
-  "category": "数据展示",
   "description": "使用 mtone 样式展示月历、年度概览与日期内容，支持完整面板及紧凑卡片。",
   "importNames": [
     "Calendar"
@@ -1719,7 +1747,6 @@ export default function Demo() {
 },
 {
   "name": "Mentions",
-  "category": "数据录入",
   "description": "紧凑的纯文本提及输入框，支持光标候选、多个触发符、键盘选择与异步搜索。",
   "importNames": [
     "Mentions",
@@ -1867,7 +1894,6 @@ export default function Demo() {
 },
 {
   "name": "Splitter",
-  "category": "布局容器",
   "description": "可拖动的紧凑分栏布局，支持横向、纵向、受控大小和可折叠面板。",
   "importNames": [
     "Splitter"
@@ -1988,7 +2014,6 @@ export default function Demo() {
 },
 {
   "name": "Spotlight",
-  "category": "操作命令",
   "description": "可搜索的快捷操作面板，支持分组、键盘导航和动作回调。",
   "importNames": [
     "Spotlight"
@@ -2110,7 +2135,6 @@ export default function Demo() {
 },
   {
     name: "PageLayout",
-    category: "布局容器",
     description: "组织单页标题、操作、标签页和内容，也可限制整页宽度并在父容器内居中。",
     importNames: ["PageLayout"],
     code: 'import { PageLayout } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <PageLayout title="项目总览" maxWidth="md">本周有 3 项任务待处理。</PageLayout>;\n}',
@@ -2131,7 +2155,6 @@ export default function Demo() {
   },
   {
     name: "AdminLayout",
-    category: "布局容器",
     description:
       "可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。",
     importNames: ["AdminLayout"],
@@ -2208,6 +2231,11 @@ export default function Demo() {
         description: "继承 Sidebar 的切换按钮可访问名称。",
       },
       {
+        name: "notice",
+        type: "ReactNode",
+        description: "可选全宽通知插槽，位于外层布局的侧栏与主栏上方。可放入 GlobalNotice；不随应用内容区切换或滚动。",
+      },
+      {
         name: "AdminLayout.Header.breadcrumb",
         type: "ReactNode",
         description: "顶部左侧插槽；建议传入已有 Breadcrumb 组件。",
@@ -2238,6 +2266,7 @@ export default function Demo() {
       },
     ],
     notes: [
+      "将跨页面的状态通知放在持续挂载的外层 AdminLayout.notice，不要放在会随路由切换的 Content 子页面。应用负责状态、异步操作和关闭后的焦点。",
       "主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。",
       "使用 AdminLayout.Sider、AdminLayout.Header、AdminLayout.Content、AdminLayout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。",
       "AdminLayout.Sider 复用本库 Sidebar 的状态、32px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。",
@@ -2249,7 +2278,6 @@ export default function Demo() {
   },
   {
     name: "Button",
-    category: "操作命令",
     description: "带完整样式的基础操作按钮，支持可选的按下状态。",
     importNames: ["Button"],
     code: "import React from \"react\";\nimport { ArrowRight, Download, Image, Plus } from \"lucide-react\";\nimport { Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <div style={{ display: \"flex\", gap: 8, flexWrap: \"wrap\" }}>\n      <Button leftSection={<Image size={14} aria-hidden=\"true\" />}>图库</Button>\n      <Button\n        variant=\"solid\"\n        rightSection={<Download size={14} aria-hidden=\"true\" />}\n      >\n        下载\n      </Button>\n      <Button\n        variant=\"soft\"\n        leftSection={<Image size={14} aria-hidden=\"true\" />}\n        rightSection={<ArrowRight size={14} aria-hidden=\"true\" />}\n      >\n        查看图库\n      </Button>\n      <Button iconOnly aria-label=\"添加文档\">\n        <Plus size={16} aria-hidden=\"true\" />\n      </Button>\n    </div>\n  );\n}",
@@ -2352,7 +2380,6 @@ export default function Demo() {
   },
   {
     name: "ButtonGroup",
-    category: "操作命令",
     description: "将关联按钮组织为一个操作组，支持默认分开排列或相连组合。",
     importNames: ["ButtonGroup", "Button", "Menu"],
     code: "import { useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { ButtonGroup, Button, Menu } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [message, setMessage] = useState(\"\");\n  return (\n    <div>\n      <ButtonGroup connected aria-label=\"导出文档\">\n        <Button onClick={() => setMessage(\"已选择导出 PDF\")}>导出 PDF</Button>\n        <Menu\n          trigger={<Button iconOnly aria-label=\"更多导出格式\"><ChevronDown size={14} /></Button>}\n          items={[\n            { key: \"markdown\", label: \"导出 Markdown\", onSelect: () => setMessage(\"已选择导出 Markdown\") },\n            { key: \"html\", label: \"导出 HTML\", onSelect: () => setMessage(\"已选择导出 HTML\") },\n          ]}\n        />\n      </ButtonGroup>\n      <p role=\"status\">{message}</p>\n    </div>\n  );\n}",
@@ -2375,7 +2402,6 @@ export default function Demo() {
   },
   {
   "name": "Input",
-  "category": "数据录入",
   "description": "紧凑输入家族：基础、搜索、密码、多行文本与分格验证码。",
   "importNames": [
     "Input"
@@ -2486,7 +2512,6 @@ export default function Demo() {
 },
   {
     name: "SearchInput",
-    category: "数据录入",
     description: "Input.Search 的兼容导出；新代码推荐 Input.Search。",
     importNames: ["SearchInput"],
     code: 'import { SearchInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <SearchInput aria-label="搜索文档" placeholder="搜索文档…" />\n  );\n}',
@@ -2527,7 +2552,6 @@ export default function Demo() {
   },
   {
     name: "Textarea",
-    category: "数据录入",
     description: "Input.TextArea 的兼容导出，用于多行说明和长文本。",
     importNames: ["Textarea"],
     code: 'import { Textarea } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Textarea aria-label="说明" rows={4} placeholder="记录你的想法" />\n  );\n}',
@@ -2568,7 +2592,6 @@ export default function Demo() {
   },
 {
   "name": "Form",
-  "category": "数据录入",
   "description": "管理字段值与同步/异步校验，支持受验证的提交回调并保留原生表单用法。",
   "importNames": [
     "Form",
@@ -2683,7 +2706,6 @@ export default function Demo() {
 },
 {
   "name": "FormField",
-  "category": "数据录入",
   "description": "关联字段标签与帮助信息，配合 Form 的 name/rules 自动管理值和校验。",
   "importNames": [
     "Form",
@@ -2806,7 +2828,6 @@ export default function Demo() {
 },
   {
     name: "Checkbox",
-    category: "数据录入",
     description: "勾选状态切换。",
     importNames: ["Checkbox"],
     code: 'import { Checkbox } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Checkbox label="自动保存" defaultChecked />\n  );\n}',
@@ -2861,7 +2882,6 @@ export default function Demo() {
   },
   {
     name: "Switch",
-    category: "数据录入",
     description: "开关式布尔状态控制。",
     importNames: ["Switch"],
     code: 'import { Switch } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Switch label="自动保存" defaultChecked />\n  );\n}',
@@ -2911,7 +2931,6 @@ export default function Demo() {
   },
   {
     name: "RadioGroup",
-    category: "数据录入",
     description: "从一组选项中选择一个值。",
     importNames: ["RadioGroup"],
     code: 'import { RadioGroup } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <RadioGroup label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />\n  );\n}',
@@ -2968,7 +2987,6 @@ export default function Demo() {
   },
   {
     name: "Segmented",
-    category: "导航切换",
     description: "用紧凑分段按钮切换视图或模式。",
     importNames: ["Segmented"],
     code: 'import { Segmented } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Segmented label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />\n  );\n}',
@@ -3025,7 +3043,6 @@ export default function Demo() {
   },
   {
     name: "Select",
-    category: "数据录入",
     description: "带浮层列表的单选控件。",
     importNames: ["Select"],
     code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Select label="分类" defaultValue="design" options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />\n  );\n}',
@@ -3097,7 +3114,6 @@ export default function Demo() {
   },
   {
     name: "TagSelect",
-    category: "数据录入",
     description: "将多选选项平铺为标签，空间不足时可展开。",
     importNames: ["TagSelect"],
     code: `import { TagSelect } from "@bixlab/mtone";
@@ -3125,7 +3141,6 @@ export default function Demo() {
   },
   {
     name: "MultiSelect",
-    category: "数据录入",
     description: "支持搜索与移除标签的多选控件。",
     importNames: ["MultiSelect"],
     code: 'import { MultiSelect } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MultiSelect label="分类" defaultValue={["design"]} options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />\n  );\n}',
@@ -3197,7 +3212,6 @@ export default function Demo() {
   },
   {
     name: "Slider",
-    category: "数据录入",
     description: "通过滑轨调整一个数值。",
     importNames: ["Slider"],
     code: 'import { Slider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Slider label="数量" defaultValue={20} min={0} max={100} step={5} />\n  );\n}',
@@ -3252,7 +3266,6 @@ export default function Demo() {
   },
   {
     name: "NumberInput",
-    category: "数据录入",
     description: "带增减按钮的数字输入框。",
     importNames: ["NumberInput"],
     code: 'import { NumberInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NumberInput label="数量" defaultValue={20} min={0} max={100} step={5} />\n  );\n}',
@@ -3307,7 +3320,6 @@ export default function Demo() {
   },
   {
     name: "DatePicker",
-    category: "数据录入",
     description: "使用浏览器原生日历的单日期选择。",
     importNames: ["DatePicker"],
     code: 'import { DatePicker } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DatePicker label="完成日期" defaultValue="2026-11-15" min="2026-01-01" max="2026-12-31" />\n  );\n}',
@@ -3373,7 +3385,6 @@ export default function Demo() {
   },
   {
     name: "Sidebar",
-    category: "导航切换",
     description: "支持展开与图标窄栏切换的应用侧栏。",
     importNames: ["Sidebar", "NavItem"],
     code: 'import { Sidebar, NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
@@ -3446,7 +3457,6 @@ export default function Demo() {
   },
   {
     name: "NavItem",
-    category: "导航切换",
     description: "支持当前状态和图标的导航项，可作为按钮或原生链接，并可添加独立的尾部操作。",
     importNames: ["NavItem"],
     code: 'import { NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <NavItem active onClick={() => console.log("navigation")}>我的知识库</NavItem>\n  );\n}',
@@ -3502,7 +3512,6 @@ export default function Demo() {
   },
   {
     name: "NavSubmenu",
-    category: "导航切换",
     description: "有子项的侧边栏导航；展开时内联，收起时侧向弹出。",
     importNames: ["NavSubmenu", "NavItem", "Sidebar"],
     code: 'import { NavSubmenu, NavItem, Sidebar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Sidebar collapsible><NavSubmenu label="账单与许可" defaultExpanded><NavItem active>用量</NavItem><NavItem>许可</NavItem></NavSubmenu></Sidebar>;\n}',
@@ -3522,7 +3531,6 @@ export default function Demo() {
   },
   {
     name: "NavGroup",
-    category: "导航切换",
     description: "以可选标题组织导航项，相邻组默认以细线分隔，标题末端可放置独立操作。",
     importNames: ["NavGroup", "NavItem", "Button"],
     code: `import { useState } from "react";
@@ -3577,7 +3585,6 @@ export default function Demo() {
   },
   {
       "name": "Breadcrumb",
-      "category": "导航切换",
       "description": "紧凑的层级路径，支持图标、下拉菜单与自定义分隔符。",
       "importNames": [
         "Breadcrumb"
@@ -3632,7 +3639,6 @@ export default function Demo() {
   },
   {
     name: "Tree",
-    category: "数据展示",
     description:
       "保持紧凑风格的层级树，支持多选、级联勾选、目录模式、异步加载、拖放事件与虚拟滚动。",
     importNames: ["Tree", "DirectoryTree"],
@@ -3870,7 +3876,6 @@ export default function Demo() {
   },
   {
   "name": "DirectoryTree",
-  "category": "数据展示",
   "description": "Tree 的目录交互模式，默认文件夹 / 文件图标，支持点击展开与桌面式多选。",
   "importNames": [
     "DirectoryTree"
@@ -3914,7 +3919,6 @@ export default function Demo() {
 },
   {
     name: "Tabs",
-    category: "导航切换",
     description: "中性风格的标签切换，支持顶部贴合、卡片编辑、多方向布局和溢出导航。",
     importNames: ["Tabs"],
     code: 'import { Tabs } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />;\n}',
@@ -4024,7 +4028,6 @@ export default function Demo() {
   },
   {
     name: "FilterBar",
-    category: "数据录入",
     description: "筛选控件的弹性布局容器。",
     importNames: ["FilterBar", "FilterChip", "Button"],
     code: 'import { FilterBar, FilterChip, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <FilterBar><FilterChip onRemove={() => console.log("remove")}>分类：设计</FilterChip><Button>添加筛选</Button></FilterBar>\n  );\n}',
@@ -4045,7 +4048,6 @@ export default function Demo() {
   },
   {
     name: "FilterChip",
-    category: "数据录入",
     description: "展示已生效条件并提供移除操作。",
     importNames: ["FilterChip"],
     code: 'import { useState } from "react";\nimport { FilterChip } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [visible, setVisible] = useState(true);\n  if (!visible) return <span>筛选已移除</span>;\n  return (\n    <FilterChip onRemove={() => setVisible(false)}>分类：设计</FilterChip>\n  );\n}',
@@ -4065,7 +4067,6 @@ export default function Demo() {
   },
   {
     name: "Pagination",
-    category: "导航切换",
     description: "完全受控的分页导航。",
     importNames: ["Pagination"],
     code: 'import { useState } from "react";\nimport { Pagination } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [page, setPage] = useState(1);\n  return (\n    <Pagination total={80} pageSize={10} page={page} onPageChange={setPage} />\n  );\n}',
@@ -4100,31 +4101,7 @@ export default function Demo() {
     notes: ["不自动加载数据。首尾翻页按钮会禁用；大量页码显示省略。"],
   },
   {
-    name: "Dropdown",
-    category: "浮层对话",
-    description: "独立的触发式下拉容器，承载任意自定义内容，默认按内容宽度。",
-    importNames: ["Dropdown", "Button"],
-    code: "import { Dropdown, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Dropdown trigger={<Button>查看信息</Button>} align=\"right\" width={240} label=\"文档信息\" content={<div style={{padding:8}}>这里可以放置说明、表单或自定义内容。</div>} />;\n}",
-    props: [
-      { name: "trigger", type: "ReactElement", description: "必填；触发元素，需转发 ref 与 DOM props。" },
-      { name: "content", type: "ReactNode", description: "必填；任意下拉内容。点击内部内容不会自动关闭。" },
-      { name: "label", type: "string", description: "非模态 dialog 的可访问名称；默认中文为下拉内容，英文为 Dropdown content。" },
-      { name: "width", type: "CSSProperties['width']", description: "默认按内容宽度，最小 160px，不跟随 trigger；number 为 px，也可用 rem/ch/vw 等 CSS 宽度。显式宽度允许小于 160px；最终受可用视口宽度约束。" },
-      { name: "align", type: "'start' | 'end' | 'left' | 'right'", default: "start", description: "首选与 trigger 的对齐边。left/right 是物理左右；start/end 在 RTL 中反转。空间不足时自动避让、移位或翻转。" },
-      { name: "open", type: "boolean", description: "受控开关。" },
-      { name: "defaultOpen", type: "boolean", description: "非受控初始开关。" },
-      { name: "onOpenChange", type: "(open: boolean) => void", description: "开关变化回调。" },
-    ],
-    notes: [
-      "Dropdown 是非模态 dialog，使用 Tab 导航自定义交互内容。操作菜单请使用 Menu，它保留菜单语义与方向键导航；两者共享浮层实现而不是嵌套浮层。",
-      "Escape、外部点击可关闭并由 Base UI 管理焦点返回。内部保存/取消动作需要关闭时，使用 open/onOpenChange 自行控制。",
-      "LTR 下 start 是左边、end 是右边；RTL 下相反。left/right 始终表示物理左右。RTL 交互需由 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 提供方向上下文，并设置相应 DOM dir。",
-      "默认宽度 max-content，最小宽度 160px；窄屏时最小宽度也会收缩。超长文本折行，超过最大高度的内容滚动。百分比宽度相对于定位容器，不是 trigger，优先使用像素或 rem/ch 等明确长度。",
-    ],
-  },
-  {
     name: "Menubar",
-    category: "操作命令",
     description: "桌面应用式菜单栏，协调多个操作菜单，支持子菜单、分组及键盘导航。",
     importNames: ["Menubar"],
     code: 'import { Menubar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Menubar aria-label="编辑器菜单" menus={[{key:"file",label:"文件",items:[{key:"new",label:"新建"},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"md",label:"Markdown"}]}]},{key:"edit",label:"编辑",items:[{key:"undo",label:"撤销"}]}]} onSelect={(itemKey, menuKey) => console.log(menuKey, itemKey)} />;\n}',
@@ -4142,7 +4119,7 @@ export default function Demo() {
     ],
     notes: [
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。",
-      "Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一操作入口用 Menu，任意自定义浮层内容用 Dropdown。三者共享浮层样式，Menubar 与 Menu 保留菜单语义，不嵌套额外 dialog。",
+      "Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一操作入口用 Menu，任意自定义浮层内容用 Popover。三者共享浮层样式，Menubar 与 Menu 保留菜单语义，不嵌套额外 dialog。",
       "菜单栏作为一个 Tab 停靠点，左右方向键移动顶层焦点；Enter、Space 或向下键进入菜单，Escape 退出并返回触发项。键盘逻辑由 Base UI 管理。快捷键文字仅展示，不注册全局快捷键。",
       "RTL 同时提供 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 与 DOM dir=rtl；start/end 和左右方向键按方向上下文工作。",
       "菜单栏保持单行，窄屏时横向滚动；浮层受可用视口宽高限制。保留 mtone 紧凑高度、灰色背景与淡蓝色细边框。",
@@ -4152,7 +4129,6 @@ export default function Demo() {
   },
   {
     name: "Menu",
-    category: "操作命令",
     description: "默认点击打开的操作菜单，可启用悬停，支持分组与多级子菜单。",
     importNames: ["Menu", "Button"],
     code: 'import { Menu } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu trigger="文档操作" items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
@@ -4200,7 +4176,7 @@ export default function Demo() {
     notes: [
       "悬停时鼠标可以从触发器跨过间隙进入菜单并继续进入子菜单；离开菜单区域后关闭。受控 open / onOpenChange 与条目选择规则不变。",
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。",
-      "Menu 复用 Dropdown 的浮层布局，但仍使用菜单语义、方向键与选择关闭。通用自定义内容使用 Dropdown。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。",
+      "Menu 与 Popover 共用浮层定位和外观基础，但 Menu 保留菜单语义、方向键与选择关闭。通用自定义内容使用 Popover。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。",
       "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",
       "快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。",
       "复选项 type: checkbox 支持 checked/defaultChecked、onCheckedChange 与 closeOnClick（默认 false）。单选组 type: radio-group 支持 label、value/defaultValue、onValueChange 与 children，子项 key 是选择值；选择后保持打开。两类选择使用各自变更回调，不调用 Menu 的 onSelect。",
@@ -4210,7 +4186,6 @@ export default function Demo() {
   },
   {
     name: "ContextMenu",
-    category: "操作命令",
     description: "在指定区域右键打开操作菜单。",
     importNames: ["ContextMenu"],
     code: 'import { ContextMenu } from "@bixlab/mtone";\nimport { Copy } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ContextMenu items={[{key:"copy",label:"复制",icon:<Copy />},{key:"paste",label:"粘贴",shortcut:"⌘V"}]} onSelect={(key) => console.log(key)}><div style={{padding:24}}>在此区域点击右键</div></ContextMenu>\n  );\n}',
@@ -4252,15 +4227,14 @@ export default function Demo() {
   },
   {
     name: "Popover",
-    category: "浮层对话",
-    description: "点击展开的轻量信息或操作浮层。",
-    importNames: ["Popover", "Button"],
-    code: 'import { Popover, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Popover trigger={<Button>查看说明</Button>} title="提示" content="这里放置相关内容。" />\n  );\n}',
+    description: "点击打开的非模态浮层，适合信息、表单和自定义卡片。",
+    importNames: ["Popover"],
+    code: 'import { Popover } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />\n  );\n}',
     props: [
       {
         name: "trigger",
-        type: "ReactElement",
-        description: "必填；触发元素。",
+        type: "string | ReactElement",
+        description: "必填；字符串使用 Button 的 dropdown 预设，自定义触发器可传 React 元素。",
       },
       {
         name: "content",
@@ -4271,6 +4245,28 @@ export default function Demo() {
         name: "title",
         type: "ReactNode",
         description: "浮层标题。",
+      },
+      {
+        name: "label",
+        type: "string",
+        description: "浮层的可访问名称，优先于可见 title。无 title 和 label 时默认使用浮层内容 / Popover content。",
+      },
+      {
+        name: "width",
+        type: "number | string",
+        description: "浮层宽度，数字为 px；默认随内容而非触发按钮，且自动约束在视口内。",
+      },
+      {
+        name: "align",
+        type: '"start" | "center" | "end" | "left" | "right"',
+        default: "center",
+        description: "沿边对齐。上下浮层的 start/end 随布局方向，left/right 为物理边；左右浮层用 start/end 对齐上/下边。",
+      },
+      {
+        name: "unstyled",
+        type: "boolean",
+        default: "false",
+        description: "去除浮层自身的背景、边框、阴影和内边距，保留定位及非模态行为；适合让 Card 绘制外框。",
       },
       {
         name: "side",
@@ -4295,12 +4291,11 @@ export default function Demo() {
       },
     ],
     notes: [
-      "自定义触发器需转发 ref 与 DOM props。浮层自动继承 MtoneProvider 上下文。",
+      "Popover 是非模态 dialog，可使用 Tab 操作表单，Escape 关闭并恢复焦点；命令菜单请使用 Menu。自定义触发器需转发 ref 与 DOM props，浮层继承 MtoneProvider 上下文。",
     ],
   },
   {
     name: "Tooltip",
-    category: "浮层对话",
     description: "悬停或聚焦时显示简短说明。",
     importNames: ["Tooltip", "Button"],
     code: 'import { Tooltip, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tooltip content="复制当前链接"><Button>复制链接</Button></Tooltip>\n  );\n}',
@@ -4341,7 +4336,6 @@ export default function Demo() {
   },
 {
   "name": "CardGroup",
-  "category": "布局容器",
   "description": "排列多个独立卡片，支持响应式列数与间距、跨列、纵向排列和行列分隔线。",
   "importNames": [
     "CardGroup",
@@ -4395,7 +4389,6 @@ export default function Demo() {
 },
   {
     "name": "Card",
-    "category": "数据展示",
     "description": "紧凑的结构化内容卡片，支持封面、操作、加载、标签页、元信息与网格。",
     "importNames": [
       "Card",
@@ -4522,7 +4515,6 @@ export default function Demo() {
   },
   {
   "name": "Typography",
-  "category": "数据展示",
   "description": "统一的标题、正文、段落、链接、引用与代码，按子组件独立演示，支持复制、纯文本编辑及省略展开。",
   "importNames": [
     "Typography"
@@ -4530,6 +4522,7 @@ export default function Demo() {
   "code": "import { Typography } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <section>\n    <Typography.Title level={2}>工作笔记</Typography.Title>\n    <Typography.Paragraph copyable>让内容清晰、有层次。</Typography.Paragraph>\n    <Typography.Text muted>更新于今天</Typography.Text>\n    <Typography.Link href=\"/docs\">查看文档</Typography.Link>\n  </section>;\n}",
   "props": [
     {"name":"Title.divider", "type":"boolean", "default":"level === 2", "description":"标题下方的整行分隔线，仅二级标题默认启用；不同于给文字添加下划线的 underline。"},
+    {"name":"Code.language", "type":"string", "description":"可选语法高亮语言。仅代码块的字符串内容启用；支持 js、ts、jsx、tsx、json、html、css、bash。默认、行内、其他语言及加载失败均保持纯文本或原有子内容。"},
     {"name":"Code.block", "type":"boolean", "default":"false", "description":"Typography.Code 默认渲染行内 <code>；block 渲染 <pre><code> 并保留缩进和换行。长行在块内滚动，溢出时可用 Tab 聚焦并按左右方向键滚动。"},
     {"name":"Blockquote", "type":"BlockquoteProps", "description":"引用子组件；支持 cite 可见署名、citeUrl 来源 URL、icon、iconSize（默认 28）、color（CSS 色值）、radius（默认 4）、textWrap（默认 wrap）。它不支持 Text 的复制、编辑或省略属性；完整 API 见 Blockquote 条目。"},
     {
@@ -4575,7 +4568,7 @@ export default function Demo() {
   ],
   "notes": [
     "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。",
-    "Typography.Code 只从 Typography 命名空间使用，支持原生属性和 ref（指向外层 code 或 pre）；可用 tabIndex 覆盖默认 Tab 顺序。不提供语法高亮或复制按钮；Typography.Text 的 code 用法保持不变。",
+    "Typography.Code 只从 Typography 命名空间使用，支持原生属性和 ref（指向外层 code 或 pre）；可用 tabIndex 覆盖默认 Tab 顺序。使用 block language=\"tsx\" 等可按需启用 Shiki。服务端和首次显示保留原文，浏览器按需着色并随最近主题切换，文本、缩进和换行不变。不内置复制按钮；Typography.Text 的 code 用法保持不变。",
     "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
     "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
     "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",
@@ -4584,7 +4577,6 @@ export default function Demo() {
 },
   {
   "name": "Blockquote",
-  "category": "数据展示",
   "description": "Typography.Blockquote 引用块，支持署名、来源 URL、装饰图标与可选强调色。",
   "importNames": [
     "Blockquote",
@@ -4635,7 +4627,6 @@ export default function Demo() {
 },
   {
   "name": "Text",
-  "category": "数据展示",
   "description": "兼容原有 muted 的行内文本，支持文字修饰与交互。",
   "importNames": [
     "Text"
@@ -4693,7 +4684,6 @@ export default function Demo() {
 },
   {
   "name": "Title",
-  "category": "数据展示",
   "description": "遵循 mtone 字号与间距的语义标题，支持 h1 至 h6 与可选整行分隔线。",
   "importNames": [
     "Title"
@@ -4763,7 +4753,6 @@ export default function Demo() {
 },
   {
   "name": "Paragraph",
-  "category": "数据展示",
   "description": "支持复制、编辑和多行省略的语义段落。",
   "importNames": [
     "Paragraph"
@@ -4821,7 +4810,6 @@ export default function Demo() {
 },
   {
   "name": "Link",
-  "category": "数据展示",
   "description": "使用 mtone 中性色和轻量悬停背景的语义链接。",
   "importNames": [
     "Link"
@@ -4852,7 +4840,6 @@ export default function Demo() {
 },
   {
     name: "Divider",
-    category: "布局容器",
     description: "水平或垂直分隔线，支持标题、对齐、线型与紧凑间距。",
     importNames: ["Divider"],
     code: 'import { Divider } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <div><Divider titlePlacement="start">基本信息</Divider><p>内容</p><Divider variant="dashed" plain>更多</Divider><span>编辑</span><Divider orientation="vertical" /><span>归档</span></div>;\n}',
@@ -4912,7 +4899,6 @@ export default function Demo() {
   },
   {
     name: "List",
-    category: "数据展示",
     description: "语义化列表，支持数据渲染、虚拟滚动、分组吸顶与滚动定位。",
     importNames: ["List", "ListItem"],
     code: 'import { List } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nconst items = Array.from({length: 10000}, (_, id) => ({id, title: `记录 ${id + 1}`}));\nexport default function Demo() {\n  return <List items={items} getKey={item => item.id} renderItem={item => item.title} height={240} virtual />;\n}',
@@ -4940,7 +4926,6 @@ export default function Demo() {
   },
   {
     name: "DataList",
-    category: "数据展示",
     description: "用于管理记录的列表，支持搜索筛选、分页、跨页选择、批量操作和行详情。",
     importNames: ["DataList"],
     code: `import { DataList, Text } from "@bixlab/mtone";
@@ -4987,7 +4972,6 @@ export default function Demo() {
   },
   {
     name: "ListItem",
-    category: "数据展示",
     description: "包含图标、说明与尾部操作的列表项。",
     importNames: ["ListItem", "List", "Button"],
     code: 'import { ListItem, List, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <List><ListItem description="记录项目过程" actions={<Button size="sm">打开</Button>}>研究笔记</ListItem></List>\n  );\n}',
@@ -5024,7 +5008,6 @@ export default function Demo() {
   },
   {
     name: "DocumentList",
-    category: "数据展示",
     description: "面向知识库文档的标题与摘要列表。",
     importNames: ["DocumentList"],
     code: 'import { DocumentList } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DocumentList items={[{id:"guide",title:"使用指南",description:"从一个想法开始",updatedAt:"今天",onClick:() => console.log("open guide")}]} />\n  );\n}',
@@ -5044,7 +5027,6 @@ export default function Demo() {
   },
   {
     name: "DocumentCard",
-    category: "数据展示",
     description: "以卡片展示一份文档。",
     importNames: ["DocumentCard"],
     code: 'import { DocumentCard } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <DocumentCard id="guide" title="使用指南" description="从一个想法开始" updatedAt="今天" onClick={() => console.log("open guide")} />\n  );\n}',
@@ -5079,7 +5061,6 @@ export default function Demo() {
   },
   {
     name: "Table",
-    category: "数据展示",
     description:
       "保留 mtone 紧凑风格的数据表格，支持高级排序筛选、选择、展开、固定布局与虚拟滚动。",
     importNames: ["Table"],
@@ -5262,7 +5243,6 @@ export default function Demo() {
   },
   {
     name: "Badge",
-    category: "数据展示",
     description: "紧凑的低饱和标签，支持语义颜色与可选移除操作。",
     importNames: ["Badge"],
     code: 'import { Badge } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Badge tone="green">已完成</Badge>\n  );\n}',
@@ -5294,7 +5274,6 @@ export default function Demo() {
   },
   {
     name: "Status",
-    category: "状态反馈",
     description: "使用状态点和文字表达进度。",
     importNames: ["Status"],
     code: 'import { Status } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Status tone="green">已完成</Status>\n  );\n}',
@@ -5315,7 +5294,6 @@ export default function Demo() {
   },
 {
   "name": "Avatar",
-  "category": "数据展示",
   "description": "支持图片、图标、自动缩放文字、响应式尺寸及方形头像。",
   "importNames": [
     "Avatar"
@@ -5380,7 +5358,6 @@ export default function Demo() {
 },
 {
   "name": "AvatarGroup",
-  "category": "数据展示",
   "description": "叠放头像，并通过可键盘操作的 +N 按钮查看溢出成员。",
   "importNames": [
     "AvatarGroup"
@@ -5428,7 +5405,6 @@ export default function Demo() {
 },
 {
   "name": "Progress",
-  "category": "状态反馈",
   "description": "紧凑的线性、圆形与仪表盘进度，支持状态、步骤、成功分段、渐变和自定义信息。",
   "importNames": [
     "Progress"
@@ -5544,7 +5520,6 @@ export default function Demo() {
 },
   {
     name: "PropertyList",
-    category: "数据展示",
     description: "文档属性的定义列表容器。",
     importNames: ["PropertyList", "PropertyItem"],
     code: 'import { PropertyList, PropertyItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <PropertyList><PropertyItem label="类型">文档</PropertyItem><PropertyItem label="状态">进行中</PropertyItem></PropertyList>\n  );\n}',
@@ -5559,7 +5534,6 @@ export default function Demo() {
   },
   {
     name: "PropertyItem",
-    category: "数据展示",
     description: "展示一行属性名和值。",
     importNames: ["PropertyItem", "PropertyList"],
     code: 'import { PropertyItem, PropertyList } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <PropertyList><PropertyItem label="负责人">张三</PropertyItem></PropertyList>\n  );\n}',
@@ -5579,7 +5553,6 @@ export default function Demo() {
   },
   {
     name: "Dialog",
-    category: "浮层对话",
     description: "聚焦当前任务的模态对话框。",
     importNames: ["Dialog", "Button"],
     code: 'import { Dialog, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dialog modal={true} title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开 Dialog</Button>}><p>这里是内容区域。</p></Dialog>\n  );\n}',
@@ -5640,7 +5613,6 @@ export default function Demo() {
   },
   {
     name: "Drawer",
-    category: "浮层对话",
     description: "从右侧打开的属性抽屉。",
     importNames: ["Drawer", "Button"],
     code: 'import { Drawer, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Drawer title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开Drawer</Button>}><p>这里是内容区域。</p></Drawer>\n  );\n}',
@@ -5698,7 +5670,6 @@ export default function Demo() {
   },
   {
     name: "ConfirmDialog",
-    category: "浮层对话",
     description: "可等待异步结果的危险操作确认。",
     importNames: ["ConfirmDialog", "Button"],
     code: 'import { ConfirmDialog, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <ConfirmDialog title="移除文档？" description="这是演示，不会删除任何文件。" danger trigger={<Button danger>移除文档</Button>} onConfirm={async () => { console.log("confirmed"); }} />\n  );\n}',
@@ -5760,7 +5731,6 @@ export default function Demo() {
   },
   {
     name: "Alert",
-    category: "状态反馈",
     description: "显示信息、成功、警告或错误反馈。",
     importNames: ["Alert"],
     code: 'import { Alert } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Alert tone="success" title="已保存">你的更改已保存。</Alert>\n  );\n}',
@@ -5790,8 +5760,35 @@ export default function Demo() {
     notes: ["错误使用 alert 语义，其余类型使用 status。"],
   },
   {
+    name: "GlobalNotice",
+    description: "持续可见的全局警示通知，可独立使用或通过 AdminLayout 的 notice 插槽跨页面展示。",
+    importNames: ["GlobalNotice"],
+    code: `import { GlobalNotice } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <GlobalNotice title="管理员模式" actionLabel="退出管理模式" onAction={() => {/* 由应用处理 */}}>
+    完成管理操作后请退出。
+  </GlobalNotice>;
+}`,
+    props: [
+      { name: "title", type: "ReactNode", description: "必填；简短通知标题。" },
+      { name: "children", type: "ReactNode", description: "可选详情；窄屏可自然换行。" },
+      { name: "icon", type: "ReactNode | false", description: "默认显示装饰性警示图标。设为 false 隐藏图标。" },
+      { name: "onAction", type: "() => void", description: "提供时渲染操作按钮；操作请求、关闭与持久状态由应用负责。" },
+      { name: "actionLabel", type: "string", description: "可选可见操作文字；没有文字时显示本地化无障碍名称的关闭按钮。" },
+      { name: "actionRef", type: "Ref<HTMLButtonElement>", description: "操作按钮引用，便于错误后返回重试按钮。" },
+      { name: "loading", type: "boolean", default: "false", description: "显示加载图标并禁用按钮。异步处理建议应用另外设置立即生效的请求锁。" },
+      { name: "error", type: "ReactNode", description: "可选操作失败反馈，以警报语义公布；应用决定何时清除。" },
+      { name: "原生 div 属性和 ref", type: "HTMLAttributes<HTMLDivElement>", description: "支持 className、style 与 DOM 属性，title 使用通知标题。" },
+    ],
+    notes: [
+      "通知不会自动关闭，不执行权限、导航或网络操作。成功后由应用移除通知，并把焦点恢复到仍存在的控件。",
+      "用于持续全局状态；局部反馈使用 Alert。警示颜色沿用语义警告样式，不是装饰性颜色预设。",
+    ],
+  },
+  {
     name: "Empty",
-    category: "状态反馈",
     description: "为空数据提供说明与下一步入口。",
     importNames: ["Empty", "Button"],
     code: 'import { Empty, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Empty title="暂无文档" description="创建第一份文档开始记录。" action={<Button>新建文档</Button>} />\n  );\n}',
@@ -5816,7 +5813,6 @@ export default function Demo() {
   },
   {
     name: "Skeleton",
-    category: "状态反馈",
     description: "加载期间用于占位的轻量骨架。",
     importNames: ["Skeleton"],
     code: 'import { Skeleton } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Skeleton style={{width:240,height:16}} />\n  );\n}',
@@ -5832,7 +5828,6 @@ export default function Demo() {
   },
   {
     name: "Spinner",
-    category: "状态反馈",
     description: "带状态语义的小型加载图标。",
     importNames: ["Spinner"],
     code: 'import { Spinner } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Spinner label="正在加载文档" />\n  );\n}',
@@ -5848,7 +5843,6 @@ export default function Demo() {
   },
   {
     name: "Upload",
-    category: "数据录入",
     description: "支持选择、拖拽、进度、取消与重试的上传组件。",
     importNames: ["Upload"],
     code: 'import { Upload } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Upload accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {\n      // 仅演示：不会发送文件到服务器\n      if (signal.aborted) throw new DOMException("Aborted", "AbortError");\n      onProgress(100);\n    }}>模拟上传：文件不会发送到服务器。</Upload>\n  );\n}',
@@ -5903,7 +5897,6 @@ export default function Demo() {
   },
   {
     name: "Dropzone",
-    category: "数据录入",
     description: "Upload 的别名，支持相同上传适配器。",
     importNames: ["Dropzone"],
     code: 'import { Dropzone } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dropzone accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {\n      // 仅演示：不会发送文件到服务器\n      if (signal.aborted) throw new DOMException("Aborted", "AbortError");\n      onProgress(100);\n    }}>模拟上传：文件不会发送到服务器。</Dropzone>\n  );\n}',
@@ -5959,7 +5952,6 @@ export default function Demo() {
   },
   {
     name: "Toast",
-    category: "状态反馈",
     description:
       "ToastProvider 的别名，提供成功、失败、普通通知，不是单条消息组件。",
     importNames: ["Toast", "Button", "useToast"],
@@ -6065,7 +6057,6 @@ export default function Demo() {
   },
   {
     name: "ToastProvider",
-    category: "状态反馈",
     description: "支持预设状态、标题正文与多位置的通知上下文。",
     importNames: ["ToastProvider", "Button", "useToast"],
     code: 'import { ToastProvider, Button, useToast } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nfunction Action() {\n  const toast = useToast();\n  return <Button onClick={() => toast.success({\n    title: "更改已保存",\n    body: "文档已同步，可以继续编辑。",\n    position: "top-right",\n  })}>显示成功通知</Button>;\n}\n\nexport default function Demo() {\n  return <ToastProvider position="bottom-right" timeout={5000} limit={3}>\n    <Action />\n  </ToastProvider>;\n}',
@@ -6170,7 +6161,6 @@ export default function Demo() {
   },
   {
     name: "MtoneProvider",
-    category: "全局配置",
     description: "为组件及其浮层配置颜色模式、语言和主题变量。",
     importNames: ["MtoneProvider", "Button"],
     code: 'import { MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider locale="zh" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>\n  );\n}',
@@ -6207,7 +6197,6 @@ export default function Demo() {
   },
   {
     name: "MtoneScope",
-    category: "全局配置",
     description: "把当前 Provider 的主题变量应用到一个 div，可局部覆盖颜色模式。",
     importNames: ["MtoneScope", "MtoneProvider", "Button"],
     code: 'import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope theme="dark"><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>\n  );\n}',
@@ -6236,7 +6225,6 @@ export default function Demo() {
   },
   {
     name: "AiChat",
-    category: "AI 界面",
     description: "容纳滚动消息和固定输入区域，可跟随最新消息。",
     importNames: ["AiChat"],
     code: 'import { AiChat, AiMessage } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiChat style={{ height: 180, width: "100%" }} aria-label="项目讨论">\n      <AiMessage from="user">下一步做什么？</AiMessage>\n      <AiMessage from="assistant">先把待确认事项列出来。</AiMessage>\n    </AiChat>\n  );\n}',
@@ -6276,7 +6264,6 @@ export default function Demo() {
   },
   {
     name: "AiMessage",
-    category: "AI 界面",
     description: "展示用户、助手或系统消息及生成状态、附件内容和可选操作。",
     importNames: ["AiMessage"],
     code: 'import { AiMessage, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiMessage\n      from="assistant"\n      status="streaming"\n      actions={<Button size="sm">复制（示例）</Button>}\n    >\n      正在整理记录。\n    </AiMessage>\n  );\n}',
@@ -6306,7 +6293,6 @@ export default function Demo() {
   },
   {
     name: "AiPromptInput",
-    category: "AI 界面",
     description: "提供消息输入、提交、停止、附件选择和错误展示。",
     importNames: ["AiPromptInput"],
     code: 'import { useState } from "react";\nimport { AiPromptInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [text, setText] = useState("");\n  const [sent, setSent] = useState("");\n  return (\n    <div style={{ width: "100%" }}>\n      <AiPromptInput\n        aria-label="演示消息"\n        value={text}\n        onValueChange={setText}\n        onSubmit={(submission) => {\n          setSent(submission.text);\n          setText("");\n        }}\n      />\n      <p role="status">{sent}</p>\n    </div>\n  );\n}',
@@ -6359,7 +6345,6 @@ export default function Demo() {
   },
   {
     name: "AiSuggestion",
-    category: "AI 界面",
     description: "点击后把建议提示词交给应用，用于填入输入框或其他交互。",
     importNames: ["AiSuggestion"],
     code: 'import { useState } from "react";\nimport { AiSuggestion } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [text, setText] = useState("");\n  return (\n    <div>\n      <AiSuggestion prompt="整理项目要点" onSelect={setText}>\n        建议：整理项目\n      </AiSuggestion>\n      <p role="status">{text}</p>\n    </div>\n  );\n}',
@@ -6381,7 +6366,6 @@ export default function Demo() {
   },
   {
     name: "AiModelSelector",
-    category: "AI 界面",
     description: "用受控选择器展示应用提供的模型和可选推理强度。",
     importNames: ["AiModelSelector"],
     code: 'import { useState } from "react";\nimport { AiModelSelector } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [model, setModel] = useState("fast");\n  const [effort, setEffort] = useState("normal");\n  return (\n    <AiModelSelector\n      models={[\n        { value: "fast", label: "快速（模拟）" },\n        { value: "review", label: "审阅（模拟）" },\n      ]}\n      value={model}\n      onValueChange={setModel}\n      efforts={[\n        { value: "normal", label: "常规" },\n        { value: "deep", label: "深入" },\n      ]}\n      effort={effort}\n      onEffortChange={setEffort}\n    />\n  );\n}',
@@ -6408,7 +6392,6 @@ export default function Demo() {
   },
   {
     name: "AiPlan",
-    category: "AI 界面",
     description: "用步骤列表和完成进度展示应用提供的任务计划。",
     importNames: ["AiPlan"],
     code: 'import { AiPlan } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiPlan\n      title="整理文档"\n      status="running"\n      items={[\n        { id: "read", title: "读取目录", status: "completed" },\n        { id: "write", title: "整理提纲", status: "running" },\n      ]}\n    />\n  );\n}',
@@ -6445,7 +6428,6 @@ export default function Demo() {
   },
   {
     name: "AiChainOfThought",
-    category: "AI 界面",
     description: "展示应用提供的公开摘要或可观察步骤。",
     importNames: ["AiChainOfThought"],
     code: 'import { AiChainOfThought } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiChainOfThought\n      defaultOpen\n      status="completed"\n      steps={[\n        {\n          id: "find",\n          title: "汇总两份资料",\n          status: "completed",\n          description: "已核对标题及日期。",\n        },\n      ]}\n    />\n  );\n}',
@@ -6483,7 +6465,6 @@ export default function Demo() {
   },
   {
     name: "AiReasoning",
-    category: "AI 界面",
     description: "以可折叠区域展示应用提供的公开文字说明。",
     importNames: ["AiReasoning"],
     code: 'import { AiReasoning } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiReasoning\n      defaultOpen\n      status="completed"\n      text="只比较发布时间和记录编号，结果仍需人工核对。"\n    />\n  );\n}',
@@ -6521,7 +6502,6 @@ export default function Demo() {
   },
   {
     name: "AiTask",
-    category: "AI 界面",
     description: "展示任务状态及可选步骤列表。",
     importNames: ["AiTask"],
     code: 'import { AiTask } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiTask\n      title="核对版本"\n      defaultOpen\n      status="running"\n      steps={[\n        { id: "tag", title: "查看发布标签", status: "completed" },\n        { id: "file", title: "比对内容", status: "running" },\n      ]}\n    />\n  );\n}',
@@ -6559,7 +6539,6 @@ export default function Demo() {
   },
   {
     name: "AiQueue",
-    category: "AI 界面",
     description: "根据状态展示待完成事项与已结束事项。",
     importNames: ["AiQueue"],
     code: 'import { AiQueue } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiQueue\n      items={[\n        { id: "first", title: "整理目录", status: "completed" },\n        { id: "second", title: "检查引用", status: "pending" },\n      ]}\n    />\n  );\n}',
@@ -6598,7 +6577,6 @@ export default function Demo() {
   },
   {
     name: "AiSubagent",
-    category: "AI 界面",
     description: "展示应用提供的代理名称、工作描述及结果。",
     importNames: ["AiSubagent"],
     code: 'import { AiSubagent } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiSubagent\n      name="文档校对"\n      status="completed"\n      defaultOpen\n      description="核对目录和页码"\n      result="发现一处需要核实的页码。"\n    />\n  );\n}',
@@ -6636,7 +6614,6 @@ export default function Demo() {
   },
   {
     name: "AiTool",
-    category: "AI 界面",
     description: "按纯文本展示工具输入、输出及状态。",
     importNames: ["AiTool"],
     code: 'import { AiTool } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiTool\n      name="检索示例"\n      defaultOpen\n      status="completed"\n      input={JSON.stringify({ keyword: "目录" })}\n      output="匹配到 2 条示例记录"\n    />\n  );\n}',
@@ -6674,7 +6651,6 @@ export default function Demo() {
   },
   {
     name: "AiCheckpoint",
-    category: "AI 界面",
     description: "展示检查点信息，并把恢复请求交给应用。",
     importNames: ["AiCheckpoint"],
     code: 'import { useState } from "react";\nimport { AiCheckpoint } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [restored, setRestored] = useState(false);\n  return (\n    <div>\n      <AiCheckpoint\n        label="整理前"\n        description="演示检查点"\n        onRestore={() => setRestored(true)}\n      />\n      {restored && <p role="status">已收到恢复请求（模拟）。</p>}\n    </div>\n  );\n}',
@@ -6696,7 +6672,6 @@ export default function Demo() {
   },
   {
     name: "AiConfirmation",
-    category: "AI 界面",
     description: "展示待确认事项、受控决定和按钮状态。",
     importNames: ["AiConfirmation"],
     code: 'import { useState } from "react";\nimport { AiConfirmation } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [state, setState] = useState<"pending" | "approved" | "rejected">(\n    "pending",\n  );\n  return (\n    <AiConfirmation\n      title="保存示例摘要？"\n      description="仅演示确认界面，不会保存文件。"\n      state={state}\n      onConfirm={() => setState("approved")}\n      onReject={() => setState("rejected")}\n    />\n  );\n}',
@@ -6729,7 +6704,6 @@ export default function Demo() {
   },
   {
     name: "AiSources",
-    category: "AI 界面",
     description: "集中展示引文来源和说明，可折叠并显示数量。",
     importNames: ["AiSources"],
     code: 'import { AiSources } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiSources\n      defaultOpen\n      sources={[\n        { id: "one", title: "项目准备说明", description: "示例来源一" },\n        { id: "two", title: "当前文档", url: "#/components/AiSources" },\n      ]}\n    />\n  );\n}',
@@ -6758,7 +6732,6 @@ export default function Demo() {
   },
   {
     name: "AiInlineCitation",
-    category: "AI 界面",
     description: "在句子中插入来源编号或标题。",
     importNames: ["AiInlineCitation"],
     code: 'import { AiInlineCitation } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <p>\n      整理前请核对原始记录。{" "}\n      <AiInlineCitation\n        index={1}\n        source={{\n          id: "one",\n          title: "查看来源示例",\n          url: "#/components/AiSources?section=ai-sources",\n        }}\n      />\n    </p>\n  );\n}',
@@ -6787,7 +6760,6 @@ export default function Demo() {
   },
   {
     name: "AiContext",
-    category: "AI 界面",
     description: "展示调用方报告的词元使用量和预格式化费用。",
     importNames: ["AiContext"],
     code: 'import { AiContext } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiContext\n      usedTokens={4200}\n      maxTokens={8000}\n      inputTokens={3200}\n      outputTokens={1000}\n      cost="¥0.08（模拟）"\n    />\n  );\n}',
@@ -6814,7 +6786,6 @@ export default function Demo() {
   },
   {
     name: "AiFileTree",
-    category: "AI 界面",
     description: "从应用数据展示文件和目录，并回传选择。",
     importNames: ["AiFileTree"],
     code: 'import { useState } from "react";\nimport { AiFileTree } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [selected, setSelected] = useState<string | null>(null);\n  return (\n    <div>\n      <AiFileTree\n        items={[\n          {\n            id: "src",\n            name: "src",\n            kind: "folder",\n            children: [\n              { id: "main", name: "main.tsx" },\n              { id: "test", name: "main.test.tsx" },\n            ],\n          },\n        ]}\n        defaultExpandedIds={["src"]}\n        selectedId={selected}\n        onSelect={setSelected}\n      />\n      <p role="status">{selected ? "已选：" + selected : "请选择文件"}</p>\n    </div>\n  );\n}',
@@ -6848,7 +6819,6 @@ export default function Demo() {
   },
   {
     name: "AiStackTrace",
-    category: "AI 界面",
     description: "展示错误文本和可折叠的堆栈帧。",
     importNames: ["AiStackTrace"],
     code: 'import { AiStackTrace } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiStackTrace\n      defaultOpen\n      message="Error: Missing project name"\n      frames={[\n        {\n          file: "src/project.ts",\n          line: 24,\n          column: 8,\n          functionName: "readProject",\n        },\n      ]}\n    />\n  );\n}',
@@ -6876,7 +6846,6 @@ export default function Demo() {
   },
   {
     name: "AiTerminal",
-    category: "AI 界面",
     description: "以可聚焦的纯文本区域展示命令输出及状态。",
     importNames: ["AiTerminal"],
     code: 'import { AiTerminal } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <AiTerminal status="success" output={"$ npm test\\nPASS 3 tests"} />;\n}',
@@ -6900,7 +6869,6 @@ export default function Demo() {
   },
   {
     name: "AiTestResults",
-    category: "AI 界面",
     description: "可折叠查看测试结果和状态汇总。",
     importNames: ["AiTestResults"],
     code: 'import { AiTestResults } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiTestResults\n      defaultOpen\n      results={[\n        { id: "one", name: "保存标题", status: "passed", durationMs: 15 },\n        {\n          id: "two",\n          name: "空记录提示",\n          status: "failed",\n          details: "期望看到空状态提示",\n        },\n      ]}\n    />\n  );\n}',
@@ -6928,3 +6896,15 @@ export default function Demo() {
     sidebarParent: "AiSources",
   },
 ];
+
+
+export const componentDocs: ComponentDoc[] = componentReferences.map((doc) => ({
+  ...doc,
+  category: categoryByName.get(doc.name)!,
+}));
+
+const docsByName = new Map(componentDocs.map((doc) => [doc.name, doc]));
+export const componentDocGroups = componentCategories.map((label) => ({
+  label,
+  members: taxonomy[label].map((name) => docsByName.get(name)!),
+}));

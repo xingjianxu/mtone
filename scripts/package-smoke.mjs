@@ -67,14 +67,38 @@ try {
     readFileSync(join(dir, "node_modules/@bixlab/mtone/llms.txt"), "utf8"),
     readFileSync(join(root, "packages/mtone/llms.txt"), "utf8"),
   );
+  const installed = join(dir, "node_modules/@bixlab/mtone");
+  const main = readFileSync(join(installed, "dist/index.js"), "utf8");
+  assert(!main.includes("@shikijs/"), "Shiki cannot be in the package's eager entry");
+  const lazyChunk = main.match(/import\("\.\/(typography-highlight-[^"]+\.js)"\)/)?.[1];
+  assert(lazyChunk, "Expected a relative lazy typography highlighter import");
+  assert(pack.files.some((file) => file.path === `dist/${lazyChunk}`), "Lazy highlighter missing from tarball");
+  const { highlightCode } = await import((await import("node:url")).pathToFileURL(join(installed, "dist", lazyChunk)).href);
+  const examples = {
+    js: "const example = 1;",
+    ts: "const example: number = 1;",
+    jsx: "const example = <b>text</b>;",
+    tsx: "const example = <b>text</b>;",
+    json: '{"example":true}',
+    html: "<b>text</b>",
+    css: "b { color: red; }",
+    bash: "if true; then echo example; fi",
+  };
+  for (const [language, source] of Object.entries(examples)) {
+    const exactText = `  ${source}\r\n\r\n`;
+    const tokens = await highlightCode(exactText, language);
+    assert.equal(tokens.map((token) => token.text).join(""), exactText);
+    assert(tokens.some(({ light, dark }) => light && dark && light !== dark), `Missing theme colors for ${language}`);
+  }
   writeFileSync(
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, SearchInput, Textarea, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Dropdown, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, PageLayout, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
+import { MtoneProvider, MtoneScope, Input, SearchInput, Textarea, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, PageLayout, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert.equal(Input.Search, SearchInput);
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
+assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Dropdown'));
 assert.match(renderToStaticMarkup(createElement(List.SortHandle, {'aria-label':'Sort'})), /mt-list-sort-handle/);
 assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}],defaultValue:['one'],selectAll:true,expandable:false})), /aria-pressed="true"/);
 assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}]})), /Release tag/);
@@ -95,7 +119,7 @@ assert(renderToStaticMarkup(createElement(Progress, {value:60,type:'dashboard',s
 assert(renderToStaticMarkup(createElement(Tabs, {items:[{value:'one',label:'Package tab',content:'Panel'}],variant:'card',placement:'start'})).includes('Package tab'));
 assert(renderToStaticMarkup(createElement(Divider, {titlePlacement:'start',variant:'dashed'}, 'Section')).includes('Section'));
 assert(renderToStaticMarkup(createElement(TableOfContents, {initialItems:[{id:'intro',label:'SSR contents check',level:2}]})).includes('SSR contents check'));
-assert(renderToStaticMarkup(createElement(Dropdown,{trigger:createElement(Button,null,'Dropdown trigger'),content:'Details',width:240,align:'right'})).includes('Dropdown trigger'));
+assert(renderToStaticMarkup(createElement(Popover,{trigger:'Popover trigger',content:'Details',width:240,align:'right'})).includes('Popover trigger'));
 assert(renderToStaticMarkup(createElement(LoadingOverlay,{visible:true,label:'Package loading'})).includes('Package loading'));
 assert.equal(renderToStaticMarkup(createElement(LoadingOverlay,{})), '');
 assert(renderToStaticMarkup(createElement(HoverCard,{trigger:createElement(Button,null,'Hover preview'),content:'Preview'})).includes('Hover preview'));
@@ -149,9 +173,17 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Dropdown, type DropdownProps, type DropdownAlign, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
+    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
 // @ts-expect-error The former component and its props are no longer exported.
 import { Layout, type LayoutProps } from '@bixlab/mtone';
+// @ts-expect-error There is no old standalone Dropdown alias or type.
+import { Dropdown } from '@bixlab/mtone';
+// @ts-expect-error DropdownProps was removed.
+import { type DropdownProps } from '@bixlab/mtone';
+// @ts-expect-error DropdownAlign was removed.
+import { type DropdownAlign } from '@bixlab/mtone';
+// @ts-expect-error DropdownLayoutProps was removed.
+import { type DropdownLayoutProps } from '@bixlab/mtone';
 const tagProps: TagSelectProps = {options:[{value:'one',label:'Release tag'}],selectAll:true,value:['one'],onValueChange: value => { const selected: string[] = value; }};
 const tags = <TagSelect {...tagProps} />;
 const handleProps: ListSortHandleProps = {title:'Sort',onDragStart: event => event.dataTransfer.setData('text/plain','one')};
@@ -171,9 +203,9 @@ const overlay = <LoadingOverlay {...overlayProps}/>;
 const menubarProps: MenubarProps = {menus:[{key:'file',label:'File',items:[]}],openKey:null};
 const menubar = <Menubar {...menubarProps}/>;
 const menuEntries: MenuEntry[] = [{type:'group',key:'g',label:'Group',children:[{key:'s',label:'Sub',children:[{key:'leaf',label:'Leaf'}]}]},{type:'divider',key:'d'}];
-const dropdownAlign: DropdownAlign = 'right';
-const dropdownProps: DropdownProps = {trigger:<button>Details</button>,content:<input/>,width:'15rem',align:dropdownAlign,label:'Details'};
-const dropdown = <Dropdown {...dropdownProps}/>;
+const popoverAlign: PopoverProps['align'] = 'right';
+const popoverProps: PopoverProps = {trigger:'Details',content:<input/>,width:'15rem',align:popoverAlign,label:'Details',unstyled:true};
+const popover = <Popover {...popoverProps}/>;
 const menuProps: MenuProps = {trigger:<button>Actions</button>,items:menuEntries,width:240,align:'left'};
 const legacyMenuProps: DropdownMenuProps = menuProps;
 const menu = <><Menu {...menuProps}/><DropdownMenu {...legacyMenuProps}/></>;

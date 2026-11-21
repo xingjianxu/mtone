@@ -11,6 +11,21 @@
 .mt-layout-has-sider {
   flex-direction: row;
 }
+.mt-layout-has-sider.mt-layout-with-notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.mt-layout-notice {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  min-inline-size: 0;
+  flex: none;
+}
+.mt-layout-has-sider > .mt-layout-notice {
+  grid-column: 1 / -1;
+}
 .mt-layout-full-height {
   height: 100dvh;
   overflow: hidden;

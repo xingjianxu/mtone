@@ -1,0 +1,82 @@
+.mt-global-notice {
+  --_mt-notice-border: var(--mt-alert-warning-border, #eee3c9);
+  --_mt-notice-fg: var(--mt-alert-warning-fg, #8c6b34);
+  --_mt-notice-bg: var(--mt-alert-warning-bg, #fcf8ee);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  padding: 10px clamp(12px, 2vw, 20px);
+  border-block-end: 1px solid var(--_mt-notice-border);
+  background: var(--_mt-notice-bg);
+  color: var(--_mt-notice-fg);
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.mt-global-notice-message {
+  display: flex;
+  flex: 1 1 240px;
+  align-items: center;
+  gap: 12px;
+  min-inline-size: 0;
+}
+.mt-global-notice-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--mt-radius, 4px);
+  background: var(--_mt-notice-border);
+}
+.mt-global-notice-icon > svg {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+}
+.mt-global-notice-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+  min-inline-size: 0;
+}
+.mt-global-notice-title,
+.mt-global-notice-detail,
+.mt-global-notice-error {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.mt-global-notice-error {
+  flex-basis: 100%;
+  font-weight: 600;
+}
+.mt-global-notice .mt-global-notice-action {
+  color: var(--_mt-notice-fg);
+  border-color: var(--_mt-notice-border);
+  background: var(--_mt-notice-bg);
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin-inline-start: auto;
+}
+.mt-global-notice .mt-global-notice-action:not(.mt-icon-btn) {
+  height: auto;
+  min-height: var(--_mt-button-height);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.mt-global-notice .mt-global-notice-action:hover:not(:disabled) {
+  /* Preserve the warning text contrast when hovering. */
+  border-color: var(--_mt-notice-fg);
+  background: var(--_mt-notice-bg);
+}
+.mt-global-notice .mt-global-notice-action:focus-visible {
+  outline-color: var(--_mt-notice-fg);
+  outline-offset: 2px;
+}

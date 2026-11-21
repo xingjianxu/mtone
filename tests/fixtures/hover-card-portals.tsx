@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import {
   HoverCard,
-  Dropdown,
+  Popover,
   MtoneProvider,
   Button,
 } from "../../packages/mtone/src";
@@ -17,9 +17,9 @@ createRoot(document.getElementById("root")!).render(
         content={
           <>
             <p>Parent preview content</p>
-            <Dropdown
+            <Popover
               defaultOpen
-              trigger={<Button>Nested dropdown</Button>}
+              trigger={<Button>Nested popup</Button>}
               content={<button>Nested portal action</button>}
             />
           </>

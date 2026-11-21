@@ -14,7 +14,6 @@ import { FieldsetExample } from "./fieldset-example";
 import { LoadingOverlayExample } from "./loading-overlay-example";
 import { HoverCardExample } from "./hover-card-example";
 import { MenubarExample } from "./menubar-example";
-import { DropdownExample } from "./dropdown-example";
 import { TypographyExample } from "./typography-example";
 import { TransferExample } from "./transfer-example";
 import { TreeSelectExample } from "./tree-select-example";
@@ -496,8 +495,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Menubar":
       return <MenubarExample />;
-    case "Dropdown":
-      return <DropdownExample />;
     case "DropdownMenu":
     case "Menu":
       return (
@@ -734,6 +731,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           {output}
         </div>
       );
+    case "GlobalNotice":
+      return <M.GlobalNotice title="维护提醒">请提前保存正在编辑的内容。</M.GlobalNotice>;
     case "Alert":
       return (
         <div style={stackStyle}>

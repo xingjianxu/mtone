@@ -4,7 +4,7 @@ import { expect, test, vi } from "vitest";
 import { DocsApp } from "../apps/docs/docs-app";
 import { componentCategories, componentDocs } from "../apps/docs/catalog";
 
-test("sidebar preserves semantic groups and guide order while sorting component names A–Z", () => {
+test("sidebar keeps semantic neighbors together and renders each component and guide as a link", () => {
   window.location.hash = "#/start";
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
   const { container } = render(<DocsApp />);
@@ -16,14 +16,25 @@ test("sidebar preserves semantic groups and guide order while sorting component 
   expect(headings.map((heading) => heading.textContent)).toEqual([...componentCategories]);
   const sectionOnly = new Set(["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"]);
   const sidebarDocs = componentDocs.filter((doc) => !doc.sidebarParent && !sectionOnly.has(doc.name));
+  const namesByGroup = new Map<string, string[]>();
   for (const heading of headings) {
-    const names = Array.from(heading.parentElement!.querySelectorAll("a"), (link) => link.textContent);
-    const expected = sidebarDocs
-      .filter((doc) => doc.category === heading.textContent)
-      .map((doc) => doc.name)
-      .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
-    expect(names).toEqual(expected);
+    const category = heading.textContent!;
+    const links = Array.from(heading.parentElement!.querySelectorAll("a"));
+    const names = links.map((link) => link.textContent!);
+    const expected = sidebarDocs.filter((doc) => doc.category === category).map((doc) => doc.name);
+    expect(names).toHaveLength(expected.length);
+    expect(new Set(names)).toEqual(new Set(expected));
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(
+      names.map((name) => `#/components/${name}`),
+    );
+    namesByGroup.set(category, names);
   }
+  expect(namesByGroup.get("基础组件")?.slice(0, 2)).toEqual(["Button", "ButtonGroup"]);
+  expect(namesByGroup.get("弹层与菜单")?.slice(0, 3)).toEqual(["Popover", "Menu", "ContextMenu"]);
+  const formNames = namesByGroup.get("表单输入")!;
+  expect(formNames.slice(formNames.indexOf("Select"), formNames.indexOf("Select") + 3)).toEqual([
+    "Select", "MultiSelect", "TreeSelect",
+  ]);
   expect(Array.from(sidebar.querySelectorAll('a:not([href^="#/components/"])'), (link) => link.getAttribute("href")))
     .toEqual(["#/start", "#/gallery", "./showcase.html", "#/theme", "#/theme/color-presets"]);
   expect(sidebar.querySelector('a[href="#/start"]')).toHaveAttribute("aria-current", "page");

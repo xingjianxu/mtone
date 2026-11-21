@@ -99,6 +99,13 @@
   border-radius: 0;
   padding: 0;
 }
+.mt-typography-code-block .mt-code-token {
+  color: var(--mt-code-token-light, inherit);
+  color: light-dark(var(--mt-code-token-light, currentColor), var(--mt-code-token-dark, currentColor));
+}
+@media (forced-colors: active) {
+  .mt-typography-code-block .mt-code-token { color: inherit; }
+}
 .mt-typography-code-block:focus-visible {
   outline: 1px solid var(--mt-focus, #93b4dc);
   outline-offset: -1px;

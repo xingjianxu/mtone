@@ -3,124 +3,55 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import * as catalog from "../apps/docs/catalog";
 import { DocsApp, parseRoute, searchDocs } from "../apps/docs/docs-app";
-const categories = [
-  "布局容器",
-  "操作命令",
-  "导航切换",
-  "数据录入",
-  "数据展示",
-  "AI 界面",
-  "浮层对话",
-  "状态反馈",
-  "全局配置",
-];
+// Independent expected taxonomy. Within each group names are in reading order.
 const expected: Record<string, string[]> = {
-  布局容器: ["CardGroup", "Affix", "AdminLayout", "PageLayout", "Splitter", "Divider"],
-  操作命令: [
-    "Button",
-    "ButtonGroup",
-    "Menu",
-    "Menubar",
-    "ContextMenu",
-    "Spotlight",
+  "布局容器": [
+    "AdminLayout", "PageLayout", "Splitter", "Affix", "Divider",
   ],
-  导航切换: [
-    "TableOfContents",
-    "Sidebar",
-    "NavItem",
-    "NavSubmenu",
-    "NavGroup",
-    "Breadcrumb",
-    "Tabs",
-    "Pagination",
-    "Segmented",
+  "基础组件": [
+    "Button", "ButtonGroup", "Typography", "Title", "Text",
+    "Paragraph", "Link", "Blockquote",
   ],
-  数据录入: [
-    "CheckCard",
-    "Questionnaire",
-    "Cascader",
-    "CascaderPanel",
-    "Transfer",
-    "TreeSelect",
-    "AutoComplete",
-    "Rate",
-    "Input",
-    "SearchInput",
-    "Textarea",
-    "Mentions",
-    "Fieldset",
-    "Form",
-    "FormField",
-    "Checkbox",
-    "Switch",
-    "TagSelect",
-    "RadioGroup",
-    "Select",
-    "MultiSelect",
-    "Slider",
-    "NumberInput",
-    "DatePicker",
-    "FilterBar",
-    "FilterChip",
-    "Upload",
-    "Dropzone",
+  "导航切换": [
+    "Sidebar", "NavGroup", "NavItem", "NavSubmenu", "Breadcrumb",
+    "TableOfContents", "Tabs", "Segmented", "Pagination",
   ],
-  数据展示: [
-    "Image",
-    "ImageGroup",
-    "ImagePreview",
-    "Calendar",
-    "Card",
-    "Text",
-    "Typography",
-    "Blockquote",
-    "Title",
-    "Paragraph",
-    "Link",
-    "List",
-    "DataList",
-    "ListItem",
-    "DocumentList",
-    "DocumentCard",
-    "Table",
-    "Tree",
-    "DirectoryTree",
-    "Badge",
-    "Avatar",
-    "Timeline",
-    "AvatarGroup",
-    "PropertyList",
-    "PropertyItem",
+  "表单输入": [
+    "Form", "FormField", "Fieldset", "Input", "SearchInput",
+    "Textarea", "Mentions", "NumberInput", "AutoComplete", "Select",
+    "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
+    "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
+    "Slider", "Rate", "DatePicker", "FilterBar", "FilterChip",
+    "Upload", "Dropzone", "Questionnaire",
+  ],
+  "数据展示": [
+    "Card", "CardGroup", "List", "ListItem", "DataList",
+    "DocumentList", "DocumentCard", "Table", "Tree", "DirectoryTree",
+    "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
+    "Avatar", "AvatarGroup", "Badge", "Calendar", "Timeline",
+  ],
+  "弹层与菜单": [
+    "Popover", "Menu", "ContextMenu", "Menubar", "HoverCard",
+    "Tooltip", "Spotlight", "Dialog", "ConfirmDialog", "Popconfirm",
+    "Drawer",
+  ],
+  "状态反馈": [
+    "Alert", "GlobalNotice", "ToastProvider", "Toast", "Status",
+    "Progress", "Spinner", "LoadingOverlay", "Skeleton", "Empty",
+    "Result",
   ],
   "AI 界面": [
     "AiChat", "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
     "AiPlan", "AiChainOfThought", "AiReasoning", "AiTask", "AiQueue",
-    "AiSubagent", "AiTool", "AiCheckpoint", "AiConfirmation",
-    "AiSources", "AiInlineCitation", "AiContext", "AiFileTree", "AiStackTrace",
-    "AiTerminal", "AiTestResults",
+    "AiSubagent", "AiTool", "AiCheckpoint", "AiConfirmation", "AiSources",
+    "AiInlineCitation", "AiContext", "AiFileTree", "AiStackTrace", "AiTerminal",
+    "AiTestResults",
   ],
-  浮层对话: ["HoverCard",
-    "Popconfirm",
-    "Dropdown", "Popover",
-    "Tooltip",
-    "Dialog",
-    "Drawer",
-    "ConfirmDialog",
+  "全局配置": [
+    "MtoneProvider", "MtoneScope",
   ],
-  状态反馈: [
-    "Result",
-    "Status",
-    "Progress",
-    "Alert",
-    "Empty",
-    "Skeleton",
-    "Spinner",
-    "LoadingOverlay",
-    "Toast",
-    "ToastProvider",
-  ],
-  全局配置: ["MtoneProvider", "MtoneScope"],
 };
+const categories = Object.keys(expected);
 describe("documentation taxonomy", () => {
   it("uses a closed, explicitly ordered taxonomy and assigns every export once", () => {
     expect(catalog.componentCategories).toEqual(categories);
@@ -154,13 +85,15 @@ describe("documentation taxonomy", () => {
     }
     const sectionOnly = new Set([
       "Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea",
-      ...catalog.componentDocs.filter((doc) => doc.sidebarParent).map((doc) => doc.name),
+      "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
+      "AiChainOfThought", "AiReasoning", "AiTask", "AiQueue", "AiSubagent",
+      "AiTool", "AiCheckpoint", "AiConfirmation", "AiInlineCitation", "AiContext",
+      "AiFileTree", "AiStackTrace", "AiTerminal", "AiTestResults",
     ]);
     const expectedLinks = [
       ["快速开始", "Component gallery", "应用示例", "主题与样式", "颜色预设"],
       ...categories.map((category) =>
-        expected[category].filter((name) => !sectionOnly.has(name))
-          .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" })),
+        expected[category].filter((name) => !sectionOnly.has(name)),
       ),
     ];
     for (const [index, group] of groups.entries()) {
@@ -168,7 +101,10 @@ describe("documentation taxonomy", () => {
       const names = expectedLinks[index];
       expect(links).toHaveLength(names.length);
       for (const [position, link] of links.entries()) {
-        expect(link).toHaveAccessibleName(names[position]);
+        const name = names[position];
+        expect(link).toHaveAccessibleName(name);
+        if (index > 0) expect(link).toHaveAttribute("href", `#/components/${name}`);
+        expect(link.getAttribute("aria-current")).toBe(name === "Button" ? "page" : null);
       }
     }
     expect(
@@ -203,10 +139,10 @@ describe("documentation taxonomy", () => {
   });
   it("searches the new categories while preserving description matching", () => {
     expect(
-      searchDocs("数据录入")
+      searchDocs("表单输入")
         .map((d) => d.name)
         .sort(),
-    ).toEqual([...expected.数据录入].sort());
+    ).toEqual([...expected.表单输入].sort());
     expect(searchDocs("布局容器").map((d) => d.name)).toEqual(
       expect.arrayContaining(expected.布局容器),
     );

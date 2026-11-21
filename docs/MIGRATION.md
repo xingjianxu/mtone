@@ -1,7 +1,28 @@
+# Upgrade notes for 0.9.0
+
+## Removed exports
+
+- Replace `IconButton` with `Button iconOnly` and retain a meaningful `aria-label` or `aria-labelledby`. Icon-only buttons are square at the chosen Button size. Prefer checking installed types for refs and native button attributes.
+- Replace `Dropdown` and `DropdownProps` with `Popover` and `PopoverProps`. Keep existing `trigger`, `content`, `open`, `defaultOpen`, `onOpenChange`, `width` and `label` where relevant. If you relied on Dropdown’s implicit start alignment, add `align="start"`; Popover defaults to centered alignment. `DropdownMenu` is still the Menu alias, not an alias for Popover.
+
+```tsx
+import { Button, Popover } from "@bixlab/mtone";
+
+const remove = <Button iconOnly aria-label="Remove">×</Button>;
+const details = <Popover trigger={<Button>Details</Button>} content={<p>More details</p>} align="start" />;
+```
+
+## Sizing and composition
+
+- Default single-line controls, sidebar navigation and Tabs items use a 32px outer height with 20px single-line text. Multiline controls still grow. See [control heights](CONTROL-HEIGHTS.md) for scoped `--mt-height` overrides and exclusions.
+- Buttons and ButtonGroup use `small` / `normal` / `large` (28 / 32 / 36px), and `sm` / `md` / `lg` still work. Buttons without an explicit size inherit their nearest ButtonGroup size.
+- A NavItem with trailing actions wraps the trigger and actions as siblings. Custom CSS expecting that item to be a direct child of a navigation group should account for the wrapper; items without actions retain their existing trigger structure.
+- With Tabs `indicatorColor`, `"coral"` now uses the theme token. Use `"#ff7f50"` to retain the standard CSS named color when migrating an existing value.
+
 # Upgrade notes for 0.8.0
 
 - Remove `density` from `MtoneProvider`. The compact/comfortable modes and their `data-density` attributes are no longer present. Theme and locale remain independent.
-- Default single-line controls and sidebar navigation rows now use a 32px outer height. Remove legacy height overrides if you want the new default, or use explicit size variants where supported. MultiSelect still grows when chips wrap. See [control heights](CONTROL-HEIGHTS.md).
+- Default single-line controls and sidebar navigation rows now use a 34px outer height in 0.8.0. Remove legacy height overrides if you want that version’s default, or use explicit size variants where supported. MultiSelect still grows when chips wrap. See [control heights](CONTROL-HEIGHTS.md).
 - Expanded `NavItem` renders plain-text and numeric labels in `.mt-nav-item-label` for single-line truncation. Complex children keep their previous structure; review custom direct-child selectors that depend on plain label markup.
 
 # Upgrade notes for 0.7.0

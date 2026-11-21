@@ -24,6 +24,24 @@ try {
       elements.slice(0, 2).map((link) => [getComputedStyle(link).height, getComputedStyle(link).marginTop])),
       [["32px", "0px"], ["32px", "3px"]]);
     assert.equal(await links.first().getAttribute("aria-current"), "page");
+    if (width === 1280 || width === 360) {
+      const popupGroup = groups.filter({ has: page.locator(".mt-nav-label", { hasText: "弹层与菜单" }) });
+      assert.deepEqual(await popupGroup.locator(":scope > a").evaluateAll((anchors) =>
+        anchors.slice(0, 4).map((anchor) => [anchor.textContent, anchor.getAttribute("href")])
+      ), [
+        ["Popover", "#/components/Popover"], ["Menu", "#/components/Menu"],
+        ["ContextMenu", "#/components/ContextMenu"], ["Menubar", "#/components/Menubar"],
+      ]);
+      if (mobile) {
+        await popupGroup.getByRole("link", { name: "Menu", exact: true }).click();
+        await page.waitForURL("**/#/components/Menu");
+        assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+        await toggle.click();
+        await popupGroup.getByRole("link", { name: "Menu", exact: true, current: "page" }).waitFor();
+        await page.goto("http://127.0.0.1:5197/#/start");
+        await toggle.click();
+      }
+    }
     const showcase = sidebar.getByRole("link", { name: "应用示例", exact: true });
     assert.equal(await showcase.getAttribute("href"), "./showcase.html");
     assert.equal(await showcase.getAttribute("target"), "_blank");

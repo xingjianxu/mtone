@@ -133,6 +133,18 @@ jobs:
       - run: node tests/fieldset.browser.mjs
       - run: node tests/progress.browser.mjs
       - run: node tests/questionnaire.browser.mjs
+      - name: Icon-only Button browser regressions
+        run: |
+          for browser in chromium firefox webkit; do
+            BROWSER=$browser node tests/button-icon-only.browser.mjs || exit 1
+          done
+      - run: node tests/button-toggle.browser.mjs
+      - run: node tests/menu-doc-trigger-width.browser.mjs
+      - run: node tests/page-layout-docs.browser.mjs
+      - run: node tests/tabs-attached.browser.mjs
+      - run: node tests/typography-code.browser.mjs
+      - run: node tests/global-notice.browser.mjs
+      - run: node tests/global-notice-docs.browser.mjs
       - name: Assert tracked files unchanged
         run: git diff --exit-code HEAD --
       - run: npm pack -w @bixlab/mtone --dry-run
