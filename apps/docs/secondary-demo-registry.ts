@@ -1,3 +1,15 @@
+import CheckCardUsage from "./secondary-demos/check-card-usage";
+import CheckCardUsageSource from "./secondary-demos/check-card-usage.tsx?raw";
+import CheckCardSingle from "./secondary-demos/check-card-single";
+import CheckCardSingleSource from "./secondary-demos/check-card-single.tsx?raw";
+import CheckCardMultiple from "./secondary-demos/check-card-multiple";
+import CheckCardMultipleSource from "./secondary-demos/check-card-multiple.tsx?raw";
+import CheckCardLayout from "./secondary-demos/check-card-layout";
+import CheckCardLayoutSource from "./secondary-demos/check-card-layout.tsx?raw";
+import CheckCardContent from "./secondary-demos/check-card-content";
+import CheckCardContentSource from "./secondary-demos/check-card-content.tsx?raw";
+import CheckCardStates from "./secondary-demos/check-card-states";
+import CheckCardStatesSource from "./secondary-demos/check-card-states.tsx?raw";
 import CardCollapse from "./secondary-demos/card-collapse";
 import CardCollapseSource from "./secondary-demos/card-collapse.tsx?raw";
 import CardGroup0 from "./secondary-demos/card-group-responsive";
@@ -267,6 +279,14 @@ const source = (tsx: string) =>
 const standaloneSource = (tsx: string) =>
   'import "@bixlab/mtone/styles.css";\n' + source(tsx);
 export const secondaryDocSections: Record<string, readonly DocSection[]> = {
+  CheckCard: [
+    { id: "usage", title: "基础勾选", Demo: CheckCardUsage, source: standaloneSource(CheckCardUsageSource), note: "独立卡片是复选框；点击卡片内容或按空格可切换。" },
+    { id: "single", title: "单选卡片组", Demo: CheckCardSingle, source: standaloneSource(CheckCardSingleSource), note: "使用 options 配置选项；受控单选返回一个字符串，支持原生方向键切换。" },
+    { id: "multiple", title: "多选卡片组", Demo: CheckCardMultiple, source: standaloneSource(CheckCardMultipleSource), note: "设置 multiple；可同时选中多个选项，返回字符串数组。" },
+    { id: "layout", title: "搭配 CardGroup 的响应式布局", Demo: CheckCardLayout, source: standaloneSource(CheckCardLayoutSource), note: "CheckCard.Group 管理选择，内部 CardGroup 按视口切换为 1、2、3 列。" },
+    { id: "content", title: "封面、头像与独立操作", Demo: CheckCardContent, source: standaloneSource(CheckCardContentSource), note: "extra 内的按钮只切换资料说明，不改变卡片的勾选状态。" },
+    { id: "states", title: "尺寸、禁用与加载", Demo: CheckCardStates, source: standaloneSource(CheckCardStatesSource), note: "改变尺寸或边框不会影响选择；禁用和加载状态下均不可切换。" },
+  ],
   Mentions: [
     {
       id: "usage",

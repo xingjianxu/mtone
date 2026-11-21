@@ -54,3 +54,5 @@ export * from "./questionnaire";
 export * from "./ai-chat";
 export * from "./ai-activity";
 export * from "./ai-evidence";
+
+export * from "./check-card";

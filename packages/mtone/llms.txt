@@ -36,6 +36,49 @@ This file describes this package checkout, not necessarily the latest published 
 
 ## Components
 
+### CheckCard
+
+- [CheckCard](https://xingjianxu.github.io/mtone/#/components/CheckCard): 以卡片呈现可选项。独立使用可勾选，CheckCard.Group 管理单选或多选，CardGroup 负责响应式排列。
+- Import: CheckCard, CardGroup from @bixlab/mtone
+- checked / defaultChecked: boolean (default: false). 独立卡片的受控选中状态或非受控初始状态。放入 Group 时由组管理。
+- onChange: (checked: boolean) => void. 独立卡片切换时触发；组内选择使用 Group 的 onChange。
+- value: string. 独立使用时为表单值；组内每张卡片指定唯一的 value。
+- name / form: string. 独立卡片的表单字段名与可选关联表单 ID。组内由 Group 提供字段名，Group 的 form 可关联外部表单。
+- required: boolean (default: false). 独立复选框设为必选；组级必选使用单选 Group 的 required。
+- title / description: ReactNode. 卡片标题与辅助说明。无可读标题时用 aria-label 或 aria-labelledby 为输入控件命名。
+- avatar / cover / children: ReactNode. 头像、封面和自定义内容。按钮、链接等独立交互放入 extra，而非选择区域。
+- extra: ReactNode. 独立操作区。此区域不会切换卡片的选中状态；在表单中使用 type=button 防止无意提交。
+- disabled / loading: boolean (default: false). 禁止选择；loading 显示加载状态。extra 中操作的禁用状态由调用方管理。
+- size: 'sm' | 'md' | 'lg' (default: 'md'). 卡片尺寸，未设置时继承 Group 的尺寸。
+- bordered: boolean (default: true). 是否展示卡片边框，未设置时继承 Group 的设置。
+- CheckCard.Group.multiple: boolean (default: false). 默认渲染单选卡片；设为 true 后渲染多选卡片。
+- CheckCard.Group.value / defaultValue: string | readonly string[]. 受控值或非受控初始值。单选用字符串，多选用字符串数组。
+- CheckCard.Group.onChange: ((value: string) => void) | ((value: string[]) => void). 单选收到选中的字符串，多选收到选中项数组；受控用法需要在回调中更新 value。
+- CheckCard.Group.legend / name / form: ReactNode / string / string. 可见组名、表单字段名与可选关联表单 ID。单选未指定 name 时生成独立的内部名称。同一表单中的独立单选组应使用不同的 name。
+- CheckCard.Group.options / children: readonly CheckCardOption[] / ReactNode. 可用 options 提供带字符串 value 的卡片数据，或通过 children 自定义组合。两者同时提供时优先渲染 children。
+- CheckCard.Group.required: boolean (default: false). 仅单选 Group 支持，要求在该组选择一项。
+- CheckCard.Group.disabled / loading / size / bordered: boolean / boolean / 'sm' | 'md' | 'lg' / boolean. 禁用组内选择、显示整组加载状态，或设置组内卡片的默认尺寸和边框。
+- CheckCard.Group 管理表单选择，不负责响应式列数；CardGroup 管理列数、间距和跨列，不管理选择。把 CardGroup 放在 CheckCard.Group 内，可同时获得两种行为。
+- 选项使用原生单选框或复选框，支持 Tab、空格和单选组方向键。为 Group 提供可读 legend，为每张卡片提供明确标题；仅用于装饰的图形应从无障碍树隐藏。
+- 需要提交表单时明确指定 name 和 value；多选用 FormData.getAll(name) 读取同名项。可用 CheckCardProps、CheckCardGroupProps 和 CheckCardOption 类型描述使用方式。
+
+```tsx
+import { CheckCard, CardGroup } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <CheckCard.Group legend="选择工作区视图" defaultValue="overview">
+      <CardGroup columns={{ xs: 1, sm: 2, md: 3 }} gap={12}>
+        <CheckCard value="overview" title="概览" />
+        <CheckCard value="projects" title="项目" />
+        <CheckCard value="notes" title="笔记" />
+      </CardGroup>
+    </CheckCard.Group>
+  );
+}
+```
+
 ### Questionnaire
 
 - [Questionnaire](https://xingjianxu.github.io/mtone/#/components/Questionnaire): 逐题填写的多步问卷，支持单选、多选、自由文本、其他答案、必答校验和跳过。

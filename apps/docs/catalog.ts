@@ -28,6 +28,51 @@ export type ComponentDoc = {
   demoLabel?: string;
 };
 export const componentDocs: ComponentDoc[] = [
+  {
+    name: "CheckCard",
+    category: "数据录入",
+    description: "以卡片呈现可选项。独立使用可勾选，CheckCard.Group 管理单选或多选，CardGroup 负责响应式排列。",
+    importNames: ["CheckCard", "CardGroup"],
+    code: `import { CheckCard, CardGroup } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <CheckCard.Group legend="选择工作区视图" defaultValue="overview">
+      <CardGroup columns={{ xs: 1, sm: 2, md: 3 }} gap={12}>
+        <CheckCard value="overview" title="概览" />
+        <CheckCard value="projects" title="项目" />
+        <CheckCard value="notes" title="笔记" />
+      </CardGroup>
+    </CheckCard.Group>
+  );
+}`,
+    props: [
+      { name: "checked / defaultChecked", type: "boolean", default: "false", description: "独立卡片的受控选中状态或非受控初始状态。放入 Group 时由组管理。" },
+      { name: "onChange", type: "(checked: boolean) => void", description: "独立卡片切换时触发；组内选择使用 Group 的 onChange。" },
+      { name: "value", type: "string", description: "独立使用时为表单值；组内每张卡片指定唯一的 value。" },
+      { name: "name / form", type: "string", description: "独立卡片的表单字段名与可选关联表单 ID。组内由 Group 提供字段名，Group 的 form 可关联外部表单。" },
+      { name: "required", type: "boolean", default: "false", description: "独立复选框设为必选；组级必选使用单选 Group 的 required。" },
+      { name: "title / description", type: "ReactNode", description: "卡片标题与辅助说明。无可读标题时用 aria-label 或 aria-labelledby 为输入控件命名。" },
+      { name: "avatar / cover / children", type: "ReactNode", description: "头像、封面和自定义内容。按钮、链接等独立交互放入 extra，而非选择区域。" },
+      { name: "extra", type: "ReactNode", description: "独立操作区。此区域不会切换卡片的选中状态；在表单中使用 type=button 防止无意提交。" },
+      { name: "disabled / loading", type: "boolean", default: "false", description: "禁止选择；loading 显示加载状态。extra 中操作的禁用状态由调用方管理。" },
+      { name: "size", type: "'sm' | 'md' | 'lg'", default: "'md'", description: "卡片尺寸，未设置时继承 Group 的尺寸。" },
+      { name: "bordered", type: "boolean", default: "true", description: "是否展示卡片边框，未设置时继承 Group 的设置。" },
+      { name: "CheckCard.Group.multiple", type: "boolean", default: "false", description: "默认渲染单选卡片；设为 true 后渲染多选卡片。" },
+      { name: "CheckCard.Group.value / defaultValue", type: "string | readonly string[]", description: "受控值或非受控初始值。单选用字符串，多选用字符串数组。" },
+      { name: "CheckCard.Group.onChange", type: "((value: string) => void) | ((value: string[]) => void)", description: "单选收到选中的字符串，多选收到选中项数组；受控用法需要在回调中更新 value。" },
+      { name: "CheckCard.Group.legend / name / form", type: "ReactNode / string / string", description: "可见组名、表单字段名与可选关联表单 ID。单选未指定 name 时生成独立的内部名称。同一表单中的独立单选组应使用不同的 name。" },
+      { name: "CheckCard.Group.options / children", type: "readonly CheckCardOption[] / ReactNode", description: "可用 options 提供带字符串 value 的卡片数据，或通过 children 自定义组合。两者同时提供时优先渲染 children。" },
+      { name: "CheckCard.Group.required", type: "boolean", default: "false", description: "仅单选 Group 支持，要求在该组选择一项。" },
+      { name: "CheckCard.Group.disabled / loading / size / bordered", type: "boolean / boolean / 'sm' | 'md' | 'lg' / boolean", description: "禁用组内选择、显示整组加载状态，或设置组内卡片的默认尺寸和边框。" },
+    ],
+    notes: [
+      "CheckCard.Group 管理表单选择，不负责响应式列数；CardGroup 管理列数、间距和跨列，不管理选择。把 CardGroup 放在 CheckCard.Group 内，可同时获得两种行为。",
+      "选项使用原生单选框或复选框，支持 Tab、空格和单选组方向键。为 Group 提供可读 legend，为每张卡片提供明确标题；仅用于装饰的图形应从无障碍树隐藏。",
+      "需要提交表单时明确指定 name 和 value；多选用 FormData.getAll(name) 读取同名项。可用 CheckCardProps、CheckCardGroupProps 和 CheckCardOption 类型描述使用方式。",
+    ],
+  },
 {
   "name": "Questionnaire",
   "category": "数据录入",

@@ -1,3 +1,4 @@
+import CheckCardExample from "./secondary-demos/check-card-usage";
 import { CardGroupExample } from "./card-group-example";
 import QuestionnaireExample from "./secondary-demos/questionnaire-usage";
 import { aiExamples } from "./ai-demos/examples";
@@ -243,6 +244,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           {output}
         </div>
       );
+    case "CheckCard":
+      return <CheckCardExample />;
     case "Questionnaire":
       return <QuestionnaireExample />;
     case "Input":
