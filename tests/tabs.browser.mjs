@@ -153,22 +153,26 @@ try {
       }
       await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
       const editable = page.getByTestId("editable-card-medium-top");
-      // Pixel sampling needs an integer origin; this fixture follows many
-      // fractional-height sections that can otherwise include the list's line.
+      // Anchor the frame at integer viewport coordinates before sampling.
       await editable.evaluate((node) => Object.assign(node.style, {
         position: "fixed", top: "24px", left: "24px", width: "380px", zIndex: "10",
       }));
       async function lowerRows(frame) {
-        return page.evaluate(async (data) => {
+        const rect = await frame.boundingBox();
+        // Locator screenshots can capture a neighboring row because of
+        // clip rounding. Sample the two pixels inside the frame
+        // directly from the viewport, excluding the adjacent list border.
+        const data = (await page.screenshot({ scale: "css" })).toString("base64");
+        return page.evaluate(async ({ data, x, bottom }) => {
           const image = await createImageBitmap(await (await fetch("data:image/png;base64," + data)).blob());
           const canvas = document.createElement("canvas");
           canvas.width = image.width;
           canvas.height = image.height;
           const context = canvas.getContext("2d");
           context.drawImage(image, 0, 0);
-          const pixel = (y) => [...context.getImageData(20, y, 1, 1).data];
-          return [pixel(image.height - 1), pixel(image.height - 2)];
-        }, (await frame.screenshot()).toString("base64"));
+          const pixel = (y) => [...context.getImageData(x, y, 1, 1).data];
+          return [pixel(bottom - 1), pixel(bottom - 2)];
+        }, { data, x: Math.floor(rect.x + 20), bottom: Math.round(rect.y + rect.height) });
       }
       const activeFrame = editable.locator(".mt-tab-item[data-active]");
       const inactiveFrame = editable.locator(".mt-tab-item:not([data-active])").first();
