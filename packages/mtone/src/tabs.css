@@ -30,6 +30,9 @@
   white-space: nowrap;
   text-decoration: none;
 }
+.mt-tabs[data-variant="line"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab > span.mt-tab-label {
+  margin-inline: 3px;
+}
 .mt-tab:hover:not(:disabled):not([data-disabled]) {
   color: var(--mt-fg, #37352f);
   background: var(--mt-hover, #f1f1ef);

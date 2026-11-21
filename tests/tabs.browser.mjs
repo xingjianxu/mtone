@@ -121,7 +121,17 @@ try {
         }
       }
       await expect(page.getByRole("tablist", {name:"Nested medium card", exact:true}).locator(".mt-tab-item")).toHaveCSS("height", "28px");
-      await expect(page.getByRole("tab", {name:"Line tab", exact:true})).toHaveCSS("padding-top", "9px");
+      const lineTab = page.getByRole("tab", {name:"Line tab", exact:true});
+      const lineLabel = lineTab.locator("span.mt-tab-label");
+      await expect(lineLabel).toHaveCSS("margin-inline-start", "3px");
+      await expect(lineLabel).toHaveCSS("margin-inline-end", "3px");
+      await expect(lineTab).toHaveCSS("padding-top", "9px");
+      await expect(lineTab).toHaveCSS("padding-inline-start", "2px");
+      await expect(lineTab).toHaveCSS("padding-inline-end", "2px");
+      const lineList = page.getByRole("tablist", {name:"Unchanged line", exact:true});
+      await expect(lineList).toHaveCSS("gap", "16px");
+      await expect(lineList.locator(".mt-tab-item")).toHaveCSS("margin-inline-start", "0px");
+      await expect(lineList.locator(".mt-tab-item")).toHaveCSS("margin-inline-end", "0px");
       await expect(page.getByLabel("Unchanged input", {exact:true})).toHaveCSS("height", "34px");
       const editable = page.getByTestId("editable-card-medium-top");
       // Pixel sampling needs an integer origin; this fixture follows many
