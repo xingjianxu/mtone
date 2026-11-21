@@ -4,6 +4,7 @@ import { FileText } from "lucide-react";
 
 const stackStyle: React.CSSProperties = {
   display: "grid",
+  justifyItems: "start",
   gap: 12,
   width: "100%",
   maxWidth: 460,

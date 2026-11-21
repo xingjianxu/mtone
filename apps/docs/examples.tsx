@@ -501,7 +501,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "DropdownMenu":
     case "Menu":
       return (
-        <div style={stackStyle}>
+        <div style={{ ...stackStyle, justifyItems: "start" }}>
           <M.Menu
             trigger={<M.Button>文档操作</M.Button>}
             items={[

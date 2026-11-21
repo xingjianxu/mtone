@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FileText } from "lucide-react";
 import * as M from "../../../packages/mtone/src";
-const stackStyle: React.CSSProperties = { display: "grid", gap: 12 };
+const stackStyle: React.CSSProperties = { display: "grid", justifyItems: "start", gap: 12 };
 
 export default function Demo() {
   const [notice, setNotice] = useState("");
