@@ -5,7 +5,6 @@ import {
   Badge,
   Button,
   Card,
-  IconButton,
 } from "../../../packages/mtone/src";
 
 /** All actions below are local demo state; no account or server is changed. */
@@ -33,7 +32,7 @@ export default function Demo() {
       <Card
         title="设计知识库"
         extra={
-          <IconButton
+          <Button iconOnly
             aria-label="查看卡片信息"
             variant="ghost"
             onClick={() =>
@@ -41,7 +40,7 @@ export default function Demo() {
             }
           >
             <MoreHorizontal size={16} />
-          </IconButton>
+          </Button>
         }
         cover={
           <div

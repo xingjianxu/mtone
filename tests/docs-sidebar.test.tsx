@@ -14,10 +14,12 @@ test("sidebar preserves semantic groups and guide order while sorting component 
   expect(groups[0].querySelector(".mt-nav-label")).toHaveTextContent("开始使用");
   const headings = groups.slice(1).map((group) => group.querySelector(".mt-nav-label")!);
   expect(headings.map((heading) => heading.textContent)).toEqual([...componentCategories]);
+  const sectionOnly = new Set(["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea", "IconButton"]);
+  const sidebarDocs = componentDocs.filter((doc) => !doc.sidebarParent && !sectionOnly.has(doc.name));
   for (const heading of headings) {
     const names = Array.from(heading.parentElement!.querySelectorAll("a"), (link) => link.textContent);
-    const expected = componentDocs
-      .filter((doc) => doc.category === heading.textContent && !doc.sidebarParent && !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"].includes(doc.name))
+    const expected = sidebarDocs
+      .filter((doc) => doc.category === heading.textContent)
       .map((doc) => doc.name)
       .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
     expect(names).toEqual(expected);
@@ -27,5 +29,5 @@ test("sidebar preserves semantic groups and guide order while sorting component 
   expect(sidebar.querySelector('a[href="#/start"]')).toHaveAttribute("aria-current", "page");
   expect(sidebar.querySelectorAll("nav a:not(.mt-nav-item)")).toHaveLength(0);
   expect(sidebar.querySelector('a[href="./showcase.html"]')).toHaveAttribute("target", "_blank");
-  expect(sidebar.querySelectorAll('a[href^="#/components/"]')).toHaveLength(componentDocs.filter((doc) => !doc.sidebarParent).length - 7);
+  expect(sidebar.querySelectorAll('a[href^="#/components/"]')).toHaveLength(sidebarDocs.length);
 });

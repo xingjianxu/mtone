@@ -104,6 +104,8 @@ export type ButtonProps = Omit<
   className?: string;
   variant?: "blue" | "solid" | "outline" | "soft" | "ghost";
   size?: "sm" | "md" | "lg";
+  /** Square icon-only mode. Provide aria-label or aria-labelledby for its accessible name. */
+  iconOnly?: boolean;
   danger?: boolean;
   loading?: boolean;
   /** Opt into a persistent pressed state. True uses background mode. */
@@ -117,6 +119,7 @@ export type ButtonProps = Omit<
   /** Content after the label (inline end), including while loading. */
   rightSection?: React.ReactNode;
 };
+
 function hasButtonSection(section: React.ReactNode) {
   return section != null && typeof section !== "boolean" && section !== "";
 }
@@ -125,6 +128,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       variant = "outline",
       size = "md",
+      iconOnly,
       danger,
       loading,
       toggle,
@@ -194,6 +198,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "mt-btn",
           `mt-btn-${variant}`,
           `mt-size-${size}`,
+          iconOnly && "mt-icon-btn",
           danger && "mt-danger",
           className,
         )}
@@ -217,9 +222,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 export const IconButton = React.forwardRef<
   HTMLButtonElement,
-  ButtonProps & { "aria-label": string }
+  Omit<ButtonProps, "iconOnly"> & { "aria-label": string }
 >(function IconButton(p, r) {
-  return <Button {...p} ref={r} className={cn("mt-icon-btn", p.className)} />;
+  return (
+    <Button
+      {...p}
+      ref={r}
+      iconOnly
+      className={cn("mt-icon-btn-legacy", p.className)}
+    />
+  );
 });
 export type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Join adjacent buttons, keeping only the outside corners rounded. */

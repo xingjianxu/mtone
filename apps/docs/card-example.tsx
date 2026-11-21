@@ -1,7 +1,7 @@
 import CardCollapse from "./secondary-demos/card-collapse";
 import React, { useState } from "react";
 import { BookOpen, Bookmark, Check, MoreHorizontal } from "lucide-react";
-import { Avatar, Badge, Button, Card, IconButton, Text } from "../../packages/mtone/src";
+import { Avatar, Badge, Button, Card, Text } from "../../packages/mtone/src";
 
 /** All actions below are local demo state; no account or server is changed. */
 export function CardExample() {
@@ -21,7 +21,7 @@ export function CardExample() {
       </div>
       <Card
         title="设计知识库"
-        extra={<IconButton aria-label="查看卡片信息" variant="ghost" onClick={() => setNotice("这张卡片组合了封面、元信息、标签页和底部操作。")}><MoreHorizontal size={16} /></IconButton>}
+        extra={<Button iconOnly aria-label="查看卡片信息" variant="ghost" onClick={() => setNotice("这张卡片组合了封面、元信息、标签页和底部操作。")}><MoreHorizontal size={16} /></Button>}
         cover={<div style={{ minHeight: 72, background: "var(--mt-subtle, #f7f7f5)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--mt-muted, #787774)" }}><BookOpen size={28} aria-hidden="true" /></div>}
         loading={loading}
         actions={[

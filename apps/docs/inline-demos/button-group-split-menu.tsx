@@ -24,9 +24,9 @@ export default function Demo() {
         </M.Button>
         <M.Menu
           trigger={
-            <M.IconButton aria-label="更多导出格式">
+            <M.Button iconOnly aria-label="更多导出格式">
               <ChevronDown size={14} />
-            </M.IconButton>
+            </M.Button>
           }
           items={[
             {

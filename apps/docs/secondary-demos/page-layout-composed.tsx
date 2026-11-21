@@ -8,6 +8,7 @@ export default function Demo() {
   return (
     <PageLayout
       headingLevel={3}
+      maxWidth={520}
       title="跨部门协同与项目交付记录"
       subtitle="项目管理"
       icon={<FileText size={22} aria-hidden="true" />}

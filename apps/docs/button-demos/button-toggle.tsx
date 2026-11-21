@@ -1,6 +1,6 @@
 import React from "react";
 import { Bookmark } from "lucide-react";
-import { Button, IconButton } from "../../../packages/mtone/src";
+import { Button } from "../../../packages/mtone/src";
 
 export default function Demo() {
   const [pinned, setPinned] = React.useState(false);
@@ -14,7 +14,7 @@ export default function Demo() {
       }}
     >
       <Button toggle>仅显示未读</Button>
-      <IconButton aria-label="收藏" toggle={{ mode: "icon", preset: "star" }} />
+      <Button iconOnly aria-label="收藏" toggle={{ mode: "icon", preset: "star" }} />
       <Button
         toggle={{ mode: "icon", preset: "pin" }}
         pressed={pinned}

@@ -179,6 +179,16 @@
   width: var(--mt-height, 34px);
   padding: 0;
 }
+/* The legacy wrapper retains its historical sm/lg width and padding. */
+.mt-btn.mt-icon-btn:not(.mt-icon-btn-legacy) {
+  padding: 0;
+}
+.mt-btn.mt-icon-btn.mt-size-sm:not(.mt-icon-btn-legacy) {
+  width: 24px;
+}
+.mt-btn.mt-icon-btn.mt-size-lg:not(.mt-icon-btn-legacy) {
+  width: 36px;
+}
 .mt-button-group {
   display: inline-flex;
   gap: 4px;

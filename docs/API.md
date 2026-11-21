@@ -93,7 +93,8 @@ Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-gree
 ## Buttons and forms
 
 - `Button`: `variant` blue/solid/outline/soft/ghost, `size` sm/md/lg, `danger`, `loading`, `icon`, `leftSection`, `rightSection`, native/Base UI button props and ref. The optional sections accept React nodes and follow logical inline start/end (flipped in RTL); a supplied `leftSection` takes precedence over the legacy `icon`. Loading disables actions, displays a spinner instead of the leading content, and keeps the trailing section.
-- `IconButton`: Button props plus required `aria-label`.
+- `Button iconOnly`: square icon-only mode with the same variants, sizes, loading, and toggle behavior. Give it an accessible name with either `aria-label` or `aria-labelledby`. See the [icon-only example](https://xingjianxu.github.io/mtone/#/components/Button?section=icon-only).
+- `IconButton`: legacy compatibility export requiring `aria-label` and retaining its historical sizing; use `Button iconOnly` in new code.
 - `ButtonGroup`: group wrapper.
 - `Input`: native input attributes, native ref and `onChange(event)`, with `prefix`, `suffix`, `allowClear`, character counts and appearance options. `Input.Search`, `Input.Password`, `Input.TextArea` and `Input.OTP` are subcomponents; `SearchInput` and `Textarea` remain compatibility exports. See [Input family](#input-family).
 - `Form`: native form props plus managed values and validation through `Form.useForm()`, `form`, `initialValues`, named `Form.Item` fields and `rules`. Use `onFinish` for valid values and `onFinishFailed` for validation errors; `onSubmit` remains available. See the installed declarations for the supported rule and trigger contracts.

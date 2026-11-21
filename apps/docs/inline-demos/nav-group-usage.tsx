@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Ellipsis, Plus } from "lucide-react";
-import { IconButton, NavGroup, NavItem } from "../../../packages/mtone/src";
+import { Button, NavGroup, NavItem } from "../../../packages/mtone/src";
 
 export default function Demo() {
   const [viewCount, setViewCount] = useState(0);
@@ -16,15 +16,15 @@ export default function Demo() {
         label="保存的视图"
         actions={
           <>
-            <IconButton
+            <Button iconOnly
               variant="ghost"
               size="sm"
               aria-label="新增视图"
               onClick={() => setViewCount((n) => n + 1)}
             >
               <Plus size={14} aria-hidden="true" />
-            </IconButton>
-            <IconButton
+            </Button>
+            <Button iconOnly
               variant="ghost"
               size="sm"
               aria-label="视图详情"
@@ -32,7 +32,7 @@ export default function Demo() {
               onClick={() => setShowDetails((open) => !open)}
             >
               <Ellipsis size={14} aria-hidden="true" />
-            </IconButton>
+            </Button>
           </>
         }
       >

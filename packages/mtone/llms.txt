@@ -890,7 +890,7 @@ export default function Demo() {
 
 ### PageLayout
 
-- [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): 组织单页标题、操作、标签页和内容。
+- [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): 组织单页标题、操作、标签页和内容，也可限制整页宽度并在父容器内居中。
 - Import: PageLayout from @bixlab/mtone
 - title: ReactNode. 必填标题，渲染在语义标题元素中。
 - headingLevel: 1 | 2 | 3 | 4 | 5 | 6 (default: 1). 标题级别；嵌入时按页面结构调整。
@@ -900,8 +900,10 @@ export default function Demo() {
 - description: ReactNode. 标题行下方的补充内容。
 - extra: ReactNode. 与描述同组的附加信息。
 - tabs: ReactNode. 标题区之后、正文之前的内容，可传入完整 Tabs。
+- maxWidth: "sm" | "md" | "lg" | number. 可选。sm 为 720px、md 为 960px、lg 为 1200px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。
 - children: ReactNode. 正文。
 - HTML div 属性: Omit<ComponentPropsWithRef<"div">, "title">. className、style、ref 等传给根元素。
+- maxWidth 同时约束标题、操作、标签页与正文，不影响外层 AdminLayout 的侧栏或顶栏。
 - 只负责单页布局，不管理标签状态、路由或应用导航。
 
 ```tsx
@@ -909,7 +911,7 @@ import { PageLayout } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
-  return <PageLayout title="项目总览">本周有 3 项任务待处理。</PageLayout>;
+  return <PageLayout title="项目总览" maxWidth="md">本周有 3 项任务待处理。</PageLayout>;
 }
 ```
 
@@ -930,13 +932,13 @@ export default function Demo() {
 - AdminLayout.Sider.onBreakpoint: (broken: boolean) => void. 监听断点状态；true 表示视口低于设定断点。
 - AdminLayout.Sider.collapseLabel / expandLabel: string (default: 收起侧边栏 / 展开侧边栏). 继承 Sidebar 的切换按钮可访问名称。
 - AdminLayout.Header.breadcrumb: ReactNode. 顶部左侧插槽；建议传入已有 Breadcrumb 组件。
-- AdminLayout.Header.extra: ReactNode. 顶部右对齐操作插槽，可组合 IconButton、Menu、Avatar 等。
+- AdminLayout.Header.extra: ReactNode. 顶部右对齐操作插槽，可组合 Button、Menu、Avatar 等。
 - AdminLayout.Header.children: ReactNode. 顶部左侧补充内容；窄屏允许换行。
 - AdminLayout.Content.as: "main" | "section" | "div" (default: main). 主体语义标签。一个页面通常只使用一个 main；嵌入其他主体时改为 section 或 div。
 - children / className / style / 原生属性: ReactNode / string / CSSProperties / HTMLAttributes. 各区域均可嵌套内容和覆盖样式；默认不生成主体 Footer，显式组合 AdminLayout.Footer 时显示，默认高度 42px。
 - 主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。
 - 使用 AdminLayout.Sider、AdminLayout.Header、AdminLayout.Content、AdminLayout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。
-- AdminLayout.Sider 复用本库 Sidebar 的状态、34px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、IconButton 等已有组件。
+- AdminLayout.Sider 复用本库 Sidebar 的状态、34px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。
 - 默认头部 48px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌、侧栏底部版本/折叠行与顶部操作保持可见。
 - 响应式收起为图标窄栏，不是弹出式抽屉。breakpoint 按浏览器视口判断，不按示例容器宽度判断；希望自定义手机抽屉时可组合已有 Drawer。
 - 受控状态必须在 onCollapsedChange 中更新，否则切换只发出请求。导航、路由、数据保存、账号菜单与持久化由应用实现。
@@ -945,7 +947,7 @@ export default function Demo() {
 ```tsx
 import { useState } from "react";
 import { Box, BookOpen, Home, Settings } from "lucide-react";
-import { AdminLayout, Breadcrumb, NavItem, IconButton, Card } from "@bixlab/mtone";
+import { AdminLayout, Breadcrumb, NavItem, Button, Card } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
@@ -970,7 +972,7 @@ export default function Demo() {
       <AdminLayout>
         <AdminLayout.Header
           breadcrumb={<Breadcrumb items={[{ label: "知识库" }, { label: "设计规范" }]} />}
-          extra={<IconButton aria-label="设置"><Settings size={16} /></IconButton>}
+          extra={<Button iconOnly aria-label="设置"><Settings size={16} /></Button>}
         />
         <AdminLayout.Content>
           <h1>设计规范</h1>
@@ -988,6 +990,7 @@ export default function Demo() {
 - Import: Button from @bixlab/mtone
 - variant: "blue" | "solid" | "outline" | "soft" | "ghost" (default: outline). 按钮外观。
 - size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
+- iconOnly: boolean (default: false). 仅图标的等宽高模式；必须通过 aria-label 或 aria-labelledby 提供操作名称。复用 Button 的尺寸、变体、加载与切换行为。
 - danger: boolean. 危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。
 - loading: boolean. 显示加载图标并禁用点击。
 - icon: ReactNode. 旧版前置图标；未传 leftSection 时使用。
@@ -1000,16 +1003,17 @@ export default function Demo() {
 - disabled: boolean. 禁用按钮。
 - onClick: MouseEventHandler. 点击回调。
 - children: ReactNode. 组件内容。
-- 未开启 toggle 时保留普通按钮行为，不接管应用手动设置的 aria-pressed。开启时由 Button 提供 aria-pressed。保留前后状态一致的按钮名；纯图标使用固定 aria-label。
+- 旧版 IconButton 仍可用且要求 aria-label；新代码使用 Button iconOnly。
+- 未开启 toggle 时保留普通按钮行为，不接管应用手动设置的 aria-pressed。开启时由 Button 提供 aria-pressed。保留前后状态一致的按钮名；纯图标使用固定 aria-label 或 aria-labelledby。
 - 图标模式不改变按钮背景，切换图标替代左侧 leftSection 与 icon，加载指示器优先，rightSection 保留。preset 和自定义图标对互斥；建议自定义图标两态同尺寸，且不要传入可交互内容。
-- 例如 <Button toggle>仅显示未读</Button> 或 <IconButton aria-label="收藏" toggle={{ mode: "icon", preset: "star" }} />。
+- 例如 <Button toggle>仅显示未读</Button> 或 <Button iconOnly aria-label="收藏" toggle={{ mode: "icon", preset: "star" }} />。
 - 支持 ref 和 Base UI Button 的可组合属性。加载中显示前置加载图标并禁用按钮，右侧内容不变。
 - 左右内容按阅读方向排列，在 RTL 中自动对调。传入内容的一侧使用更紧凑的内边距；装饰图标可标记 aria-hidden。
 - blue 为蓝色实心变体：背景 #2783DE、文字 #F3F9FD，悬停背景 #2276C9，背景颜色过渡 100ms ease-in-out。danger 会优先使用危险操作色。
 
 ```tsx
 import React from "react";
-import { ArrowRight, Download, Image } from "lucide-react";
+import { ArrowRight, Download, Image, Plus } from "lucide-react";
 import { Button } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
@@ -1030,6 +1034,9 @@ export default function Demo() {
       >
         查看图库
       </Button>
+      <Button iconOnly aria-label="添加文档">
+        <Plus size={16} aria-hidden="true" />
+      </Button>
     </div>
   );
 }
@@ -1037,47 +1044,36 @@ export default function Demo() {
 
 ### IconButton
 
-- [IconButton](https://xingjianxu.github.io/mtone/#/components/IconButton): 有可访问名称的图标操作按钮。
+- [IconButton](https://xingjianxu.github.io/mtone/#/components/IconButton): 使用 Button iconOnly 的旧版兼容导出；新代码请使用 Button 的纯图标模式。
 - Import: IconButton from @bixlab/mtone
-- aria-label: string. 必填；读屏器朗读的操作名称。
-- variant: "blue" | "solid" | "outline" | "soft" | "ghost" (default: outline). 按钮外观。
-- size: "sm" | "md" | "lg" (default: md). 按钮尺寸。
-- danger: boolean. 危险操作样式；搭配 variant="solid" 显示红色背景、白色文字，悬停保持深红色。
-- loading: boolean. 显示加载图标并禁用点击。
-- icon: ReactNode. 前置图标。
-- disabled: boolean. 禁用按钮。
-- onClick: MouseEventHandler. 点击回调。
-- children: ReactNode. 组件内容。
-- 可使用 Button 的 toggle、pressed、defaultPressed 和 onPressedChange。切换时请保留同一个 aria-label。
-- children 中可直接放 lucide-react 图标；不要只用图标而省略名称。
+- aria-label: string. 使用兼容 IconButton 时必填；提供明确的操作名称。
+- 共享 Button 的尺寸、变体、加载和切换行为；新代码用 <Button iconOnly> 并提供 aria-label 或 aria-labelledby。
 
 ```tsx
 import { IconButton } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
-  return (
-    <IconButton aria-label="添加">＋</IconButton>
-  );
+  return <IconButton aria-label="添加">＋</IconButton>;
 }
 ```
 
 ### ButtonGroup
 
 - [ButtonGroup](https://xingjianxu.github.io/mtone/#/components/ButtonGroup): 将关联按钮组织为一个操作组，支持默认分开排列或相连组合。
-- Import: ButtonGroup, Button, IconButton, Menu from @bixlab/mtone
+- Import: ButtonGroup, Button, Menu from @bixlab/mtone
 - connected: boolean (default: false). 相连样式：移除间距、共享边框，仅保留外侧圆角。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
 - Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。
-- 默认保留 4px 间距。相连模式请直接放置同尺寸的 Button 或 IconButton，不要增加包裹元素。
+- 默认保留 4px 间距。相连模式请直接放置同尺寸的 Button（可使用 iconOnly），不要增加包裹元素。
 - 使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。
 - 危险实心按钮使用 <Button danger variant="solid">删除</Button>。
 
 ```tsx
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { ButtonGroup, Button, IconButton, Menu } from "@bixlab/mtone";
+import { ButtonGroup, Button, Menu } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
@@ -1087,7 +1083,7 @@ export default function Demo() {
       <ButtonGroup connected aria-label="导出文档">
         <Button onClick={() => setMessage("已选择导出 PDF")}>导出 PDF</Button>
         <Menu
-          trigger={<IconButton aria-label="更多导出格式"><ChevronDown size={14} /></IconButton>}
+          trigger={<Button iconOnly aria-label="更多导出格式"><ChevronDown size={14} /></Button>}
           items={[
             { key: "markdown", label: "导出 Markdown", onSelect: () => setMessage("已选择导出 Markdown") },
             { key: "html", label: "导出 HTML", onSelect: () => setMessage("已选择导出 HTML") },
@@ -1638,7 +1634,7 @@ export default function Demo() {
 - 原生属性: ButtonHTMLAttributes | AnchorHTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
 - 当前页使用灰色圆角底和逻辑起始侧蓝色竖标；悬停不显示竖标。
 - 默认行高 34px，图标和标签垂直居中。长纯文本标签单行省略，仍保留完整的可访问名称；可通过 --mt-height 调整。
-- 尾部操作不触发导航。建议使用自带 aria-label 的 IconButton；Sidebar 的图标窄栏隐藏尾部操作，窄栏子菜单弹层中的完整行仍显示。
+- 尾部操作不触发导航。建议使用提供可访问名称的 Button iconOnly；Sidebar 的图标窄栏隐藏尾部操作，窄栏子菜单弹层中的完整行仍显示。
 - 不提供 href 时仍为按钮。ref 指向实际 button 或 a；组件不接管路由。
 
 ```tsx
@@ -1678,18 +1674,18 @@ export default function Demo() {
 ### NavGroup
 
 - [NavGroup](https://xingjianxu.github.io/mtone/#/components/NavGroup): 以可选标题组织导航项，相邻组默认以细线分隔，标题末端可放置独立操作。
-- Import: NavGroup, NavItem, IconButton from @bixlab/mtone
+- Import: NavGroup, NavItem, Button from @bixlab/mtone
 - label: ReactNode. 可选分组标题。
 - divider: boolean (default: true). 仅在前一个兄弟元素也是 NavGroup 时绘制组前分隔线。设为 false 只隐藏这一条线，不改变间距。
 - actions: ReactNode. 标题行末端的独立操作。可传入一个控件，或用片段组合多个控件；无标题时仍可单独显示。收起的 Sidebar 隐藏此操作区。
 - children: ReactNode. 组件内容。
 - 组前分隔线是装饰，不会出现在无障碍树中。独立导航和 Sidebar 展开、收起时均支持相邻组分隔；有其它导航项隔开时不画线。
 - 组内 NavItem 默认行高 34px，相邻项仍保留 3px 间距。首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。
-- 标题操作不触发导航项；建议使用 size="sm"、variant="ghost" 的 IconButton 并提供 aria-label。操作区与标题分开布局，过长的标题会截断。
+- 标题操作不触发导航项；建议使用 size="sm"、variant="ghost" 的 Button iconOnly 并提供可访问名称。操作区与标题分开布局，过长的标题会截断。
 
 ```tsx
 import { useState } from "react";
-import { NavGroup, NavItem, IconButton } from "@bixlab/mtone";
+import { NavGroup, NavItem, Button } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
@@ -1700,7 +1696,7 @@ export default function Demo() {
         <NavItem active>工作笔记</NavItem>
         <NavItem>阅读记录</NavItem>
       </NavGroup>
-      <NavGroup label="保存的视图" actions={<IconButton size="sm" variant="ghost" aria-label="新增视图" onClick={() => setViewCount((count) => count + 1)}>+</IconButton>}>
+      <NavGroup label="保存的视图" actions={<Button iconOnly size="sm" variant="ghost" aria-label="新增视图" onClick={() => setViewCount((count) => count + 1)}>+</Button>}>
         <NavItem>保存的视图：{viewCount}</NavItem>
       </NavGroup>
       <NavGroup label="工具" divider={false}>
@@ -2149,7 +2145,7 @@ export default function Demo() {
 - title / extra: ReactNode. 可见标题与标题栏尾部区域；无内容时不生成空标题栏。
 - htmlTitle: string. 原生 HTML title 悬浮提示。旧 Card title 原生提示用法需迁移到此属性。
 - cover: ReactNode. 独立封面区域，可放图片或其他内容；图片请提供合适的 alt。
-- actions: ReactNode[]. 底部操作区域；请使用 Button、IconButton 或链接等有语义的交互元素。
+- actions: ReactNode[]. 底部操作区域；请使用 Button 或链接等有语义的交互元素。
 - loading / loadingLabel: boolean / string. loading 默认 false，使用 Skeleton 显示加载态；loadingLabel 提供可访问的加载提示。
 - size: "medium" | "small". 默认 medium；紧凑风格提供较小 padding 的 small 变体。
 - variant: "outlined" | "borderless". 默认 outlined；borderless 隐藏可见边框并保留外框几何。

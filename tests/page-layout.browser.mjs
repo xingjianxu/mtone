@@ -60,6 +60,41 @@ try {
     await expect(root.getByRole("tabpanel", { name: "Week" })).toHaveText("Weekly activity");
     await expect(root.getByText("Project tasks")).toBeVisible();
   }
+  for (const viewport of [1600, 320]) {
+    await page.setViewportSize({ width: viewport, height: 700 });
+    await page.goto("http://127.0.0.1:5284/tests/fixtures/page-layout.html?max-width");
+    for (const [preset, cap] of [["default", Infinity], ["sm", 720], ["md", 960], ["lg", 1200], ["custom", 840]]) {
+      const root = page.getByTestId(preset);
+      await expect(root.getByRole("heading")).toBeVisible();
+      const dimensions = await root.evaluate((node) => {
+        const parent = node.parentElement;
+        const parentBox = parent.getBoundingClientRect();
+        const parentStyle = getComputedStyle(parent);
+        const parentLeft = parentBox.left + parseFloat(parentStyle.paddingLeft);
+        const parentRight = parentBox.right - parseFloat(parentStyle.paddingRight);
+        const rootBox = node.getBoundingClientRect();
+        const slots = [...node.querySelectorAll(
+          ".mt-page-layout-header, .mt-page-layout-actions, .mt-page-layout-tabs, .mt-page-layout-body",
+        )].map((element) => element.getBoundingClientRect());
+        return {
+          available: parentRight - parentLeft,
+          width: rootBox.width,
+          center: (rootBox.left + rootBox.right) / 2,
+          parentCenter: (parentLeft + parentRight) / 2,
+          viewportCenter: innerWidth / 2,
+          fits: node.scrollWidth <= Math.ceil(rootBox.width) &&
+            slots.length === 4 &&
+            slots.every((slot) => slot.left >= rootBox.left - 1 && slot.right <= rootBox.right + 1),
+          documentFits: document.documentElement.scrollWidth <= innerWidth,
+        };
+      });
+      const context = JSON.stringify({ viewport, preset, dimensions });
+      assert(Math.abs(dimensions.width - Math.min(cap, dimensions.available)) < 1, context);
+      assert(Math.abs(dimensions.center - dimensions.parentCenter) < 1, context);
+      assert(Math.abs(dimensions.center - dimensions.viewportCenter) > 4, context);
+      assert(dimensions.fits && dimensions.documentFits, context);
+    }
+  }
   assert.deepEqual(errors, []);
   console.log("PageLayout responsive geometry, dark theme, and live actions/tabs passed");
 } finally {

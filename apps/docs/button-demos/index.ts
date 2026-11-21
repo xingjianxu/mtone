@@ -9,6 +9,9 @@ import source3 from "./button-blue.tsx?raw";
 import SectionsDemo from "./button-sections";
 import sectionsSource from "./button-sections.tsx?raw";
 
+import IconOnlyDemo from "./icon-only";
+import iconOnlySource from "./icon-only.tsx?raw";
+
 import ToggleDemo from "./button-toggle";
 import toggleSource from "./button-toggle.tsx?raw";
 
@@ -18,6 +21,13 @@ export const buttonDocSections = [
     title: "外观",
     Demo: Demo0,
     source: source0.replace("../../../packages/mtone/src", "@bixlab/mtone"),
+  },
+  {
+    id: "icon-only",
+    title: "纯图标按钮",
+    note: "使用 iconOnly 获得等宽高按钮，并通过 aria-label 或 aria-labelledby 提供明确的操作名称。IconButton 仍作为兼容导出。",
+    Demo: IconOnlyDemo,
+    source: iconOnlySource.replace("../../../packages/mtone/src", "@bixlab/mtone"),
   },
   {
     id: "button-toggle",

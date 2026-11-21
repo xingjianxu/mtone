@@ -149,7 +149,7 @@ describe("documentation taxonomy", () => {
         (e) => e.textContent,
       ),
     ).toEqual(["开始使用", ...categories]);
-    for (const doc of catalog.componentDocs.filter((doc) => !doc.sidebarParent && !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"].includes(doc.name))) {
+    for (const doc of catalog.componentDocs.filter((doc) => !doc.sidebarParent && !["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea", "IconButton"].includes(doc.name))) {
       expect(
         within(nav as HTMLElement).getAllByRole("link", { name: doc.name }),
       ).toHaveLength(1);
@@ -157,6 +157,16 @@ describe("documentation taxonomy", () => {
     expect(
       screen.getByRole("heading", { name: "Button", level: 1 }),
     ).toBeInTheDocument();
+  });
+  it("opens canonical Button icon-only docs from the legacy IconButton URL", () => {
+    window.location.hash = "#/components/IconButton?section=usage";
+    const { container } = render(<DocsApp />);
+    const nav = container.querySelector(".docs-sidebar nav")!;
+    expect(within(nav as HTMLElement).queryByRole("link", { name: "IconButton" })).not.toBeInTheDocument();
+    expect(within(nav as HTMLElement).getByRole("link", { name: "Button" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("heading", { name: "Button", level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "纯图标按钮", level: 2 })).toHaveAttribute("id", "icon-only");
+    expect(searchDocs("IconButton").map((doc) => doc.name)).toContain("IconButton");
   });
   it("shows three AI sidebar groups and keeps all 21 components discoverable", () => {
     window.location.hash = "#/components/AiChat?section=ai-prompt-input";

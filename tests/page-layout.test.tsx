@@ -50,3 +50,26 @@ test("does not create a second banner next to a shell header", () => {
   expect(screen.getAllByRole("banner")).toHaveLength(1);
   expect(screen.getByRole("heading", { level: 1, name: "Inventory" })).toBeVisible();
 });
+
+test.each([
+  ["sm", "720px"], ["md", "960px"], ["lg", "1200px"], [840, "840px"],
+] as const)("limits %s to %s on the original root, preserving native props", (maxWidth, expected) => {
+  const ref = React.createRef<HTMLDivElement>();
+  const { rerender } = render(
+    <Mtone.PageLayout ref={ref} title="Projects" className="own-layout"
+      style={{ marginTop: 12 }} maxWidth={maxWidth}>
+      Content
+    </Mtone.PageLayout>,
+  );
+  const root = ref.current!;
+  expect(root).toHaveClass("mt-page-layout", "mt-page-layout-constrained", "own-layout");
+  expect(root.style.getPropertyValue("--mt-page-layout-max-width")).toBe(expected);
+  expect(root).not.toHaveAttribute("maxwidth");
+  expect(root).toHaveStyle({ marginTop: "12px" });
+  expect(root).toContainElement(screen.getByRole("heading", { name: "Projects" }));
+
+  rerender(<Mtone.PageLayout ref={ref} title="Projects" style={{ marginTop: 12 }}>Content</Mtone.PageLayout>);
+  expect(ref.current).toBe(root);
+  expect(root).not.toHaveClass("mt-page-layout-constrained");
+  expect(root.style.getPropertyValue("--mt-page-layout-max-width")).toBe("");
+});

@@ -30,4 +30,31 @@ function Fixture() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(<Fixture />);
+function MaxWidthFixture() {
+  const cases = [
+    ["default", undefined], ["sm", "sm"], ["md", "md"], ["lg", "lg"], ["custom", 840],
+  ] as const;
+  return (
+    // The parent is deliberately not centered in the viewport.
+    <div data-testid="layout-parent" style={{
+      marginInlineStart: 24, marginInlineEnd: 48, paddingInline: 12, maxInlineSize: 1350,
+    }}>
+      {cases.map(([testId, maxWidth]) => (
+        <PageLayout
+          key={testId}
+          data-testid={testId}
+          maxWidth={maxWidth}
+          title="ProjectActivityForTeamsWithLongNames"
+          actions={<Button>Share project</Button>}
+          tabs={<Tabs items={[{ value: "today", label: "Today", content: "Daily activity" }]} />}
+        >
+          Project tasks
+        </PageLayout>
+      ))}
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  new URLSearchParams(window.location.search).has("max-width") ? <MaxWidthFixture /> : <Fixture />,
+);

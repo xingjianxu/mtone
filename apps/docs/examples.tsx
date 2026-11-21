@@ -205,20 +205,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           {output}
         </div>
       );
-    case "IconButton":
-      return (
-        <div style={rowStyle}>
-          <M.IconButton
-            aria-label="收藏文档"
-            aria-pressed={checked}
-            variant={checked ? "soft" : "outline"}
-            onClick={() => setChecked(!checked)}
-          >
-            <Star size={16} fill={checked ? "currentColor" : "none"} />
-          </M.IconButton>
-          <M.Text muted>{checked ? "已收藏" : "未收藏"}</M.Text>
-        </div>
-      );
     case "ButtonGroup":
       return (
         <div style={stackStyle}>
@@ -239,7 +225,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.ButtonGroup connected aria-label="导出文档">
             <M.Button onClick={() => setNotice("已选择导出 PDF")}>导出 PDF</M.Button>
             <M.Menu
-              trigger={<M.IconButton aria-label="更多导出格式"><ChevronDown size={14} /></M.IconButton>}
+              trigger={<M.Button iconOnly aria-label="更多导出格式"><ChevronDown size={14} /></M.Button>}
               items={[
                 { key: "markdown", label: "导出 Markdown", onSelect: () => setNotice("已选择导出 Markdown") },
                 { key: "html", label: "导出 HTML", onSelect: () => setNotice("已选择导出 HTML") },
@@ -570,9 +556,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "Tooltip":
       return (
         <M.Tooltip content="搜索当前知识库">
-          <M.IconButton aria-label="搜索">
+          <M.Button iconOnly aria-label="搜索">
             <Search size={16} />
-          </M.IconButton>
+          </M.Button>
         </M.Tooltip>
       );
     case "CardGroup":

@@ -391,7 +391,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
   ],
   PageLayout: [
     { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },
-    { id: "actions-and-tabs", title: "操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
+    { id: "actions-and-tabs", title: "居中限宽、操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
   ],
   AdminLayout: [
     {

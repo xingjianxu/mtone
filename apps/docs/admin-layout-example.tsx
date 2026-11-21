@@ -16,7 +16,6 @@ import {
   Avatar,
   Breadcrumb,
   Card,
-  IconButton,
   AdminLayout,
   NavItem,
   Text,
@@ -108,7 +107,7 @@ export function AdminLayoutExample({ compact = false }: { compact?: boolean }) {
           extra={
             compact ? null : (
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <IconButton
+                <Button iconOnly
                   variant="ghost"
                   aria-label="搜索示例"
                   onClick={() =>
@@ -118,15 +117,15 @@ export function AdminLayoutExample({ compact = false }: { compact?: boolean }) {
                   }
                 >
                   <Search size={17} />
-                </IconButton>
-                <IconButton
+                </Button>
+                <Button iconOnly
                   variant="ghost"
                   aria-label="查看通知"
                   onClick={() => setNotice("暂时没有新通知。")}
                 >
                   <Bell size={17} />
-                </IconButton>
-                <IconButton
+                </Button>
+                <Button iconOnly
                   variant="ghost"
                   aria-label="打开设置"
                   onClick={() => {
@@ -135,7 +134,7 @@ export function AdminLayoutExample({ compact = false }: { compact?: boolean }) {
                   }}
                 >
                   <Settings size={17} />
-                </IconButton>
+                </Button>
                 <Avatar name="用户" />
               </div>
             )

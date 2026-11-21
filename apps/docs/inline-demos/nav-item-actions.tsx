@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Ellipsis, Folder, Pencil, Star } from "lucide-react";
-import { IconButton, NavGroup, NavItem } from "../../../packages/mtone/src";
+import { Button, NavGroup, NavItem } from "../../../packages/mtone/src";
 
 export default function Demo() {
   const [current, setCurrent] = useState("研究资料");
@@ -14,9 +14,9 @@ export default function Demo() {
           icon={<Folder size={16} aria-hidden="true" />}
           onClick={() => setCurrent(label)}
           actions={[
-            { content: <IconButton size="sm" variant="ghost" aria-label={`更多操作：${label}`} onClick={() => setOperation(`更多操作：${label}`)}><Ellipsis size={15} /></IconButton> },
-            { visibility: "hover", content: <IconButton size="sm" variant="ghost" aria-label={`编辑：${label}`} onClick={() => setOperation(`编辑：${label}`)}><Pencil size={14} /></IconButton> },
-            { visibility: "active", content: <IconButton size="sm" variant="ghost" aria-label={`收藏：${label}`} onClick={() => setOperation(`收藏：${label}`)}><Star size={14} /></IconButton> },
+            { content: <Button iconOnly size="sm" variant="ghost" aria-label={`更多操作：${label}`} onClick={() => setOperation(`更多操作：${label}`)}><Ellipsis size={15} /></Button> },
+            { visibility: "hover", content: <Button iconOnly size="sm" variant="ghost" aria-label={`编辑：${label}`} onClick={() => setOperation(`编辑：${label}`)}><Pencil size={14} /></Button> },
+            { visibility: "active", content: <Button iconOnly size="sm" variant="ghost" aria-label={`收藏：${label}`} onClick={() => setOperation(`收藏：${label}`)}><Star size={14} /></Button> },
           ]}
         >{label}</NavItem>)}
       </NavGroup>

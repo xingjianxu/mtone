@@ -24,7 +24,6 @@ import {
   ConfirmDialog,
   Dialog,
   FormField,
-  IconButton,
   Input,
   AdminLayout,
   NavItem,
@@ -328,22 +327,22 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
                 <span>{filtered.length}</span>
               </h3>
               <div className="showcase-view" role="group" aria-label="文档视图">
-                <IconButton
+                <Button iconOnly
                   variant="ghost"
                   aria-label="卡片视图"
                   aria-pressed={view === "cards"}
                   onClick={() => setView("cards")}
                 >
                   <Grid2X2 size={15} />
-                </IconButton>
-                <IconButton
+                </Button>
+                <Button iconOnly
                   variant="ghost"
                   aria-label="列表视图"
                   aria-pressed={view === "list"}
                   onClick={() => setView("list")}
                 >
                   <List size={16} />
-                </IconButton>
+                </Button>
               </div>
             </div>
             <div className="showcase-filters">
@@ -389,7 +388,7 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
                           <Icon size={19} aria-hidden="true" />
                         </span>
                         <div className="showcase-document-actions">
-                          <IconButton
+                          <Button iconOnly
                             size="sm"
                             variant="ghost"
                             aria-label={`${doc.favorite ? "取消收藏" : "收藏"}：${doc.title}`}
@@ -400,15 +399,15 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
                               size={14}
                               fill={doc.favorite ? "currentColor" : "none"}
                             />
-                          </IconButton>
-                          <IconButton
+                          </Button>
+                          <Button iconOnly
                             size="sm"
                             variant="ghost"
                             aria-label={`删除文档：${doc.title}`}
                             onClick={() => setDeleteId(doc.id)}
                           >
                             <Trash2 size={14} />
-                          </IconButton>
+                          </Button>
                         </div>
                       </div>
                       <button

@@ -4,6 +4,12 @@
   min-inline-size: 0;
   color: var(--mt-fg, #37352f);
 }
+.mt-page-layout-constrained {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: var(--mt-page-layout-max-width);
+  margin-inline: auto;
+}
 .mt-page-layout-header {
   display: grid;
   gap: 12px;

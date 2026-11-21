@@ -3,8 +3,6 @@ import NavItemActionsSource from "./inline-demos/nav-item-actions.tsx?raw";
 import NavItemLink from "./inline-demos/nav-item-link";
 import NavItemLinkSource from "./inline-demos/nav-item-link.tsx?raw";
 import type { DocSection } from "./doc-section";
-import Example0_0 from "./inline-demos/icon-button-usage";
-import Example0_0Raw from "./inline-demos/icon-button-usage.tsx?raw";
 import Example1_0 from "./inline-demos/button-group-usage";
 import Example1_0Raw from "./inline-demos/button-group-usage.tsx?raw";
 import Example1_1 from "./inline-demos/button-group-connected";
@@ -150,14 +148,6 @@ export const inlineDocSections: Readonly<
 > = {
   Toast: toastSections,
   ToastProvider: toastSections,
-  IconButton: [
-    {
-      id: "usage",
-      title: "基础用法",
-      Demo: Example0_0,
-      source: source(Example0_0Raw),
-    },
-  ],
   ButtonGroup: [
     {
       id: "usage",
