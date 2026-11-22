@@ -2,7 +2,7 @@ import React from "react";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
-import { Form, Input, MtoneProvider, MultiSelect, Select } from "../packages/mtone/src";
+import { Form, Input, MtoneProvider, Select } from "../packages/mtone/src";
 
 const grouped = [
   { label: "Systems", options: [
@@ -337,16 +337,13 @@ test("Form.Item collects tags as string arrays and treats an empty array as requ
   expect(finish).toHaveBeenCalledExactlyOnceWith({ topics: ["paper"] });
 });
 
-test("ordinary multiple and its compatibility alias never offer a custom option", async () => {
+test("ordinary multiple Select does not offer a custom option", async () => {
   const user = userEvent.setup();
   const changed = vi.fn();
   render(<MtoneProvider locale="en">
     <Select mode="multiple" label="Fixed choices" options={[]} onValueChange={changed} />
-    <MultiSelect label="Legacy choices" options={[]} onValueChange={changed} />
   </MtoneProvider>);
-  for (const label of ["Fixed choices", "Legacy choices"]) {
-    await user.type(screen.getByRole("combobox", { name: label }), "new choice{Enter}");
-    expect(screen.queryByRole("option", { name: /^Create/ })).not.toBeInTheDocument();
-  }
+  await user.type(screen.getByRole("combobox", { name: "Fixed choices" }), "new choice{Enter}");
+  expect(screen.queryByRole("option", { name: /^Create/ })).not.toBeInTheDocument();
   expect(changed).not.toHaveBeenCalled();
 });

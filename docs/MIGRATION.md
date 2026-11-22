@@ -1,10 +1,10 @@
-# Upgrade notes for 0.11.1
+# Upgrade notes for 0.12.0
 
-Use these changes when upgrading from 0.10.3 to 0.11.1.
+Start with the Select migration when upgrading from 0.11.1 to 0.12.0. The later sections also cover earlier releases.
 
 ## Select multiple mode
 
-When your installed mtone includes unified Select, replace `MultiSelect` with `Select` and add `mode="multiple"`. `MultiSelect` and `MultiSelectProps` remain deprecated compatibility exports. Values and callbacks remain `string[]` for multiple fields; the default single mode continues to use `string | null`.
+Starting in 0.12.0, `MultiSelect` and `MultiSelectProps` are removed with no compatibility aliases. Replace `MultiSelect` with `Select` and add `mode="multiple"`. Use `SelectMultipleProps` for props that include the mode, or `Omit<SelectMultipleProps, "mode">` if a wrapper supplies it. Values and callbacks remain `string[]` for multiple fields; the default single mode continues to use `string | null`. If you styled the previous `.mt-multiselect` selector, target `.mt-select-multiple` instead.
 
 ```tsx
 import { Select } from "@bixlab/mtone";

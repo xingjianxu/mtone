@@ -117,8 +117,8 @@ describe("styled interactive controls", () => {
     );
     expect(change.mock.calls[0][0]).toBe("c");
   });
-  it("multiselect supports searchable choices", async () => {
-    render(<UI.MultiSelect options={options} label="Tags" />);
+  it("multiple Select supports searchable choices", async () => {
+    render(<UI.Select mode="multiple" options={options} label="Tags" />);
     await userEvent.click(screen.getByRole("combobox"));
     await userEvent.type(screen.getByRole("combobox"), "Char");
     expect(
@@ -226,10 +226,10 @@ describe("styled interactive controls", () => {
     expect(change.mock.calls[0][0]).toBe(true);
     expect(screen.getByRole("switch")).not.toBeChecked();
   });
-  it("multiselect renders selected chips and removes a selection", async () => {
+  it("multiple Select renders selected chips and removes a selection", async () => {
     const change = vi.fn();
     render(
-      <UI.MultiSelect
+      <UI.Select mode="multiple"
         options={options}
         defaultValue={["a"]}
         onValueChange={change}
@@ -321,7 +321,7 @@ describe("styled interactive controls", () => {
 });
 
 it('keeps disabled compound inputs unfocusable', async () => {
-  render(<><UI.NumberInput label="Disabled count" disabled /><UI.MultiSelect label="Disabled tags" options={options} disabled /></>);
+  render(<><UI.NumberInput label="Disabled count" disabled /><UI.Select mode="multiple" label="Disabled tags" options={options} disabled /></>);
   const number = screen.getByLabelText('Disabled count');
   const combo = screen.getByRole('combobox', {name: 'Disabled tags'});
   expect(number).toBeDisabled();
@@ -389,8 +389,8 @@ it("keeps Escape dismissal when outside dismissal is disabled", async () => {
   expect(screen.queryByRole("dialog")).toBeNull();
 });
 
-it("multiselect uses the same decorative arrow and selection check as Select", async () => {
-  render(<UI.MultiSelect label="Vector tags" options={options} defaultValue={["a"]} />);
+it("multiple Select uses the same decorative arrow and selection check as single Select", async () => {
+  render(<UI.Select mode="multiple" label="Vector tags" options={options} defaultValue={["a"]} />);
   const trigger = screen.getByRole("button", { name: "展开选项" });
   expect(trigger.querySelector("svg")).toHaveClass("lucide-chevron-down");
   expect(trigger.querySelector("svg")).toHaveAttribute("width", "16");

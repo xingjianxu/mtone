@@ -49,8 +49,8 @@ import Example4_0 from "./inline-demos/radio-group-usage";
 import Example4_0Raw from "./inline-demos/radio-group-usage.tsx?raw";
 import Example5_0 from "./inline-demos/select-usage";
 import Example5_0Raw from "./inline-demos/select-usage.tsx?raw";
-import Example6_0 from "./inline-demos/multi-select-usage";
-import Example6_0Raw from "./inline-demos/multi-select-usage.tsx?raw";
+import SelectMultiple from "./inline-demos/select-multiple";
+import SelectMultipleSource from "./inline-demos/select-multiple.tsx?raw";
 import Example7_0 from "./inline-demos/slider-usage";
 import Example7_0Raw from "./inline-demos/slider-usage.tsx?raw";
 import Example8_0 from "./inline-demos/number-input-usage";
@@ -149,8 +149,8 @@ import Toast2 from "./inline-demos/toast-custom";
 import Toast2Raw from "./inline-demos/toast-custom.tsx?raw";
 import SelectExtra from "./inline-demos/select-disabled";
 import SelectExtraRaw from "./inline-demos/select-disabled.tsx?raw";
-import MultiSelectExtra from "./inline-demos/multi-select-disabled";
-import MultiSelectExtraRaw from "./inline-demos/multi-select-disabled.tsx?raw";
+import SelectMultipleDisabled from "./inline-demos/select-multiple-disabled";
+import SelectMultipleDisabledSource from "./inline-demos/select-multiple-disabled.tsx?raw";
 import DialogExtra from "./inline-demos/dialog-modal";
 import DialogExtraRaw from "./inline-demos/dialog-modal.tsx?raw";
 const source = (raw: string) =>
@@ -302,8 +302,14 @@ export const inlineDocSections: Readonly<
     {
       id: "multiple",
       title: "多选模式",
-      Demo: Example6_0,
-      source: source(Example6_0Raw),
+      Demo: SelectMultiple,
+      source: source(SelectMultipleSource),
+    },
+    {
+      id: "multiple-disabled",
+      title: "多选中的禁用选项",
+      Demo: SelectMultipleDisabled,
+      source: source(SelectMultipleDisabledSource),
     },
     {
       id: "tags",
@@ -316,22 +322,6 @@ export const inlineDocSections: Readonly<
   TagSelect: [
     { id: "usage", title: "基础用法", Demo: TagChoice, source: source(TagChoiceRaw) },
     { id: "expandable", title: "展开与收起", Demo: TagDisclosure, source: source(TagDisclosureRaw) },
-  ],
-  MultiSelect: [
-    {
-      id: "usage",
-      title: "基础用法",
-      note: "MultiSelect 保留为兼容入口，新代码使用 Select 的 multiple 模式。",
-      relatedLink: { href: "#/components/Select?section=multiple", label: "Select 多选模式" },
-      Demo: Example6_0,
-      source: source(Example6_0Raw),
-    },
-    {
-      id: "disabled-option",
-      title: "禁用选项",
-      Demo: MultiSelectExtra,
-      source: source(MultiSelectExtraRaw),
-    },
   ],
   Slider: [
     {

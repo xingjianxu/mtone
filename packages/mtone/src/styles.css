@@ -879,7 +879,7 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
   outline-offset: -1px;
 }
 .mt-number-group .mt-number-input:focus-visible,
-.mt-multiselect .mt-combobox-input:focus-visible {
+.mt-select-multiple .mt-combobox-input:focus-visible {
   outline: none;
 }
 /* Inset rings remain visible inside clipped stepper and popup containers. */
@@ -888,7 +888,7 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
   outline-offset: -1px;
 }
 
-.mt-select[aria-invalid="true"], .mt-multiselect[aria-invalid="true"] { border-color: var(--mt-input-error, #c66660); }
+.mt-select[aria-invalid="true"], .mt-select-multiple[aria-invalid="true"] { border-color: var(--mt-input-error, #c66660); }
 
 /* Result: quiet status feedback, with content-sized actions and readable details. */
 .mt-result {
@@ -917,11 +917,11 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 
 /* Bordered input surfaces: change color only, without an extra outer ring. */
 :is(.mt-input, .mt-select):not(:disabled):not([data-disabled]):is(:focus, [aria-expanded="true"]),
-:is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):focus-within {
+:is(.mt-number-group, .mt-select-multiple):not(:has(input:disabled)):focus-within {
   outline: none;
 }
 :is(.mt-input, .mt-select):not(:disabled):not([data-disabled]):not([aria-invalid="true"]):not([data-invalid]):is(:focus, [aria-expanded="true"]),
-:is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):not([aria-invalid="true"]):not([data-invalid]):not(:has([aria-invalid="true"], [data-invalid])):focus-within {
+:is(.mt-number-group, .mt-select-multiple):not(:has(input:disabled)):not([aria-invalid="true"]):not([data-invalid]):not(:has([aria-invalid="true"], [data-invalid])):focus-within {
   border-color: var(--mt-focus, #93b4dc);
 }
 .mt-number-group:has([aria-invalid="true"], [data-invalid]) { border-color: var(--mt-input-error, #c66660); }
@@ -931,7 +931,7 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
     color: HighlightText;
   }
   :is(.mt-input, .mt-select):not(:disabled):not([data-disabled]):is(:focus, [aria-expanded="true"]),
-  :is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):focus-within {
+  :is(.mt-number-group, .mt-select-multiple):not(:has(input:disabled)):focus-within {
     outline: 1px solid Highlight;
     outline-offset: 1px;
   }

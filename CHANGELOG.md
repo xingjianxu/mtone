@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.0
+
+### Breaking changes
+- Remove the `MultiSelect` component and `MultiSelectProps` entirely. Use `Select mode="multiple"` and `SelectMultipleProps`; multiple selection, tags, keyboard interaction, and form behavior remain available. See the [upgrade notes](docs/MIGRATION.md#select-multiple-mode).
+
 ## 0.11.1
 
 The v0.11.0 GitHub tag did not reach npm. This release includes the full update from 0.10.3.

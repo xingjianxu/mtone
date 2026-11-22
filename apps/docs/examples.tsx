@@ -96,7 +96,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
   const [text, setText] = useState("设计规范");
   const [checked, setChecked] = useState(true);
   const [value, setValue] = useState<string | null>("design");
-  const [multi, setMulti] = useState<string[]>(["design"]);
   const [number, setNumber] = useState<number | null>(40);
   const [date, setDate] = useState("2026-11-15");
   const [page, setPage] = useState(1);
@@ -331,18 +330,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "TagSelect":
       return <M.TagSelect aria-label="主题" defaultValue={["design"]} options={[{value:"design",label:"设计"},{value:"research",label:"研究"},{value:"development",label:"开发"}]} />;
-    case "MultiSelect":
-      return (
-        <div style={stackStyle}>
-          <M.MultiSelect
-            label="文档标签"
-            options={options}
-            value={multi}
-            onValueChange={setMulti}
-          />
-          <M.Text muted>已选 {multi.length} 项</M.Text>
-        </div>
-      );
     case "Slider":
       return (
         <div style={stackStyle}>

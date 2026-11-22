@@ -8,15 +8,15 @@ This is the rendered outer **border-box**, including borders, rather than a chil
 | Button, including inherited ButtonGroup size and icon-only mode | 32px normal |
 | Tabs item in every variant, size and placement | 32px |
 | Input, Input.Search, DatePicker input | 32px |
-| Select, TreeSelect, Cascader and AutoComplete trigger/input | 32px |
+| Single Select, TreeSelect, Cascader and AutoComplete trigger/input | 32px |
 | NumberInput complete group | 32px |
 | Table column filter input | 32px |
-| MultiSelect chips/input container | minimum 32px |
+| Select chips/input container (`mode="multiple"` or `"tags"`) | minimum 32px |
 | Tag with `variant="filter"` | 32px |
 | TagSelect option, expansion trigger and collapsed viewport | 32px |
 | NavItem (including Sidebar, NavGroup and AdminLayout.Sider) and docs sidebar links | 32px |
 
-MultiSelect grows when chips wrap. Do not force a fixed 32px height that hides values,
+Select in multiple and tags modes grows when chips wrap. Do not force a fixed 32px height that hides values,
 removal buttons or the search input. Long Select labels and plain-text navigation labels remain single-line with ellipsis.
 Navigation row gaps, group headings and the collapsed sidebar controls are unchanged.
 

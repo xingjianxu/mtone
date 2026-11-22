@@ -7,7 +7,6 @@ import {
   Input,
   Button,
   Select,
-  MultiSelect,
   Rate,
   AutoComplete,
   Cascader,
@@ -62,7 +61,7 @@ describe("Fieldset", () => {
             <Input aria-label="Name" />
             <Button onClick={change}>Save</Button>
             <Select label="Choice" options={[{ value: "a", label: "A" }]} />
-            <MultiSelect
+            <Select mode="multiple"
               label="Choices"
               options={[{ value: "a", label: "A" }]}
             />
@@ -135,12 +134,12 @@ it("closes an uncontrolled popup and allows opening again after disabled changes
   expect(await screen.findByRole("option")).toBeVisible();
 });
 
-it("re-enables initially disabled MultiSelect and disables chip removal without dropping values", async () => {
+it("re-enables initially disabled multiple Select and disables chip removal without dropping values", async () => {
   const user = userEvent.setup();
   const change = vi.fn();
   const Demo = ({ disabled }: { disabled: boolean }) => (
     <Fieldset disabled={disabled}>
-      <MultiSelect
+      <Select mode="multiple"
         label="Tags"
         defaultValue={["a"]}
         onValueChange={change}

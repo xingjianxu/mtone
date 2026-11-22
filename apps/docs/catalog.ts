@@ -6,7 +6,7 @@ export type PropDoc = {
   description: string;
 };
 /** Group by primary use; lists are in reading order, with base components before variants.
- * Keep companion utilities together (e.g. Card/CardGroup, Popover/Menu, and Select/MultiSelect).
+ * Keep companion utilities together (e.g. Card/CardGroup and Popover/Menu).
  * This is the shared taxonomy for sidebar, catalog categories, and category search.
  */
 const taxonomy = {
@@ -23,7 +23,7 @@ const taxonomy = {
   ],
   "表单输入": [
     "Form", "Fieldset", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
-    "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
+    "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker",
     "Upload", "Questionnaire",
@@ -398,7 +398,7 @@ export default function Demo() {
   "notes": [
     "Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 Form.Item 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。",
     "disabled 保留原生 fieldset 语义：本组第一个 legend 内的控件不受本组禁用影响，仍继承祖先禁用。",
-    "mtone 的 Button、Input、Input.TextArea、Checkbox、Switch、RadioGroup、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
+    "mtone 的 Button、Input、Input.TextArea、Checkbox、Switch、RadioGroup、Select、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
     "原生 input/button/select/textarea 使用浏览器禁用语义；自定义第三方控件、链接、Menu 等非表单动作需应用自行传递 disabled。受控值仍由应用管理，Fieldset 不清空已有值。"
   ]
 },
@@ -2716,7 +2716,7 @@ export default function Demo() {
       "name": "Form.Item: trigger",
       "type": "string",
       "description": "取值事件名；同名子控件事件仍会调用。",
-      "default": "Input: onChange；Select/MultiSelect: onValueChange"
+      "default": "Input: onChange；Select: onValueChange"
     },
     {
       "name": "Form.Item: getValueFromEvent",
@@ -2773,12 +2773,12 @@ export default function Demo() {
   "notes": [
     "这是 mtone 的轻量表单 API；支持 Form.Item 和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。",
     "字段 name 是扁平字符串 key；例如 \"user.email\" 只是一个完整 key，不会生成嵌套对象。控件以 Form 接管的值为准，不要同时传 value/defaultValue。",
-    "initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，MultiSelect 的初始值建议在 initialValues 中设为 []。",
+    "initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，Select 多选或标签模式的初始值建议在 initialValues 中设为 []。",
     "无 name 的 Form.Item 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。",
     "规则按顺序执行，每个字段遇到首个错误停止。可选空值跳过内建类型/长度/范围/正则检查，但仍执行自定义 validator；若要求填写请设置 required。required 只判断空值，不等于 Checkbox 必须选中；此类业务约束用自定义 validator。",
     "异步校验不发送内置网络请求；自定义 validator 可返回错误字符串、抛出错误或返回 Promise。值变化、重置或新校验可能使旧校验失效，validateFields 会拒绝并返回 outOfDate: true；手动调用须 catch，忽略过期结果。",
     "显式 error 优先于自动错误显示，但仅是展示，不会使 validateFields 失败或阻止 onFinish；阻止提交必须使用 rules。",
-    "组件注入 id、required、aria-invalid、aria-describedby 和校验中的 aria-busy；子控件需将这些属性传递到实际输入元素。内置 Input/Select/MultiSelect 已适配。",
+    "组件注入 id、required、aria-invalid、aria-describedby 和校验中的 aria-busy；子控件需将这些属性传递到实际输入元素。内置 Input 和 Select 已适配。",
     "控件交互触发 onValuesChange；setFieldValue/setFieldsValue/resetFields 不触发该回调，也不会自动重跑校验。set 操作清除对应字段旧错误，若需校验请手动调用 validateFields。",
     "托管提交会阻止浏览器默认提交并校验；通过后调用 onFinish，失败调用 onFinishFailed。用户 onSubmit 最先执行，若调用 preventDefault 则取消本次内建提交和校验。",
     "Form 内 type=\"reset\" 按钮恢复初始值与校验状态；onReset 若 preventDefault 则取消内建重置。业务保存/请求、成功状态与提交中的 loading 由应用管理。",
@@ -3035,7 +3035,7 @@ export default function Demo() {
       "保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择；按 Enter 选中高亮选项或点击才提交，Esc、失焦或外部点击撤销搜索。",
       "默认值和受控值按 mode 区分。空字符串可以作为显式选项值，原生和 Form.Item 的必填检查都将其视为已选；未选择单项用 null，多选未选择用 []。Form.Item 随 mode 集成。",
       '标签模式（SelectTagsProps）通过 Enter 或点击“创建”添加去掉首尾空白的输入。已有选项的精确 value 或纯文本标签不另建，包括禁用选项；重复输入不会添加。失焦或输入法确认不创建，不按逗号等分隔符拆分批量输入。仅更新已选值数组，不修改 options。外部传入而不在 options 中的已选值显示原字符串。',
-      '原 MultiSelect 保留为兼容入口，新代码使用 Select mode="multiple"。多选标签可换行；已选的禁用标签不由用户删除。',
+      'Select mode="multiple" 使用 SelectMultipleProps；外框最低 32px，标签可以换行。多选与标签模式都保留已选的禁用标签。',
 
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 32px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
@@ -3065,14 +3065,6 @@ export default function Demo() {
       { name: "expandLabel / collapseLabel", type: "string", description: "展开与收起按钮文字，默认「展开」与「收起」。" },
     ],
     notes: ["选项按钮、展开按钮及单行折叠视口统一采用 32px 基准高度。建议用 aria-label 或 aria-labelledby 为整组选项命名。折叠不会清除已选值。"],
-  },
-  {
-    name: "MultiSelect",
-    description: '已弃用的兼容入口；新代码请用 Select mode="multiple"。',
-    importNames: ["Select"],
-    code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Select mode="multiple" label="分类" options={[{value:"design",label:"设计"}]} defaultValue={["design"]} />;\n}',
-    props: [{ name: "MultiSelectProps", type: 'Omit<SelectMultipleProps, "mode">', description: "仍可导入 MultiSelect 与 MultiSelectProps；行为等同 Select 的 multiple 模式。" }],
-    notes: ['迁移时用 Select 替换组件名并加 mode="multiple"；现有的 string[] 值、回调、表单名称与受控开关保持不变。 默认单行外框高度为 32px（含边框），多行标签可以换行并撑高控件。'],
   },
   {
     name: "Slider",

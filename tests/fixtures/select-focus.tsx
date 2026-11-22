@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Input, Select, MultiSelect, MtoneProvider } from '../../packages/mtone/src';
+import { Input, Select, MtoneProvider } from '../../packages/mtone/src';
 import '../../packages/mtone/dist/styles.css';
 const options = [{value:'one',label:'One'}, {value:'two',label:'Two'}, {value:'disabled',label:'Disabled',disabled:true}];
 createRoot(document.getElementById('root')!).render(<>
@@ -8,5 +8,5 @@ createRoot(document.getElementById('root')!).render(<>
 <MtoneProvider locale="en">
 <Input aria-label="Reference input" />
 <section><Select label="Select" options={options} defaultValue="one" /></section>
-<section><MultiSelect label="MultiSelect" options={options} defaultValue={['one']} /></section>
+<section><Select mode="multiple" label="Multiple Select" options={options} defaultValue={['one']} /></section>
 </MtoneProvider></>);

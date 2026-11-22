@@ -63,9 +63,6 @@ export interface SelectTagsProps extends Omit<SelectMultipleProps, "mode"> {
 }
 export type SelectProps = SelectSingleProps | SelectPopupSearchProps | SelectMultipleProps | SelectTagsProps;
 
-/** @deprecated Use SelectMultipleProps and Select with mode="multiple". */
-export type MultiSelectProps = Omit<SelectMultipleProps, "mode">;
-
 const noValues: string[] = [];
 type OptionSection = { items: readonly SelectOption[]; label?: React.ReactNode; grouped: boolean };
 function useOptions(options: SelectCommonProps["options"]) {
@@ -593,7 +590,7 @@ function SelectMultiple({ mode, options, clearable, emptyContent, renderOption, 
         } else selection.change(next);
       }}
       open={popup.open} onOpenChange={popup.change}>
-      <Combobox.Chips aria-invalid={invalid} className={cn("mt-multiselect", className)}>
+      <Combobox.Chips aria-invalid={invalid} className={cn("mt-select-multiple", className)}>
         {selection.value.map((value) => {
           const option = optionData.byValue.get(value);
           return (
@@ -656,9 +653,3 @@ export function Select(props: SelectProps) {
   return props.searchable ? <SelectSearchable {...props} /> : <SelectSingle {...props} />;
 }
 Select.formValueType = (props: { mode?: unknown }) => props.mode === "multiple" || props.mode === "tags" ? "array" : "select-single";
-
-/** @deprecated Use <Select mode="multiple" />. */
-export function MultiSelect(props: MultiSelectProps) {
-  return <Select {...props} mode="multiple" />;
-}
-MultiSelect.formValueType = "array" as const;

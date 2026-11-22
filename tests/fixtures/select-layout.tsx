@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Select, MultiSelect, Checkbox } from "../../packages/mtone/src/interactive";
+import { Select, Checkbox } from "../../packages/mtone/src/interactive";
 import { DatePicker } from "../../packages/mtone/src/data";
 import { MtoneProvider } from "../../packages/mtone/src/basic";
 import "../../packages/mtone/dist/styles.css";
@@ -47,7 +47,7 @@ function ClearSlotFixture() {
   return (
     <MtoneProvider locale="en">
       <div className="clear-slots" style={{ display: "grid", gap: 12, padding: 12 }}>
-        <style>{".clear-slots .mt-select, .clear-slots .mt-multiselect { width: 220px; min-width: 0; }"}</style>
+        <style>{".clear-slots .mt-select, .clear-slots .mt-select-multiple { width: 220px; min-width: 0; }"}</style>
         <div data-testid="plain"><Select label="Plain" clearable options={options} defaultValue="alpha" /></div>
         <div data-testid="searchable"><Select label="Searchable" searchable clearable options={options} defaultValue="alpha" /></div>
         <div data-testid="multiple"><Select mode="multiple" label="Multiple" clearable options={options} defaultValue={["alpha", "locked"]} /></div>
@@ -111,11 +111,11 @@ createRoot(document.getElementById("root")!).render(
           />
         </div>
         <div className={`case multi-${theme}`} style={{ width: 250 }}>
-          <MultiSelect label={`${theme}-multi`} options={[{value:"a",label:"Alpha"},{value:"b",label:"Beta"},{value:"c",label:"Disabled",disabled:true}]} defaultValue={["a"]} />
+          <Select mode="multiple" label={`${theme}-multi`} options={[{value:"a",label:"Alpha"},{value:"b",label:"Beta"},{value:"c",label:"Disabled",disabled:true}]} defaultValue={["a"]} />
           <Checkbox label={`${theme}-check`} defaultChecked />
           <Checkbox label={`${theme}-mixed`} indeterminate />
         </div>
-        <div className="case"><MultiSelect label={`${theme}-multi-disabled`} options={[]} disabled /></div>
+        <div className="case"><Select mode="multiple" label={`${theme}-multi-disabled`} options={[]} disabled /></div>
         <div className={`case date-${theme}`} style={{ width: 250 }}><DatePicker label={`${theme}-date`} min="2026-01-01" max="2026-12-31" defaultValue="2026-02-01" /></div>
         <div className={`case date-disabled-${theme}`} style={{ width: 180 }}><DatePicker label={`${theme}-date-disabled`} disabled /></div>
       </MtoneProvider>

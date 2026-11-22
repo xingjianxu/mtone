@@ -32,8 +32,8 @@ test("sidebar keeps semantic neighbors together and renders each component and g
   expect(namesByGroup.get("基础组件")?.slice(0, 2)).toEqual(["Button", "ButtonGroup"]);
   expect(namesByGroup.get("弹层与菜单")?.slice(0, 3)).toEqual(["Popover", "Menu", "ContextMenu"]);
   const formNames = namesByGroup.get("表单输入")!;
-  expect(formNames.slice(formNames.indexOf("Select"), formNames.indexOf("Select") + 3)).toEqual([
-    "Select", "MultiSelect", "TreeSelect",
+  expect(formNames.slice(formNames.indexOf("Select"), formNames.indexOf("Select") + 2)).toEqual([
+    "Select", "TreeSelect",
   ]);
   expect(Array.from(sidebar.querySelectorAll('a:not([href^="#/components/"])'), (link) => link.getAttribute("href")))
     .toEqual(["#/start", "#/gallery", "./showcase.html", "#/theme", "#/theme/color-presets"]);

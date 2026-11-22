@@ -1,14 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import { Form, Input, Select, MultiSelect, Button, type FormInstance } from "../packages/mtone/src";
+import { Form, Input, Select, Button, type FormInstance } from "../packages/mtone/src";
 let instance: FormInstance;
 function Demo({ finish = vi.fn(), failed = vi.fn() }) {
  const [form] = Form.useForm(); instance = form;
  return <Form form={form} initialValues={{name:"",roles:[]}} onFinish={finish} onFinishFailed={failed}>
  <Form.Item name="name" label="Name" rules={[{required:true,message:"Name required"}]}><Input /></Form.Item>
  <Form.Item name="team" label="Team" rules={[{required:true,message:"Team required"}]}><Select options={[{value:"design",label:"Design"}]} /></Form.Item>
- <Form.Item name="roles" label="Roles" rules={[{type:"array",min:1,required:true,message:"Role required"}]}><MultiSelect options={[{value:"read",label:"Read"}]} /></Form.Item>
+ <Form.Item name="roles" label="Roles" rules={[{type:"array",min:1,required:true,message:"Role required"}]}><Select mode="multiple" options={[{value:"read",label:"Read"}]} /></Form.Item>
  <Button type="submit">Save</Button><Button type="reset">Reset</Button>
  </Form>;
 }
@@ -78,7 +78,7 @@ test("custom blur collection trigger composes value update and validation", asyn
  await screen.findByText("Too short");expect(instance.getFieldValue("blur")).toBe("ab");
 });
 
-test("collects actual Select and MultiSelect option clicks", async () => {
+test("collects option clicks in single and multiple Select modes", async () => {
  const user=(await import("@testing-library/user-event")).default.setup();const finish=vi.fn();render(<Demo finish={finish} />);
  await user.type(screen.getByRole("textbox",{name:"Name"}),"Alice");
  await user.click(screen.getByRole("combobox",{name:"Team"}));await user.click(await screen.findByRole("option",{name:"Design"}));

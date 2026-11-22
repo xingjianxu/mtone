@@ -77,7 +77,7 @@
   background: var(--mt-on-primary, white);
 }
 .mt-select,
-.mt-multiselect,
+.mt-select-multiple,
 .mt-number-group {
   font: inherit;
   font-size: 14px;
@@ -160,7 +160,7 @@
   opacity: calc(1 - var(--_mt-select-clear-opacity, 0));
 }
 .mt-select-clearable:hover:has(> .mt-select-clear),
-:is(.mt-multiselect, .mt-select-inline-search):hover .mt-select-action-slot:has(> .mt-select-clear),
+:is(.mt-select-multiple, .mt-select-inline-search):hover .mt-select-action-slot:has(> .mt-select-clear),
 :is(.mt-select-clearable, .mt-select-action-slot):has(> .mt-select-clear:focus-visible) {
   --_mt-select-clear-opacity: 1;
   --_mt-select-clear-hit: auto;
@@ -375,7 +375,7 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
-.mt-multiselect {
+.mt-select-multiple {
   min-height: var(--mt-height, 32px);
   max-width: 100%;
   flex-wrap: wrap;

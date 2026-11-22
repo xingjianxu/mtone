@@ -3,7 +3,6 @@ import {
   Button,
   Form,
   Input,
-  MultiSelect,
   Select,
   type FormValidationError,
 } from "../../packages/mtone/src";
@@ -85,7 +84,7 @@ export function FormExample() {
           },
         ]}
       >
-        <MultiSelect options={topicOptions} placeholder="选择关注主题" />
+        <Select mode="multiple" options={topicOptions} placeholder="选择关注主题" />
       </Form.Item>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         <Button type="submit" variant="blue">

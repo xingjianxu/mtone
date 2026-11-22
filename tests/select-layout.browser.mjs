@@ -270,11 +270,11 @@ try {
   await form.getByRole("button", { name: "Clear selection" }).first().click();
   assert.equal(await form.evaluate((node) => node.checkValidity()), false);
 
-  const multiselect = form.getByRole("combobox", { name: "Projects", exact: true });
-  await multiselect.press("Backspace");
+  const multipleSelect = form.getByRole("combobox", { name: "Projects", exact: true });
+  await multipleSelect.press("Backspace");
   assert.deepEqual(await selectionValue("projects"), ["", "locked"]);
-  await multiselect.press("Escape");
-  await multiselect.hover();
+  await multipleSelect.press("Escape");
+  await multipleSelect.hover();
   await form.getByRole("button", { name: "Clear selection" }).click();
   assert.deepEqual(await selectionValue("projects"), ["locked"]);
   await form.getByRole("button", { name: "Reset selection" }).click();
@@ -286,7 +286,7 @@ try {
     return {
       wrapper,
       field: wrapper.getByRole("combobox"),
-      surface: wrapper.locator(".mt-select, .mt-multiselect"),
+      surface: wrapper.locator(".mt-select, .mt-select-multiple"),
       arrow: wrapper.locator(".mt-select-icon, .mt-combobox-trigger > svg"),
       clear: wrapper.getByRole("button", { name: "Clear selection", exact: true }),
     };

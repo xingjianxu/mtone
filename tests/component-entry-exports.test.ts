@@ -11,6 +11,7 @@ test.each([
   ["SearchInput", mtone.Input.Search],
   ["Textarea", mtone.Input.TextArea],
   ["FormField", mtone.Form.Item],
+  ["MultiSelect", mtone.Select],
 ] as const)("keeps the canonical component without exporting %s", (removed, replacement) => {
   expect(replacement).toBeTruthy();
   expect(mtone).not.toHaveProperty(removed);

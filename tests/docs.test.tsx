@@ -15,14 +15,7 @@ describe("documentation", () => {
       componentDocs.length,
     );
     for (const doc of componentDocs) {
-      if (doc.name === "MultiSelect") {
-        // Its compatibility page intentionally demonstrates the recommended replacement.
-        expect(doc.importNames).toEqual(["Select"]);
-        expect(doc.code).toContain('import { Select } from "@bixlab/mtone"');
-        expect(doc.code).toContain('<Select mode="multiple"');
-      } else {
-        expect(doc.code).toContain(doc.name);
-      }
+      expect(doc.code).toContain(doc.name);
       expect(doc.description.length).toBeGreaterThan(4);
     }
   });
@@ -32,6 +25,7 @@ describe("documentation", () => {
       name: "Button",
     });
     expect(parseRoute("#/components/DropdownMenu")).toEqual({ kind: "not-found" });
+    expect(parseRoute("#/components/MultiSelect")).toEqual({ kind: "not-found" });
     expect(parseRoute("#/components/Modal")).toEqual({ kind: "not-found" });
     expect(parseRoute("#/showcase")).toEqual({ kind: "showcase" });
     expect(parseRoute("#/apps")).toEqual({ kind: "showcase" });

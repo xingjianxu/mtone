@@ -134,8 +134,8 @@ export function RadioGroup({
     </BRadioGroup>
   );
 }
-export { Select, MultiSelect } from "./select";
-export type { SelectProps, SelectSingleProps, SelectPopupSearchProps, SelectMultipleProps, SelectTagsProps, SelectOption, SelectOptionGroup, MultiSelectProps } from "./select";
+export { Select } from "./select";
+export type { SelectProps, SelectSingleProps, SelectPopupSearchProps, SelectMultipleProps, SelectTagsProps, SelectOption, SelectOptionGroup } from "./select";
 
 export interface SliderProps extends Common, ValueProps<number> {
   min?: number;

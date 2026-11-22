@@ -20,7 +20,7 @@ const expected: Record<string, string[]> = {
   "表单输入": [
     "Form", "Fieldset", "Input",
     "Mentions", "NumberInput", "AutoComplete", "Select",
-    "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
+    "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker",
     "Upload", "Questionnaire",

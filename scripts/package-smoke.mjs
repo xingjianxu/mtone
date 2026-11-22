@@ -68,6 +68,8 @@ try {
     readFileSync(join(root, "packages/mtone/llms.txt"), "utf8"),
   );
   const installed = join(dir, "node_modules/@bixlab/mtone");
+  const declarations = readFileSync(join(installed, "dist/index.d.ts"), "utf8");
+  assert.doesNotMatch(declarations, /\bMultiSelect(?:Props)?\b/, "Removed Select aliases must not appear in the public declarations");
   const main = readFileSync(join(installed, "dist/index.js"), "utf8");
   assert(!main.includes("@shikijs/"), "Shiki cannot be in the package's eager entry");
   const lazyChunk = main.match(/import\("\.\/(typography-highlight-[^"]+\.js)"\)/)?.[1];
@@ -98,13 +100,14 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, MultiSelect, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
+import { MtoneProvider, MtoneScope, Input, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Dropdown'));
-for (const name of ['Toast', 'DirectoryTree', 'AiChainOfThought', 'Modal', 'DropdownMenu', 'Mention', 'SearchInput', 'Textarea', 'FormField']) {
+for (const name of ['Toast', 'DirectoryTree', 'AiChainOfThought', 'Modal', 'DropdownMenu', 'Mention', 'SearchInput', 'Textarea', 'FormField', 'MultiSelect']) {
   assert(!Object.hasOwn(await import('@bixlab/mtone'), name), 'Removed export: ' + name);
 }
+assert.match(renderToStaticMarkup(createElement(Select, {mode:'multiple', options:[{value:'one',label:'Package selection'}], defaultValue:['one']})), /Package selection/);
 assert(renderToStaticMarkup(createElement(Input.Search, {'aria-label':'Search package'})).includes('Search package'));
 assert(renderToStaticMarkup(createElement(Input.TextArea, {'aria-label':'Notes package'})).includes('<textarea'));
 assert.match(renderToStaticMarkup(createElement(List.SortHandle, {'aria-label':'Sort'})), /mt-list-sort-handle/);
@@ -173,7 +176,7 @@ for (const virtual of [false, true]) {
 assert(renderToStaticMarkup(createElement(Card, {title:"Card title",htmlTitle:"Tooltip"}, "Body")).includes("Card title"));
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Layout'));
 assert(renderToStaticMarkup(createElement(PageLayout, { title: "Project", headingLevel: 2 })).includes('<h2 class="mt-page-layout-title">Project</h2>'));
-assert(TagSelect && AdminLayout.Sider && Dialog && ToastProvider && NumberInput && MultiSelect && Spotlight && Form.useForm && Form.Item);
+assert(TagSelect && AdminLayout.Sider && Dialog && ToastProvider && NumberInput && Select && Spotlight && Form.useForm && Form.Item);
 const submenuHtml = renderToStaticMarkup(createElement(NavSubmenu, { label: 'Billing', defaultExpanded: true }, createElement(NavItem, { active: true }, 'Usage')));
 assert(submenuHtml.includes('aria-expanded="true"') && submenuHtml.includes('aria-current="page"'));
 assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.css'));

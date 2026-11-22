@@ -41,9 +41,9 @@ it('keeps shared focus tokens and allows the Input forced-colors fallback', () =
   }
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   expect(css).toContain('.mt-chip,');
-  expect(css).toContain(':is(.mt-number-group, .mt-multiselect):not(:has(input:disabled)):focus-within');
+  expect(css).toContain(':is(.mt-number-group, .mt-select-multiple):not(:has(input:disabled)):focus-within');
   expect(css).toContain('.mt-number-group .mt-number-input:focus-visible');
-  expect(css).toContain('.mt-multiselect .mt-combobox-input:focus-visible');
+  expect(css).toContain('.mt-select-multiple .mt-combobox-input:focus-visible');
   const docs = readFileSync('apps/docs/site.css', 'utf8');
   expect(docs).not.toContain('outline: 2px solid #779482');
   expect(docs).toContain('outline: 1px solid var(--mt-focus, #93b4dc)');
@@ -78,7 +78,7 @@ it('uses border color only for all bordered input focus surfaces', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(([, selector]) =>
     selector.includes(':is(.mt-input, .mt-select)') &&
-    selector.includes(':is(.mt-number-group, .mt-multiselect)') &&
+    selector.includes(':is(.mt-number-group, .mt-select-multiple)') &&
     selector.includes(':focus-within')
   );
   const colorRule = rules.find(([, , declarations]) =>
@@ -100,7 +100,7 @@ it('uses border-box standard single-line surfaces without fixing multiline chips
  expect(css.slice(css.indexOf('.mt-number-input {')).split('}')[0]).toContain('line-height: 20px');
  const step=css.slice(css.indexOf('.mt-number-step {')).split('}')[0];
  expect(step).toContain('height: calc(var(--mt-height, 32px) - 2px)');
- const multi=css.slice(css.indexOf('.mt-multiselect {')).split('}')[0];
+ const multi=css.slice(css.indexOf('.mt-select-multiple {')).split('}')[0];
  expect(multi).toContain('flex-wrap: wrap');
  expect(multi).toContain('min-height: var(--mt-height, 32px)');
  expect(multi).not.toMatch(/^\s*height:/m);
@@ -119,7 +119,7 @@ it('reserves menu icon columns for all grouped rows of popup and inline menus wi
   expect(rules.find(([, rule]) => rule.trim().endsWith(selector))?.[2] ?? '').toContain('display: inline-flex');
 });
 
-it('keeps Select and MultiSelect highlights background-only, including forced colors', () => {
+it('keeps single and multiple Select highlights background-only, including forced colors', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
   const optionRules = rules.filter((rule) => rule[1].includes('.mt-option[data-highlighted]'));

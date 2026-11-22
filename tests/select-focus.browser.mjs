@@ -11,7 +11,7 @@ try {
     try {
       const page = await browser.newPage({viewport:{width:800,height:700}});
       const errors=[]; page.on('pageerror', e=>errors.push(e.message));
-      for (const dark of [false,true]) for (const control of ['Select','MultiSelect']) {
+      for (const dark of [false,true]) for (const control of ['Select','Multiple Select']) {
         await page.goto('http://127.0.0.1:5198/tests/fixtures/select-focus.html');
         await page.getByLabel('Reference input').waitFor();
         await page.evaluate(dark=>document.body.classList.toggle('dark',dark),dark);
@@ -65,7 +65,7 @@ try {
         await expect(list.getByRole('option',{name:'Two',exact:true})).toHaveAttribute('aria-selected','true');
         await page.keyboard.press('Escape'); await expect(list).toBeHidden();
       }
-      assert.deepEqual(errors,[]); console.log(`${name}: Select/MultiSelect background-only highlight, pointer/keyboard/selection, disabled and light/dark passed; forced colors verified where supported`);
+      assert.deepEqual(errors,[]); console.log(`${name}: Single/multiple Select background-only highlight, pointer/keyboard/selection, disabled and light/dark passed; forced colors verified where supported`);
     } finally { await browser.close(); }
   }
 } finally { await server.close(); }

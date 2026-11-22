@@ -4,7 +4,6 @@ import {
   Fieldset,
   Input,
   Select,
-  MultiSelect,
   Rate,
   Button,
   MtoneProvider,
@@ -26,7 +25,7 @@ function Demo() {
                 { value: "b", label: "Beta" },
               ]}
             />
-            <MultiSelect
+            <Select mode="multiple"
               label="Tags"
               defaultValue={["a"]}
               options={[

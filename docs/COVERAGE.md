@@ -6,7 +6,7 @@ Reference groups 01–09, 11–12 are implemented. Group10 block editor was expl
 | --------------- | ---------------------------------------------------------------------------------- |
 | Buttons         | Button (including iconOnly), ButtonGroup                                          |
 | Forms           | Input, Input.Search, Input.TextArea, Form, Form.Item                                      |
-| Selection       | Checkbox, RadioGroup (including segmented), Switch, Select, MultiSelect, Slider, NumberInput, DatePicker |
+| Selection       | Checkbox, RadioGroup (including segmented), Switch, Select (single, multiple, and tags), Slider, NumberInput, DatePicker |
 | Navigation      | Sidebar, NavItem, NavGroup, Tree, Breadcrumb, Tabs, Pagination |
 | Menus           | Menu, ContextMenu, Popover, Tooltip                                        |
 | Documents       | List, ListItem, DocumentList, DocumentCard, Card, Text, Divider                    |
