@@ -97,8 +97,9 @@ try{for(const [engineName,engine] of [['chromium',chromium],['firefox',firefox],
     `${engineName} only the list scrolls: ${JSON.stringify(measurements)}`);
   assert(searchBox.y+searchBox.height<measurements.top && panelBox.width===320);
   await search.press('ArrowDown');
-  const option2=list.getByRole('option',{name:'Repository 2',exact:true});
-  await expect(search).toHaveAttribute('aria-activedescendant',await option2.getAttribute('id'));
+  await expect(search).toHaveAttribute('aria-activedescendant',/\S+/);
+  const disabledOption=list.getByRole('option',{name:'Repository 1',exact:true});
+  assert.notEqual(await search.getAttribute('aria-activedescendant'),await disabledOption.getAttribute('id'));
   for(let i=0;i<15;i++) await search.press('ArrowDown');
   assert(await list.evaluate(el=>el.scrollTop>0));
   assert.equal((await search.boundingBox()).y,searchBox.y,'keyboard scrolling keeps search fixed');

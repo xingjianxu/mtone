@@ -1310,8 +1310,10 @@ export default function Demo() {
 - name: string. 表单字段名称。
 - className: string. 附加样式类。
 - mode: "single" | "multiple" | "tags" (default: "single"). 单选值为 string | null，多选与标签模式均为可搜索的 string[]；只有 tags 可以创建自定义值。
-- searchable / searchPlaceholder: boolean / string. 仅单选使用。启用后直接在选择框内输入；编辑时用 searchPlaceholder，收起未选时用 placeholder。下拉仅显示匹配选项。
-- clearable: boolean (default: false). 有可清除的选中值时，桌面悬停或键盘聚焦清除按钮会在箭头原位显示 ×；无悬停的触屏可直接点 ×。清除不打开下拉；单选变为 null，多选与标签模式保留已选禁用项。
+- searchable / searchPlaceholder: boolean | "popup" / string. 仅单选使用。true 在可见选择框内搜索，下拉只显示选项；"popup" 用按钮打开带独立搜索框的浮层。searchPlaceholder 设置搜索提示。
+- trigger / popupWidth / popupTitle: ReactElement | string / number | string / ReactNode. 仅 searchable="popup" 使用。SelectPopupSearchProps 支持可选的自定义触发器、宽度和标题。宽度默认 320px（数字为 px）且受视口限制。省略触发器时使用标准 Select；省略标题时用 label 或本地化默认标题。
+- renderOption: (option: SelectOption) => ReactNode. 自定义选项行的内容，如图标或说明；不替换选项节点、键盘和禁用行为，不更改 value、搜索或已选显示。内容不应包含独立交互控件。
+- clearable: boolean (default: false). 标准触发器有可清除的选中值时，桌面悬停或键盘聚焦清除按钮会在箭头原位显示 ×；无悬停的触屏可直接点 ×。自定义浮层触发器保留原外观，清除按钮单独显示。清除不打开下拉；单选变为 null，多选与标签模式保留已选禁用项。
 - emptyContent: ReactNode. 替换空列表或搜索无结果的默认提示。
 - required / form: boolean / string. 原生必填校验、可选外部表单 ID；多选与标签模式通过重复 name 提交已选值。
 - options: readonly (SelectOption | SelectOptionGroup)[]. 必填。选项包含唯一字符串 value、可渲染 label、可选 disabled 和 searchText；分组为 { label, options }，可与未分组选项混用。
@@ -1322,6 +1324,7 @@ export default function Demo() {
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
+- 浮层搜索适合仓库切换等独立触发器场景；打开聚焦搜索，Enter 或点击确认，Esc 返回触发器，关闭后清空查询。字符串触发器使用下拉预设 Button；自定义按钮须转发 ref 与触发器属性。searchable={true} 的输入框内搜索保持不变。
 - 保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择；按 Enter 选中高亮选项或点击才提交，Esc、失焦或外部点击撤销搜索。
 - 默认值和受控值按 mode 区分。空字符串可以作为显式选项值，原生和 Form.Item 的必填检查都将其视为已选；未选择单项用 null，多选未选择用 []。Form.Item 随 mode 集成。
 - 标签模式（SelectTagsProps）通过 Enter 或点击“创建”添加去掉首尾空白的输入。已有选项的精确 value 或纯文本标签不另建，包括禁用选项；重复输入不会添加。失焦或输入法确认不创建，不按逗号等分隔符拆分批量输入。仅更新已选值数组，不修改 options。外部传入而不在 options 中的已选值显示原字符串。
@@ -1341,6 +1344,7 @@ export default function Demo() {
   return (
     <>
       <Select label="分类" searchable clearable defaultValue="design" options={options} />
+      <Select label="切换分类" searchable="popup" popupTitle="分类" options={options} />
       <Select mode="multiple" label="标签" clearable defaultValue={["design"]} options={options} />
     </>
   );
@@ -1876,7 +1880,7 @@ export default function Demo() {
 
 ### Popover
 
-- [Popover](https://xingjianxu.github.io/mtone/#/components/Popover): 非模态自定义浮层，另提供 Popover.Menu 操作菜单和 Popover.SearchableSelect 可搜索单选。
+- [Popover](https://xingjianxu.github.io/mtone/#/components/Popover): 非模态自定义浮层，另提供 Popover.Menu 操作菜单。
 - Import: Popover from @bixlab/mtone
 - trigger: string | ReactElement. 必填；字符串使用 Button 的 dropdown 预设，自定义触发器可传 React 元素。
 - content: ReactNode. 必填；浮层内容。
@@ -1893,15 +1897,10 @@ export default function Demo() {
 - Popover.Menu.trigger / triggerMode: string | ReactElement / "click" | "hover". 必填触发器及触发方式（默认 click）；hover 仍支持点击、键盘与触屏。
 - Popover.Menu.width / align: CSSProperties["width"] / "start" | "end" | "left" | "right". 菜单面板默认随内容且最小 160px；对齐默认为 start。子菜单独立定宽。
 - Popover.Menu.open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 菜单浮层的受控开关、非受控初始开关及变更回调。
-- Popover.SearchableSelect.items: readonly PopoverSearchableSelectItem[]. 必填；每项为 { value: string, label: string, icon?: ReactNode, disabled?: boolean }。value 必须唯一；label 用于显示和搜索，图标可选。
-- Popover.SearchableSelect.value / defaultValue / onValueChange: string | null / string | null / (value: string) => void. 受控值、非受控初始值及值变更回调；null 表示没有选中项。确认后关闭，选择当前项也关闭但不触发值变更。
-- Popover.SearchableSelect.trigger / title / label / searchPlaceholder: string | ReactElement / ReactNode / string / string. 复用普通 Popover 的触发器、可见标题和可访问名称。默认标题为“选择选项”，搜索占位符为“搜索选项”（随语言切换）。
-- Popover.SearchableSelect.width / align / side / open: 同 Popover. 默认 width=320px、align=start、side=bottom。亦支持 defaultOpen 和 onOpenChange；不接受 content 或 unstyled。
 - Popover 是非模态 dialog，可使用 Tab 操作自定义内容，Escape 关闭并恢复焦点。自定义触发器需转发 ref 与 DOM props，浮层继承 MtoneProvider 上下文。
 - Popover.Menu（PopoverMenuProps）适合纯操作菜单：传 trigger、items 与可选 label / onSelect；保留方向键、分组、子菜单、焦点恢复和叶子选择关闭，不另嵌套 dialog。
 - Popover.Menu 的 triggerMode 默认为 click，可选 hover。悬停支持鼠标跨间隙和进入子菜单，不抢占键盘焦点；点击、键盘与触屏仍可用。字符串用内容宽度的下拉预设 Button，也可传自定义元素。
 - Popover.Menu 的 width 默认随内容且最小 160px，align 默认 start，可传 start/end（随方向）或 left/right（物理边）；子菜单单独定宽。受控开关用 open / onOpenChange，或用 defaultOpen 设置初始状态。
-- Popover.SearchableSelect 按标签做忽略大小写的子串过滤，标题与搜索框不随列表滚动。打开聚焦搜索，按方向键浏览并跳过禁用项，Enter 或点击确认，Escape 关闭；关闭后重置查询，不改变已选值。
 - 普通 Popover 的 content 可组合触发器无关的 Menu 和其他内容；内联 Menu 不改变外层 Popover 的开关，应用可在 onSelect 中控制。
 
 ```tsx
@@ -1913,7 +1912,6 @@ export default function Demo() {
     <>
       <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />
       <Popover.Menu trigger="文档操作" items={[{ key: "open", label: "打开文档" }]} onSelect={(key) => console.log(key)} />
-      <Popover.SearchableSelect trigger="切换仓库" title="仓库" items={[{ value: "mtone", label: "mtone" }]} defaultValue="mtone" />
     </>
   );
 }

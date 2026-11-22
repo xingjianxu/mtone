@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Breaking changes
+- Replace `Popover.SearchableSelect` with `Select searchable="popup"` and use `renderOption` for custom option content. No compatibility alias is provided. Existing inline Select search and ordinary Popover and Popover.Menu behavior are unchanged. See the [upgrade notes](docs/MIGRATION.md#searchable-selection-popover).
+
 ## 0.10.3
 
 The earlier 0.10.x tags did not reach npm. This version contains the complete update from 0.9.0.

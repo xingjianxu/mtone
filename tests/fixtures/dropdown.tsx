@@ -1,7 +1,7 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {DirectionProvider} from '@base-ui/react/direction-provider';
-import {Popover,ContextMenu,Button,Card,Input,MtoneProvider,type PopoverMenuProps} from '../../packages/mtone/src';
+import {Popover,ContextMenu,Button,Card,Input,MtoneProvider,Select,type PopoverMenuProps} from '../../packages/mtone/src';
 import '../../packages/mtone/dist/styles.css';
 const params=new URLSearchParams(window.location.search);
 const align=(params.get('align')||undefined) as PopoverMenuProps["align"];
@@ -22,10 +22,11 @@ const repos = Array.from({length: 20}, (_, index) => ({
 function SelectDemo() {
   const [value, setValue] = React.useState("0");
   return <>
-    <Popover.SearchableSelect trigger="Repository" title="Switch repository" align="start" width={320}
-      items={repos} value={value} onValueChange={setValue} />
-    <Popover.SearchableSelect trigger={<Button>Another picker</Button>} title="Other options"
-      items={repos} defaultValue="5" />
+    <Select searchable="popup" trigger="Repository" popupTitle="Switch repository" popupWidth={320}
+      options={repos} value={value} onValueChange={(next) => setValue(next ?? "")}
+      renderOption={(option) => <>{option.value === "0" && <span aria-hidden="true">◇ </span>}{option.label}</>} />
+    <Select searchable="popup" trigger={<Button>Another picker</Button>} popupTitle="Other options"
+      options={repos} defaultValue="5" />
     <output aria-label="Selected repository">{value}</output>
   </>;
 }

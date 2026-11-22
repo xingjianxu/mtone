@@ -18,8 +18,6 @@ import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
 import { Button, MtoneScope, useMtone, cn } from "./basic";
 import { runConfirmTransaction } from "./confirm-transaction";
-import { PopoverSearchableSelectContent, type PopoverSearchableSelectProps } from "./popover-select";
-export type { PopoverSearchableSelectItem, PopoverSearchableSelectProps } from "./popover-select";
 import {
   MenuSurfaceOwnerContext,
   FloatingSurface,
@@ -137,7 +135,7 @@ export function RadioGroup({
   );
 }
 export { Select, MultiSelect } from "./select";
-export type { SelectProps, SelectSingleProps, SelectMultipleProps, SelectTagsProps, SelectOption, SelectOptionGroup, MultiSelectProps } from "./select";
+export type { SelectProps, SelectSingleProps, SelectPopupSearchProps, SelectMultipleProps, SelectTagsProps, SelectOption, SelectOptionGroup, MultiSelectProps } from "./select";
 
 export interface SliderProps extends Common, ValueProps<number> {
   min?: number;
@@ -980,39 +978,7 @@ function PopoverRoot(props: PopoverProps) {
   return <PopoverFrame {...props} />;
 }
 
-function PopoverSearchableSelect({
-  items, value, defaultValue, onValueChange,
-  open, defaultOpen, onOpenChange, searchPlaceholder, title,
-  width = 320, align = "start", ...props
-}: PopoverSearchableSelectProps) {
-  const { locale } = useMtone();
-  const [localValue, setLocalValue] = useState(defaultValue);
-  const [localOpen, setLocalOpen] = useState(defaultOpen ?? false);
-  const input = React.useRef<HTMLInputElement>(null);
-  const isOpen = open ?? localOpen;
-  const selected = value === undefined ? localValue : value;
-  function changeOpen(next: boolean) {
-    if (open === undefined) setLocalOpen(next);
-    onOpenChange?.(next);
-  }
-  return (
-    <PopoverFrame {...props} width={width} align={align} open={isOpen} onOpenChange={changeOpen}
-      title={title ?? (locale === "zh" ? "选择选项" : "Choose an option")}
-      initialFocus={input}
-      content={<PopoverSearchableSelectContent items={items} value={selected} open={isOpen}
-        searchPlaceholder={searchPlaceholder} inputRef={input}
-        select={(next) => {
-          if (next !== selected) {
-            if (value === undefined) setLocalValue(next);
-            onValueChange?.(next);
-          }
-          changeOpen(false);
-        }} />}
-    />
-  );
-}
-
-export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu, SearchableSelect: PopoverSearchableSelect });
+export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu });
 
 export function Tooltip({
   children,
