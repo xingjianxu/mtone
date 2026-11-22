@@ -3,9 +3,8 @@ import * as M from "../../../packages/mtone/src";
 
 const stackStyle: React.CSSProperties = {
   display: "grid",
+  justifyItems: "start",
   gap: 12,
-  width: "100%",
-  maxWidth: 460,
 };
 export default function Demo() {
   const [value, setValue] = useState("list");

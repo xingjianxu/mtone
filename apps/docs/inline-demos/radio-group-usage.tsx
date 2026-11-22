@@ -10,11 +10,13 @@ export default function Demo() {
   const [value, setValue] = useState<string | null>("design");
 
   return (
-    <M.RadioGroup
-      label="文档分类"
-      options={options}
-      value={value ?? "design"}
-      onValueChange={setValue}
-    />
+    <div style={{ display: "inline-flex", maxWidth: "100%" }}>
+      <M.RadioGroup
+        label="文档分类"
+        options={options}
+        value={value ?? "design"}
+        onValueChange={setValue}
+      />
+    </div>
   );
 }

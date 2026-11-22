@@ -2927,7 +2927,11 @@ export default function Demo() {
         description: "普通单选默认纵向排列，分段按钮默认横向排列；两者都可覆盖。",
       },
     ],
-    notes: ["每个选项的 label 为可见名称；可用 disabled 禁用单项。", "两种变体沿用同一组选项、值和表单 API，支持方向键选择。"],
+    notes: [
+      "options[].label 可渲染文本或 React 节点；可用 disabled 禁用单项。",
+      "纯图标分段单选应给装饰图标设置 aria-hidden，并通过视觉隐藏的文字为每个选项命名。用 Tab 进入选中的选项，再用方向键切换。",
+      "两种变体沿用同一组选项、值和表单 API。",
+    ],
   },
   {
     name: "Select",

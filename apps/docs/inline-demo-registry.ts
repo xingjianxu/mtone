@@ -51,6 +51,8 @@ import Example12_0 from "./inline-demos/nav-item-usage";
 import Example12_0Raw from "./inline-demos/nav-item-usage.tsx?raw";
 import RadioGroupSegmented from "./inline-demos/radiogroup-segmented";
 import RadioGroupSegmentedRaw from "./inline-demos/radiogroup-segmented.tsx?raw";
+import RadioGroupIconOnly from "./inline-demos/radiogroup-icon-only";
+import RadioGroupIconOnlyRaw from "./inline-demos/radiogroup-icon-only.tsx?raw";
 import Example16_0 from "./inline-demos/pagination-usage";
 import Example16_0Raw from "./inline-demos/pagination-usage.tsx?raw";
 import Example17_0 from "./inline-demos/menu-usage";
@@ -244,6 +246,13 @@ export const inlineDocSections: Readonly<
       source: source(Example4_0Raw),
     },
     { id: "segmented", title: "分段单选", Demo: RadioGroupSegmented, source: source(RadioGroupSegmentedRaw) },
+    {
+      id: "icon-only",
+      title: "纯图标分段单选",
+      note: "按 Tab 进入已选项，按左右方向键切换布局。图标不参与朗读，屏幕阅读器可读出每项的隐藏文字名称。",
+      Demo: RadioGroupIconOnly,
+      source: source(RadioGroupIconOnlyRaw),
+    },
   ],
   Select: [
     {

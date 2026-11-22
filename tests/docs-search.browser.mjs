@@ -260,7 +260,39 @@ try {
   } finally {
     await sectionsPage.close();
   }
-  console.log("Docs navigation, Sidebar sections and Spotlight desktop/mobile checks passed");
+  const radiosPage = await browser.newPage({ viewport: { width: 1280, height: 740 } });
+  try {
+    await radiosPage.goto(`${base}#/components/RadioGroup?section=icon-only`);
+    for (const width of [1280, 320]) {
+      await radiosPage.setViewportSize({ width, height: 740 });
+      for (const name of ["文档分类", "视图模式", "显示布局"]) {
+        const group = radiosPage.getByRole("radiogroup", { name, exact: true });
+        await group.waitFor();
+        const size = await group.evaluate((node) => {
+          const original = node.getBoundingClientRect().width;
+          const probe = node.cloneNode(true);
+          Object.assign(probe.style, {
+            position: "absolute",
+            visibility: "hidden",
+            inlineSize: "max-content",
+          });
+          node.parentElement.append(probe);
+          const intrinsic = probe.getBoundingClientRect().width;
+          probe.remove();
+          return { original, intrinsic, stage: node.closest(".component-demo-stage").clientWidth };
+        });
+        assert(size.original > 0 && size.original < size.stage && Math.abs(size.original - size.intrinsic) < 1,
+          `${name} should sit at content width at ${width}px: ${JSON.stringify(size)}`);
+      }
+    }
+    const icons = radiosPage.getByRole("radiogroup", { name: "显示布局", exact: true });
+    await icons.getByRole("radio", { name: "列表", checked: true }).focus();
+    await radiosPage.keyboard.press("ArrowRight");
+    await icons.getByRole("radio", { name: "卡片", checked: true }).waitFor();
+  } finally {
+    await radiosPage.close();
+  }
+  console.log("Docs navigation, Sidebar sections, Spotlight and RadioGroup layout checks passed");
 } finally {
   await browser?.close();
   await server.close();
