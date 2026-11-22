@@ -1,5 +1,5 @@
 import packageInfo from "../../packages/mtone/package.json";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
   Menu,
@@ -373,7 +373,19 @@ export function DocsApp() {
   const [route, setRoute] = useState(() => parseRoute(window.location.hash));
   const [query, setQuery] = useState("");
   const [mobile, setMobile] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
   const results = searchDocs(query).filter((doc) => query.trim() || !doc.sidebarParent);
+  useLayoutEffect(() => {
+    // Align only on a fresh document load, not on in-app hash navigation.
+    const sidebar = sidebarRef.current;
+    if (route.kind !== "component" || !sidebar) return;
+    const current = sidebar.querySelector('nav a[aria-current="page"]');
+    if (!current) return;
+    const row = current.getBoundingClientRect();
+    const viewportTop = sidebar.getBoundingClientRect().top + sidebar.clientTop;
+    // Move only this scrollport; scrollIntoView can also move the main page.
+    sidebar.scrollTop += row.top + row.height / 2 - viewportTop - sidebar.clientHeight / 2;
+  }, []);
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobile(false);
@@ -483,7 +495,7 @@ export function DocsApp() {
             onClick={() => setMobile(false)}
           />
         )}
-        <aside className={`docs-sidebar ${mobile ? "is-open" : ""}`}>
+        <aside ref={sidebarRef} className={`docs-sidebar ${mobile ? "is-open" : ""}`}>
           <nav
             aria-label="文档导航"
             onClick={(event) => {

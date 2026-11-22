@@ -145,7 +145,69 @@ try {
     await page.keyboard.press("Control+k");
     assert.equal(await page.getByRole("dialog").count(), 0);
   }
-  console.log("Docs Spotlight desktop/mobile keyboard and layout checks passed");
+  // Use fresh-document openings: changing an in-app hash must not run the initial alignment.
+  const direct = await browser.newPage({ viewport: { width: 1280, height: 740 } });
+  try {
+    const scrollport = direct.locator(".docs-sidebar");
+    const currentLink = (name) => scrollport.locator(`a[href="#/components/${name}"][aria-current="page"]`);
+    const openDirect = async (path, name) => {
+      await direct.goto("about:blank");
+      await direct.goto(`${base}${path}`);
+      await currentLink(name).waitFor({ state: "attached" });
+    };
+    const centerDelta = (item) => item.evaluate((link) => {
+      const viewport = link.closest(".docs-sidebar");
+      const row = link.getBoundingClientRect();
+      return row.top + row.height / 2
+        - (viewport.getBoundingClientRect().top + viewport.clientTop + viewport.clientHeight / 2);
+    });
+    const assertCentered = async (name) => {
+      const delta = await centerDelta(currentLink(name));
+      assert(Math.abs(delta) <= 1, `${name} is centered in the sidebar; offset ${delta}px`);
+    };
+    const scrollTop = () => scrollport.evaluate((node) => node.scrollTop);
+    const assertSectionAnchor = async () => {
+      await direct.waitForFunction(() => document.activeElement?.id === "sorting");
+      const heading = await direct.locator("#sorting").boundingBox();
+      assert(heading.y >= 60 && heading.y < 200, "the requested section remains near the main content start");
+    };
+
+    await openDirect("#/components/List?section=sorting", "List");
+    await assertSectionAnchor();
+    await assertCentered("List");
+    await scrollport.evaluate((node) => { node.scrollTop = 0; });
+    await direct.reload();
+    await assertSectionAnchor();
+    await assertCentered("List");
+
+    const tree = scrollport.getByRole("link", { name: "Tree", exact: true });
+    assert(Math.abs(await centerDelta(tree)) >= 80, "manual link starts away from the center");
+    const before = await scrollTop();
+    await tree.click();
+    await currentLink("Tree").waitFor();
+    assert.equal(await scrollTop(), before, "manual sidebar navigation does not recenter it");
+
+    await openDirect("#/components/AdminLayout", "AdminLayout");
+    assert.equal(await scrollTop(), 0, "the first component clamps to the top");
+    assert.equal(await direct.evaluate(() => scrollY), 0);
+    assert(await direct.evaluate(() => document.activeElement === document.body));
+    await openDirect("#/components/MtoneScope", "MtoneScope");
+    assert.equal(await scrollTop(), await scrollport.evaluate((node) => node.scrollHeight - node.clientHeight),
+      "the last component clamps to the bottom");
+    assert.equal(await direct.evaluate(() => scrollY), 0);
+
+    await direct.setViewportSize({ width: 390, height: 740 });
+    await openDirect("#/components/List?section=sorting", "List");
+    const mobileMenu = direct.getByRole("button", { name: "打开导航" });
+    assert.equal(await mobileMenu.getAttribute("aria-expanded"), "false");
+    await assertSectionAnchor();
+    await mobileMenu.click();
+    await currentLink("List").waitFor();
+    await assertCentered("List");
+  } finally {
+    await direct.close();
+  }
+  console.log("Docs navigation, initial sidebar alignment and Spotlight desktop/mobile checks passed");
 } finally {
   await browser?.close();
   await server.close();
