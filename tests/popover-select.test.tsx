@@ -4,6 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
 import { MtoneProvider, Popover } from "../packages/mtone/src";
 
+test("exports the searchable component name without the unreleased Select alias", () => {
+  expect(Popover.SearchableSelect).toBeTypeOf("function");
+  expect(Popover).not.toHaveProperty("Select");
+});
+
 const items = [
   { value: "mtone", label: "mtone", icon: <span>◇</span> },
   { value: "disabled", label: "Archived", disabled: true },
@@ -15,7 +20,7 @@ test("opens a searchable single-choice dialog; commits with the keyboard and res
   const user = userEvent.setup();
   const onValueChange = vi.fn();
   render(<MtoneProvider locale="en">
-    <Popover.Select trigger="Choose repository" title="Switch repository" items={items}
+    <Popover.SearchableSelect trigger="Choose repository" title="Switch repository" items={items}
       defaultValue="mtone" onValueChange={onValueChange} />
   </MtoneProvider>);
   const trigger = screen.getByRole("button", { name: "Choose repository" });
@@ -44,7 +49,7 @@ test("honors controlled selection, ignores disabled options and composition, and
   const onValueChange = vi.fn();
   const onOpenChange = vi.fn();
   render(<MtoneProvider locale="en">
-    <Popover.Select trigger={<button>Projects</button>} label="Project picker" items={items}
+    <Popover.SearchableSelect trigger={<button>Projects</button>} label="Project picker" items={items}
       value="mtone" onValueChange={onValueChange} onOpenChange={onOpenChange} />
   </MtoneProvider>);
   const trigger = screen.getByRole("button", { name: "Projects" });

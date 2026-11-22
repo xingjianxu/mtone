@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.10.1. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.10.2. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 
@@ -1875,7 +1875,7 @@ export default function Demo() {
 
 ### Popover
 
-- [Popover](https://xingjianxu.github.io/mtone/#/components/Popover): 非模态自定义浮层，另提供 Popover.Menu 操作菜单和 Popover.Select 可搜索单选。
+- [Popover](https://xingjianxu.github.io/mtone/#/components/Popover): 非模态自定义浮层，另提供 Popover.Menu 操作菜单和 Popover.SearchableSelect 可搜索单选。
 - Import: Popover from @bixlab/mtone
 - trigger: string | ReactElement. 必填；字符串使用 Button 的 dropdown 预设，自定义触发器可传 React 元素。
 - content: ReactNode. 必填；浮层内容。
@@ -1892,15 +1892,15 @@ export default function Demo() {
 - Popover.Menu.trigger / triggerMode: string | ReactElement / "click" | "hover". 必填触发器及触发方式（默认 click）；hover 仍支持点击、键盘与触屏。
 - Popover.Menu.width / align: CSSProperties["width"] / "start" | "end" | "left" | "right". 菜单面板默认随内容且最小 160px；对齐默认为 start。子菜单独立定宽。
 - Popover.Menu.open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 菜单浮层的受控开关、非受控初始开关及变更回调。
-- Popover.Select.items: readonly PopoverSelectItem[]. 必填；每项为 { value: string, label: string, icon?: ReactNode, disabled?: boolean }。value 必须唯一；label 用于显示和搜索，图标可选。
-- Popover.Select.value / defaultValue / onValueChange: string | null / string | null / (value: string) => void. 受控值、非受控初始值及值变更回调；null 表示没有选中项。确认后关闭，选择当前项也关闭但不触发值变更。
-- Popover.Select.trigger / title / label / searchPlaceholder: string | ReactElement / ReactNode / string / string. 复用普通 Popover 的触发器、可见标题和可访问名称。默认标题为“选择选项”，搜索占位符为“搜索选项”（随语言切换）。
-- Popover.Select.width / align / side / open: 同 Popover. 默认 width=320px、align=start、side=bottom。亦支持 defaultOpen 和 onOpenChange；不接受 content 或 unstyled。
+- Popover.SearchableSelect.items: readonly PopoverSearchableSelectItem[]. 必填；每项为 { value: string, label: string, icon?: ReactNode, disabled?: boolean }。value 必须唯一；label 用于显示和搜索，图标可选。
+- Popover.SearchableSelect.value / defaultValue / onValueChange: string | null / string | null / (value: string) => void. 受控值、非受控初始值及值变更回调；null 表示没有选中项。确认后关闭，选择当前项也关闭但不触发值变更。
+- Popover.SearchableSelect.trigger / title / label / searchPlaceholder: string | ReactElement / ReactNode / string / string. 复用普通 Popover 的触发器、可见标题和可访问名称。默认标题为“选择选项”，搜索占位符为“搜索选项”（随语言切换）。
+- Popover.SearchableSelect.width / align / side / open: 同 Popover. 默认 width=320px、align=start、side=bottom。亦支持 defaultOpen 和 onOpenChange；不接受 content 或 unstyled。
 - Popover 是非模态 dialog，可使用 Tab 操作自定义内容，Escape 关闭并恢复焦点。自定义触发器需转发 ref 与 DOM props，浮层继承 MtoneProvider 上下文。
 - Popover.Menu（PopoverMenuProps）适合纯操作菜单：传 trigger、items 与可选 label / onSelect；保留方向键、分组、子菜单、焦点恢复和叶子选择关闭，不另嵌套 dialog。
 - Popover.Menu 的 triggerMode 默认为 click，可选 hover。悬停支持鼠标跨间隙和进入子菜单，不抢占键盘焦点；点击、键盘与触屏仍可用。字符串用内容宽度的下拉预设 Button，也可传自定义元素。
 - Popover.Menu 的 width 默认随内容且最小 160px，align 默认 start，可传 start/end（随方向）或 left/right（物理边）；子菜单单独定宽。受控开关用 open / onOpenChange，或用 defaultOpen 设置初始状态。
-- Popover.Select 按标签做忽略大小写的子串过滤，标题与搜索框不随列表滚动。打开聚焦搜索，按方向键浏览并跳过禁用项，Enter 或点击确认，Escape 关闭；关闭后重置查询，不改变已选值。
+- Popover.SearchableSelect 按标签做忽略大小写的子串过滤，标题与搜索框不随列表滚动。打开聚焦搜索，按方向键浏览并跳过禁用项，Enter 或点击确认，Escape 关闭；关闭后重置查询，不改变已选值。
 - 普通 Popover 的 content 可组合触发器无关的 Menu 和其他内容；内联 Menu 不改变外层 Popover 的开关，应用可在 onSelect 中控制。
 
 ```tsx
@@ -1912,7 +1912,7 @@ export default function Demo() {
     <>
       <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />
       <Popover.Menu trigger="文档操作" items={[{ key: "open", label: "打开文档" }]} onSelect={(key) => console.log(key)} />
-      <Popover.Select trigger="切换仓库" title="仓库" items={[{ value: "mtone", label: "mtone" }]} defaultValue="mtone" />
+      <Popover.SearchableSelect trigger="切换仓库" title="仓库" items={[{ value: "mtone", label: "mtone" }]} defaultValue="mtone" />
     </>
   );
 }

@@ -22,9 +22,9 @@ const repos = Array.from({length: 20}, (_, index) => ({
 function SelectDemo() {
   const [value, setValue] = React.useState("0");
   return <>
-    <Popover.Select trigger="Repository" title="Switch repository" align="start" width={320}
+    <Popover.SearchableSelect trigger="Repository" title="Switch repository" align="start" width={320}
       items={repos} value={value} onValueChange={setValue} />
-    <Popover.Select trigger={<Button>Another picker</Button>} title="Other options"
+    <Popover.SearchableSelect trigger={<Button>Another picker</Button>} title="Other options"
       items={repos} defaultValue="5" />
     <output aria-label="Selected repository">{value}</output>
   </>;

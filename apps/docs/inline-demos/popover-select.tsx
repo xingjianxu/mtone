@@ -16,7 +16,7 @@ const repositories = [
 export default function Demo() {
   const [repository, setRepository] = useState("design-system");
   return (
-    <Popover.Select
+    <Popover.SearchableSelect
       trigger={repository}
       title="切换仓库"
       searchPlaceholder="搜索仓库"

@@ -1,5 +1,5 @@
-import PopoverSelect from "./inline-demos/popover-select";
-import PopoverSelectSource from "./inline-demos/popover-select.tsx?raw";
+import PopoverSearchableSelect from "./inline-demos/popover-select";
+import PopoverSearchableSelectSource from "./inline-demos/popover-select.tsx?raw";
 import PopoverControlled from "./inline-demos/popover-controlled";
 import PopoverControlledSource from "./inline-demos/popover-controlled.tsx?raw";
 import PopoverCard from "./inline-demos/popover-card";
@@ -376,8 +376,8 @@ export const inlineDocSections: Readonly<
       id: "searchable-select",
       title: "可搜索单选",
       note: "搜索框固定在选项列表上方。方向键浏览，Enter 确认，Esc 关闭；也可直接点击一项。",
-      Demo: PopoverSelect,
-      source: source(PopoverSelectSource),
+      Demo: PopoverSearchableSelect,
+      source: source(PopoverSearchableSelectSource),
     },
     {
       id: "controlled",

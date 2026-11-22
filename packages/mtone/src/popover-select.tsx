@@ -4,23 +4,23 @@ import { useMtone } from "./basic";
 import { Input } from "./input";
 import type { PopoverProps } from "./interactive";
 
-export interface PopoverSelectItem {
+export interface PopoverSearchableSelectItem {
   value: string;
   label: string;
   icon?: React.ReactNode;
   disabled?: boolean;
 }
 
-export interface PopoverSelectProps extends Omit<PopoverProps, "content" | "unstyled"> {
-  items: readonly PopoverSelectItem[];
+export interface PopoverSearchableSelectProps extends Omit<PopoverProps, "content" | "unstyled"> {
+  items: readonly PopoverSearchableSelectItem[];
   value?: string | null;
   defaultValue?: string | null;
   onValueChange?: (value: string) => void;
   searchPlaceholder?: string;
 }
 
-export function PopoverSelectContent({ items, value, searchPlaceholder, select, open, inputRef }: {
-  items: readonly PopoverSelectItem[];
+export function PopoverSearchableSelectContent({ items, value, searchPlaceholder, select, open, inputRef }: {
+  items: readonly PopoverSearchableSelectItem[];
   value: string | null | undefined;
   searchPlaceholder?: string;
   select: (value: string) => void;
@@ -64,7 +64,7 @@ export function PopoverSelectContent({ items, value, searchPlaceholder, select, 
   }, [activeId, open, query]);
 
   return (
-    <div className="mt-popover-select">
+    <div className="mt-popover-searchable-select">
       <Input ref={inputRef} role="combobox" aria-label={searchLabel} aria-autocomplete="list"
         aria-expanded={open} aria-controls={listId} aria-activedescendant={open ? activeId : undefined}
         autoComplete="off" placeholder={searchPlaceholder ?? searchLabel}
@@ -91,25 +91,25 @@ export function PopoverSelectContent({ items, value, searchPlaceholder, select, 
             select(active.value);
           }
         }} />
-      <div className="mt-popover-select-body">
+      <div className="mt-popover-searchable-select-body">
         <div ref={listRef} id={listId} role="listbox" aria-label={locale === "zh" ? "选项" : "Options"}
-          className="mt-popover-select-list">
+          className="mt-popover-searchable-select-list">
           {filtered.map((item, index) => (
             <div key={item.value} id={optionId(index)} role="option"
               aria-selected={item.value === value} aria-disabled={item.disabled || undefined}
-              data-highlighted={item === active || undefined} className="mt-popover-select-option"
+              data-highlighted={item === active || undefined} className="mt-popover-searchable-select-option"
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => { if (!item.disabled) select(item.value); }}>
-              <span aria-hidden="true" className="mt-popover-select-mark">
+              <span aria-hidden="true" className="mt-popover-searchable-select-mark">
                 {item.value === value && <Check size={16} />}
               </span>
-              {hasIcons && <span aria-hidden="true" className="mt-popover-select-icon">{item.icon}</span>}
-              <span className="mt-popover-select-label">{item.label}</span>
+              {hasIcons && <span aria-hidden="true" className="mt-popover-searchable-select-icon">{item.icon}</span>}
+              <span className="mt-popover-searchable-select-label">{item.label}</span>
             </div>
           ))}
         </div>
         {!filtered.length && (
-          <div role="status" className="mt-popover-select-empty">
+          <div role="status" className="mt-popover-searchable-select-empty">
             {locale === "zh" ? "没有匹配的选项" : "No matching options"}
           </div>
         )}

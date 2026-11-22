@@ -82,6 +82,10 @@ try{for(const [engineName,engine] of [['chromium',chromium],['firefox',firefox],
   const listId=await list.getAttribute('id');
   await expect(search).toHaveAttribute('aria-controls',listId);
   await expect(list.getByRole('option',{name:'Repository 0',exact:true,selected:true})).toBeVisible();
+  const optionRows=list.getByRole('option');
+  const row0=await optionRows.nth(0).boundingBox(), row1=await optionRows.nth(1).boundingBox();
+  assert(Math.abs(row1.y-(row0.y+row0.height)-3)<1,
+    `${engineName} adjacent searchable options have the same 3px spacing as NavGroup items`);
   let measurements=await list.evaluate(el=>({
     top:el.getBoundingClientRect().top, scroll:el.scrollHeight, client:el.clientHeight,
     panelScroll:el.closest('[role=dialog]').scrollHeight,

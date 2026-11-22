@@ -20,8 +20,8 @@ import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
 import { Button, MtoneScope, useMtone, cn } from "./basic";
 import { runConfirmTransaction } from "./confirm-transaction";
-import { PopoverSelectContent, type PopoverSelectProps } from "./popover-select";
-export type { PopoverSelectItem, PopoverSelectProps } from "./popover-select";
+import { PopoverSearchableSelectContent, type PopoverSearchableSelectProps } from "./popover-select";
+export type { PopoverSearchableSelectItem, PopoverSearchableSelectProps } from "./popover-select";
 import {
   MenuSurfaceOwnerContext,
   FloatingSurface,
@@ -1181,11 +1181,11 @@ function PopoverRoot(props: PopoverProps) {
   return <PopoverFrame {...props} />;
 }
 
-function PopoverSelect({
+function PopoverSearchableSelect({
   items, value, defaultValue, onValueChange,
   open, defaultOpen, onOpenChange, searchPlaceholder, title,
   width = 320, align = "start", ...props
-}: PopoverSelectProps) {
+}: PopoverSearchableSelectProps) {
   const { locale } = useMtone();
   const [localValue, setLocalValue] = useState(defaultValue);
   const [localOpen, setLocalOpen] = useState(defaultOpen ?? false);
@@ -1200,7 +1200,7 @@ function PopoverSelect({
     <PopoverFrame {...props} width={width} align={align} open={isOpen} onOpenChange={changeOpen}
       title={title ?? (locale === "zh" ? "选择选项" : "Choose an option")}
       initialFocus={input}
-      content={<PopoverSelectContent items={items} value={selected} open={isOpen}
+      content={<PopoverSearchableSelectContent items={items} value={selected} open={isOpen}
         searchPlaceholder={searchPlaceholder} inputRef={input}
         select={(next) => {
           if (next !== selected) {
@@ -1213,7 +1213,7 @@ function PopoverSelect({
   );
 }
 
-export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu, Select: PopoverSelect });
+export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu, SearchableSelect: PopoverSearchableSelect });
 
 export function Tooltip({
   children,
