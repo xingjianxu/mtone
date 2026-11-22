@@ -151,20 +151,16 @@
   /* Center the 22px hit area on the 16px icon inside the 9px field inset. */
   inset-inline-end: 7px;
 }
-.mt-select-inline-search > .mt-select-clear {
-  /* The inline combobox is its own positioned, bordered surface. */
-  inset-inline-end: 6px;
-}
 .mt-select-action-slot > .mt-select-clear {
   inset-inline-end: -1px;
 }
 .mt-select-clearable > .mt-select .mt-select-icon,
-.mt-select-inline-search.mt-select-clearable > .mt-select-icon,
+.mt-select-inline-action > .mt-select-icon,
 .mt-select-action-slot > .mt-combobox-trigger > svg {
   opacity: calc(1 - var(--_mt-select-clear-opacity, 0));
 }
 .mt-select-clearable:hover:has(> .mt-select-clear),
-.mt-multiselect:hover .mt-select-action-slot:has(> .mt-select-clear),
+:is(.mt-multiselect, .mt-select-inline-search):hover .mt-select-action-slot:has(> .mt-select-clear),
 :is(.mt-select-clearable, .mt-select-action-slot):has(> .mt-select-clear:focus-visible) {
   --_mt-select-clear-opacity: 1;
   --_mt-select-clear-hit: auto;
@@ -199,6 +195,11 @@
   font-size: 12px;
   color: var(--mt-muted, #787774);
 }
+.mt-select-inline-search {
+  gap: 0;
+  padding-block: 0;
+  padding-inline-end: 0;
+}
 .mt-select-inline-value {
   position: relative;
   flex: 1 1 0;
@@ -217,11 +218,29 @@
   font: inherit;
   text-overflow: ellipsis;
 }
+/* The nested editor must not acquire a second ring from consumer input rules. */
+.mt-select-inline-search .mt-select-inline-input:focus { outline: none; }
 .mt-select-inline-input[data-rich-label] { opacity: 0; }
 .mt-select-rich-label {
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+.mt-select-inline-input[data-rich-label]:focus-visible + .mt-select-rich-label {
+  /* The closed rich label covers the caret; mark keyboard focus without a ring. */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mt-select-inline-action {
+  /* One full-height trailing strip; both glyphs share its logical midpoint. */
+  align-self: stretch;
+  flex-basis: 34px;
+  display: grid;
+  place-items: center;
+}
+.mt-select-inline-action > .mt-select-clear {
+  inset-inline: 0;
+  margin-inline: auto;
 }
 .mt-select-inline-trigger {
   border: 0;
@@ -230,13 +249,14 @@
   cursor: pointer;
 }
 .mt-select-inline-search[data-disabled] .mt-select-inline-trigger { cursor: not-allowed; }
-.mt-select-inline-search:not([data-disabled]):not([aria-invalid="true"]):focus-within {
-  border-color: var(--mt-focus, #93b4dc);
+.mt-select-inline-search:has(.mt-select-inline-input:focus) {
+  background: var(--mt-hover, #f1f1ef);
 }
 @media (forced-colors: active) {
-  .mt-select-inline-search:not([data-disabled]):focus-within {
-    outline: 1px solid Highlight;
-    outline-offset: 1px;
+  .mt-select-inline-value:has(.mt-select-inline-input:focus-visible) {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
   }
 }
 .mt-select-option-label {

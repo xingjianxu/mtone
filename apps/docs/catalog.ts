@@ -2225,6 +2225,11 @@ export default function Demo() {
           "占满视口高度（100dvh）；嵌入页面时可改用 style.height 指定有限高度。",
       },
       {
+        name: "AdminLayout.Sider.tabs",
+        type: "SidebarTabsOptions",
+        description: "透传 Sidebar 顶部标签配置；侧栏宽屏时显示标签，收起时保持当前面板图标导航。",
+      },
+      {
         name: "AdminLayout.Sider.collapsible",
         type: "boolean",
         default: "false",
@@ -3224,7 +3229,7 @@ export default function Demo() {
   },
   {
     name: "Sidebar",
-    description: "支持展开与图标窄栏切换的应用侧栏。",
+    description: "支持顶部标签、展开与图标窄栏切换的侧栏。",
     importNames: ["Sidebar", "NavItem"],
     code: 'import { Sidebar, NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
     props: [
@@ -3245,6 +3250,11 @@ export default function Demo() {
         type: "ReactNode | ((collapsed: boolean) => ReactNode)",
         description:
           "可选品牌头部，与已有折叠按钮同排；AdminLayout.Sider 的 logo 通过该插槽复用。",
+      },
+      {
+        name: "tabs",
+        type: "SidebarTabsOptions",
+        description: "可选顶部标签。items 为只读数组；每项包含唯一 value、label、content，可选 disabled 与 icon。tabs 可指定可访问 label、value / defaultValue / onValueChange。非空 items 代替 children；省略或为空则沿用原内容。",
       },
       {
         name: "collapsible",
@@ -3291,6 +3301,7 @@ export default function Demo() {
       "收起为 52px 图标窄栏，NavItem 保留可访问名称；NavGroup 隐藏标题与标题操作，保留默认分组分隔（可用 divider={false} 关闭）。建议每个 NavItem 提供 icon，没有图标时显示圆形占位。",
       "收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。",
       "受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。",
+      "顶部标签复用小尺寸 32px Tabs 与蓝色下划线，NavItem 的当前项保持灰色。设置有限高度后仅中间面板滚动；收起后隐藏标签栏但保留当前导航，展开恢复。已访问的面板保持挂载，标签不接管路由。AdminLayout.Sider 可直接传 tabs，PageLayout 可在 sidebar 插槽中传入同一个 Sidebar。",
       "不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。",
       "版本、部署和包信息等非导航内容，可使用 SectionGroup 分区；示例使用不收起的 Sidebar，不影响导航图标窄栏。",
     ],

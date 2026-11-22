@@ -287,7 +287,7 @@ function SelectSearchable({ options, searchPlaceholder, clearable, emptyContent,
         popup.change(open);
       }}>
       <Combobox.InputGroup ref={surface} aria-invalid={invalid}
-        className={cn("mt-select mt-select-inline-search", clearable && "mt-select-clearable", className)}
+        className={cn("mt-select mt-select-inline-search", className)}
         onBlur={(event) => {
           if (surface.current?.contains(event.relatedTarget) || popupRef.current?.contains(event.relatedTarget)) return;
           composingRef.current = false;
@@ -320,16 +320,18 @@ function SelectSearchable({ options, searchPlaceholder, clearable, emptyContent,
             }} />
           {showRichLabel && <span id={richLabelId} className="mt-select-value mt-select-rich-label" aria-hidden="true">{selectedLabel}</span>}
         </span>
-        <Combobox.Trigger className="mt-select-icon mt-select-inline-trigger" tabIndex={-1}
-          aria-label={locale === "zh" ? "展开选项" : "Show options"}>
-          <ChevronDown size={16} aria-hidden="true" />
-        </Combobox.Trigger>
-        {clearable && !disabled && selection.value !== null && (
-          <Combobox.Clear className="mt-select-clear" tabIndex={popup.open ? -1 : 0}
-            aria-label={locale === "zh" ? "清除选择" : "Clear selection"}>
-            <X size={14} aria-hidden="true" />
-          </Combobox.Clear>
-        )}
+        <span className="mt-select-action-slot mt-select-inline-action">
+          <Combobox.Trigger className="mt-select-icon mt-select-inline-trigger" tabIndex={-1}
+            aria-label={locale === "zh" ? "展开选项" : "Show options"}>
+            <ChevronDown size={16} aria-hidden="true" />
+          </Combobox.Trigger>
+          {clearable && !disabled && selection.value !== null && (
+            <Combobox.Clear className="mt-select-clear" tabIndex={popup.open ? -1 : 0}
+              aria-label={locale === "zh" ? "清除选择" : "Clear selection"}>
+              <X size={14} aria-hidden="true" />
+            </Combobox.Clear>
+          )}
+        </span>
       </Combobox.InputGroup>
       <ComboboxPopup data={data} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
         popupRef={popupRef} label={label} searchable />
