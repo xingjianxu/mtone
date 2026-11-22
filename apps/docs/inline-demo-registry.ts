@@ -41,8 +41,8 @@ import Example11_0 from "./inline-demos/nav-group-usage";
 import Example11_0Raw from "./inline-demos/nav-group-usage.tsx?raw";
 import Example12_0 from "./inline-demos/nav-item-usage";
 import Example12_0Raw from "./inline-demos/nav-item-usage.tsx?raw";
-import Example13_0 from "./inline-demos/segmented-usage";
-import Example13_0Raw from "./inline-demos/segmented-usage.tsx?raw";
+import RadioGroupSegmented from "./inline-demos/radiogroup-segmented";
+import RadioGroupSegmentedRaw from "./inline-demos/radiogroup-segmented.tsx?raw";
 import Example14_0 from "./inline-demos/filter-bar-usage";
 import Example14_0Raw from "./inline-demos/filter-bar-usage.tsx?raw";
 import Example14_1 from "./inline-demos/filter-bar-chip";
@@ -107,8 +107,8 @@ import Example36_0 from "./inline-demos/spinner-usage";
 import Example36_0Raw from "./inline-demos/spinner-usage.tsx?raw";
 import Example37_0 from "./inline-demos/upload-usage";
 import Example37_0Raw from "./inline-demos/upload-usage.tsx?raw";
-import Example38_0 from "./inline-demos/dropzone-usage";
-import Example38_0Raw from "./inline-demos/dropzone-usage.tsx?raw";
+import UploadDragAndDrop from "./inline-demos/upload-drag-and-drop";
+import UploadDragAndDropRaw from "./inline-demos/upload-drag-and-drop.tsx?raw";
 import Example39_0 from "./inline-demos/mtone-provider-usage";
 import Example39_0Raw from "./inline-demos/mtone-provider-usage.tsx?raw";
 import Example40_0 from "./inline-demos/mtone-scope-usage";
@@ -213,6 +213,7 @@ export const inlineDocSections: Readonly<
       Demo: Example4_0,
       source: source(Example4_0Raw),
     },
+    { id: "segmented", title: "分段单选", Demo: RadioGroupSegmented, source: source(RadioGroupSegmentedRaw) },
   ],
   Select: [
     {
@@ -295,14 +296,6 @@ export const inlineDocSections: Readonly<
     },
     { id: "link", title: "原生链接", Demo: NavItemLink, source: source(NavItemLinkSource) },
     { id: "actions", title: "尾部操作", Demo: NavItemActions, source: source(NavItemActionsSource) },
-  ],
-  Segmented: [
-    {
-      id: "usage",
-      title: "基础用法",
-      Demo: Example13_0,
-      source: source(Example13_0Raw),
-    },
   ],
   FilterBar: [
     {
@@ -562,13 +555,11 @@ export const inlineDocSections: Readonly<
       Demo: Example37_0,
       source: source(Example37_0Raw),
     },
-  ],
-  Dropzone: [
     {
-      id: "usage",
-      title: "基础用法",
-      Demo: Example38_0,
-      source: source(Example38_0Raw),
+      id: "drag-and-drop",
+      title: "拖拽上传",
+      Demo: UploadDragAndDrop,
+      source: source(UploadDragAndDropRaw),
     },
   ],
   MtoneProvider: [

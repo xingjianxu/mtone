@@ -42,6 +42,70 @@ describe("styled interactive controls", () => {
     await userEvent.click(screen.getByRole("radio", { name: "Charlie" }));
     expect(screen.getByRole("radio", { name: "Charlie" })).toBeChecked();
   });
+  it("uses the old segmented styles under an accessible RadioGroup without exporting Segmented", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const { container } = render(
+      <form>
+        <UI.RadioGroup
+          variant="segmented"
+          className="custom-segment"
+          label="Layout"
+          name="layout"
+          defaultValue="a"
+          options={options}
+          onValueChange={handleChange}
+        />
+      </form>,
+    );
+    const form = container.querySelector("form")!;
+    const group = screen.getByRole("radiogroup", { name: "Layout" });
+    expect(group).toHaveClass("mt-segmented", "mt-horizontal", "custom-segment");
+    expect(group).not.toHaveAttribute("variant");
+    expect(group.querySelector(".mt-radio-indicator")).not.toBeInTheDocument();
+    expect(UI).not.toHaveProperty("Segmented");
+    expect(new FormData(form).get("layout")).toBe("a");
+    const first = screen.getByRole("radio", { name: "Alpha" });
+    const next = screen.getByRole("radio", { name: "Charlie" });
+    expect(first).toHaveClass("mt-segment");
+    expect(first).toBeChecked();
+    first.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(next).toHaveFocus();
+    expect(next).toBeChecked();
+    expect(handleChange.mock.lastCall?.[0]).toBe("c");
+    expect(new FormData(form).get("layout")).toBe("c");
+  });
+
+  it("retains standard vertical styling and accepts explicit direction in both variants", () => {
+    const { rerender } = render(<UI.RadioGroup label="Direction" defaultValue="a" options={options} />);
+    const group = screen.getByRole("radiogroup", { name: "Direction" });
+    expect(group).toHaveClass("mt-radio-group", "mt-vertical");
+    expect(group.querySelector(".mt-radio-indicator")).toBeInTheDocument();
+    rerender(<UI.RadioGroup label="Direction" defaultValue="a" options={options} orientation="horizontal" />);
+    expect(group).toHaveClass("mt-radio-group", "mt-horizontal");
+    rerender(<UI.RadioGroup label="Direction" defaultValue="a" options={options} variant="segmented" orientation="vertical" />);
+    expect(group).toHaveClass("mt-segmented", "mt-vertical");
+    expect(group).not.toHaveClass("mt-horizontal");
+  });
+
+  it("uses controlled semantics and group disabling for segmented radios", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const { rerender } = render(<UI.RadioGroup variant="segmented" label="Mode" options={options} value="a" onValueChange={handleChange} />);
+    const alpha = screen.getByRole("radio", { name: "Alpha" });
+    const charlie = screen.getByRole("radio", { name: "Charlie" });
+    await user.click(charlie);
+    expect(handleChange.mock.lastCall?.[0]).toBe("c");
+    expect(alpha).toBeChecked();
+    expect(charlie).not.toBeChecked();
+    rerender(<UI.RadioGroup variant="segmented" label="Mode" options={options} value="c" onValueChange={handleChange} disabled />);
+    expect(charlie).toBeChecked();
+    expect(alpha).toHaveAttribute("aria-disabled", "true");
+    await user.click(alpha);
+    expect(handleChange).toHaveBeenCalledTimes(1);
+  });
+
   it("select exposes options and returns the selected value", async () => {
     const change = vi.fn();
     render(
@@ -75,7 +139,7 @@ describe("styled interactive controls", () => {
       "30",
     );
   });
-  it("tabs and segmented switch selection", async () => {
+  it("tabs switch selection", async () => {
     render(
       <>
         <UI.Tabs
@@ -84,7 +148,6 @@ describe("styled interactive controls", () => {
             { value: "two", label: "Second", content: "Second panel" },
           ]}
         />
-        <UI.Segmented options={options} defaultValue="a" />
       </>,
     );
     await userEvent.click(screen.getByRole("tab", { name: "Second" }));

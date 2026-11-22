@@ -105,34 +105,45 @@ export function Switch({
 }
 export interface RadioGroupProps extends Common, ValueProps<string> {
   options: Option[];
+  /** Visual treatment; both modes use the same radio semantics and form behavior. */
+  variant?: "default" | "segmented";
+  /** Defaults to vertical for standard radios and horizontal for segments. */
   orientation?: "horizontal" | "vertical";
 }
 export function RadioGroup({
   options,
   label,
   className,
-  orientation = "vertical",
+  variant = "default",
+  orientation = variant === "segmented" ? "horizontal" : "vertical",
   ...props
 }: RadioGroupProps) {
   props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
+  const segmented = variant === "segmented";
   return (
     <BRadioGroup
       aria-label={label}
-      className={cn("mt-radio-group", `mt-${orientation}`, className)}
+      className={cn(segmented ? "mt-segmented" : "mt-radio-group", `mt-${orientation}`, className)}
       {...props}
     >
-      {options.map((o) => (
-        <label className="mt-check-label" key={o.value}>
+      {options.map((option) => {
+        const radio = (
           <BRadio.Root
-            value={o.value}
-            disabled={o.disabled}
-            className="mt-radio"
+            key={option.value}
+            value={option.value}
+            disabled={option.disabled}
+            className={segmented ? "mt-segment" : "mt-radio"}
           >
-            <BRadio.Indicator className="mt-radio-indicator" />
+            {segmented ? option.label : <BRadio.Indicator className="mt-radio-indicator" />}
           </BRadio.Root>
-          {o.label}
-        </label>
-      ))}
+        );
+        return segmented ? radio : (
+          <label className="mt-check-label" key={option.value}>
+            {radio}
+            {option.label}
+          </label>
+        );
+      })}
     </BRadioGroup>
   );
 }
@@ -375,32 +386,6 @@ export function NumberInput({ label, className, ...props }: NumberInputProps) {
 }
 export { Tabs } from "./tabs";
 export type { TabItem, TabsProps, TabsIndicatorColor } from "./tabs";
-export function Segmented({
-  options,
-  label,
-  className,
-  ...props
-}: RadioGroupProps) {
-  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
-  return (
-    <BRadioGroup
-      className={cn("mt-segmented", className)}
-      aria-label={label}
-      {...props}
-    >
-      {options.map((o) => (
-        <BRadio.Root
-          key={o.value}
-          value={o.value}
-          disabled={o.disabled}
-          className="mt-segment"
-        >
-          {o.label}
-        </BRadio.Root>
-      ))}
-    </BRadioGroup>
-  );
-}
 export interface MenuItem {
   type?: "item";
   icon?: React.ReactNode;

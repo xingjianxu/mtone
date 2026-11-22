@@ -27,16 +27,18 @@ const simulateUpload: M.UploadAdapter = (_file, { signal, onProgress }) =>
     else signal.addEventListener("abort", abort, { once: true });
   });
 export default function Demo() {
-  const Upload = M.Dropzone;
   return (
     <div style={stackStyle}>
-      <Upload
+      <M.Upload
         upload={simulateUpload}
-        accept=".pdf,.txt,image/*"
-        maxSize={5 * 1024 * 1024}
-      />
+        accept=".txt"
+        maxSize={1024 * 1024}
+        multiple={false}
+      >
+        <span>拖拽一个 TXT 文件到这里，或点击选择文件</span>
+      </M.Upload>
       <M.Text muted>
-        模拟上传：文件不会发送到服务器。支持 PDF、TXT、图片，单文件最大 5 MB。
+        单次最多添加一个文件，单文件上限 1 MB。可在模拟上传过程中取消，或取消后重试；文件不会发送到服务器。
       </M.Text>
     </div>
   );

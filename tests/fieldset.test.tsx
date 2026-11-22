@@ -19,7 +19,6 @@ import {
   Checkbox,
   Switch,
   RadioGroup,
-  Segmented,
   Textarea,
   DatePicker,
   Upload,
@@ -174,7 +173,7 @@ it("propagates state to compound form controls and removes it when enabled", () 
       <Checkbox label="Check" />
       <Switch label="Switch" />
       <RadioGroup label="Radio" options={options} />
-      <Segmented label="Segment" options={options} />
+      <RadioGroup variant="segmented" label="Segment" options={options} />
       <Slider label="Volume" />
       <NumberInput label="Count" />
       <AutoComplete options={options} aria-label="Suggest" />

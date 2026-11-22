@@ -401,4 +401,3 @@ export function Upload({
     </div>
   );
 }
-export const Dropzone = Upload;

@@ -19,7 +19,7 @@ const taxonomy = {
   ],
   "导航切换": [
     "Sidebar", "NavGroup", "NavItem", "NavSubmenu", "Breadcrumb",
-    "TableOfContents", "Tabs", "Segmented", "Pagination",
+    "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
     "Form", "FormField", "Fieldset", "Input", "SearchInput",
@@ -27,7 +27,7 @@ const taxonomy = {
     "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker", "FilterBar", "FilterChip",
-    "Upload", "Dropzone", "Questionnaire",
+    "Upload", "Questionnaire",
   ],
   "数据展示": [
     "Card", "CardGroup", "List", "ListItem", "DataList",
@@ -398,7 +398,7 @@ export default function Demo() {
   "notes": [
     "Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 FormField 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。",
     "disabled 保留原生 fieldset 语义：本组第一个 legend 内的控件不受本组禁用影响，仍继承祖先禁用。",
-    "mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Segmented、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
+    "mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
     "原生 input/button/select/textarea 使用浏览器禁用语义；自定义第三方控件、链接、Menu 等非表单动作需应用自行传递 disabled。受控值仍由应用管理，Fieldset 不清空已有值。"
   ]
 },
@@ -2931,7 +2931,7 @@ export default function Demo() {
   },
   {
     name: "RadioGroup",
-    description: "从一组选项中选择一个值。",
+    description: "从一组选项中选择一个值，可显示为普通单选或分段按钮。",
     importNames: ["RadioGroup"],
     code: 'import { RadioGroup } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <RadioGroup label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />\n  );\n}',
     props: [
@@ -2977,69 +2977,18 @@ export default function Demo() {
         description: "值变化回调。",
       },
       {
-        name: "orientation",
-        type: '"horizontal" | "vertical"',
-        description: "RadioGroup 的排列方向；Segmented 默认采用水平分段样式。",
-        default: "vertical",
-      },
-    ],
-    notes: ["每个选项的 label 为可见名称；可用 disabled 禁用单项。"],
-  },
-  {
-    name: "Segmented",
-    description: "用紧凑分段按钮切换视图或模式。",
-    importNames: ["Segmented"],
-    code: 'import { Segmented } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Segmented label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />\n  );\n}',
-    props: [
-      {
-        name: "label",
-        type: "string",
-        description: "提供可访问名称。",
-      },
-      {
-        name: "disabled",
-        type: "boolean",
-        description: "禁用交互。",
-      },
-      {
-        name: "name",
-        type: "string",
-        description: "表单字段名称。",
-      },
-      {
-        name: "className",
-        type: "string",
-        description: "附加样式类。",
-      },
-      {
-        name: "options",
-        type: "Option[]",
-        description:
-          "必填；每项含 value、label，可设置 disabled。value 必须唯一。",
-      },
-      {
-        name: "value",
-        type: "string",
-        description: "受控值；提供后需在回调中更新。",
-      },
-      {
-        name: "defaultValue",
-        type: "string",
-        description: "非受控初始值。",
-      },
-      {
-        name: "onValueChange",
-        type: "(value: string) => void",
-        description: "值变化回调。",
+        name: "variant",
+        type: '"default" | "segmented"',
+        default: "default",
+        description: "default 显示单选圆点，segmented 显示紧凑分段按钮。",
       },
       {
         name: "orientation",
         type: '"horizontal" | "vertical"',
-        description: "RadioGroup 的排列方向；Segmented 默认采用水平分段样式。",
-        default: "horizontal",
+        description: "普通单选默认纵向排列，分段按钮默认横向排列；两者都可覆盖。",
       },
     ],
-    notes: ["每个选项的 label 为可见名称；可用 disabled 禁用单项。"],
+    notes: ["每个选项的 label 为可见名称；可用 disabled 禁用单项。", "两种变体沿用同一组选项、值和表单 API，支持方向键选择。"],
   },
   {
     name: "Select",
@@ -5893,61 +5842,6 @@ export default function Demo() {
       "实际上传需应用提供服务器接口，示例明确为模拟上传。",
       "适配器应使用 signal 取消请求；进度通过 onProgress(0–100) 更新。",
       "文件类型/大小检查只是客户端便利检查，服务端仍需校验。",
-    ],
-  },
-  {
-    name: "Dropzone",
-    description: "Upload 的别名，支持相同上传适配器。",
-    importNames: ["Dropzone"],
-    code: 'import { Dropzone } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Dropzone accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {\n      // 仅演示：不会发送文件到服务器\n      if (signal.aborted) throw new DOMException("Aborted", "AbortError");\n      onProgress(100);\n    }}>模拟上传：文件不会发送到服务器。</Dropzone>\n  );\n}',
-    props: [
-      {
-        name: "upload",
-        type: "(file: File, context: UploadContext) => Promise<unknown>",
-        description: "必填；context 包含 signal 和 onProgress(percent)。",
-      },
-      {
-        name: "accept",
-        type: "string",
-        description: "扩展名或 MIME 类型筛选，例如 .pdf,image/*。",
-      },
-      {
-        name: "maxSize",
-        type: "number",
-        description: "最大文件字节数。",
-      },
-      {
-        name: "multiple",
-        type: "boolean",
-        description: "允许多文件选择。",
-        default: "true",
-      },
-      {
-        name: "disabled",
-        type: "boolean",
-        description: "禁用选择和拖拽。",
-      },
-      {
-        name: "onChange",
-        type: "(files: UploadFile[]) => void",
-        description: "文件状态列表变化。",
-      },
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "组件内容。",
-      },
-      {
-        name: "className",
-        type: "string",
-        description: "附加样式类。",
-      },
-    ],
-    notes: [
-      "实际上传需应用提供服务器接口，示例明确为模拟上传。",
-      "适配器应使用 signal 取消请求；进度通过 onProgress(0–100) 更新。",
-      "文件类型/大小检查只是客户端便利检查，服务端仍需校验。",
-      "Dropzone 是 Upload 的同一实现。",
     ],
   },
   {

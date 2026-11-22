@@ -179,7 +179,7 @@ const items = [{ id: "resources", label: "资源", children: [
 - 原生属性 / ref: FieldsetHTMLAttributes<HTMLFieldSetElement> / Ref<HTMLFieldSetElement>. 支持 name、form、className、style、aria-* 等原生属性。
 - Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 FormField 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。
 - disabled 保留原生 fieldset 语义：本组第一个 legend 内的控件不受本组禁用影响，仍继承祖先禁用。
-- mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Segmented、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。
+- mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。
 - 原生 input/button/select/textarea 使用浏览器禁用语义；自定义第三方控件、链接、Menu 等非表单动作需应用自行传递 disabled。受控值仍由应用管理，Fieldset 不清空已有值。
 
 ```tsx
@@ -1349,7 +1349,7 @@ export default function Demo() {
 
 ### RadioGroup
 
-- [RadioGroup](https://xingjianxu.github.io/mtone/#/components/RadioGroup): 从一组选项中选择一个值。
+- [RadioGroup](https://xingjianxu.github.io/mtone/#/components/RadioGroup): 从一组选项中选择一个值，可显示为普通单选或分段按钮。
 - Import: RadioGroup from @bixlab/mtone
 - label: string. 提供可访问名称。
 - disabled: boolean. 禁用交互。
@@ -1359,8 +1359,10 @@ export default function Demo() {
 - value: string. 受控值；提供后需在回调中更新。
 - defaultValue: string. 非受控初始值。
 - onValueChange: (value: string) => void. 值变化回调。
-- orientation: "horizontal" | "vertical" (default: vertical). RadioGroup 的排列方向；Segmented 默认采用水平分段样式。
+- variant: "default" | "segmented" (default: default). default 显示单选圆点，segmented 显示紧凑分段按钮。
+- orientation: "horizontal" | "vertical". 普通单选默认纵向排列，分段按钮默认横向排列；两者都可覆盖。
 - 每个选项的 label 为可见名称；可用 disabled 禁用单项。
+- 两种变体沿用同一组选项、值和表单 API，支持方向键选择。
 
 ```tsx
 import { RadioGroup } from "@bixlab/mtone";
@@ -1369,32 +1371,6 @@ import "@bixlab/mtone/styles.css";
 export default function Demo() {
   return (
     <RadioGroup label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />
-  );
-}
-```
-
-### Segmented
-
-- [Segmented](https://xingjianxu.github.io/mtone/#/components/Segmented): 用紧凑分段按钮切换视图或模式。
-- Import: Segmented from @bixlab/mtone
-- label: string. 提供可访问名称。
-- disabled: boolean. 禁用交互。
-- name: string. 表单字段名称。
-- className: string. 附加样式类。
-- options: Option[]. 必填；每项含 value、label，可设置 disabled。value 必须唯一。
-- value: string. 受控值；提供后需在回调中更新。
-- defaultValue: string. 非受控初始值。
-- onValueChange: (value: string) => void. 值变化回调。
-- orientation: "horizontal" | "vertical" (default: horizontal). RadioGroup 的排列方向；Segmented 默认采用水平分段样式。
-- 每个选项的 label 为可见名称；可用 disabled 禁用单项。
-
-```tsx
-import { Segmented } from "@bixlab/mtone";
-import "@bixlab/mtone/styles.css";
-
-export default function Demo() {
-  return (
-    <Segmented label="显示方式" defaultValue="list" options={[{value:"list",label:"列表"},{value:"table",label:"表格"}]} />
   );
 }
 ```
@@ -2933,38 +2909,6 @@ export default function Demo() {
       if (signal.aborted) throw new DOMException("Aborted", "AbortError");
       onProgress(100);
     }}>模拟上传：文件不会发送到服务器。</Upload>
-  );
-}
-```
-
-### Dropzone
-
-- [Dropzone](https://xingjianxu.github.io/mtone/#/components/Dropzone): Upload 的别名，支持相同上传适配器。
-- Import: Dropzone from @bixlab/mtone
-- upload: (file: File, context: UploadContext) => Promise<unknown>. 必填；context 包含 signal 和 onProgress(percent)。
-- accept: string. 扩展名或 MIME 类型筛选，例如 .pdf,image/*。
-- maxSize: number. 最大文件字节数。
-- multiple: boolean (default: true). 允许多文件选择。
-- disabled: boolean. 禁用选择和拖拽。
-- onChange: (files: UploadFile[]) => void. 文件状态列表变化。
-- children: ReactNode. 组件内容。
-- className: string. 附加样式类。
-- 实际上传需应用提供服务器接口，示例明确为模拟上传。
-- 适配器应使用 signal 取消请求；进度通过 onProgress(0–100) 更新。
-- 文件类型/大小检查只是客户端便利检查，服务端仍需校验。
-- Dropzone 是 Upload 的同一实现。
-
-```tsx
-import { Dropzone } from "@bixlab/mtone";
-import "@bixlab/mtone/styles.css";
-
-export default function Demo() {
-  return (
-    <Dropzone accept=".txt,.md" maxSize={1024 * 1024} upload={async (_file, {signal, onProgress}) => {
-      // 仅演示：不会发送文件到服务器
-      if (signal.aborted) throw new DOMException("Aborted", "AbortError");
-      onProgress(100);
-    }}>模拟上传：文件不会发送到服务器。</Dropzone>
   );
 }
 ```

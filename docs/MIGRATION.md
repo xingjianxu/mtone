@@ -116,3 +116,8 @@ Applications still manage removal state themselves.
 
 If you override the internal CSS class `.mt-tag`, update it to `.mt-badge`.
 The documentation gallery now lists only Badge.
+
+## Unreleased: Upload and RadioGroup consolidation
+
+- Replace `Dropzone` with `Upload` without changing props. Click-to-select and drag-and-drop use the same upload area.
+- Replace `Segmented` with `RadioGroup variant="segmented"`. Keep the existing options and value props; the segmented style defaults to horizontal.

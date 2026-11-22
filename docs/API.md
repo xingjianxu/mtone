@@ -112,7 +112,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 `Option = { value: string; label: ReactNode; disabled?: boolean }`.
 
 - `Checkbox`, `Switch`: `checked`, `defaultChecked`, `onCheckedChange`, `label` or children, disabled; Checkbox also indeterminate.
-- `RadioGroup`: options, value/defaultValue/onValueChange, label, orientation horizontal/vertical.
+- `RadioGroup`: options, value/defaultValue/onValueChange, label and form name. The default radio style is vertical; `variant="segmented"` shows compact buttons and defaults to horizontal. Override either with `orientation`.
 - `Select`: options, string/null value, defaultValue, onValueChange, placeholder, label, disabled, open/defaultOpen/onOpenChange. The dropdown chevron is a fixed 16px vector icon; long selected labels and placeholders truncate within constrained trigger widths without stretching or pushing out the icon. Selected options use a vertically centered 16px Lucide Check with a thin 1.5px stroke; selection semantics and APIs are unchanged.
 - `MultiSelect`: options, string[] value, defaultValue, onValueChange, placeholder, label; searchable with removable chips. Use textual option labels for reliable filtering.
 - `Slider`: number value/defaultValue/onValueChange, min/max/step, label, disabled.
@@ -128,7 +128,6 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - Breadcrumb: items `{label,href?}`; final item is current page.
 - Tree/DirectoryTree: legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
 - Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card/attached variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. Every tab item is 32px tall including borders, in every variant, size and placement. The default inter-item gap is 6px for line and 4px for both card variants; explicit `gap` overrides the default. Line labels have 6px inline margins. Selected card and editable-card labels retain their background on hover. `indicatorColor` styles only the selected line indicator, using an accent preset or a CSS color (including a CSS variable); it defaults to `currentColor` and does not recolor the list divider, text, or cards. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
-- Segmented: options, value/defaultValue/onValueChange, label.
 - FilterBar: flexible layout; FilterChip(children,onRemove).
 - Pagination: total, pageSize (default10), **controlled** page/onPageChange.
 
@@ -378,7 +377,7 @@ The legacy `onChange(state)` remains unchanged: it receives `{ sort, filters, pa
 />
 ```
 
-Required adapter `upload(file,{signal,onProgress}) => Promise<unknown>`. Progress0–100. Props accept/maxSize(bytes)/multiple/disabled/onChange(files). Dropzone is an alias. Retry, cancel and removal abort active work; stale results cannot overwrite newer attempts. Validation is client convenience only; server must enforce file rules too. The component does not persist files, provide credentials or choose an endpoint. Documentation demo is explicitly simulated.
+Required adapter `upload(file,{signal,onProgress}) => Promise<unknown>`. Progress0–100. Props accept/maxSize(bytes)/multiple/disabled/onChange(files). Files can be selected by click or dropped onto the upload area. Retry, cancel and removal abort active work; stale results cannot overwrite newer attempts. Validation is client convenience only; server must enforce file rules too. The component does not persist files, provide credentials or choose an endpoint. Documentation demo is explicitly simulated.
 
 ### Dialog dismissal
 

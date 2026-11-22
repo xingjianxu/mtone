@@ -2,6 +2,7 @@ import React from "react";
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import * as catalog from "../apps/docs/catalog";
+import { inlineDocSections } from "../apps/docs/inline-demo-registry";
 import { DocsApp, parseRoute, searchDocs } from "../apps/docs/docs-app";
 // Independent expected taxonomy. Within each group names are in reading order.
 const expected: Record<string, string[]> = {
@@ -14,7 +15,7 @@ const expected: Record<string, string[]> = {
   ],
   "导航切换": [
     "Sidebar", "NavGroup", "NavItem", "NavSubmenu", "Breadcrumb",
-    "TableOfContents", "Tabs", "Segmented", "Pagination",
+    "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
     "Form", "FormField", "Fieldset", "Input", "SearchInput",
@@ -22,7 +23,7 @@ const expected: Record<string, string[]> = {
     "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker", "FilterBar", "FilterChip",
-    "Upload", "Dropzone", "Questionnaire",
+    "Upload", "Questionnaire",
   ],
   "数据展示": [
     "Card", "CardGroup", "List", "ListItem", "DataList",
@@ -116,6 +117,17 @@ describe("documentation taxonomy", () => {
     expect(parseRoute("#/components/IconButton?section=usage")).toEqual({ kind: "not-found" });
     expect(searchDocs("IconButton")).toEqual([]);
     expect(catalog.componentDocs.some((doc) => doc.name === "IconButton")).toBe(false);
+  });
+  it.each([
+    ["Dropzone", "Upload", "drag-and-drop", "<M.Upload"],
+    ["Segmented", "RadioGroup", "segmented", 'variant="segmented"'],
+  ])("replaces %s with an example under %s", (removed, owner, id, snippet) => {
+    expect(parseRoute(`#/components/${removed}`)).toEqual({ kind: "not-found" });
+    expect(parseRoute(`#/components/${removed}?section=usage`)).toEqual({ kind: "not-found" });
+    expect(searchDocs(removed).map((doc) => doc.name)).not.toContain(removed);
+    expect(inlineDocSections[removed]).toBeUndefined();
+    expect(inlineDocSections[owner]?.find((section) => section.id === id)?.source)
+      .toContain(snippet);
   });
   it("keeps the Button icon-only docs and canonical deep link", () => {
     window.location.hash = "#/components/Button?section=icon-only";

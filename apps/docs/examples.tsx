@@ -440,23 +440,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <TreeExample compact={compact} />;
     case "Tabs":
       return <TabsExample compact={compact} />;
-    case "Segmented":
-      return (
-        <div style={stackStyle}>
-          <M.Segmented
-            label="视图模式"
-            options={[
-              { value: "design", label: "列表" },
-              { value: "research", label: "卡片" },
-            ]}
-            value={value ?? "design"}
-            onValueChange={setValue}
-          />
-          <M.Text muted>
-            {value === "design" ? "当前列表视图" : "当前卡片视图"}
-          </M.Text>
-        </div>
-      );
     case "FilterBar":
       return (
         <M.FilterBar>
@@ -799,12 +782,10 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.Text muted>正在加载文档…</M.Text>
         </div>
       );
-    case "Upload":
-    case "Dropzone": {
-      const Upload = name === "Dropzone" ? M.Dropzone : M.Upload;
+    case "Upload": {
       return (
         <div style={stackStyle}>
-          <Upload
+          <M.Upload
             upload={simulateUpload}
             accept=".pdf,.txt,image/*"
             maxSize={5 * 1024 * 1024}
