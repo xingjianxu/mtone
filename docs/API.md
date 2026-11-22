@@ -269,16 +269,18 @@ a `ListItem` or `li`; the index is zero-based within the current page). Use
 `getLabel(item)` for readable selection and disclosure names; it defaults to
 the key as a string. Numeric keys must be finite. The root accepts section attributes such as `aria-label`,
 `className` and `style`. The frame surrounds the rows and any pagination. When
-controls are present, a single tinted header places selection and bulk actions
-at the start and search, filters and custom controls at the end. Controls wrap
-in narrow layouts; when none are supplied the header is omitted.
+controls are present, DataList uses the shared gray Toolbar to lay out the
+search first, selection and bulk actions at the start, and filters and custom
+controls at the end. Search takes a full row in narrow containers; when none
+are supplied the header is omitted.
 
 - `search` enables a search input. Use `value` with `onChange` for controlled
   search or `defaultValue` for the initial query. Set `placeholder`/`label` and
   a local `match(item, query)` predicate if needed. The local predicate receives
   a trimmed query. Without `match`, the input does not filter the records.
   `filter(item)` applies another local predicate; use `filters` to render filter
-  controls and `toolbar` to supply other controls or context.
+  controls and `toolbar` to supply other controls or context at the end. Keep
+  passing React content; do not wrap the slot in another Toolbar.
 - `pagination` is optional. Local mode applies search and filters before paging;
   `page`/`defaultPage`, `pageSize` (default 10) and `onPageChange` configure it.
   Local results clamp to the available page range. Editing the search requests
@@ -323,6 +325,8 @@ See [Progress examples and full API](https://xingjianxu.github.io/mtone/#/compon
 ### Version scope
 
 This section describes the Table API introduced in **0.3.0**. Version 0.2.0 contains only the legacy API below. The [live documentation](https://xingjianxu.github.io/mtone/#/components/Table) follows `master` and may be newer than npm; check the declarations bundled with your installed version.
+
+For external search, filtering or export, compose a standalone [Toolbar above the Table](https://xingjianxu.github.io/mtone/#/components/Table?section=toolbar). Keep the query, filters and actions in the application; neither component requires the other.
 
 ### Basic usage (legacy API retained)
 

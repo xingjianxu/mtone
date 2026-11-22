@@ -38,7 +38,11 @@ try {
         name: "Select visible items",
         exact: true,
       });
-      const controls = header.locator(".mt-data-list-controls");
+      await expect(header).toHaveClass(/\bmt-toolbar\b/);
+      await expect(header).toHaveAttribute("data-background", "gray");
+      const leading = header.locator(".mt-toolbar-start");
+      const searchSlot = leading.locator(":scope > .mt-search");
+      const trailing = header.locator(".mt-toolbar-end");
       const measureFrame = () =>
         frame.evaluate((root) => {
           const header = root.querySelector(":scope > .mt-data-list-toolbar");
@@ -99,15 +103,23 @@ try {
       const selectionGroup = header.locator(".mt-data-list-selection");
       async function expectHeaderOrder({ stackedOnly = false } = {}) {
         const selection = await selectionGroup.boundingBox();
-        const actions = await controls.boundingBox();
-        // Intrinsic widths differ by engine and font: controls may start a new
-        // flex line even at the desktop viewport. Check both axes, not x alone.
-        const stacked = selection.y + selection.height <= actions.y + 0.05;
-        const beside = selection.x + selection.width <= actions.x + 0.05;
+        const searchBox = await searchSlot.boundingBox();
+        const startBox = await leading.boundingBox();
+        const actions = await trailing.boundingBox();
+        const layout = await header.locator(".mt-toolbar-layout").boundingBox();
+        // Intrinsic widths differ by engine and font. Keep both permitted desktop
+        // arrangements, but insist on a full-width search row at narrow sizes.
+        const stacked = selection.y + selection.height <= searchBox.y + 0.05;
+        const beside = selection.x + selection.width <= searchBox.x + 0.05;
         expect(
           stacked || (!stackedOnly && beside),
-          `expected selection before controls without overlap: ${JSON.stringify({ selection, actions, stackedOnly })}`,
+          `expected selection before search without overlap: ${JSON.stringify({ selection, searchBox, stackedOnly })}`,
         ).toBe(true);
+        expect(Math.abs(actions.x + actions.width - layout.x - layout.width)).toBeLessThan(1);
+        if (stackedOnly) {
+          expect(Math.abs(searchBox.width - startBox.width)).toBeLessThan(1);
+          expect(actions.y + 0.05).toBeGreaterThanOrEqual(searchBox.y + searchBox.height);
+        }
       }
       await expectHeaderOrder();
       const filterTrigger = header.getByRole("button", {

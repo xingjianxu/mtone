@@ -5,6 +5,7 @@ import { Pagination } from "./data";
 import { Input } from "./input";
 import { Checkbox } from "./interactive";
 import { List } from "./list";
+import { Toolbar } from "./toolbar";
 
 export type DataListKey = string | number;
 
@@ -277,47 +278,50 @@ export function DataList<T>({
     filters != null && typeof filters !== "boolean" && filters !== "";
   const hasToolbar =
     toolbar != null && typeof toolbar !== "boolean" && toolbar !== "";
-  const hasControls = search || hasFilters || hasToolbar;
+  const hasLeadingControls = selection || search;
+  const hasTrailingControls = hasFilters || hasToolbar;
 
   return (
     <section {...props} className={cn("mt-data-list", className)}>
-      {(selection || hasControls) && (
-        <div className="mt-data-list-toolbar">
-          {selection && (
-            <div className="mt-data-list-selection">
-              <Checkbox
-                label={zh ? "选择当前可见项" : "Select visible items"}
-                checked={all}
-                indeterminate={picked > 0 && !all}
-                disabled={!enabledKeys.length}
-                onCheckedChange={(checked) =>
-                  changeSelection(updateKeys(selected, enabledKeys, checked))
-                }
-              />
-              <span className="mt-data-list-count" aria-live="polite">
-                {zh
-                  ? `已选择 ${selected.size} 项`
-                  : `${selected.size} selected`}
-              </span>
-              {selected.size > 0 && (
-                <div className="mt-data-list-actions">
-                  {renderBatchActions?.({
-                    selectedKeys: [...selected],
-                    clearSelection,
-                  })}
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    onClick={clearSelection}
-                  >
-                    {zh ? "清除选择" : "Clear selection"}
-                  </Button>
+      {(hasLeadingControls || hasTrailingControls) && (
+        <Toolbar
+          className="mt-data-list-toolbar"
+          background="gray"
+          start={hasLeadingControls && (
+            <>
+              {selection && (
+                <div className="mt-data-list-selection">
+                  <Checkbox
+                    label={zh ? "选择当前可见项" : "Select visible items"}
+                    checked={all}
+                    indeterminate={picked > 0 && !all}
+                    disabled={!enabledKeys.length}
+                    onCheckedChange={(checked) =>
+                      changeSelection(updateKeys(selected, enabledKeys, checked))
+                    }
+                  />
+                  <span className="mt-data-list-count" aria-live="polite">
+                    {zh
+                      ? `已选择 ${selected.size} 项`
+                      : `${selected.size} selected`}
+                  </span>
+                  {selected.size > 0 && (
+                    <div className="mt-data-list-actions">
+                      {renderBatchActions?.({
+                        selectedKeys: [...selected],
+                        clearSelection,
+                      })}
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        onClick={clearSelection}
+                      >
+                        {zh ? "清除选择" : "Clear selection"}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
-          {hasControls && (
-            <div className="mt-data-list-controls">
               {search && (
                 <Input.Search
                   aria-label={search.label ?? (zh ? "搜索列表" : "Search list")}
@@ -327,15 +331,17 @@ export function DataList<T>({
                   allowClear
                 />
               )}
+            </>
+          )}
+          end={hasTrailingControls && (
+            <>
               {hasFilters && (
                 <div className="mt-data-list-filters">{filters}</div>
               )}
-              {hasToolbar && (
-                <div className="mt-data-list-toolbar-end">{toolbar}</div>
-              )}
-            </div>
+              {hasToolbar && toolbar}
+            </>
           )}
-        </div>
+        />
       )}
       <List
         items={visible}

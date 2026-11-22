@@ -31,7 +31,7 @@ const labels = () =>
     .map((row) => row.textContent);
 
 describe("DataList", () => {
-  it("keeps selection and optional controls in a single header before the list", async () => {
+  it("uses one shared gray Toolbar while preserving DataList control order before the list", async () => {
     const user = userEvent.setup();
     render(
       english(
@@ -50,6 +50,10 @@ describe("DataList", () => {
     const header = frame.querySelector<HTMLElement>(
       ":scope > .mt-data-list-toolbar",
     )!;
+    expect(header).toHaveClass("mt-toolbar");
+    expect(header).toHaveAttribute("data-background", "gray");
+    expect(header).not.toHaveAttribute("role");
+    expect(frame.querySelectorAll(".mt-toolbar")).toHaveLength(1);
     const selection = within(header).getByRole("checkbox", {
       name: "Select visible items",
     });
@@ -58,12 +62,12 @@ describe("DataList", () => {
     expect(selection).toHaveFocus();
     await user.tab();
     expect(search).toHaveFocus();
-    expect(
-      within(header).getByRole("button", { name: "Filters" }),
-    ).toBeVisible();
-    expect(
-      within(header).getByRole("button", { name: "New record" }),
-    ).toBeVisible();
+    const filters = within(header).getByRole("button", { name: "Filters" });
+    const action = within(header).getByRole("button", { name: "New record" });
+    await user.tab();
+    expect(filters).toHaveFocus();
+    await user.tab();
+    expect(action).toHaveFocus();
     await user.click(selection);
     expect(within(header).getByText("4 selected")).toBeVisible();
     expect(

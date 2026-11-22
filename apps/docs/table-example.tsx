@@ -1,4 +1,6 @@
 /// <reference types="vite/client" />
+import ToolbarTable from "./inline-demos/toolbar-table";
+import toolbarTableSource from "./inline-demos/toolbar-table.tsx?raw";
 import TableExample0 from "./table-demos/basic";
 import tableSource0 from "./table-demos/basic.tsx?raw";
 import TableExample1 from "./table-demos/selection";
@@ -645,6 +647,13 @@ export const tableDocSections = [
     title: "基础用法",
     Demo: TableExample0,
     source: displayTableSource(tableSource0),
+  },
+  {
+    id: "toolbar",
+    title: "工具栏与表格",
+    note: "Toolbar 与 Table 同级放置，搜索、状态筛选和导出由应用控制，不需要给 Table 添加属性。",
+    Demo: ToolbarTable,
+    source: displayTableSource(toolbarTableSource),
   },
   {
     id: "row-selection",

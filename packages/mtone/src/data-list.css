@@ -6,13 +6,10 @@
   border-radius: var(--mt-radius, 6px);
   background: var(--mt-bg, #fff);
 }
-.mt-data-list-toolbar,
 .mt-data-list-selection,
-.mt-data-list-controls,
 .mt-data-list-row,
 .mt-data-list-actions,
-.mt-data-list-filters,
-.mt-data-list-toolbar-end {
+.mt-data-list-filters {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -20,21 +17,26 @@
   min-inline-size: 0;
 }
 .mt-data-list-toolbar {
-  padding: 8px 12px;
   border-block-end: 1px solid var(--_mt-data-list-border);
   border-start-start-radius: inherit;
   border-start-end-radius: inherit;
-  background: var(--mt-subtle, #f7f7f5);
 }
-.mt-data-list-controls {
-  flex: 1 1 auto;
-  justify-content: flex-end;
+/* Keep the selection group before search in the native focus order. The
+ * composite start slot gives both controls room; the trailing slot stays free
+ * to hold filters and caller actions without changing the standalone Toolbar. */
+.mt-data-list-toolbar > .mt-toolbar-layout > .mt-toolbar-start:has(> .mt-search) {
+  flex: 1 1 22rem;
 }
-.mt-data-list-controls > .mt-search {
+.mt-data-list-toolbar > .mt-toolbar-layout > .mt-toolbar-start > .mt-search {
   flex: 1 1 10rem;
   min-inline-size: 0;
   max-inline-size: 20rem;
-  margin-inline-end: auto;
+}
+@container mt-toolbar (max-width: 28rem) {
+  .mt-data-list-toolbar > .mt-toolbar-layout > .mt-toolbar-start > .mt-search {
+    flex-basis: 100%;
+    max-inline-size: none;
+  }
 }
 .mt-data-list-count {
   font-size: 12px;

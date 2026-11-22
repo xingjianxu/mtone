@@ -1,3 +1,5 @@
+import ToolbarStandalone from "./inline-demos/toolbar-standalone";
+import ToolbarStandaloneSource from "./inline-demos/toolbar-standalone.tsx?raw";
 import ToolbarTable from "./inline-demos/toolbar-table";
 import ToolbarTableSource from "./inline-demos/toolbar-table.tsx?raw";
 import ToolbarList from "./inline-demos/toolbar-list";
@@ -356,6 +358,7 @@ export const inlineDocSections: Readonly<
     },
   ],
   Toolbar: [
+    { id: "standalone", title: "独立工具栏", Demo: ToolbarStandalone, source: source(ToolbarStandaloneSource) },
     { id: "table", title: "表格", Demo: ToolbarTable, source: source(ToolbarTableSource) },
     { id: "list", title: "列表", Demo: ToolbarList, source: source(ToolbarListSource) },
     { id: "page", title: "普通页面", Demo: ToolbarPage, source: source(ToolbarPageSource) },
