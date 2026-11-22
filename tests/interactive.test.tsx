@@ -156,7 +156,7 @@ describe("styled interactive controls", () => {
   it("dropdown menu activates actions", async () => {
     const action = vi.fn();
     render(
-      <UI.Menu
+      <UI.Popover.Menu
         trigger={<button>Actions</button>}
         items={[{ key: "copy", label: "Copy", onSelect: action }]}
       />,
@@ -281,7 +281,7 @@ describe("styled interactive controls", () => {
   });
   it("menu icons render decoratively without changing accessible labels", async () => {
     render(
-      <UI.Menu
+      <UI.Popover.Menu
         trigger={<button>Icon menu</button>}
         items={[
           {

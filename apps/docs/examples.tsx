@@ -222,7 +222,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           </M.ButtonGroup>
           <M.ButtonGroup connected aria-label="导出文档">
             <M.Button onClick={() => setNotice("已选择导出 PDF")}>导出 PDF</M.Button>
-            <M.Menu
+            <M.Popover.Menu
               trigger={<M.Button iconOnly aria-label="更多导出格式"><ChevronDown size={14} /></M.Button>}
               items={[
                 { key: "markdown", label: "导出 Markdown", onSelect: () => setNotice("已选择导出 Markdown") },
@@ -439,7 +439,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return (
         <div style={{ ...stackStyle, justifyItems: "start" }}>
           <M.Menu
-            trigger={<M.Button>文档操作</M.Button>}
+            label="文档操作"
             items={[
               { type: "group", key: "documents", label: "文档操作", children: menuItems },
               { type: "divider", key: "divider" },
@@ -457,7 +457,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
             ]}
             onSelect={setNotice}
           />
-          <M.Menu trigger={<M.Button>右对齐菜单，宽度 240px</M.Button>} width={240} align="right" items={menuItems} onSelect={setNotice}/>
           {output}
         </div>
       );
@@ -483,11 +482,26 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <HoverCardExample />;
     case "Popover":
       return (
-        <M.Popover
-          title="文档信息"
-          trigger={<M.Button>查看信息</M.Button>}
-          content={<div style={{ minWidth: 180 }}>{properties}</div>}
-        />
+        <div style={{ ...stackStyle, justifyItems: "start" }}>
+          <M.Popover
+            title="文档信息"
+            trigger={<M.Button>查看信息</M.Button>}
+            content={<div style={{ minWidth: 180 }}>{properties}</div>}
+          />
+          <M.Popover.Menu
+            trigger={<M.Button>文档操作</M.Button>}
+            items={menuItems}
+            onSelect={setNotice}
+          />
+          <M.Popover.Menu
+            trigger={<M.Button>右对齐菜单，宽度 240px</M.Button>}
+            width={240}
+            align="right"
+            items={menuItems}
+            onSelect={setNotice}
+          />
+          {output}
+        </div>
       );
     case "Tooltip":
       return (

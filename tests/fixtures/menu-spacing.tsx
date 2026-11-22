@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import {
   Button,
   ContextMenu,
-  Menu,
+  Popover,
   Menubar,
   MtoneProvider,
   type MenuEntry,
@@ -51,7 +51,7 @@ createRoot(document.getElementById("root")!).render(
           <button>Actions</button>
         </ContextMenu>
       ) : (
-        <Menu trigger={<Button>Actions</Button>} items={items} />
+        <Popover.Menu trigger={<Button>Actions</Button>} items={items} />
       )}
       <button style={{ position: "fixed", left: 800, top: 550 }}>Outside</button>
     </main>

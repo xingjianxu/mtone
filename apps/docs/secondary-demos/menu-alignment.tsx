@@ -18,7 +18,7 @@ export default function Demo() {
   ];
   return (
     <div style={stackStyle}>
-      <M.Menu
+      <M.Popover.Menu
         trigger={<M.Button>右对齐菜单，宽度 240px</M.Button>}
         width={240}
         align="right"

@@ -18,7 +18,7 @@ export default function Demo() {
   ];
   return (
     <div style={stackStyle}>
-      <M.Menu
+      <M.Popover.Menu
         trigger={<M.Button>文档操作</M.Button>}
         items={[
           {

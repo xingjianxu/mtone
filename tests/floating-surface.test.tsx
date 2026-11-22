@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { DirectionProvider } from "@base-ui/react/direction-provider";
-import { Popover, Menu, ContextMenu } from "../packages/mtone/src";
+import { Popover, ContextMenu } from "../packages/mtone/src";
 import { readFileSync } from "node:fs";
 
 describe("Popover", () => {
@@ -107,7 +107,7 @@ describe("Popover", () => {
 describe("Menu sizing", () => {
   it("applies a main-panel width while preserving menu semantics and independent submenu width", async () => {
     render(
-      <Menu
+      <Popover.Menu
         trigger={<button>Actions</button>}
         width="220px"
         align="right"

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import { INTERNAL_COL_DEFINE } from "@rc-component/table";
-import { Menu } from "./interactive";
+import { Popover } from "./interactive";
 import type {
   TableColumn,
   TableLocale,
@@ -306,7 +306,7 @@ export function useTableSelection<T>({
     <span className={controlsClass}>
       {checkbox}
       {hasActions && (
-        <Menu
+        <Popover.Menu
           trigger={
             <button
               type="button"

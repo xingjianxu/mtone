@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
-  Menu,
+  Popover,
   type MenuEntry,
 } from "../packages/mtone/src/interactive";
 
@@ -39,8 +39,8 @@ describe("Menu", () => {
     render(
       <>
         <button>Keep focus</button>
-        <Menu trigger={<button>Click only</button>} items={items} />
-        <Menu
+        <Popover.Menu trigger={<button>Click only</button>} items={items} />
+        <Popover.Menu
           triggerMode="hover"
           trigger={<button>Hover actions</button>}
           items={items}
@@ -67,14 +67,14 @@ describe("Menu", () => {
     const change = vi.fn();
     render(
       <>
-        <Menu
+        <Popover.Menu
           triggerMode="hover"
           trigger={<button>Controlled actions</button>}
           items={items}
           open={false}
           onOpenChange={change}
         />
-        <Menu
+        <Popover.Menu
           triggerMode="hover"
           trigger={<button disabled>Unavailable actions</button>}
           items={items}
@@ -100,7 +100,7 @@ describe("Menu", () => {
       return (
         <>
           <button>Before accepted</button>
-          <Menu
+          <Popover.Menu
             triggerMode="hover"
             trigger={<button>Accepted actions</button>}
             items={items}
@@ -126,7 +126,7 @@ describe("Menu", () => {
     const controlled = (open: boolean) => (
       <>
         <button>Before controlled</button>
-        <Menu
+        <Popover.Menu
           triggerMode="hover"
           trigger={<button>Deferred actions</button>}
           items={items}
@@ -150,7 +150,7 @@ describe("Menu", () => {
     const user = userEvent.setup();
     const change = vi.fn();
     render(
-      <Menu
+      <Popover.Menu
         triggerMode="hover"
         trigger={
           <button aria-disabled="true">Unavailable but focusable</button>
@@ -173,7 +173,7 @@ describe("Menu", () => {
   });
 
   it("renders named groups and separators without selectable headings", async () => {
-    render(<Menu trigger={<button>Actions</button>} items={items} />);
+    render(<Popover.Menu trigger={<button>Actions</button>} items={items} />);
     await userEvent.click(screen.getByRole("button", { name: "Actions" }));
     expect(await screen.findByRole("group", { name: "Files" })).toBeVisible();
     expect(screen.getByRole("separator")).toBeVisible();
@@ -186,7 +186,7 @@ describe("Menu", () => {
     const leaf = vi.fn();
     const parent = vi.fn();
     render(
-      <Menu
+      <Popover.Menu
         trigger={<button>Actions</button>}
         onSelect={select}
         items={[
@@ -213,7 +213,7 @@ describe("Menu", () => {
     );
   });
   it("navigates right into a submenu and left back, then restores the trigger on Escape", async () => {
-    render(<Menu trigger={<button>Actions</button>} items={items} />);
+    render(<Popover.Menu trigger={<button>Actions</button>} items={items} />);
     const trigger = screen.getByRole("button", { name: "Actions" });
     trigger.focus();
     await userEvent.keyboard("{ArrowDown}");
@@ -232,7 +232,7 @@ describe("Menu", () => {
     await waitFor(() => expect(trigger).toHaveFocus());
   });
   it("does not open disabled parents", async () => {
-    render(<Menu trigger={<button>Actions</button>} items={items} />);
+    render(<Popover.Menu trigger={<button>Actions</button>} items={items} />);
     await userEvent.click(screen.getByRole("button", { name: "Actions" }));
     await userEvent.click(
       await screen.findByRole("menuitem", { name: "Locked" }),
@@ -261,7 +261,7 @@ it("keeps controlled state and supports repeated open and close cycles", async (
   function Demo() {
     const [open, setOpen] = React.useState(false);
     return (
-      <Menu
+      <Popover.Menu
         open={open}
         onOpenChange={setOpen}
         trigger={<button>Toggle</button>}
@@ -304,7 +304,7 @@ it("shares groups and submenus with ContextMenu, respecting disabled leaves", as
 
 it('positions RTL submenus on the logical end side', async () => {
   const {DirectionProvider}=await import('@base-ui/react/direction-provider');
-  render(<DirectionProvider direction="rtl"><Menu trigger={<button>RTL actions</button>} items={[{key:'parent',label:'Parent',children:[{key:'child',label:'Child'}]}]}/></DirectionProvider>);
+  render(<DirectionProvider direction="rtl"><Popover.Menu trigger={<button>RTL actions</button>} items={[{key:'parent',label:'Parent',children:[{key:'child',label:'Child'}]}]}/></DirectionProvider>);
   await userEvent.click(screen.getByRole('button',{name:'RTL actions'}));
   await userEvent.click(await screen.findByRole('menuitem',{name:'Parent'}));
   const child=await screen.findByRole('menuitem',{name:'Child'});
@@ -312,7 +312,7 @@ it('positions RTL submenus on the logical end side', async () => {
 });
 
 it.each(['pointer', 'keyboard'])('keeps logical row spacing when %s opens and closes nested submenus', async (input) => {
-  render(<Menu defaultOpen trigger={<button>Spacing</button>} items={[
+  render(<Popover.Menu defaultOpen trigger={<button>Spacing</button>} items={[
     { type: "group", key: "group", label: "Files", children: [
       { key: "new", label: "New" },
       { key: "export", label: "Export", children: [{ key: "pdf", label: "PDF", children: [{ key: 'leaf', label: 'Leaf' }] }, { key: "doc", label: "DOC" }] },

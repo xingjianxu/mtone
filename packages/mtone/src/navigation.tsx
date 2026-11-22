@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Popover as BPopover } from "@base-ui/react/popover";
 import { Button, cn, MtoneScope, useMtone } from "./basic";
-import { Menu, type MenuProps, Tooltip } from "./interactive";
+import { Popover, type PopoverMenuProps, Tooltip } from "./interactive";
 const SidebarContext = React.createContext(false);
 const NavSubmenuSelectionContext = React.createContext<(() => void) | null>(null);
 export type SidebarProps = React.HTMLAttributes<HTMLElement> & {
@@ -396,7 +396,7 @@ export interface BreadcrumbItem {
   /** Separator after this item; null hides it. */
   separator?: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
-  menu?: Omit<MenuProps, "trigger">;
+  menu?: Omit<PopoverMenuProps, "trigger">;
 }
 export interface BreadcrumbProps extends Omit<
   React.HTMLAttributes<HTMLElement>,
@@ -476,7 +476,7 @@ export function Breadcrumb({
                     <span {...common}>{content}</span>
                   ))}
                 {hasMenu && (
-                  <Menu
+                  <Popover.Menu
                     {...item.menu!}
                     trigger={
                       <button

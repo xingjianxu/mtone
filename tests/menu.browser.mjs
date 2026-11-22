@@ -104,6 +104,56 @@ try {
       } finally {
         await touch.close();
       }
+      await page.goto('http://127.0.0.1:5198/tests/fixtures/menu.html?composition');
+      const inline = page.getByRole("menu", { name: "Inline commands" });
+      const after = page.getByRole("button", { name: "After commands" });
+      const before = page.getByRole("button", { name: "Before commands" });
+      const archive = inline.getByRole("menuitem", { name: "Archive" });
+      assert(await inline.evaluate(el => el.closest("main") !== null), "the inline menu is rendered in normal document order");
+      await before.focus();
+      await page.keyboard.press("Tab");
+      await expect(inline).toBeFocused();
+      await page.keyboard.press("ArrowDown");
+      await expect(archive).toBeFocused();
+      await page.keyboard.press("Enter");
+      await expect(page.getByRole("status")).toHaveText("archive");
+      await page.keyboard.press("Tab");
+      await expect(after).toBeFocused();
+      await page.keyboard.press("Shift+Tab");
+      await expect.poll(() => inline.evaluate(el => el.contains(document.activeElement))).toBe(true);
+      await page.keyboard.press("Shift+Tab");
+      await expect(before).toBeFocused();
+      const details = page.getByRole("button", { name: "Details" });
+      await details.click();
+      const dialog = page.getByRole("dialog", { name: "Project details" });
+      const hosted = dialog.getByRole("menu", { name: "Project commands" });
+      const exportItem = hosted.getByRole("menuitem", { name: "Export more" });
+      const footer = dialog.getByRole("button", { name: "Footer action" });
+      await footer.click();
+      await expect(page.getByRole("status")).toHaveText("footer");
+      await hosted.getByRole("menuitem", { name: "Archive" }).click();
+      await expect(page.getByRole("status")).toHaveText("archive");
+      await expect(dialog).toBeVisible();
+      await exportItem.hover();
+      const file = page.getByRole("menuitem", { name: "JSON" });
+      await expect(file).toBeVisible();
+      await exportItem.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(file).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(file).toHaveCount(0);
+      await expect(dialog).toBeVisible();
+      await expect(exportItem).toBeFocused();
+      await page.keyboard.press("ArrowRight");
+      await expect(file).toBeFocused();
+      await file.click();
+      await expect(page.getByRole("status")).toHaveText("json");
+      await expect(file).toHaveCount(0);
+      await expect(dialog).toBeVisible();
+      await expect(exportItem).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(dialog).toHaveCount(0);
+      await expect(details).toBeFocused();
       console.log(`${name}: Menu grouped alignment, thin border, pointer crossing, repeat cycles, keyboard and disabled submenu passed`);
     } finally {await browser.close();}
   }
