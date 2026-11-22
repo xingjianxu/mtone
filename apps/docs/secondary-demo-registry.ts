@@ -1197,16 +1197,3 @@ export default function Demo() {
     },
   ],
 };
-
-function singleAlias(component: string, id: string): readonly DocSection[] {
-  const section = secondaryDocSections[component].find(
-    (item) => item.id === id,
-  )!;
-  return [{ ...section, id: "usage" }];
-}
-
-secondaryDocSections.CascaderPanel = singleAlias("Cascader", "panel");
-secondaryDocSections.ImageGroup = singleAlias("Image", "groups");
-secondaryDocSections.ImagePreview = singleAlias("Image", "controlled");
-secondaryDocSections.FormField = singleAlias("Form", "validation");
-secondaryDocSections.DirectoryTree = singleAlias("Tree", "directory");

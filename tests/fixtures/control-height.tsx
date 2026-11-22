@@ -1,11 +1,11 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {Input,SearchInput,Select,MultiSelect,NumberInput,DatePicker,FilterChip,Table,Textarea,Button,MtoneProvider,AutoComplete,TreeSelect,Cascader,TagSelect} from '../../packages/mtone/src';
+import {Input,Select,MultiSelect,NumberInput,DatePicker,FilterChip,Table,Button,MtoneProvider,AutoComplete,TreeSelect,Cascader,TagSelect} from '../../packages/mtone/src';
 import '../../packages/mtone/dist/styles.css';
 const options=Array.from({length:8},(_,i)=>({value:String(i),label:'Label '+i}));
 createRoot(document.getElementById('root')!).render(<><MtoneProvider locale="en"><main style={{width:'min(300px,100%)',display:'grid',gap:12}}>
 <Button>Before fields</Button>
-<Input aria-label="Input" placeholder="Input"/><SearchInput aria-label="SearchInput"/>
+<Input aria-label="Input" placeholder="Input"/><Input.Search aria-label="SearchInput"/>
 <Select label="Select" options={options}/><MultiSelect label="MultiSelect" options={options} defaultValue={['0']}/>
 <NumberInput label="NumberInput" defaultValue={2}/><DatePicker label="DatePicker"/>
 <FilterChip onRemove={()=>{}}>Filter</FilterChip>
@@ -15,5 +15,5 @@ createRoot(document.getElementById('root')!).render(<><MtoneProvider locale="en"
 <section data-case="wrap" style={{width:180}}><MultiSelect label="Many labels" options={options} defaultValue={options.map(o=>o.value)}/><FilterChip onRemove={()=>{}}>A very long filter label that should not grow outside its row</FilterChip></section>
 <AutoComplete options={options}/><TreeSelect items={[]}/><Cascader options={[]}/><TagSelect options={options}/>
 <Input aria-label="Small input" controlSize="sm"/><Input aria-label="Large input" controlSize="lg"/>
-<Textarea aria-label="Textarea"/>
+<Input.TextArea aria-label="Textarea"/>
 </main></MtoneProvider><section data-case="unscoped"><Button>Unscoped</Button><Input/><Select options={options}/><NumberInput/></section></>);

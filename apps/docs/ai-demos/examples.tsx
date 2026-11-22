@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  AiChainOfThought,
   AiChat,
   AiCheckpoint,
   AiConfirmation,
@@ -105,23 +104,6 @@ function DemoAiPlan() {
       items={[
         { id: "read", title: "读取目录", status: "completed" },
         { id: "write", title: "整理提纲", status: "running" },
-      ]}
-    />
-  );
-}
-
-function DemoAiChainOfThought() {
-  return (
-    <AiChainOfThought
-      defaultOpen
-      status="completed"
-      steps={[
-        {
-          id: "find",
-          title: "汇总两份资料",
-          status: "completed",
-          description: "已核对标题及日期。",
-        },
       ]}
     />
   );
@@ -325,7 +307,6 @@ export const aiExamples: Record<string, React.ComponentType> = {
   AiSuggestion: DemoAiSuggestion,
   AiModelSelector: DemoAiModelSelector,
   AiPlan: DemoAiPlan,
-  AiChainOfThought: DemoAiChainOfThought,
   AiReasoning: DemoAiReasoning,
   AiTask: DemoAiTask,
   AiQueue: DemoAiQueue,

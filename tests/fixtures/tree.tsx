@@ -2,7 +2,6 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import {
   Tree,
-  DirectoryTree,
   MtoneProvider,
   Button,
   type TreeItem,
@@ -36,7 +35,7 @@ function App() {
           defaultExpandAll
           showLine
         />
-        <DirectoryTree label="Directory" items={basic} multiple />
+        <Tree directory label="Directory" items={basic} multiple />
         <Tree
           label="Async tree"
           items={items}

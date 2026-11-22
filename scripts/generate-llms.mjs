@@ -4,7 +4,7 @@ const root = new URL("../", import.meta.url);
 const pkg = JSON.parse(readFileSync(new URL("packages/mtone/package.json", root), "utf8"));
 const source = readFileSync(new URL("apps/docs/catalog.ts", root), "utf8");
 const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
-const { componentDocs } = await import("data:text/javascript;base64," + Buffer.from(js).toString("base64"));
+const { componentDocs, familyDocHref } = await import("data:text/javascript;base64," + Buffer.from(js).toString("base64"));
 const site = "https://xingjianxu.github.io/mtone/";
 const lines = [
 "# mtone",
@@ -31,7 +31,7 @@ const lines = [
 "- Pair controlled values/open state with the documented change callbacks; defaultValue/defaultOpen are for uncontrolled initial state.",
 "- Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact. Focus uses --mt-focus (#93B4DC): existing input borders change color only; other controls use a single 1px inset edge without changing layout. Select/MultiSelect option highlights remain background-only.",
 "- Shared theme accents: use --mt-accent-neutral/blue/green/orange/red/purple/teal/coral with CSS var() or override the matching keys via MtoneProvider tokens. Tabs indicatorColor accepts these preset names or a CSS color for the selected line only.",
-"- Prefer Dialog. Modal/ModalProps are deprecated aliases. Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.",
+"- Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.",
 "- Use Tag for content labels with optional removal, and Status for a state indicator. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.",
 "- Toast notifications need ToastProvider; useToast exposes add, success, error, info, update, promise and close (verify installed declarations before use).",
 "- Do not assume the live docs match an older npm package. Type-check generated code and run interaction tests.",
@@ -49,7 +49,7 @@ const lines = [
 ""
 ];
 for (const doc of componentDocs) {
-  lines.push("### " + doc.name, "", "- [" + doc.name + "](" + site + "#/components/" + doc.name + "): " + doc.description,
+  lines.push("### " + doc.name, "", "- [" + doc.name + "](" + site + (familyDocHref(doc.name) ?? "#/components/" + doc.name) + "): " + doc.description,
     "- Import: " + doc.importNames.join(", ") + " from @bixlab/mtone");
   for (const prop of doc.props) lines.push("- " + prop.name + ": " + prop.type + (prop.default === undefined ? "" : " (default: " + prop.default + ")") + ". " + prop.description);
   for (const note of doc.notes) lines.push("- " + note);

@@ -83,6 +83,20 @@ describe("Targeted CI selection", () => {
     expect(plan.browser).toContain("tests/tree.browser.mjs");
   });
 
+  it("checks consumers when shared pagination or confirmation internals change", () => {
+    const inventory = [
+      "tests/pagination.test.tsx",
+      "tests/table-advanced.test.tsx",
+      "tests/confirm-transaction.test.tsx",
+      "tests/interactive.test.tsx",
+      "tests/popconfirm.test.tsx",
+    ];
+    const pagination = makePlan(["packages/mtone/src/pagination-controls.tsx"], inventory);
+    expect(pagination.unit).toEqual(inventory.slice(0, 2).sort());
+    const confirm = makePlan(["packages/mtone/src/confirm-transaction.ts"], inventory);
+    expect(confirm.unit).toEqual(inventory.slice(2).sort());
+  });
+
   it("runs changed tests directly and deduplicates checks across paths", () => {
     const plan = makePlan(
       [

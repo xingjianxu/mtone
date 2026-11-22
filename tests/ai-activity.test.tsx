@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { MtoneProvider } from "../packages/mtone/src/basic";
 import {
-  AiChainOfThought,
   AiCheckpoint,
   AiConfirmation,
   AiPlan,
@@ -22,7 +21,7 @@ const steps = [
 describe("AI activity", () => {
   it("toggles observable steps with keyboard and correctly connects the disclosure", async () => {
     const user = userEvent.setup();
-    render(<AiChainOfThought title="Activity" steps={steps} />);
+    render(<AiTask title="Activity" steps={steps} />);
     const button = screen.getByRole("button", { name: "Activity" });
     expect(button).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByText("Inspect sources")).not.toBeInTheDocument();

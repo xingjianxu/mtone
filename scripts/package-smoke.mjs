@@ -94,18 +94,21 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, SearchInput, Textarea, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, DirectoryTree, Affix, Result, Button, PageLayout, AdminLayout, Toast, NumberInput, MultiSelect, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, Mention, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
+import { MtoneProvider, MtoneScope, Input, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, MultiSelect, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
-assert.equal(Input.Search, SearchInput);
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Dropdown'));
+for (const name of ['Toast', 'DirectoryTree', 'AiChainOfThought', 'Modal', 'DropdownMenu', 'Mention', 'SearchInput', 'Textarea', 'FormField']) {
+  assert(!Object.hasOwn(await import('@bixlab/mtone'), name), 'Removed export: ' + name);
+}
+assert(renderToStaticMarkup(createElement(Input.Search, {'aria-label':'Search package'})).includes('Search package'));
+assert(renderToStaticMarkup(createElement(Input.TextArea, {'aria-label':'Notes package'})).includes('<textarea'));
 assert.match(renderToStaticMarkup(createElement(List.SortHandle, {'aria-label':'Sort'})), /mt-list-sort-handle/);
 assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}],defaultValue:['one'],selectAll:true,expandable:false})), /aria-pressed="true"/);
 assert.match(renderToStaticMarkup(createElement(TagSelect, {options:[{value:'one',label:'Release tag'}]})), /Release tag/);
 assert.match(renderToStaticMarkup(createElement(MtoneProvider, {theme:'system'},
   createElement(MtoneScope, {theme:'dark'}, 'Theme package check'))),
   /data-mt-theme="system".*data-mt-theme="dark"/);
-assert.equal(Input.TextArea, Textarea);
 assert(renderToStaticMarkup(createElement(Input.Password, {'aria-label':'Password package'})).includes('type="password"'));
 assert(renderToStaticMarkup(createElement(Input.OTP, {length:4})).includes('mt-input-otp'));
 assert(renderToStaticMarkup(createElement(Button, null, 'ready')).includes('ready'));
@@ -123,10 +126,8 @@ assert(renderToStaticMarkup(createElement(Popover,{trigger:'Popover trigger',con
 assert(renderToStaticMarkup(createElement(LoadingOverlay,{visible:true,label:'Package loading'})).includes('Package loading'));
 assert.equal(renderToStaticMarkup(createElement(LoadingOverlay,{})), '');
 assert(renderToStaticMarkup(createElement(HoverCard,{trigger:createElement(Button,null,'Hover preview'),content:'Preview'})).includes('Hover preview'));
-assert.equal(Menu, DropdownMenu);
 assert(renderToStaticMarkup(createElement(Menubar,{menus:[{key:'file',label:'File',items:[]}]})).includes('menubar'));
 assert(renderToStaticMarkup(createElement(Menu,{trigger:createElement(Button,null,'Menu trigger'),items:[]})).includes('Menu trigger'));
-assert.equal(Mention, Mentions);
 assert(renderToStaticMarkup(createElement(Transfer,{items:[{key:'a',label:'Transfer item'}]})).includes('Transfer item'));
 assert(renderToStaticMarkup(createElement(Cascader,{options:[{value:'a',label:'Alpha'}],defaultValue:['a']})).includes('Alpha'));
 assert(renderToStaticMarkup(createElement(CascaderPanel,{options:[{value:'a',label:'Alpha'}]})).includes('Alpha'));
@@ -142,7 +143,10 @@ assert(renderToStaticMarkup(createElement(Popconfirm, {title:"Confirm?",trigger:
 assert(renderToStaticMarkup(createElement(Timeline, {items:[{content:'Timeline check'}]})).includes('Timeline check'));
 assert(renderToStaticMarkup(createElement(Affix, {}, 'fixed')).includes('fixed'));
 assert(renderToStaticMarkup(createElement(Tree, {items:[{id:'root',label:'Tree package check'}]})).includes('Tree package check'));
-assert(renderToStaticMarkup(createElement(DirectoryTree, {treeData:[{key:1,title:'Directory package check'}]})).includes('Directory package check'));
+const directoryHtml = renderToStaticMarkup(createElement(Tree, {directory:true,treeData:[{key:1,title:'Directory package check'}]}));
+assert.match(directoryHtml, /mt-tree-directory/);
+assert(directoryHtml.includes('Directory package check'));
+assert(renderToStaticMarkup(createElement(AiTask, {title:'Activity package check'})).includes('Activity package check'));
 assert(renderToStaticMarkup(createElement(Result, {status:"success",title:"Saved"})).includes("Saved"));
 assert(renderToStaticMarkup(createElement(Rate, {defaultValue:2.5, allowHalf:true})).includes('aria-valuenow="2.5"'));
 assert(renderToStaticMarkup(createElement(Calendar, {defaultValue:"2026-11-16"})).includes("2026-11-16"));
@@ -164,7 +168,7 @@ for (const virtual of [false, true]) {
 assert(renderToStaticMarkup(createElement(Card, {title:"Card title",htmlTitle:"Tooltip"}, "Body")).includes("Card title"));
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Layout'));
 assert(renderToStaticMarkup(createElement(PageLayout, { title: "Project", headingLevel: 2 })).includes('<h2 class="mt-page-layout-title">Project</h2>'));
-assert(TagSelect && AdminLayout.Sider && Toast && NumberInput && MultiSelect && Spotlight && Form.useForm && Form.Item);
+assert(TagSelect && AdminLayout.Sider && Dialog && ToastProvider && NumberInput && MultiSelect && Spotlight && Form.useForm && Form.Item);
 const submenuHtml = renderToStaticMarkup(createElement(NavSubmenu, { label: 'Billing', defaultExpanded: true }, createElement(NavItem, { active: true }, 'Usage')));
 assert(submenuHtml.includes('aria-expanded="true"') && submenuHtml.includes('aria-current="page"'));
 assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.css'));
@@ -173,7 +177,7 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, Typography, Text, Title, Paragraph, Link, Menu, DropdownMenu, type MenuProps, type DropdownMenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, DirectoryTree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, Toast, useToast, Form, Input, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
+    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, Typography, Text, Title, Paragraph, Link, Menu, type MenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, ToastProvider, useToast, Form, Input, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
 // @ts-expect-error The former component and its props are no longer exported.
 import { Layout, type LayoutProps } from '@bixlab/mtone';
 // @ts-expect-error There is no old standalone Dropdown alias or type.
@@ -207,14 +211,13 @@ const popoverAlign: PopoverProps['align'] = 'right';
 const popoverProps: PopoverProps = {trigger:'Details',content:<input/>,width:'15rem',align:popoverAlign,label:'Details',unstyled:true};
 const popover = <Popover {...popoverProps}/>;
 const menuProps: MenuProps = {trigger:<button>Actions</button>,items:menuEntries,width:240,align:'left'};
-const legacyMenuProps: DropdownMenuProps = menuProps;
-const menu = <><Menu {...menuProps}/><DropdownMenu {...legacyMenuProps}/></>;
+const menu = <Menu {...menuProps}/>;
 import '@bixlab/mtone/styles.css';
 const pageLayoutProps: PageLayoutProps = { title: 'Project', headingLevel: 3 };
 const submenuProps: NavSubmenuProps = { label: 'Billing', expanded: true, children: <NavItem active>Usage</NavItem> };
 export const submenu = <NavSubmenu {...submenuProps} />;
 export const pageLayoutDemo = <PageLayout {...pageLayoutProps} />;
-export const demo = <AdminLayout {...adminLayoutProps}><AdminLayout.Sider version="v1" {...adminSiderProps} /><AdminLayout><AdminLayout.Header {...adminHeaderProps} /><AdminLayout.Content {...adminContentProps}><Toast><Button variant="blue">OK</Button></Toast></AdminLayout.Content></AdminLayout></AdminLayout>;
+export const demo = <AdminLayout {...adminLayoutProps}><AdminLayout.Sider version="v1" {...adminSiderProps} /><AdminLayout><AdminLayout.Header {...adminHeaderProps} /><AdminLayout.Content {...adminContentProps}><ToastProvider><Button variant="blue">OK</Button></ToastProvider></AdminLayout.Content></AdminLayout></AdminLayout>;
 export const inputFamily = <><Input prefix="@" allowClear showCount controlSize="sm" variant="filled"/><Input.Search searchButton="Find" onSearch={value=>console.log(value)}/><Input.Password visible={false} onVisibleChange={visible=>console.log(visible)}/><Input.TextArea autoSize={{minRows:2,maxRows:5}}/><Input.OTP length={4} onValueChange={value=>console.log(value)}/></>;
 export function FormDemo() { const [form] = Form.useForm(); return <Form form={form} onFinish={values => console.log(values)}><Form.Item name='email' label='Email' rules={[{type:'email',required:true}]}><Input /></Form.Item></Form>; }
 const cardGroupProps: CardGroupProps = {columns:{xs:1,md:3},gap:12,divided:true};
@@ -245,7 +248,7 @@ export const imagePreviewDemo = <ImagePreview items={imageItems} open={false} on
 const treeRef = createRef<TreeRef>();
 const treeProps: TreeProps = { treeData:[{key:1,title:"Root",children:[{key:2,title:"Leaf"}]}], checkable:true, defaultExpandedKeys:[1], onCheck:keys=>console.log(keys), onSelect:(keys:TreeKey[])=>console.log(keys), height:150 };
 export const treeDemo = <Tree {...treeProps} ref={treeRef}/>;
-export const directoryDemo = <DirectoryTree items={[{id:"root",label:"Folder"}]} multiple expandAction="doubleClick"/>;
+export const directoryDemo = <Tree directory items={[{id:"root",label:"Folder"}]} multiple expandAction="doubleClick"/>;
 treeRef.current?.scrollTo({key:2,autoExpand:true,align:"top"});
 const affixProps: AffixProps = { offsetTop: 10, target: () => window, onChange: fixed => Boolean(fixed) };
 export const affixDemo = <Affix {...affixProps}>Action</Affix>;

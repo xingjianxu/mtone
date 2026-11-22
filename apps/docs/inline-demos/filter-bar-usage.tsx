@@ -10,7 +10,7 @@ export default function Demo() {
 
   return (
     <M.FilterBar>
-      <M.SearchInput aria-label="按名称筛选" placeholder="筛选名称" />
+      <M.Input.Search aria-label="按名称筛选" placeholder="筛选名称" />
       <M.Select label="分类筛选" options={options} defaultValue="design" />
     </M.FilterBar>
   );

@@ -1,14 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import { Form, FormField, Input, Select, MultiSelect, Button, type FormInstance } from "../packages/mtone/src";
+import { Form, Input, Select, MultiSelect, Button, type FormInstance } from "../packages/mtone/src";
 let instance: FormInstance;
 function Demo({ finish = vi.fn(), failed = vi.fn() }) {
  const [form] = Form.useForm(); instance = form;
  return <Form form={form} initialValues={{name:"",roles:[]}} onFinish={finish} onFinishFailed={failed}>
  <Form.Item name="name" label="Name" rules={[{required:true,message:"Name required"}]}><Input /></Form.Item>
- <FormField name="team" label="Team" rules={[{required:true,message:"Team required"}]}><Select options={[{value:"design",label:"Design"}]} /></FormField>
- <FormField name="roles" label="Roles" rules={[{type:"array",min:1,required:true,message:"Role required"}]}><MultiSelect options={[{value:"read",label:"Read"}]} /></FormField>
+ <Form.Item name="team" label="Team" rules={[{required:true,message:"Team required"}]}><Select options={[{value:"design",label:"Design"}]} /></Form.Item>
+ <Form.Item name="roles" label="Roles" rules={[{type:"array",min:1,required:true,message:"Role required"}]}><MultiSelect options={[{value:"read",label:"Read"}]} /></Form.Item>
  <Button type="submit">Save</Button><Button type="reset">Reset</Button>
  </Form>;
 }
@@ -37,12 +37,12 @@ test("updates values, preserves callbacks, validates and resets", async () => {
  expect(instance.getFieldError("name")).toEqual([]);
 });
 test("manual error remains compatible and describedby is merged", () => {
- render(<><span id="external">Extra</span><FormField label="Manual" error="Server error"><Input aria-describedby="external" /></FormField></>);
+ render(<><span id="external">Extra</span><Form.Item label="Manual" error="Server error"><Input aria-describedby="external" /></Form.Item></>);
  expect(screen.getByLabelText("Manual")).toHaveAccessibleDescription("Extra Server error");
 });
 test("blur validation and explicit onSubmit cancellation", async () => {
  const finish=vi.fn();render(<Form onFinish={finish} onSubmit={event=>event.preventDefault()}>
- <FormField name="x" label="X" validateTrigger="onBlur" rules={[{required:true,message:"Missing"}]}><Input /></FormField><Button type="submit">Go</Button></Form>);
+ <Form.Item name="x" label="X" validateTrigger="onBlur" rules={[{required:true,message:"Missing"}]}><Input /></Form.Item><Button type="submit">Go</Button></Form>);
  fireEvent.change(screen.getByRole("textbox",{name:"X"}),{target:{value:""}});
  expect(screen.queryByText("Missing")).not.toBeInTheDocument();
  fireEvent.blur(screen.getByRole("textbox",{name:"X"}));
@@ -50,7 +50,7 @@ test("blur validation and explicit onSubmit cancellation", async () => {
  fireEvent.click(screen.getByRole("button",{name:"Go"}));expect(finish).not.toHaveBeenCalled();
 });
 test("unnamed legacy form retains native semantics", () => {
- const submit=vi.fn(event=>event.preventDefault());const {container}=render(<Form onSubmit={submit}><FormField label="Legacy" required><Input /></FormField></Form>);
+ const submit=vi.fn(event=>event.preventDefault());const {container}=render(<Form onSubmit={submit}><Form.Item label="Legacy" required><Input /></Form.Item></Form>);
  expect(container.querySelector("form")).not.toHaveAttribute("novalidate");
  fireEvent.submit(container.querySelector("form")!);expect(submit).toHaveBeenCalledOnce();
 });
@@ -73,7 +73,7 @@ test("stale async submit and reset cannot call onFinish", async () => {
 });
 
 test("custom blur collection trigger composes value update and validation", async () => {
- function BlurForm() {const [form]=Form.useForm();instance=form;return <Form form={form}><FormField name="blur" label="Blur" trigger="onBlur" validateTrigger="onBlur" rules={[{min:3,message:"Too short"}]}><Input /></FormField></Form>;}
+ function BlurForm() {const [form]=Form.useForm();instance=form;return <Form form={form}><Form.Item name="blur" label="Blur" trigger="onBlur" validateTrigger="onBlur" rules={[{min:3,message:"Too short"}]}><Input /></Form.Item></Form>;}
  render(<BlurForm />);fireEvent.blur(screen.getByRole("textbox",{name:"Blur"}),{target:{value:"ab"}});
  await screen.findByText("Too short");expect(instance.getFieldValue("blur")).toBe("ab");
 });

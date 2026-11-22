@@ -156,7 +156,7 @@ describe("styled interactive controls", () => {
   it("dropdown menu activates actions", async () => {
     const action = vi.fn();
     render(
-      <UI.DropdownMenu
+      <UI.Menu
         trigger={<button>Actions</button>}
         items={[{ key: "copy", label: "Copy", onSelect: action }]}
       />,
@@ -281,7 +281,7 @@ describe("styled interactive controls", () => {
   });
   it("menu icons render decoratively without changing accessible labels", async () => {
     render(
-      <UI.DropdownMenu
+      <UI.Menu
         trigger={<button>Icon menu</button>}
         items={[
           {
@@ -381,9 +381,6 @@ it("preserves zero as a visible Dialog title", () => {
   expect(modal.querySelector(".mt-dialog-title")).not.toHaveClass("mt-modal-title-hidden");
 });
 
-it("keeps deprecated Modal as an exact Dialog alias", () => {
-  expect(UI.Modal).toBe(UI.Dialog);
-});
 it("keeps Escape dismissal when outside dismissal is disabled", async () => {
   const user = userEvent.setup();
   render(<UI.Dialog title="Protected" modal={true} trigger={<button>Open protected</button>}>Content</UI.Dialog>);

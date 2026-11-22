@@ -2,6 +2,7 @@ import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { Button, cn, useMtone } from "./basic";
 import { ChevronDown, ChevronRight, Upload as UploadIcon } from "lucide-react";
+import { PaginationControls } from "./pagination-controls";
 
 export type PaginationProps = {
   total: number;
@@ -23,57 +24,25 @@ export function Pagination({
     Math.ceil(Math.max(0, total) / Math.max(1, pageSize)),
   );
   const current = Math.min(count, Math.max(1, page));
-  const pages = Array.from(
-    new Set([
-      1,
-      ...Array.from({ length: count <= 7 ? count : 3 }, (_, i) =>
-        count <= 7 ? i + 1 : current + i - 1,
-      ).filter((p) => p > 0 && p <= count),
-      count,
-    ]),
-  ).sort((a, b) => a - b);
   return (
     <nav
       aria-label={zh ? "分页" : "Pagination"}
       className={cn("mt-pagination", className)}
     >
       <span>{zh ? `共 ${total} 条` : `${total} items`}</span>
-      <Button
-        aria-label={zh ? "上一页" : "Previous page"}
-        disabled={current === 1}
-        onClick={() => onPageChange(current - 1)}
-      >
-        ‹
-      </Button>
-      <span className="mt-pagination-pages">
-        {pages.map((p, i) => (
-          <React.Fragment key={p}>
-            {i > 0 && p - pages[i - 1] > 1 && <span aria-hidden="true">…</span>}
-            <Button
-              aria-label={`${zh ? "第" : "Page "}${p}${zh ? "页" : ""}`}
-              aria-current={p === current ? "page" : undefined}
-              variant={p === current ? "soft" : "ghost"}
-              onClick={() => onPageChange(p)}
-            >
-              {p}
-            </Button>
-          </React.Fragment>
-        ))}
-      </span>
-      <Button
-        aria-label={zh ? "下一页" : "Next page"}
-        disabled={current === count}
-        onClick={() => onPageChange(current + 1)}
-      >
-        ›
-      </Button>
+      <PaginationControls
+        count={count}
+        current={current}
+        zh={zh}
+        onPageChange={onPageChange}
+      />
     </nav>
   );
 }
 export { Table } from "./table";
 export type { TableColumn, TableState, TableProps } from "./table-types";
 
-export { Tree, DirectoryTree } from "./tree";
+export { Tree } from "./tree";
 export type { TreeProps, TreeItem, TreeKey, TreeNode, TreeRef, TreeNodeInfo, TreeCheckedKeys, TreeDropInfo } from "./tree";
 
 export type DatePickerProps = {

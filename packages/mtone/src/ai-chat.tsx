@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ArrowDown, ArrowUp, Paperclip, Square, X } from "lucide-react";
-import { Button, Textarea, cn, useMtone, type ButtonProps } from "./basic";
+import { Button, Input, cn, useMtone, type ButtonProps } from "./basic";
 import { Select } from "./interactive";
 
 export interface AiChatProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -291,7 +291,7 @@ export function AiPromptInput({
           ))}
         </ul>
       )}
-      <Textarea
+      <Input.TextArea
         value={text}
         onChange={(e) => {
           if (value === undefined) setLocal(e.target.value);

@@ -23,13 +23,11 @@ import {
   Button,
   ConfirmDialog,
   Dialog,
-  FormField,
+  Form,
   Input,
   AdminLayout,
   NavItem,
-  SearchInput,
   Select,
-  Textarea,
   ToastProvider,
   useToast,
 } from "../../packages/mtone/src";
@@ -363,7 +361,7 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
                   </Button>
                 ))}
               </div>
-              <SearchInput
+              <Input.Search
                 aria-label="搜索知识库"
                 placeholder="搜索标题或内容…"
                 value={query}
@@ -470,7 +468,7 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
           className="showcase-editor"
           noValidate
         >
-          <FormField label="文档标题" required error={error}>
+          <Form.Item label="文档标题" required error={error}>
             <Input
               value={draft.title}
               onChange={(event) => {
@@ -479,7 +477,7 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
               }}
               placeholder="给你的想法起个名字"
             />
-          </FormField>
+          </Form.Item>
           <div className="showcase-editor-meta">
             <Select
               label="文档分类"
@@ -504,7 +502,7 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
               ]}
             />
           </div>
-          <FormField label="摘要">
+          <Form.Item label="摘要">
             <Input
               value={draft.summary}
               onChange={(event) =>
@@ -512,9 +510,9 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
               }
               placeholder="用一句话说明这篇文档"
             />
-          </FormField>
-          <FormField label="正文">
-            <Textarea
+          </Form.Item>
+          <Form.Item label="正文">
+            <Input.TextArea
               rows={6}
               value={draft.body}
               onChange={(event) =>
@@ -522,7 +520,7 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
               }
               placeholder="开始记录你的想法…"
             />
-          </FormField>
+          </Form.Item>
         </form>
       </Dialog>
       <ConfirmDialog

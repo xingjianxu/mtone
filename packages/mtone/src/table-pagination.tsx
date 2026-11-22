@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button, cn } from "./basic";
 import { Select } from "./interactive";
+import { PaginationControls } from "./pagination-controls";
 import type { TablePagination } from "./table-types";
 export function TablePaginationBar({
   config,
@@ -33,20 +34,6 @@ export function TablePaginationBar({
         size,
       );
   };
-  const pages = Array.from(
-    new Set([
-      1,
-      ...Array.from({ length: count <= 7 ? count : 3 }, (_, i) =>
-        count <= 7 ? i + 1 : current + i - 1,
-      ).filter((p) => p > 0 && p <= count),
-      count,
-    ]),
-  ).sort((a, b) => a - b);
-  const render = (
-    page: number,
-    type: "page" | "prev" | "next",
-    node: React.ReactNode,
-  ) => (config.itemRender ? config.itemRender(page, type, node) : node);
   return (
     <nav
       aria-label={zh ? "分页" : "Pagination"}
@@ -76,44 +63,18 @@ export function TablePaginationBar({
             ? `共 ${total} 条`
             : `${total} items`}
       </span>
-      <Button
-        aria-label={zh ? "上一页" : "Previous page"}
-        disabled={config.disabled || current === 1}
-        onClick={() => change(current - 1)}
-      >
-        {render(current - 1, "prev", <span>‹</span>)}
-      </Button>
-      {config.simple ? (
-        <span>
-          {current} / {count}
-        </span>
-      ) : (
-        <span className="mt-pagination-pages">
-          {pages.map((p, i) => (
-            <React.Fragment key={p}>
-              {i > 0 && p - pages[i - 1] > 1 && (
-                <span aria-hidden="true">…</span>
-              )}
-              <Button
-                disabled={config.disabled}
-                aria-label={`${zh ? "第" : "Page "}${p}${zh ? "页" : ""}`}
-                aria-current={p === current ? "page" : undefined}
-                variant={p === current ? "soft" : "ghost"}
-                onClick={() => change(p)}
-              >
-                {render(p, "page", <span>{p}</span>)}
-              </Button>
-            </React.Fragment>
-          ))}
-        </span>
-      )}
-      <Button
-        aria-label={zh ? "下一页" : "Next page"}
-        disabled={config.disabled || current === count}
-        onClick={() => change(current + 1)}
-      >
-        {render(current + 1, "next", <span>›</span>)}
-      </Button>
+      <PaginationControls
+        count={count}
+        current={current}
+        disabled={config.disabled}
+        simple={config.simple}
+        zh={zh}
+        onPageChange={change}
+        renderItem={(page, type, label) => {
+          const node = <span>{label}</span>;
+          return config.itemRender ? config.itemRender(page, type, node) : node;
+        }}
+      />
       {config.showSizeChanger && (
         <Select
           className="mt-table-page-size"

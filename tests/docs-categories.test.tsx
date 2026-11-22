@@ -18,8 +18,8 @@ const expected: Record<string, string[]> = {
     "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
-    "Form", "FormField", "Fieldset", "Input", "SearchInput",
-    "Textarea", "Mentions", "NumberInput", "AutoComplete", "Select",
+    "Form", "Fieldset", "Input",
+    "Mentions", "NumberInput", "AutoComplete", "Select",
     "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker", "FilterBar", "FilterChip",
@@ -27,7 +27,7 @@ const expected: Record<string, string[]> = {
   ],
   "数据展示": [
     "Card", "CardGroup", "List", "ListItem", "DataList",
-    "DocumentList", "DocumentCard", "Table", "Tree", "DirectoryTree",
+    "DocumentList", "DocumentCard", "Table", "Tree",
     "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
     "Avatar", "AvatarGroup", "Tag", "Calendar", "Timeline",
   ],
@@ -37,13 +37,13 @@ const expected: Record<string, string[]> = {
     "Drawer",
   ],
   "状态反馈": [
-    "Alert", "GlobalNotice", "ToastProvider", "Toast", "Status",
+    "Alert", "GlobalNotice", "ToastProvider", "Status",
     "Progress", "Spinner", "LoadingOverlay", "Skeleton", "Empty",
     "Result",
   ],
   "AI 界面": [
     "AiChat", "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
-    "AiPlan", "AiChainOfThought", "AiReasoning", "AiTask", "AiQueue",
+    "AiPlan", "AiReasoning", "AiTask", "AiQueue",
     "AiSubagent", "AiTool", "AiCheckpoint", "AiConfirmation", "AiSources",
     "AiInlineCitation", "AiContext", "AiFileTree", "AiStackTrace", "AiTerminal",
     "AiTestResults",
@@ -85,9 +85,10 @@ describe("documentation taxonomy", () => {
       groupLinks!.push(link);
     }
     const sectionOnly = new Set([
-      "Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea",
+      "Title", "Text", "Paragraph", "Link", "Blockquote", "Textarea",
+      "ImageGroup", "ImagePreview", "CascaderPanel", "AvatarGroup", "DocumentCard",
       "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
-      "AiChainOfThought", "AiReasoning", "AiTask", "AiQueue", "AiSubagent",
+      "AiReasoning", "AiTask", "AiQueue", "AiSubagent",
       "AiTool", "AiCheckpoint", "AiConfirmation", "AiInlineCitation", "AiContext",
       "AiFileTree", "AiStackTrace", "AiTerminal", "AiTestResults",
     ]);
@@ -145,7 +146,7 @@ describe("documentation taxonomy", () => {
     expect(screen.getByRole("heading", { name: "Button", level: 1 })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "纯图标按钮", level: 2 })).toHaveAttribute("id", "icon-only");
   });
-  it("shows three AI sidebar groups and keeps all 21 components discoverable", () => {
+  it("shows three AI sidebar groups and keeps all 20 components discoverable", () => {
     window.location.hash = "#/components/AiChat?section=ai-prompt-input";
     const { container } = render(<DocsApp />);
     const nav = container.querySelector(".docs-sidebar nav")!;
@@ -157,7 +158,7 @@ describe("documentation taxonomy", () => {
     expect(screen.getByRole("heading", { name: "模拟对话", level: 2 })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "AiPromptInput · 输入与附件", level: 2 }))
       .toHaveAttribute("id", "ai-prompt-input");
-    expect(searchDocs("AI 界面")).toHaveLength(21);
+    expect(searchDocs("AI 界面")).toHaveLength(20);
   });
   it("searches the new categories while preserving description matching", () => {
     expect(

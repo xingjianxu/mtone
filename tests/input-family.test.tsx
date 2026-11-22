@@ -1,21 +1,20 @@
 import React from "react";
-import { parseRoute } from "../apps/docs/docs-app";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import {
   Input,
-  SearchInput,
-  Textarea,
   Fieldset,
   Form,
 } from "../packages/mtone/src";
 
-test("family aliases remain identical and refs point to native inputs", () => {
-  expect(Input.Search).toBe(SearchInput);
-  expect(Input.TextArea).toBe(Textarea);
+test("family refs point to their native fields", () => {
   const ref = React.createRef<HTMLInputElement>();
-  render(<Input ref={ref} aria-label="title" prefix="@" suffix=".com" />);
-  expect(ref.current).toBe(screen.getByRole("textbox"));
+  const searchRef = React.createRef<HTMLInputElement>();
+  const textAreaRef = React.createRef<HTMLTextAreaElement>();
+  render(<><Input ref={ref} aria-label="title" prefix="@" suffix=".com" /><Input.Search ref={searchRef} aria-label="search" /><Input.TextArea ref={textAreaRef} aria-label="notes" /></>);
+  expect(ref.current).toBe(screen.getByRole("textbox", { name: "title" }));
+  expect(searchRef.current).toBe(screen.getByRole("textbox", { name: "search" }));
+  expect(textAreaRef.current).toBe(screen.getByRole("textbox", { name: "notes" }));
   expect(screen.getByText("@")).toBeInTheDocument();
 });
 test("clear updates real native value, change event and count and retains focus", () => {
@@ -244,16 +243,4 @@ test("changing external form owner updates reset listener", async () => {
   fireEvent.change(screen.getByRole("textbox"), { target: { value: "xyz" } });
   fireEvent.click(screen.getByRole("button", { name: "Reset B" }));
   await waitFor(() => expect(screen.getByText("1")).toBeInTheDocument());
-});
-test("Input compatibility routes lead to the consolidated page", () => {
-  expect(parseRoute("#/components/SearchInput")).toEqual({
-    kind: "component",
-    name: "Input",
-    section: "input-search",
-  });
-  expect(parseRoute("#/components/Textarea")).toEqual({
-    kind: "component",
-    name: "Input",
-    section: "input-textarea",
-  });
 });

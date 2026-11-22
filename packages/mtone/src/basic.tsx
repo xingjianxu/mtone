@@ -258,9 +258,9 @@ export function ButtonGroup({
     </ButtonSizeContext.Provider>
   );
 }
-export { Input, SearchInput, Textarea } from "./input";
+export { Input } from "./input";
 export type { InputProps, InputSearchProps, InputPasswordProps, InputTextAreaProps, InputOTPProps, InputVariant, InputControlSize } from "./input";
-export { Form, FormField } from "./form";
+export { Form } from "./form";
 export type { FormProps, FormFieldProps, FormRule, FormInstance, FormValues, FormValidationError, FormValidateTrigger } from "./form";
 export type Tone = "neutral" | "blue" | "green" | "orange" | "red" | "purple";
 export function Tag({

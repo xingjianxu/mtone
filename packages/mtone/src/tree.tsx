@@ -925,8 +925,3 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     </div>
   );
 });
-export const DirectoryTree = React.forwardRef<TreeRef, TreeProps>(
-  function DirectoryTree(props, ref) {
-    return <Tree {...props} ref={ref} directory />;
-  },
-);

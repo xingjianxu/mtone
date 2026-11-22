@@ -166,7 +166,7 @@ export interface InputSearchProps extends InputProps {
   searchButton?: React.ReactNode;
   loading?: boolean;
 }
-export const SearchInput = React.forwardRef<HTMLInputElement, InputSearchProps>(
+const SearchInput = React.forwardRef<HTMLInputElement, InputSearchProps>(
   function SearchInput(
     {
       onSearch,
@@ -320,7 +320,7 @@ export interface InputTextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement>, InputAppearance {
   autoSize?: boolean | { minRows?: number; maxRows?: number };
 }
-export const Textarea = React.forwardRef<
+const Textarea = React.forwardRef<
   HTMLTextAreaElement,
   InputTextAreaProps
 >(function Textarea(

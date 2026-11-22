@@ -12,7 +12,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import * as M from "../../packages/mtone/src";
-import { componentCategories, componentDocGroups, componentDocs, type ComponentDoc } from "./catalog";
+import { componentCategories, componentDocGroups, componentDocs, familyDocHref, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
 import { standaloneTypographySections, focusTypographySection, isTypographySection, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
 import { ComponentOutline, focusDocSection } from "./component-outline";
@@ -32,7 +32,6 @@ export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "color-presets" | "not-found" }
   | { kind: "component"; name: string; section?: string };
 export function parseRoute(hash: string): Route {
-  if (hash === "#/components/SearchInput" || hash === "#/components/Textarea") return { kind: "component", name: "Input", section: hash.endsWith("SearchInput") ? "input-search" : "input-textarea" };
   const typography = hash.match(/^#\/components\/Typography\?section=([A-Za-z]+)$/);
   if (typography && isTypographySection(typography[1]))
     return { kind: "component", name: "Typography", section: typography[1] };
@@ -40,9 +39,6 @@ export function parseRoute(hash: string): Route {
   const legacyTypography = hash.match(/^#\/components\/([A-Za-z]+)$/);
   if (legacyTypography && standaloneTypographySections.some(({ name }) => name === legacyTypography[1]))
     return { kind: "component", name: "Typography", section: legacyTypography[1] };
-  if (hash === "#/components/Mention") return { kind: "component", name: "Mentions" };
-  if (hash === "#/components/DropdownMenu") return { kind: "component", name: "Menu" };
-  if (hash === "#/components/Modal") return { kind: "component", name: "Dialog" };
   if (!hash || hash === "#" || hash === "#/" || hash === "#/gallery")
     return { kind: "gallery" };
   if (hash === "#/showcase" || hash === "#/apps") return { kind: "showcase" };
@@ -50,7 +46,7 @@ export function parseRoute(hash: string): Route {
   if (hash === colorPresetsHref) return { kind: "color-presets" };
   if (hash === "#/theme") return { kind: "theme" };
   const m = hash.match(/^#\/components\/([A-Za-z]+)(?:\?section=([A-Za-z][A-Za-z0-9-]*))?$/);
-  return m && componentDocs.some((d) => d.name === m[1])
+  return m && componentDocs.some((d) => d.name === m[1] && !d.sidebarSection)
     ? { kind: "component", name: m[1], ...(m[2] ? { section: m[2] } : {}) }
     : { kind: "not-found" };
 }
@@ -64,10 +60,10 @@ const groups = componentCategories;
 const sidebarGroups = componentDocGroups.map(({ label, members }) => ({
   label,
   members: members.filter((doc) =>
-    !doc.sidebarParent && !isTypographySection(doc.name) && doc.name !== "SearchInput" && doc.name !== "Textarea",
+    !doc.sidebarParent && !isTypographySection(doc.name),
   ),
 }));
-const componentDocHref = (name: string) => aiSectionHref(name) ?? baseComponentDocHref(name);
+const componentDocHref = (name: string) => familyDocHref(name) ?? aiSectionHref(name) ?? baseComponentDocHref(name);
 function ImportLine({ code }: { code: string }) {
   const [status, setStatus] = useState("");
   return <div className="component-import">
@@ -520,7 +516,7 @@ export function DocsApp() {
                   </a>
                   <a href="./showcase.html" target="_blank" rel="noopener noreferrer">探索应用示例 <ArrowRight size={15} /></a>
                   <span>
-                    {componentDocs.length} 个文档条目 · 含别名与 Provider
+                    {componentDocs.length} 个文档条目
                   </span>
                 </div>
                 <div className="gallery-filter">

@@ -35,11 +35,11 @@ try {
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.reload();
     await page.waitForFunction((id) => document.activeElement?.id === id, id);
-    await page.goto(`http://127.0.0.1:${port}/#/components/SearchInput`);
+    await page.goto(`http://127.0.0.1:${port}/#/components/Input?section=input-search`);
     await page.waitForFunction(() => document.activeElement?.id === "input-search");
     assert.equal(await page.getByRole("heading", { level: 1, name: "Input", exact: true }).count(), 1);
   }
-  console.log("Component docs: desktop/mobile outline, deep links, exact clipboard source and legacy Input links passed");
+  console.log("Component docs: desktop/mobile outline, deep links, exact clipboard source and Input section links passed");
 } finally {
   await browser?.close();
   await server.close();

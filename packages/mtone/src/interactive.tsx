@@ -18,6 +18,7 @@ import { Dialog as BDialog } from "@base-ui/react/dialog";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
 import { Button, MtoneScope, useMtone, cn } from "./basic";
+import { runConfirmTransaction } from "./confirm-transaction";
 import {
   MenuSurfaceOwnerContext,
   FloatingSurface,
@@ -774,10 +775,6 @@ export function Menubar({
     </MenuSurfaceOwnerContext.Provider>
   );
 }
-/** @deprecated Use MenuProps instead. */
-export type DropdownMenuProps = MenuProps;
-/** @deprecated Use Menu instead. */
-export const DropdownMenu = Menu;
 export function ContextMenu({
   children,
   items,
@@ -938,10 +935,6 @@ export function Dialog({
     </BDialog.Root>
   );
 }
-/** @deprecated Use DialogProps instead. */
-export type ModalProps = DialogProps;
-/** @deprecated Use Dialog instead. */
-export const Modal = Dialog;
 
 export interface ConfirmDialogProps extends DialogFrameProps {
   onConfirm?: () => void | Promise<void>;
@@ -970,18 +963,18 @@ export function ConfirmDialog({
     setOpen(v);
     onOpenChange?.(v);
   };
-  const confirm = async () => {
-    setPending(true);
-    setError(false);
-    try {
-      await onConfirm?.();
-      change(false);
-    } catch {
-      setError(true);
-    } finally {
-      setPending(false);
-    }
-  };
+  const confirm = () =>
+    runConfirmTransaction({
+      invoke: () => {
+        setError(false);
+        return onConfirm?.();
+      },
+      alwaysPending: true,
+      onPending: () => setPending(true),
+      onFinish: () => setPending(false),
+      onResolve: () => change(false),
+      onReject: () => setError(true),
+    });
   return (
     <AlertDialog.Root open={open ?? localOpen} onOpenChange={change}>
       {trigger && <AlertDialog.Trigger render={trigger} />}
@@ -1072,7 +1065,7 @@ export function Drawer({
     </BDrawer.Root>
   );
 }
-export { Toast, ToastProvider, useToast } from "./toast";
+export { ToastProvider, useToast } from "./toast";
 export type {
   ToastOptions,
   ToastUpdateOptions,

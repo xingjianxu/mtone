@@ -2,7 +2,7 @@
 
 ## 带边框的输入表面
 
-Input、SearchInput、Textarea、Select、MultiSelect、NumberInput、DatePicker、Table 筛选输入及 Spotlight 中复用的 Input，聚焦只改变现有边框颜色为 `#93B4DC`，不修改边框宽度、尺寸或 padding，不显示额外外部蓝圈。
+Input、Input.Search、Input.TextArea、Select、MultiSelect、NumberInput、DatePicker、Table 筛选输入及 Spotlight 中复用的 Input，聚焦只改变现有边框颜色为 `#93B4DC`，不修改边框宽度、尺寸或 padding，不显示额外外部蓝圈。
 
 - 原生/单个输入使用 `:focus`，鼠标与键盘一致。
 - MultiSelect / NumberInput 用 `:focus-within` 覆盖子输入、下拉按钮、步进按钮、标签移除等获得焦点的情形。

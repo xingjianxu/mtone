@@ -112,7 +112,7 @@ export function AdminLayoutExample({ compact = false }: { compact?: boolean }) {
                   aria-label="搜索示例"
                   onClick={() =>
                     setNotice(
-                      "搜索是应用层功能，可在 extra 插槽接入 SearchInput 或自有搜索面板。此示例没有发送查询。",
+                      "搜索是应用层功能，可在 extra 插槽接入 Input.Search 或自有搜索面板。此示例没有发送查询。",
                     )
                   }
                 >

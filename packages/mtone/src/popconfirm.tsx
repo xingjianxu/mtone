@@ -2,6 +2,7 @@ import * as React from "react";
 import { Popover } from "@base-ui/react/popover";
 import { CircleHelp } from "lucide-react";
 import { Button, type ButtonProps, MtoneScope, cn, useMtone } from "./basic";
+import { runConfirmTransaction } from "./confirm-transaction";
 
 export type PopconfirmPlacement =
   | "top"
@@ -109,29 +110,29 @@ export function Popconfirm({
     : /(Right|Bottom)$/.test(placement)
       ? "end"
       : "center";
-  async function confirm(event: React.MouseEvent<HTMLButtonElement>) {
+  function confirm(event: React.MouseEvent<HTMLButtonElement>) {
     if (busy.current || disabled || !visible) return;
     busy.current = true;
     setFailed(false);
     const current = session.current;
-    try {
-      const result = onConfirm?.(event);
-      if (result && typeof (result as Promise<unknown>).then === "function")
-        setPending(true);
-      const accepted = await result;
-      if (alive.current && current === session.current) {
+    return runConfirmTransaction({
+      invoke: () => onConfirm?.(event),
+      isCurrent: () => alive.current && current === session.current,
+      onPending: () => setPending(true),
+      onFinish: () => {
         busy.current = false;
         setPending(false);
+      },
+      onResolve: (accepted, finish) => {
+        finish();
         if (accepted !== false) change(false);
-      }
-    } catch (error) {
-      if (alive.current && current === session.current) {
-        busy.current = false;
-        setPending(false);
+      },
+      onReject: (error, finish) => {
+        finish();
         setFailed(true);
         onConfirmError?.(error);
-      }
-    }
+      },
+    });
   }
   return (
     <Popover.Root

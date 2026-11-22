@@ -34,7 +34,7 @@ import { MentionsExample } from "./mentions-example";
 import { TableExample } from "./table-example";
 import { SplitterExample } from "./splitter-example";
 import { CardExample } from "./card-example";
-import { FormExample, FormFieldExample } from "./form-example";
+import { FormExample, FormItemExample } from "./form-example";
 import { SpotlightExample } from "./spotlight-example";
 import { ToastAction } from "./toast-example";
 import { AdminLayoutExample } from "./admin-layout-example";
@@ -94,7 +94,6 @@ export function ComponentExample({
 
 function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
   const [text, setText] = useState("设计规范");
-  const [search, setSearch] = useState("");
   const [checked, setChecked] = useState(true);
   const [value, setValue] = useState<string | null>("design");
   const [multi, setMulti] = useState<string[]>(["design"]);
@@ -133,12 +132,12 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     { key: "delete", label: "移至回收站（演示）", danger: true },
   ];
   const field = (
-    <M.FormField
+    <M.Form.Item
       label="名称"
       description="示例仅修改当前页面，不保存到服务器。"
     >
       <M.Input value={text} onChange={(e) => setText(e.target.value)} />
-    </M.FormField>
+    </M.Form.Item>
   );
   const properties = (
     <M.PropertyList>
@@ -240,18 +239,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <QuestionnaireExample />;
     case "Input":
       return <InputExample compact={compact} />;
-    case "SearchInput":
-      return (
-        <div style={stackStyle}>
-          <M.SearchInput
-            aria-label="搜索示例文档"
-            placeholder="搜索示例文档…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <M.Text muted>输入不会发送网络请求；搜索逻辑由应用实现。</M.Text>
-        </div>
-      );
     case "TableOfContents":
       return <TableOfContentsExample compact={compact} />;
     case "Image":
@@ -274,26 +261,21 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "Cascader": return <CascaderExample compact={compact} />;
     case "AutoComplete": return <AutoCompleteExample compact={compact} />;
     case "Mentions":
-    case "Mention":
       return <MentionsExample compact={compact} />;
-    case "Textarea":
-      return (
-        <div style={stackStyle}>
-          <M.Textarea
-            aria-label="文档说明"
-            rows={4}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <M.Text muted>{text.length} 个字符</M.Text>
-        </div>
-      );
     case "Fieldset":
       return <FieldsetExample />;
     case "Form":
-      return <FormExample />;
-    case "FormField":
-      return <FormFieldExample />;
+      return compact ? (
+        <FormExample />
+      ) : (
+        <div style={stackStyle}>
+          <FormExample />
+          <section>
+            <h4>Form.Item · 字段校验</h4>
+            <FormItemExample />
+          </section>
+        </div>
+      );
     case "Checkbox":
       return (
         <div style={stackStyle}>
@@ -435,7 +417,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Breadcrumb":
       return <BreadcrumbExample />;
-    case "DirectoryTree":
     case "Tree":
       return <TreeExample compact={compact} />;
     case "Tabs":
@@ -443,7 +424,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     case "FilterBar":
       return (
         <M.FilterBar>
-          <M.SearchInput aria-label="按名称筛选" placeholder="筛选名称" />
+          <M.Input.Search aria-label="按名称筛选" placeholder="筛选名称" />
           <M.Select label="分类筛选" options={options} defaultValue="design" />
           {visible && (
             <M.FilterChip onRemove={() => setVisible(false)}>
@@ -478,7 +459,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Menubar":
       return <MenubarExample />;
-    case "DropdownMenu":
     case "Menu":
       return (
         <div style={{ ...stackStyle, justifyItems: "start" }}>
@@ -734,12 +714,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
             这是状态样式演示。
           </M.Alert>
         </div>
-      );
-    case "Toast":
-      return (
-        <M.Toast timeout={3500}>
-          <ToastAction compact={compact} />
-        </M.Toast>
       );
     case "ToastProvider":
       return (

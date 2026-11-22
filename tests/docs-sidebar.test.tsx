@@ -14,7 +14,7 @@ test("sidebar keeps semantic neighbors together and renders each component and g
   expect(groups[0].querySelector(".mt-nav-label")).toHaveTextContent("开始使用");
   const headings = groups.slice(1).map((group) => group.querySelector(".mt-nav-label")!);
   expect(headings.map((heading) => heading.textContent)).toEqual([...componentCategories]);
-  const sectionOnly = new Set(["Title", "Text", "Paragraph", "Link", "Blockquote", "SearchInput", "Textarea"]);
+  const sectionOnly = new Set(["Title", "Text", "Paragraph", "Link", "Blockquote"]);
   const sidebarDocs = componentDocs.filter((doc) => !doc.sidebarParent && !sectionOnly.has(doc.name));
   const namesByGroup = new Map<string, string[]>();
   for (const heading of headings) {

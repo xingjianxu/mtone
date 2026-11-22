@@ -4,9 +4,7 @@ import {
   Alert,
   Button,
   Input,
-  SearchInput,
-  Textarea,
-  FormField,
+  Form,
   Tag,
   MtoneProvider,
 } from "../packages/mtone/src/basic";
@@ -23,9 +21,9 @@ describe("foundation", () => {
   });
   it("connects label and error to input", () => {
     render(
-      <FormField label="Name" error="Required">
+      <Form.Item label="Name" error="Required">
         <Input />
-      </FormField>,
+      </Form.Item>,
     );
     expect(screen.getByLabelText("Name")).toHaveAttribute(
       "aria-invalid",
@@ -81,8 +79,8 @@ it.each(["neutral", "blue", "green", "orange", "red", "purple"] as const)("prese
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
 
-test("Input and Input.Search share single-line styling while Textarea remains multiline", () => {
-  const { container } = render(<><Input aria-label="plain" /><SearchInput aria-label="search" /><Textarea aria-label="multiline" /></>);
+test("Input and Input.Search share single-line styling while Input.TextArea remains multiline", () => {
+  const { container } = render(<><Input aria-label="plain" /><Input.Search aria-label="search" /><Input.TextArea aria-label="multiline" /></>);
   expect(container.querySelector('[aria-label="plain"]')).toHaveClass("mt-input-control");
   expect(container.querySelector('[aria-label="search"]')).toHaveClass("mt-input-control");
   expect(container.querySelector('[aria-label="multiline"]')).not.toHaveClass("mt-input-control");

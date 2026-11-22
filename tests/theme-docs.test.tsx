@@ -64,7 +64,7 @@ test("docs expose one 32px control baseline without density API or switches", as
     const source = await readFile(file, "utf8");
     expect(source).not.toMatch(/density=|setDensity|docs-density-toggle|density: compact/);
   }
-  for (const name of ["Input", "SearchInput", "Select", "MultiSelect", "NumberInput", "DatePicker", "FilterChip"]) {
+  for (const name of ["Input", "Select", "MultiSelect", "NumberInput", "DatePicker", "FilterChip"]) {
     expect(docs.find((entry) => entry.name === name)?.notes?.join(" ")).toContain("32px");
   }
 });

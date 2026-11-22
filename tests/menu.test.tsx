@@ -4,7 +4,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   Menu,
-  DropdownMenu,
   type MenuEntry,
 } from "../packages/mtone/src/interactive";
 
@@ -35,10 +34,6 @@ const items: MenuEntry[] = [
 ];
 
 describe("Menu", () => {
-  it("keeps DropdownMenu as the same compatibility export", () => {
-    expect(Menu).toBeTypeOf("function");
-    expect(DropdownMenu).toBe(Menu);
-  });
   it("keeps hover opt-in and does not move focus when the pointer opens it", async () => {
     const user = userEvent.setup();
     render(

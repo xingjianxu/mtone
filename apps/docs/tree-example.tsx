@@ -3,7 +3,6 @@ import {
   Button,
   Input,
   Tree,
-  DirectoryTree,
   type TreeItem,
   type TreeKey,
   type TreeRef,
@@ -131,7 +130,7 @@ export function TreeExample({ compact = false }: { compact?: boolean }) {
       </section>
       <section>
         <h3>目录模式</h3>
-        <DirectoryTree
+        <Tree directory
           label="目录选择"
           items={documents}
           multiple

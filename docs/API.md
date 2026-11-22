@@ -41,8 +41,7 @@ The disclosure panels use `title`, `status`, `statusLabel`, `open`,
 | --- | --- |
 | `AiPlan` | Required `items`; shows the number of completed steps and starts open by default. |
 | `AiQueue` | Required `items`; separates completed/cancelled from remaining items and starts open by default. |
-| `AiTask` | Optional `steps` and children for a task's progress. |
-| `AiChainOfThought` | Optional `steps` for **public summaries and observed actions only**; does not obtain or reveal hidden reasoning. |
+| `AiTask` | Optional `steps` and children for task progress or a caller-provided public summary. Set `title` for the latter; does not obtain or reveal hidden reasoning. |
 | `AiReasoning` | Required `text` for a caller-provided public explanation; does not access hidden reasoning. |
 | `AiSubagent` | Required `name` and optional `description`, `result`; does not launch or control agents. |
 | `AiTool` | Required `name` and optional plain-text `input`, `output`; does not call tools. |
@@ -97,7 +96,7 @@ Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-gree
 - `ButtonGroup`: optional `size` using the same names as Button. Button descendants without an explicit size inherit it, including a Menu trigger composed from Button. A nested group can override its outer group; ungrouped buttons default to normal.
 - `Input`: native input attributes, native ref and `onChange(event)`, with `prefix`, `suffix`, `allowClear`, character counts and appearance options. `Input.Search`, `Input.Password`, `Input.TextArea` and `Input.OTP` are subcomponents; `SearchInput` and `Textarea` remain compatibility exports. See [Input family](#input-family).
 - `Form`: native form props plus managed values and validation through `Form.useForm()`, `form`, `initialValues`, named `Form.Item` fields and `rules`. Use `onFinish` for valid values and `onFinishFailed` for validation errors; `onSubmit` remains available. See the installed declarations for the supported rule and trigger contracts.
-- `FormField`: `label`, `error`, `description`, `required`, one input child. Associates label/error with cloned child's id and ARIA attributes. Use direct label props for compound selectors rather than wrapping them as a native input.
+- `Form.Item`: `label`, `error`, `description`, `required`, one input child. Associates label/error with cloned child's id and ARIA attributes. Use direct label props for compound selectors rather than wrapping them as a native input.
 
 ## Questionnaire
 
@@ -126,21 +125,21 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - Sidebar, NavGroup(label), NavItem(active, icon, optional href and actions): layout and navigation. NavItem is a button by default; an href renders a native anchor with corresponding props and ref. Native anchor navigation is unchanged. Pass one or more `{ content, visibility? }` descriptors for independent trailing actions. Visibility can be `always` (default), `hover` (also keyboard focus or touch-only), or `active`. The collapsed icon rail hides actions; the full rows in a submenu popup retain them.
 - NavSubmenu: a navigation branch with required `label` and NavItem children, optional `icon` and `disabled`, and `defaultExpanded` / `expanded` / `onExpandedChange` for inline disclosure. A collapsed Sidebar or AdminLayout.Sider opens a side popup; set active leaf state on NavItem.
 - Breadcrumb: items `{label,href?}`; final item is current page.
-- Tree/DirectoryTree: legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
+- Tree (set `directory` for file and folder behavior): legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
 - Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card/attached variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. Every tab item is 32px tall including borders, in every variant, size and placement. The default inter-item gap is 6px for line and 4px for both card variants; explicit `gap` overrides the default. Line labels have 6px inline margins. Selected card and editable-card labels retain their background on hover. `indicatorColor` styles only the selected line indicator, using an accent preset or a CSS color (including a CSS variable); it defaults to `currentColor` and does not recolor the list divider, text, or cards. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
 - FilterBar: flexible layout; FilterChip(children,onRemove).
 - Pagination: total, pageSize (default10), **controlled** page/onPageChange.
 
 ## Menus and overlays
 
-- `Menu` (legacy export: `DropdownMenu`): `trigger` as a string or React element, grouped and nested `items`, `onSelect(key)`, and `open` / `defaultOpen` / `onOpenChange`. `triggerMode="click" | "hover"` defaults to `"click"`. A string uses a content-width dropdown-preset Button; a React element retains its own rendering. Desktop mouse hover can move across the trigger gap and into submenus without taking keyboard focus on open; click, keyboard, and touch activation still work. See [trigger mode examples](https://xingjianxu.github.io/mtone/#/components/Menu?section=trigger-mode).
+- `Menu`: `trigger` as a string or React element, grouped and nested `items`, `onSelect(key)`, and `open` / `defaultOpen` / `onOpenChange`. `triggerMode="click" | "hover"` defaults to `"click"`. A string uses a content-width dropdown-preset Button; a React element retains its own rendering. Desktop mouse hover can move across the trigger gap and into submenus without taking keyboard focus on open; click, keyboard, and touch activation still work. See [trigger mode examples](https://xingjianxu.github.io/mtone/#/components/Menu?section=trigger-mode).
 - ContextMenu: same items and open contract, children are the right-click area.
 - Popover: trigger, content, optional title and side.
 - Tooltip: child trigger element, content, side. Supply accessible names on icon-only children.
 - Dialog/Drawer: title, description, children, footer, optional trigger; open/defaultOpen/onOpenChange. Escape and close button restore focus. Drawer has right-edge interaction.
 - ConfirmDialog: same basic dialog properties, onConfirm (sync/async), confirmText/cancelText/danger. Async failures remain open with error; pending action disables buttons.
 - [GlobalNotice](https://xingjianxu.github.io/mtone/#/components/GlobalNotice): persistent warning banner with required `title`, optional `children`, `icon` (`false` hides the decorative default), `onAction`, `actionLabel`, `actionRef`, `loading`, `error`, and native div attributes/ref. `onAction` adds a button; with no visible label it uses a localized accessible dismiss name. Loading disables the action, and errors use alert semantics. The app owns retries, visibility and restoring focus to a stable control after dismissal. Use standalone or in the outer `AdminLayout.notice` slot, not inside a route page when it must persist across routes.
-- ToastProvider (alias Toast): wraps application, timeout and limit. `useToast().add({title,description})` creates a dismissible toast. Place inside MtoneProvider.
+- ToastProvider: wraps application, timeout and limit. `useToast().add({title,description})` creates a dismissible toast. Place inside MtoneProvider.
 
 Triggers use Base UI's `render` composition. Custom trigger components must forward ref and DOM props; standard mtone Button does this.
 
@@ -193,8 +192,7 @@ width. `variant` is `outlined` (default), `filled`, `borderless` or `underlined`
   Whitespace is removed; `inputMode` is only a keyboard hint, not digit validation.
   This component collects a code; it does not authenticate or verify it.
 
-`SearchInput` is the same component as `Input.Search`; `Textarea` is the same as
-`Input.TextArea`. See [Input examples and full API](https://xingjianxu.github.io/mtone/#/components/Input).
+See [Input examples and full API](https://xingjianxu.github.io/mtone/#/components/Input).
 
 ## TreeSelect
 
@@ -381,7 +379,6 @@ Required adapter `upload(file,{signal,onProgress}) => Promise<unknown>`. Progres
 
 ### Dialog dismissal
 
-`Dialog` is the primary name (`Modal` / `ModalProps` remain deprecated aliases).
 `modal?: boolean` defaults to `true`: outside clicks do not close the dialog.
 Set `modal={false}` to allow outside clicks to close it. This option only controls
 outside dismissal. Focus trapping, the backdrop, scroll locking, Escape, the close
@@ -397,7 +394,7 @@ table selection checkboxes and non-selection disclosure icons are unchanged.
 
 ## Mentions
 
-`Mentions` (alias `Mention`) adds plain-text mention completion with mtone styling.
+`Mentions` adds plain-text mention completion with mtone styling.
 Available starting in 0.4.0. The live website follows master and can be ahead of npm;
 check the declarations shipped in your installed package.
 
@@ -426,7 +423,7 @@ it. It does not render immutable mention chips or validate whether a person exis
 `getMentions(text, { prefix?, split? })` is a **standalone exported helper**, returning
 `{ prefix, value }[]`. It applies boundary/whitespace splitting, not custom search
 validation or membership checks. Values containing spaces need an application-specific
-parsing strategy. Bind `Mentions` directly to `FormField` using its string change
+parsing strategy. Bind `Mentions` directly to `Form.Item` using its string change
 contract; enforce membership and authorization on your server.
 
 Use `options` for suggestions and MtoneProvider for theme configuration.

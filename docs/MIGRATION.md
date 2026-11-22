@@ -1,3 +1,20 @@
+# Changes on master after 0.9.0
+
+Use the guidance for your installed version. The following removals apply to
+the current repository version, not to the published 0.9.0 package.
+
+| Removed export | Use instead |
+| --- | --- |
+| `Toast` | `ToastProvider` with `useToast` |
+| `DirectoryTree` | `<Tree directory />` |
+| `AiChainOfThought` / `AiChainOfThoughtProps` | `AiTask` / `AiTaskProps`; set a summary title explicitly |
+| `Modal` / `ModalProps` | `Dialog` / `DialogProps` |
+| `DropdownMenu` / `DropdownMenuProps` | `Menu` / `MenuProps` |
+| `Mention` | `Mentions` |
+| `SearchInput` | `Input.Search` |
+| `Textarea` | `Input.TextArea` |
+| `FormField` | `Form.Item` |
+
 # Upgrade notes for 0.9.0
 
 ## Removed exports
@@ -82,7 +99,7 @@ old tooltip behavior. Plain Cards retain their previous markup and styling.
 ## Modal renamed to Dialog
 
 Use `Dialog` and `DialogProps` in new code. `Modal` and `ModalProps` remain
-deprecated aliases for compatibility. The old documentation URL also resolves to Dialog.
+deprecated aliases for compatibility. The legacy URL was available in earlier documentation releases.
 
 When upgrading from 0.2.0, note the new `modal` default is `true`, so outside
 clicks **do not close** the dialog by default. Set `modal={false}` to retain

@@ -6,14 +6,9 @@ import * as Mtone from "../packages/mtone/src";
 import { componentDocs } from "../apps/docs/catalog";
 import { DocsApp, parseRoute, searchDocs } from "../apps/docs/docs-app";
 
-it("removes standalone Dropdown without changing the DropdownMenu alias", () => {
+it("removes standalone Dropdown from the package and docs", () => {
   expect(Mtone).not.toHaveProperty("Dropdown");
-  expect(Mtone.DropdownMenu).toBe(Mtone.Menu);
   expect(parseRoute("#/components/Dropdown")).toEqual({ kind: "not-found" });
-  expect(parseRoute("#/components/DropdownMenu")).toEqual({
-    kind: "component",
-    name: "Menu",
-  });
   expect(componentDocs.some((doc) => doc.name === "Dropdown")).toBe(false);
   expect(searchDocs("Dropdown").some((doc) => doc.name === "Dropdown")).toBe(
     false,

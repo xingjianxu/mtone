@@ -22,8 +22,7 @@ const taxonomy = {
     "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
-    "Form", "FormField", "Fieldset", "Input", "SearchInput",
-    "Textarea", "Mentions", "NumberInput", "AutoComplete", "Select",
+    "Form", "Fieldset", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
     "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker", "FilterBar", "FilterChip",
@@ -31,7 +30,7 @@ const taxonomy = {
   ],
   "数据展示": [
     "Card", "CardGroup", "List", "ListItem", "DataList",
-    "DocumentList", "DocumentCard", "Table", "Tree", "DirectoryTree",
+    "DocumentList", "DocumentCard", "Table", "Tree",
     "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
     "Avatar", "AvatarGroup", "Tag", "Calendar", "Timeline",
   ],
@@ -41,13 +40,13 @@ const taxonomy = {
     "Drawer",
   ],
   "状态反馈": [
-    "Alert", "GlobalNotice", "ToastProvider", "Toast", "Status",
+    "Alert", "GlobalNotice", "ToastProvider", "Status",
     "Progress", "Spinner", "LoadingOverlay", "Skeleton", "Empty",
     "Result",
   ],
   "AI 界面": [
     "AiChat", "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
-    "AiPlan", "AiChainOfThought", "AiReasoning", "AiTask", "AiQueue",
+    "AiPlan", "AiReasoning", "AiTask", "AiQueue",
     "AiSubagent", "AiTool", "AiCheckpoint", "AiConfirmation", "AiSources",
     "AiInlineCitation", "AiContext", "AiFileTree", "AiStackTrace", "AiTerminal",
     "AiTestResults",
@@ -72,6 +71,7 @@ export type ComponentDoc = {
   props: PropDoc[];
   notes: string[];
   sidebarParent?: string;
+  sidebarSection?: string;
   demoLabel?: string;
 };
 const componentReferences: (Omit<ComponentDoc, "category"> & { name: DocumentedComponentName })[] = [
@@ -364,7 +364,7 @@ export default function Demo() {
   "importNames": [
     "Fieldset"
   ],
-  "code": "import { Fieldset, FormField, Input, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Fieldset legend=\"个人信息\">\n    <div style={{ display: \"grid\", gap: 10 }}>\n      <FormField label=\"姓名\"><Input /></FormField>\n      <FormField label=\"邮箱\"><Input type=\"email\" /></FormField>\n      <Button>保存</Button>\n    </div>\n  </Fieldset>;\n}",
+  "code": "import { Fieldset, Form, Input, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <Fieldset legend=\"个人信息\">\n    <div style={{ display: \"grid\", gap: 10 }}>\n      <Form.Item label=\"姓名\"><Input /></Form.Item>\n      <Form.Item label=\"邮箱\"><Input type=\"email\" /></Form.Item>\n      <Button>保存</Button>\n    </div>\n  </Fieldset>;\n}",
   "props": [
     {
       "name": "legend",
@@ -396,9 +396,9 @@ export default function Demo() {
     }
   ],
   "notes": [
-    "Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 FormField 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。",
+    "Fieldset 负责语义分组与统一禁用，不替代 Form 的提交/校验或 Form.Item 的单字段标签。内容布局由调用方控制，可用 Stack 或 Grid。",
     "disabled 保留原生 fieldset 语义：本组第一个 legend 内的控件不受本组禁用影响，仍继承祖先禁用。",
-    "mtone 的 Button、Input、Textarea、Checkbox、Switch、RadioGroup、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
+    "mtone 的 Button、Input、Input.TextArea、Checkbox、Switch、RadioGroup、Select、MultiSelect、Slider、NumberInput、AutoComplete、Mentions、Cascader/CascaderPanel、TreeSelect、Rate、Transfer、DatePicker、Upload 会继承禁用。Select/MultiSelect 等弹层同时关闭，disabled={false} 不会覆盖分组禁用。",
     "原生 input/button/select/textarea 使用浏览器禁用语义；自定义第三方控件、链接、Menu 等非表单动作需应用自行传递 disabled。受控值仍由应用管理，Fieldset 不清空已有值。"
   ]
 },
@@ -661,11 +661,13 @@ export default function Demo() {
       "options 的路径值、文字、禁用状态、叶节点标记或子节点结构变化会清除加载缓存并忽略旧响应；仅重建数组或 loadOptions 函数引用不会清除缓存。远程数据源切换但结构相同时，请更换组件 key 显式重置。isLeaf:false 表示待加载分支，isLeaf:true 强制作为叶节点。",
       "上下键、Home/End 导航同级；左右键进入/返回层级；Enter/空格选择，Escape 关闭弹层。选项采用 mtone 灰底高亮，不叠加蓝色粗边框。",
       "不提供 fieldNames、任意触发器、variant、虚拟滚动或内置远程搜索；可在传入前映射数据字段。大树建议分批加载。",
-      "name 提交 JSON 字符串，不自动接入 FormField 的 onChange 协议，也不实现原生表单 reset；需受控值时请响应 onValueChange。",
+      "name 提交 JSON 字符串，不自动接入 Form.Item 的 onChange 协议，也不实现原生表单 reset；需受控值时请响应 onValueChange。",
       "自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。",
     ],
   },
   {
+    sidebarParent: "Cascader",
+    sidebarSection: "panel",
     name: "CascaderPanel",
     description:
       "常驻页面的级联选择面板，复用路径选择、多选联动、搜索与异步加载交互。",
@@ -999,7 +1001,7 @@ export default function Demo() {
     "默认按 value、字符串 label 和 keywords 忽略大小写包含匹配；远程数据请使用 filterOption={false}，应用自行处理防抖、取消及过期响应。",
     "onSearch 只在用户输入（包括 IME 完成）时触发，选择和清除不触发；onChange 包含输入、选择及清除。",
     "默认无结果显示空状态。open 受控时仍由调用方响应 onOpenChange；disabled/readOnly 始终关闭弹层。",
-    "原生 input ref 支持 focus/blur；FormField 绑定字符串 value/onChange。非受控原生表单 reset 恢复 defaultValue。",
+    "原生 input ref 支持 focus/blur；Form.Item 绑定字符串 value/onChange。非受控原生表单 reset 恢复 defaultValue。",
     "不支持 textarea/任意输入替换、虚拟滚动、多选或 variant。大数据建议服务端筛选。",
     "自 0.4.0 提供；文档站跟随 master，请以安装版本的声明为准。"
   ]
@@ -1210,6 +1212,8 @@ export default function Demo() {
   ]
 },
 {
+    sidebarParent: "Image",
+    sidebarSection: "groups",
   "name": "ImageGroup",
   "description": "使用显式图片数组展示缩略图，并在同一个预览器中前后切换。",
   "importNames": [
@@ -1265,6 +1269,8 @@ export default function Demo() {
   ]
 },
 {
+    sidebarParent: "Image",
+    sidebarSection: "controlled",
   "name": "ImagePreview",
   "description": "独立、受控的模态图片预览器，可由任意业务按钮打开而不渲染缩略图。",
   "importNames": [
@@ -1750,7 +1756,7 @@ export default function Demo() {
   "description": "紧凑的纯文本提及输入框，支持光标候选、多个触发符、键盘选择与异步搜索。",
   "importNames": [
     "Mentions",
-    "Mention",
+
     "getMentions"
   ],
   "code": "import { useState } from \"react\";\nimport { Mentions, getMentions } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [value, setValue] = useState(\"\");\n  return (\n    <>\n      <Mentions\n        aria-label=\"评论\"\n        value={value}\n        onChange={setValue}\n        options={[{ value: \"alice\", label: \"Alice\" }, { value: \"bob\", label: \"Bob\" }]}\n        placeholder=\"输入 @ 提及成员\"\n        allowClear\n        autoSize={{ minRows: 2, maxRows: 5 }}\n      />\n      <p>{getMentions(value).length} 个提及</p>\n    </>\n  );\n}",
@@ -1883,12 +1889,12 @@ export default function Demo() {
   ],
   "notes": [
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。",
-    "Mention 是 Mentions 的同一组件别名；推荐使用 Mentions。相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件自 0.4.0 提供；请以已安装版本声明为准。",
+    "相关类型：MentionsProps、MentionOption、MentionsRef、MentionsSemantic。此组件自 0.4.0 提供；请以已安装版本声明为准。",
     "这是原生 textarea 上的纯文本补全，不是富文本 token 编辑器。选项使用 options；不支持 Mentions.Option、children 选项、variant 或函数式语义样式；尺寸使用 sm/md/lg，主题通过 MtoneProvider 配置。",
     "↑ / ↓ 在可用候选间循环，Enter 插入当前项，Escape 关闭，Tab 关闭并正常切换焦点；输入法组合期间不会选择候选。Home/End 保留文本编辑行为。选中一段文本时不弹出建议。",
     "插入替换光标之前的当前触发符和查询，保留光标之后的文本；超出 maxLength 时不插入，不截断候选。不会把已有提及变成不可分割的标签。默认查询禁止空白，含空格的实体值不适合默认解析规则。",
     "异步示例只模拟本地延迟，不发送网络请求。业务端须自行请求、处理错误、取消或忽略旧响应；loading 时不会选中旧候选，filterOption={false} 可保留服务端排序。",
-    "FormField 可直接绑定字符串 value/onChange。原生表单 reset 会恢复非受控 defaultValue，受控值仍由应用管理。getMentions 只解析文本，不能替代成员校验或权限检查。",
+    "Form.Item 可直接绑定字符串 value/onChange。原生表单 reset 会恢复非受控 defaultValue，受控值仍由应用管理。getMentions 只解析文本，不能替代成员校验或权限检查。",
     "候选使用灰色背景高亮，不加蓝色边框。弹层挂到 document.body 时通过 MtoneProvider 继承 tokens/颜色主题；自定义 popupRender 应保留完整 menu 与可访问语义。复杂变换容器、自定义候选内容需在目标布局验证。"
   ]
 },
@@ -2503,103 +2509,23 @@ export default function Demo() {
   ],
   "notes": [
     "默认单行32px，sm为24px，lg为36px；焦点保持浅蓝 #93B4DC 的1px细边框，不加粗。",
-    "Input.Search 是搜索子组件；SearchInput 是同一组件的兼容导出。Input.TextArea 与 Textarea 也是同一组件；新代码推荐子组件写法。",
+    "搜索和多行输入分别使用 Input.Search 和 Input.TextArea。",
     "原生 size、type、name、form、aria-* 和原生 ref 保留。className/style 面向原生输入，不代表外层容器。",
     "Input.OTP 支持粘贴、组合输入、方向键与删除；删除会将后续字符前移，不保留空格占位。空白字符会移除。mask 不提供任意字符替换。",
     "Search/Password 支持基础输入通用属性；TextArea/OTP 使用各自的原生属性，不能假定所有基础输入属性可通用。",
     "本页示例仅演示界面交互，不执行真实搜索、登录或验证码验证。"
   ]
 },
-  {
-    name: "SearchInput",
-    description: "Input.Search 的兼容导出；新代码推荐 Input.Search。",
-    importNames: ["SearchInput"],
-    code: 'import { SearchInput } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <SearchInput aria-label="搜索文档" placeholder="搜索文档…" />\n  );\n}',
-    props: [
-      {
-        name: "value / defaultValue",
-        type: "string",
-        description: "受控值或非受控初始值。",
-      },
-      {
-        name: "onChange",
-        type: "ChangeEventHandler",
-        description: "接收原生 React change 事件。",
-      },
-      {
-        name: "placeholder",
-        type: "string",
-        description: "输入提示。",
-      },
-      {
-        name: "disabled / readOnly",
-        type: "boolean",
-        description: "禁用或只读。",
-      },
-      {
-        name: "aria-label / id",
-        type: "string",
-        description: "可访问名称或与 label 关联的标识。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
-    ],
-    notes: ["默认单行外框高度为 32px（含边框），搜索图标垂直居中，可通过 --mt-height 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
-  },
-  {
-    name: "Textarea",
-    description: "Input.TextArea 的兼容导出，用于多行说明和长文本。",
-    importNames: ["Textarea"],
-    code: 'import { Textarea } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Textarea aria-label="说明" rows={4} placeholder="记录你的想法" />\n  );\n}',
-    props: [
-      {
-        name: "value / defaultValue",
-        type: "string",
-        description: "受控值或非受控初始值。",
-      },
-      {
-        name: "onChange",
-        type: "ChangeEventHandler",
-        description: "接收原生 React change 事件。",
-      },
-      {
-        name: "placeholder",
-        type: "string",
-        description: "输入提示。",
-      },
-      {
-        name: "disabled / readOnly",
-        type: "boolean",
-        description: "禁用或只读。",
-      },
-      {
-        name: "aria-label / id",
-        type: "string",
-        description: "可访问名称或与 label 关联的标识。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
-    ],
-    notes: ["输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持对应原生输入元素属性和 ref。占位提示不能替代标签。"],
-  },
 {
   "name": "Form",
   "description": "管理字段值与同步/异步校验，支持受验证的提交回调并保留原生表单用法。",
   "importNames": [
     "Form",
-    "FormField",
+
     "Input",
     "Button"
   ],
-  "code": "import { useState } from \"react\";\nimport { Form, FormField, Input, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [form] = Form.useForm();\n  const [message, setMessage] = useState(\"\");\n  return (\n    <Form form={form} initialValues={{ email: \"\" }}\n      onFinish={values => setMessage(`本地提交成功：${values.email}`)}\n      onFinishFailed={() => setMessage(\"请检查字段错误\")}\n    >\n      <FormField name=\"email\" label=\"邮箱\" rules={[\n        { required: true, message: \"请输入邮箱\" },\n        { type: \"email\", message: \"请输入有效邮箱\" },\n      ]}>\n        <Input type=\"email\" />\n      </FormField>\n      <Button type=\"submit\" variant=\"blue\">提交</Button>\n      <Button type=\"reset\">重置</Button>\n      <p role=\"status\">{message}</p>\n    </Form>\n  );\n}",
+  "code": "import { useState } from \"react\";\nimport { Form, Input, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [form] = Form.useForm();\n  const [message, setMessage] = useState(\"\");\n  return (\n    <Form form={form} initialValues={{ email: \"\" }}\n      onFinish={values => setMessage(`本地提交成功：${values.email}`)}\n      onFinishFailed={() => setMessage(\"请检查字段错误\")}\n    >\n      <Form.Item name=\"email\" label=\"邮箱\" rules={[\n        { required: true, message: \"请输入邮箱\" },\n        { type: \"email\", message: \"请输入有效邮箱\" },\n      ]}>\n        <Input type=\"email\" />\n      </Form.Item>\n      <Button type=\"submit\" variant=\"blue\">提交</Button>\n      <Button type=\"reset\">重置</Button>\n      <p role=\"status\">{message}</p>\n    </Form>\n  );\n}",
   "props": [
     {
       "name": "form",
@@ -2655,8 +2581,8 @@ export default function Demo() {
     },
     {
       "name": "Form.Item",
-      "type": "typeof FormField",
-      "description": "FormField 的组合式别名，支持相同字段属性。"
+      "type": "(props: FormFieldProps) => ReactElement",
+      "description": "配置单个字段，关联标签、状态、帮助信息与校验。"
     },
     {
       "name": "form.getFieldValue / getFieldsValue",
@@ -2687,13 +2613,107 @@ export default function Demo() {
       "name": "form.resetFields",
       "type": "(names?: string[]) => void",
       "description": "恢复全部或指定字段的初始值，清除错误与校验中状态。"
+    },
+    {
+      "name": "Form.Item: label",
+      "type": "ReactNode",
+      "description": "必填；字段可访问标签。"
+    },
+    {
+      "name": "Form.Item: children",
+      "type": "ReactElement",
+      "description": "必填；单个可接收注入值、事件、id 与 ARIA 属性的控件。"
+    },
+    {
+      "name": "Form.Item: name",
+      "type": "string",
+      "description": "Form 中的扁平字段 key。省略时保持手动模式。"
+    },
+    {
+      "name": "Form.Item: rules",
+      "type": "FormRule[]",
+      "description": "同步/异步规则，按顺序遇到首错停止。"
+    },
+    {
+      "name": "Form.Item: initialValue",
+      "type": "unknown",
+      "description": "字段初始值，优先级低于 Form.initialValues；只用于初始化/重置。"
+    },
+    {
+      "name": "Form.Item: validateTrigger",
+      "type": "\"onChange\" | \"onBlur\" | (\"onChange\" | \"onBlur\")[] | false",
+      "description": "覆盖此字段的自动校验时机。",
+      "default": "继承 Form"
+    },
+    {
+      "name": "Form.Item: valuePropName",
+      "type": "string",
+      "description": "绑定到子控件的值属性，例如 checked。",
+      "default": "\"value\""
+    },
+    {
+      "name": "Form.Item: trigger",
+      "type": "string",
+      "description": "取值事件名；同名子控件事件仍会调用。",
+      "default": "Input: onChange；Select/MultiSelect: onValueChange"
+    },
+    {
+      "name": "Form.Item: getValueFromEvent",
+      "type": "(...args: any[]) => unknown",
+      "description": "自定义从控件事件参数中提取字段值。"
+    },
+    {
+      "name": "Form.Item: description",
+      "type": "ReactNode",
+      "description": "没有错误时显示的辅助说明。"
+    },
+    {
+      "name": "Form.Item: error",
+      "type": "ReactNode",
+      "description": "显式错误展示，优先于规则错误；不参与提交校验。"
+    },
+    {
+      "name": "Form.Item: required",
+      "type": "boolean",
+      "description": "必填标记和传给控件的 required；规则引擎是否必填应使用 rules.required。",
+      "default": "从 rules.required 推断"
+    },
+    {
+      "name": "Form.Item rules: rule.required / whitespace",
+      "type": "boolean",
+      "description": "必填检查 / 拒绝纯空白字符串。"
+    },
+    {
+      "name": "Form.Item rules: rule.type",
+      "type": "\"string\" | \"number\" | \"boolean\" | \"array\" | \"email\" | \"url\" | \"integer\"",
+      "description": "值类型或基础格式规则，不隐式转换类型。"
+    },
+    {
+      "name": "Form.Item rules: rule.min / max / len",
+      "type": "number",
+      "description": "字符串/数组长度或数值下限、上限、相等值。"
+    },
+    {
+      "name": "Form.Item rules: rule.pattern",
+      "type": "RegExp",
+      "description": "字符串正则检查。"
+    },
+    {
+      "name": "Form.Item rules: rule.message",
+      "type": "string",
+      "description": "覆盖规则失败的错误文案。"
+    },
+    {
+      "name": "Form.Item rules: rule.validator",
+      "type": "(rule: FormRule, value: unknown, values: FormValues) => void | string | Promise<void | string>",
+      "description": "返回 void 表示通过，返回错误字符串或抛错表示失败；支持异步。"
     }
   ],
   "notes": [
-    "这是 mtone 的轻量表单 API；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。",
+    "这是 mtone 的轻量表单 API；支持 Form.Item 和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。",
     "字段 name 是扁平字符串 key；例如 \"user.email\" 只是一个完整 key，不会生成嵌套对象。控件以 Form 接管的值为准，不要同时传 value/defaultValue。",
     "initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，MultiSelect 的初始值建议在 initialValues 中设为 []。",
-    "无 name 的 FormField 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。",
+    "无 name 的 Form.Item 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。",
     "规则按顺序执行，每个字段遇到首个错误停止。可选空值跳过内建类型/长度/范围/正则检查，但仍执行自定义 validator；若要求填写请设置 required。required 只判断空值，不等于 Checkbox 必须选中；此类业务约束用自定义 validator。",
     "异步校验不发送内置网络请求；自定义 validator 可返回错误字符串、抛出错误或返回 Promise。值变化、重置或新校验可能使旧校验失效，validateFields 会拒绝并返回 outOfDate: true；手动调用须 catch，忽略过期结果。",
     "显式 error 优先于自动错误显示，但仅是展示，不会使 validateFields 失败或阻止 onFinish；阻止提交必须使用 rules。",
@@ -2701,129 +2721,9 @@ export default function Demo() {
     "控件交互触发 onValuesChange；setFieldValue/setFieldsValue/resetFields 不触发该回调，也不会自动重跑校验。set 操作清除对应字段旧错误，若需校验请手动调用 validateFields。",
     "托管提交会阻止浏览器默认提交并校验；通过后调用 onFinish，失败调用 onFinishFailed。用户 onSubmit 最先执行，若调用 preventDefault 则取消本次内建提交和校验。",
     "Form 内 type=\"reset\" 按钮恢复初始值与校验状态；onReset 若 preventDefault 则取消内建重置。业务保存/请求、成功状态与提交中的 loading 由应用管理。",
-    "字段卸载后不再参与校验，但值保留在表单数据中。实例读取返回浅拷贝，不要原地修改其中的数组或对象。"
-  ]
-},
-{
-  "name": "FormField",
-  "description": "关联字段标签与帮助信息，配合 Form 的 name/rules 自动管理值和校验。",
-  "importNames": [
-    "Form",
-    "FormField",
-    "Input",
-    "Button"
-  ],
-  "code": "import { Form, FormField, Input, Button } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return (\n    <Form onFinish={values => console.log(\"已校验\", values)}>\n      <FormField name=\"title\" label=\"文档名称\" validateTrigger=\"onBlur\"\n        rules={[\n          { required: true, whitespace: true, message: \"请输入文档名称\" },\n          { min: 3, message: \"至少输入 3 个字符\" },\n        ]}\n      >\n        <Input placeholder=\"例如：阅读笔记\" />\n      </FormField>\n      <Button type=\"submit\">校验并提交</Button>\n    </Form>\n  );\n}",
-  "props": [
-    {
-      "name": "label",
-      "type": "ReactNode",
-      "description": "必填；字段可访问标签。"
-    },
-    {
-      "name": "children",
-      "type": "ReactElement",
-      "description": "必填；单个可接收注入值、事件、id 与 ARIA 属性的控件。"
-    },
-    {
-      "name": "name",
-      "type": "string",
-      "description": "Form 中的扁平字段 key。省略时保持手动模式。"
-    },
-    {
-      "name": "rules",
-      "type": "FormRule[]",
-      "description": "同步/异步规则，按顺序遇到首错停止。"
-    },
-    {
-      "name": "initialValue",
-      "type": "unknown",
-      "description": "字段初始值，优先级低于 Form.initialValues；只用于初始化/重置。"
-    },
-    {
-      "name": "validateTrigger",
-      "type": "\"onChange\" | \"onBlur\" | (\"onChange\" | \"onBlur\")[] | false",
-      "description": "覆盖此字段的自动校验时机。",
-      "default": "继承 Form"
-    },
-    {
-      "name": "valuePropName",
-      "type": "string",
-      "description": "绑定到子控件的值属性，例如 checked。",
-      "default": "\"value\""
-    },
-    {
-      "name": "trigger",
-      "type": "string",
-      "description": "取值事件名；同名子控件事件仍会调用。",
-      "default": "Input: onChange；Select/MultiSelect: onValueChange"
-    },
-    {
-      "name": "getValueFromEvent",
-      "type": "(...args: any[]) => unknown",
-      "description": "自定义从控件事件参数中提取字段值。"
-    },
-    {
-      "name": "description",
-      "type": "ReactNode",
-      "description": "没有错误时显示的辅助说明。"
-    },
-    {
-      "name": "error",
-      "type": "ReactNode",
-      "description": "显式错误展示，优先于规则错误；不参与提交校验。"
-    },
-    {
-      "name": "required",
-      "type": "boolean",
-      "description": "必填标记和传给控件的 required；规则引擎是否必填应使用 rules.required。",
-      "default": "从 rules.required 推断"
-    },
-    {
-      "name": "rule.required / whitespace",
-      "type": "boolean",
-      "description": "必填检查 / 拒绝纯空白字符串。"
-    },
-    {
-      "name": "rule.type",
-      "type": "\"string\" | \"number\" | \"boolean\" | \"array\" | \"email\" | \"url\" | \"integer\"",
-      "description": "值类型或基础格式规则，不隐式转换类型。"
-    },
-    {
-      "name": "rule.min / max / len",
-      "type": "number",
-      "description": "字符串/数组长度或数值下限、上限、相等值。"
-    },
-    {
-      "name": "rule.pattern",
-      "type": "RegExp",
-      "description": "字符串正则检查。"
-    },
-    {
-      "name": "rule.message",
-      "type": "string",
-      "description": "覆盖规则失败的错误文案。"
-    },
-    {
-      "name": "rule.validator",
-      "type": "(rule: FormRule, value: unknown, values: FormValues) => void | string | Promise<void | string>",
-      "description": "返回 void 表示通过，返回错误字符串或抛错表示失败；支持异步。"
-    }
-  ],
-  "notes": [
-    "这是 mtone 的轻量表单 API；支持 Form.Item（等同 FormField）和 Form.useForm()，不支持 Form.List、dependencies、嵌套路径、transform 或自动依赖重验证。",
-    "字段 name 是扁平字符串 key；例如 \"user.email\" 只是一个完整 key，不会生成嵌套对象。控件以 Form 接管的值为准，不要同时传 value/defaultValue。",
-    "initialValues 对每个 Form 实例只在初始化时生效，不会随 prop 改变覆盖编辑值；动态加载数据请调用 setFieldsValue。Form.initialValues 优先于字段 initialValue，MultiSelect 的初始值建议在 initialValues 中设为 []。",
-    "无 name 的 FormField 保留原有手动 error/受控值用法；没有托管字段、没有传 form/onFinish 的 Form 仍使用原生提交行为。",
-    "规则按顺序执行，每个字段遇到首个错误停止。可选空值跳过内建类型/长度/范围/正则检查，但仍执行自定义 validator；若要求填写请设置 required。required 只判断空值，不等于 Checkbox 必须选中；此类业务约束用自定义 validator。",
-    "异步校验不发送内置网络请求；自定义 validator 可返回错误字符串、抛出错误或返回 Promise。值变化、重置或新校验可能使旧校验失效，validateFields 会拒绝并返回 outOfDate: true；手动调用须 catch，忽略过期结果。",
-    "显式 error 优先于自动错误显示，但仅是展示，不会使 validateFields 失败或阻止 onFinish；阻止提交必须使用 rules。",
-    "组件注入 id、required、aria-invalid、aria-describedby 和校验中的 aria-busy；子控件需将这些属性传递到实际输入元素。内置 Input/Select/MultiSelect 已适配。",
-    "Input 默认监听 onChange 并提取 event.target.value；内置 Select/MultiSelect 自动改用 onValueChange，无需额外 trigger。自定义控件可配置 valuePropName、trigger、getValueFromEvent。",
-    "Checkbox 等非 value 控件可配置 valuePropName=\"checked\"、trigger=\"onCheckedChange\"。trigger 负责取值，validateTrigger 负责校验时机，是两个不同概念。",
-    "rules.type 不做类型转换，原生数字输入的字符串不会自动成为 number；可用 getValueFromEvent 显式转换。string/array 的 min/max/len 比较长度，number 的 min/max/len 比较数值。",
-    "URL 规则接受有效 http/https 地址；email 是基础格式检查，不验证邮箱存在。whitespace 拒绝纯空白字符串，不会自动 trim 值。pattern 为 RegExp。",
-    "规则 message 覆盖该规则的错误文案（包括 validator 的错误），建议提供中文文案；如果希望 validator 返回不同错误，省略此规则的 message。"
+    "字段卸载后不再参与校验，但值保留在表单数据中。实例读取返回浅拷贝，不要原地修改其中的数组或对象。",
+    "Checkbox 等非 value 控件可设置 valuePropName=\"checked\"、trigger=\"onCheckedChange\"。trigger 负责取值，validateTrigger 负责校验。",
+    "可选空值会跳过内建类型和格式校验，但仍执行自定义 validator。required 仅检查空值；要求勾选 Checkbox 时需使用自定义校验。"
   ]
 },
   {
@@ -3590,7 +3490,7 @@ export default function Demo() {
     name: "Tree",
     description:
       "保持紧凑风格的层级树，支持多选、级联勾选、目录模式、异步加载、拖放事件与虚拟滚动。",
-    importNames: ["Tree", "DirectoryTree"],
+    importNames: ["Tree"],
     code: 'import { useState } from "react";\nimport { Tree, type TreeKey } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [checked, setChecked] = useState<TreeKey[]>([]);\n  return <Tree label="资料目录" checkable defaultExpandAll\n    checkedKeys={checked}\n    onCheck={keys => setChecked(Array.isArray(keys) ? keys : keys.checked)}\n    items={[{id:"root",label:"知识库",children:[\n      {id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}\n    ]}]} />;\n}',
     props: [
       {
@@ -3797,7 +3697,7 @@ export default function Demo() {
         name: "directory / expandAction",
         type: 'boolean / false | "click" | "doubleClick"',
         description:
-          "DirectoryTree 等价于 directory=true；目录模式默认点击展开，false 禁用标题触发展开但保留箭头 / 方向键。",
+          "设置 directory 开启目录模式；默认点击展开，false 禁用标题触发展开但保留箭头 / 方向键。",
         default: 'false / "click"',
       },
       {
@@ -3819,53 +3719,10 @@ export default function Demo() {
       "loadData 只管理异步状态，不负责请求协议或合并数据；叶节点需 isLeaf=true。defaultExpandAll 仅初始化有效，加载后展开由 expandedKeys 控制。",
       "虚拟化要求标题单行、固定行高；不支持自动测量变高行。长标题省略显示。scrollTo 自动展开只适用于已存在的数据，不能自动加载未知后代。",
       "拖放使用桌面原生 HTML 拖放事件，不包含触摸拖放或键盘拖动。onDrop 不自动修改树，应用负责不可变移动和持久化数据。",
-      "DirectoryTree 为独立具名导出，并非 Tree.DirectoryTree；未实现 JSX TreeNode、Tree.useTree、motion、语义 classNames / styles，以及 showLine / draggable 的对象配置。",
+      "未实现 JSX TreeNode、Tree.useTree、motion、语义 classNames / styles，以及 showLine / draggable 的对象配置。",
       "使用 mtone 主题变量与本库复选框视觉风格。",
     ],
   },
-  {
-  "name": "DirectoryTree",
-  "description": "Tree 的目录交互模式，默认文件夹 / 文件图标，支持点击展开与桌面式多选。",
-  "importNames": [
-    "DirectoryTree"
-  ],
-  "code": "import { DirectoryTree } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <DirectoryTree multiple defaultExpandedKeys={[\"root\"]} expandAction=\"doubleClick\"\n    items={[{id:\"root\",label:\"工作区\",children:[{id:\"notes\",label:\"笔记\"},{id:\"archive\",label:\"归档\"}]}]} />;\n}",
-  "props": [
-    {
-      "name": "items / treeData",
-      "type": "TreeItem[] / TreeNode[]",
-      "description": "与 Tree 共用数据格式、勾选、加载、拖放及虚拟滚动能力，完整属性见 Tree 文档。"
-    },
-    {
-      "name": "multiple",
-      "type": "boolean",
-      "default": "false",
-      "description": "目录多选模式：普通点击单选，Ctrl / Command 点击追加或取消，Shift 点击选择可见范围。"
-    },
-    {
-      "name": "expandAction",
-      "type": "false | \"click\" | \"doubleClick\"",
-      "default": "\"click\"",
-      "description": "控制标题触发展开方式；false 保留箭头和键盘展开。"
-    },
-    {
-      "name": "showIcon",
-      "type": "boolean",
-      "default": "true",
-      "description": "默认显示目录 / 文件图标，节点 icon 或根 icon 可覆盖，false 隐藏。"
-    },
-    {
-      "name": "ref",
-      "type": "React.Ref<TreeRef>",
-      "description": "同 Tree，暴露 nativeElement、focus() 与 scrollTo(options)。"
-    }
-  ],
-  "notes": [
-    "DirectoryTree 是具名导出，等价于 <Tree directory />，不是 Tree.DirectoryTree。",
-    "继承 Tree 全部其他属性、受控状态规则和限制；保持数据展示分组，不重复创建导航类目。",
-    "完整交互示例与 Tree 共用，目录专用操作见示例中的“目录模式”。"
-  ]
-},
   {
     name: "Tabs",
     description: "中性风格的标签切换，支持顶部贴合、卡片编辑、多方向布局和溢出导航。",
@@ -4129,7 +3986,6 @@ export default function Demo() {
       "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",
       "快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。",
       "复选项 type: checkbox 支持 checked/defaultChecked、onCheckedChange 与 closeOnClick（默认 false）。单选组 type: radio-group 支持 label、value/defaultValue、onValueChange 与 children，子项 key 是选择值；选择后保持打开。两类选择使用各自变更回调，不调用 Menu 的 onSelect。",
-      "Menu / MenuProps 是正式名称；DropdownMenu / DropdownMenuProps 仍作为已弃用兼容别名保留。旧文档链接自动转到 Menu。",
       "子菜单支持悬停、点击与左右方向键；Escape 关闭当前子菜单，再次 Escape 关闭主菜单并返回触发器。空 children 按普通叶子项处理，父项 onSelect 和 shortcut 不用于子菜单。key 请在每个同级列表内保持唯一。菜单项高亮使用灰色背景与 1px 淡蓝边框，不改变 Select 样式。",
     ],
   },
@@ -4975,6 +4831,8 @@ export default function Demo() {
     notes: ["不提供路由或日期格式化；点击由每项 onClick 处理。"],
   },
   {
+    sidebarParent: "DocumentList",
+    sidebarSection: "cards",
     name: "DocumentCard",
     description: "以卡片展示一份文档。",
     importNames: ["DocumentCard"],
@@ -5306,6 +5164,8 @@ export default function Demo() {
   ]
 },
 {
+    sidebarParent: "Avatar",
+    sidebarSection: "groups",
   "name": "AvatarGroup",
   "description": "叠放头像，并通过可键盘操作的 +N 按钮查看溢出成员。",
   "importNames": [
@@ -5555,7 +5415,6 @@ export default function Demo() {
     ],
     notes: [
       "支持 Esc 关闭、焦点管理与关闭后焦点恢复。",
-      "Modal/ModalProps 暂保留为已弃用兼容别名，建议迁移至 Dialog/DialogProps。",
       "复杂受控流程由 open/onOpenChange 管理。",
       "标题与关闭按钮垂直居中；面板顶部内边距 12px、左右 20px，footer 上间隔 16px，footer 内上下留白各 8px。多行标题与窄屏按钮换行均受支持。",
     ],
@@ -5845,111 +5704,6 @@ export default function Demo() {
     ],
   },
   {
-    name: "Toast",
-    description:
-      "ToastProvider 的别名，提供成功、失败、普通通知，不是单条消息组件。",
-    importNames: ["Toast", "Button", "useToast"],
-    code: 'import { Toast, Button, useToast } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nfunction Action() {\n  const toast = useToast();\n  return <Button onClick={() => toast.success({\n    title: "更改已保存",\n    body: "文档已同步，可以继续编辑。",\n    position: "top-right",\n  })}>显示成功通知</Button>;\n}\n\nexport default function Demo() {\n  return <Toast position="bottom-right" timeout={5000} limit={3}>\n    <Action />\n  </Toast>;\n}',
-    props: [
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "Provider 包裹的应用内容；不是单条通知正文。",
-      },
-      {
-        name: "position",
-        type: "ToastPosition",
-        default: "bottom-right",
-        description: "Provider 默认位置，单条通知可覆盖。",
-      },
-      {
-        name: "timeout",
-        type: "number",
-        default: "5000",
-        description: "默认自动关闭毫秒数；0 表示持续显示直到关闭。",
-      },
-      {
-        name: "limit",
-        type: "number",
-        default: "3",
-        description:
-          "所有位置共用的可见通知上限；新通知优先，超出上限的旧通知隐藏。",
-      },
-      {
-        name: "useToast().add(options)",
-        type: "(options: ToastOptions) => string",
-        description: "添加通知并返回 id；已有相同 id 时更新。",
-      },
-      {
-        name: "options.type",
-        type: '"success" | "error" | "info" | string',
-        default: "info",
-        description:
-          "成功、失败和普通通知预设，各有图标和风格；未知类型按普通通知显示。",
-      },
-      {
-        name: "options.title / body",
-        type: "ReactNode",
-        description: "标题和正文，无需提供自定义 children。",
-      },
-      {
-        name: "options.description",
-        type: "ReactNode",
-        description: "保留旧正文字段；body 提供时优先于 description。",
-      },
-      {
-        name: "options.position",
-        type: '"top-right" | "bottom-right" | "top-left" | "bottom-left" | "top-center" | "bottom-center" | "center" | "center-top"',
-        description: "覆盖此条通知的位置；center-top 位于视口上方约 25% 处。",
-      },
-      {
-        name: "options.children",
-        type: "ReactNode",
-        description: "可选自定义正文，用于更复杂的通知内容。",
-      },
-      {
-        name: "options.timeout / priority",
-        type: 'number / "low" | "high"',
-        description:
-          "单条超时和播报优先级。默认礼貌播报；仅紧急通知使用 high。",
-      },
-      {
-        name: "options.actionProps",
-        type: "ButtonHTMLAttributes",
-        description: "可选操作按钮属性，含 children、onClick 等。",
-      },
-      {
-        name: "useToast().success / error / info",
-        type: "(options: ToastOptions) => string",
-        description:
-          "预设类型快捷方法，接受同样的 title、body、position 等选项。",
-      },
-      {
-        name: "useToast().update(id, options)",
-        type: "(id, options | (previous) => options) => void",
-        description: "更新已有通知的正文、类型和位置；保留未修改的选项。",
-      },
-      {
-        name: "useToast().close(id?)",
-        type: "(id?: string) => void",
-        description: "关闭指定通知；省略 id 关闭全部。",
-      },
-      {
-        name: "useToast().promise(promise, options)",
-        type: "Promise<Value>",
-        description:
-          "保留异步通知 API，以 loading、success、error 配置各阶段；支持标题正文与预设选项。",
-      },
-    ],
-    notes: [
-      "必须在 Provider 后代调用 useToast。Toast 与 ToastProvider 是同一组件，建议放在 MtoneProvider 内。",
-      "单一队列管理所有位置，改变位置不会创建第二条通知；多位置会占用同一 limit。数量较多时请关闭旧通知或适当调整上限。",
-      "center / center-top 是非模态提示，不是 Dialog，不锁定焦点或阻止背景操作。",
-      "默认使用 Base UI 的礼貌播报、自动关闭、悬停/焦点暂停与关闭行为。保留优先级、actionProps、data、update、close 和 promise API。",
-      "持续通知（timeout: 0）必须留有关闭方式；不要仅用颜色传达状态，预设图标与文字共同表达含义。",
-    ],
-  },
-  {
     name: "ToastProvider",
     description: "支持预设状态、标题正文与多位置的通知上下文。",
     importNames: ["ToastProvider", "Button", "useToast"],
@@ -6046,7 +5800,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "必须在 Provider 后代调用 useToast。Toast 与 ToastProvider 是同一组件，建议放在 MtoneProvider 内。",
+      "必须在 ToastProvider 后代调用 useToast；建议把 ToastProvider 放在 MtoneProvider 内。",
       "单一队列管理所有位置，改变位置不会创建第二条通知；多位置会占用同一 limit。数量较多时请关闭旧通知或适当调整上限。",
       "center / center-top 是非模态提示，不是 Dialog，不锁定焦点或阻止背景操作。",
       "默认使用 Base UI 的礼貌播报、自动关闭、悬停/焦点暂停与关闭行为。保留优先级、actionProps、data、update、close 和 promise API。",
@@ -6321,43 +6075,6 @@ export default function Demo() {
     demoLabel: "执行计划",
   },
   {
-    name: "AiChainOfThought",
-    description: "展示应用提供的公开摘要或可观察步骤。",
-    importNames: ["AiChainOfThought"],
-    code: 'import { AiChainOfThought } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiChainOfThought\n      defaultOpen\n      status="completed"\n      steps={[\n        {\n          id: "find",\n          title: "汇总两份资料",\n          status: "completed",\n          description: "已核对标题及日期。",\n        },\n      ]}\n    />\n  );\n}',
-    props: [
-      {
-        name: "steps",
-        type: "AiActivityStep[]",
-        description: "公开摘要步骤；支持说明和状态。",
-      },
-      {
-        name: "title / statusLabel",
-        type: "string",
-        description: "可覆盖折叠标题和状态文字。",
-      },
-      {
-        name: "status",
-        type: "AiActivityStatus",
-        description: "状态为 pending、running、completed、error、cancelled。",
-        default: "pending",
-      },
-      {
-        name: "open / defaultOpen / onOpenChange",
-        type: "boolean / boolean / (open: boolean) => void",
-        description: "控制展开状态、指定初始展开状态或监听展开变化。",
-      },
-      {
-        name: "children / 原生属性",
-        type: "ReactNode / HTMLAttributes<HTMLDivElement>",
-        description: "额外内容及根 div 属性。",
-      },
-    ],
-    notes: ["不获取、生成或展示模型隐藏思维链。默认收起。"],
-    demoLabel: "公开过程摘要",
-    sidebarParent: "AiPlan",
-  },
-  {
     name: "AiReasoning",
     description: "以可折叠区域展示应用提供的公开文字说明。",
     importNames: ["AiReasoning"],
@@ -6396,7 +6113,7 @@ export default function Demo() {
   },
   {
     name: "AiTask",
-    description: "展示任务状态及可选步骤列表。",
+    description: "展示任务状态、可选步骤和由应用提供的过程摘要。",
     importNames: ["AiTask"],
     code: 'import { AiTask } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <AiTask\n      title="核对版本"\n      defaultOpen\n      status="running"\n      steps={[\n        { id: "tag", title: "查看发布标签", status: "completed" },\n        { id: "file", title: "比对内容", status: "running" },\n      ]}\n    />\n  );\n}',
     props: [
@@ -6427,7 +6144,7 @@ export default function Demo() {
         description: "额外内容及根 div 属性。",
       },
     ],
-    notes: ["默认收起；不会执行任务。"],
+    notes: ["默认收起；不会执行任务。用 title 自定义摘要标题，例如“过程摘要”。只显示调用方提供的公开说明和步骤。"],
     demoLabel: "子任务",
     sidebarParent: "AiPlan",
   },
@@ -6802,3 +6519,10 @@ export const componentDocGroups = componentCategories.map((label) => ({
   label,
   members: taxonomy[label].map((name) => docsByName.get(name)!),
 }));
+
+export function familyDocHref(name: string): string | undefined {
+  const doc = docsByName.get(name);
+  return doc?.sidebarParent && doc.sidebarSection
+    ? `#/components/${doc.sidebarParent}?section=${doc.sidebarSection}`
+    : undefined;
+}

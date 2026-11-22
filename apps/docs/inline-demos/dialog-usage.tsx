@@ -5,12 +5,12 @@ export default function Demo() {
   const [text, setText] = useState("设计规范");
   const [open, setOpen] = useState(false);
   const field = (
-    <M.FormField
+    <M.Form.Item
       label="名称"
       description="示例仅修改当前页面，不保存到服务器。"
     >
       <M.Input value={text} onChange={(e) => setText(e.target.value)} />
-    </M.FormField>
+    </M.Form.Item>
   );
 
   return (

@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Button,
   Form,
-  FormField,
   Mentions,
   Text,
   type MentionOption,
@@ -26,7 +25,7 @@ export default function Demo() {
         initialValues={{ message: "" }}
         onFinish={(values) => setFormResult(String(values.message))}
       >
-        <FormField
+        <Form.Item
           name="message"
           label="协作说明"
           rules={[
@@ -42,7 +41,7 @@ export default function Demo() {
             allowClear
             placeholder="例如：请 @alice 审阅"
           />
-        </FormField>
+        </Form.Item>
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <Button type="submit">提交提及示例</Button>
           <Button
@@ -58,7 +57,7 @@ export default function Demo() {
       </Form>
       <Text data-testid="mentions-form-result">{formResult}</Text>
       <Text muted>
-        onChange 返回字符串，可直接绑定 FormField。getMentions
+        onChange 返回字符串，可直接绑定 Form.Item。getMentions
         只解析文本，不确认成员是否存在，也不代替服务端权限校验。
       </Text>
     </div>

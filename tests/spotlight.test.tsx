@@ -71,7 +71,7 @@ test("disabled pointer actions and IME Enter do not execute", async () => {
   fireEvent.keyDown(input, { key: "Enter", isComposing: true });
   expect(selected).not.toHaveBeenCalled();
 });
-test("uses SearchInput with one embedded icon and keeps its input focused after clearing", async () => {
+test("uses Input.Search with one embedded icon and keeps its input focused after clearing", async () => {
   render(<Spotlight defaultOpen actions={actions} defaultQuery="home" />);
   const input = await screen.findByRole("combobox");
   expect(input.parentElement).toHaveClass("mt-search");

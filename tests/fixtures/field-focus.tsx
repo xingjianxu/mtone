@@ -1,11 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Input, SearchInput, Textarea, Select, MultiSelect, NumberInput, DatePicker, Table, Checkbox, Button, MtoneProvider } from "../../packages/mtone/src";
+import { Input, Select, MultiSelect, NumberInput, DatePicker, Table, Checkbox, Button, MtoneProvider } from "../../packages/mtone/src";
 const options=[{value:"one",label:"One"},{value:"two",label:"Two"}];
 const fields=[
  ["Input",<Input aria-label="Input" />],
- ["SearchInput",<SearchInput aria-label="SearchInput" />],
- ["Textarea",<Textarea aria-label="Textarea" />],
+ ["SearchInput",<Input.Search aria-label="SearchInput" />],
+ ["Textarea",<Input.TextArea aria-label="Textarea" />],
  ["Select",<Select label="Select" options={options} />],
  ["MultiSelect",<MultiSelect label="MultiSelect" options={options} defaultValue={["one"]} />],
  ["NumberInput",<NumberInput label="NumberInput" defaultValue={2} />],

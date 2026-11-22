@@ -19,7 +19,6 @@ import {
   Checkbox,
   Switch,
   RadioGroup,
-  Textarea,
   DatePicker,
   Upload,
 } from "../packages/mtone/src";
@@ -169,7 +168,7 @@ it("propagates state to compound form controls and removes it when enabled", () 
   const options = [{ value: "a", label: "Alpha" }];
   const Demo = ({ disabled }: { disabled: boolean }) => (
     <Fieldset disabled={disabled}>
-      <Textarea aria-label="Notes" />
+      <Input.TextArea aria-label="Notes" />
       <Checkbox label="Check" />
       <Switch label="Switch" />
       <RadioGroup label="Radio" options={options} />

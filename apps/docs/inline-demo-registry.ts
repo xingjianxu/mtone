@@ -83,8 +83,6 @@ import Example25_1 from "./inline-demos/tag-removable";
 import Example25_1Raw from "./inline-demos/tag-removable.tsx?raw";
 import Example26_0 from "./inline-demos/status-usage";
 import Example26_0Raw from "./inline-demos/status-usage.tsx?raw";
-import Example27_0 from "./inline-demos/avatar-group-usage";
-import Example27_0Raw from "./inline-demos/avatar-group-usage.tsx?raw";
 import Example28_0 from "./inline-demos/property-list-usage";
 import Example28_0Raw from "./inline-demos/property-list-usage.tsx?raw";
 import Example29_0 from "./inline-demos/property-item-usage";
@@ -150,7 +148,6 @@ import TagDisclosureRaw from "./inline-demos/tag-select-disclosure.tsx?raw";
 export const inlineDocSections: Readonly<
   Record<string, readonly DocSection[]>
 > = {
-  Toast: toastSections,
   ToastProvider: toastSections,
   ButtonGroup: [
     {
@@ -421,15 +418,13 @@ export const inlineDocSections: Readonly<
   DocumentList: [
     {
       id: "usage",
-      title: "基础用法",
+      title: "文档列表",
       Demo: Example23_0,
       source: source(Example23_0Raw),
     },
-  ],
-  DocumentCard: [
     {
-      id: "usage",
-      title: "基础用法",
+      id: "cards",
+      title: "文档卡片",
       Demo: Example24_0,
       source: source(Example24_0Raw),
     },
@@ -454,14 +449,6 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example26_0,
       source: source(Example26_0Raw),
-    },
-  ],
-  AvatarGroup: [
-    {
-      id: "usage",
-      title: "基础用法",
-      Demo: Example27_0,
-      source: source(Example27_0Raw),
     },
   ],
   PropertyList: [

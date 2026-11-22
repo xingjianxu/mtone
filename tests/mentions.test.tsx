@@ -3,7 +3,6 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import {
   Mentions,
-  Mention,
   getMentions,
   type MentionsRef,
 } from "../packages/mtone/src";
@@ -20,8 +19,7 @@ function edit(value: string, caret = value.length) {
   });
   return input;
 }
-test("exports alias and parses plain text with multiple prefixes", () => {
-  expect(Mention).toBe(Mentions);
+test("parses plain text with multiple prefixes", () => {
   expect(getMentions("Hi @alice #team @bob", { prefix: ["@", "#"] })).toEqual([
     { prefix: "@", value: "alice" },
     { prefix: "#", value: "team" },

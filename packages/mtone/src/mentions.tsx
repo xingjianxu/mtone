@@ -584,4 +584,3 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
     );
   },
 );
-export const Mention = Mentions;

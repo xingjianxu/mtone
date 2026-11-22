@@ -1,4 +1,4 @@
-import { DirectoryTree, type TreeItem } from "../../../packages/mtone/src";
+import { Tree, type TreeItem } from "../../../packages/mtone/src";
 
 const documents: TreeItem[] = [
   {
@@ -22,7 +22,7 @@ const documents: TreeItem[] = [
 export default function Demo() {
   return (
     <div style={{ display: "grid", gap: 24, width: "100%", minWidth: 0 }}>
-      <DirectoryTree
+      <Tree directory
         label="目录选择"
         items={documents}
         multiple

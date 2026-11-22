@@ -148,27 +148,6 @@ function ActivitySteps({
     </ol>
   );
 }
-export interface AiChainOfThoughtProps extends AiActivityProps {
-  steps?: AiActivityStep[];
-}
-/** Displays public summaries and observable steps supplied by the caller, not hidden model reasoning. */
-export function AiChainOfThought({
-  title,
-  steps = [],
-  children,
-  ...props
-}: AiChainOfThoughtProps) {
-  const { locale } = useMtone();
-  return (
-    <ActivityDisclosure
-      {...props}
-      title={title ?? (locale === "en" ? "Activity summary" : "过程摘要")}
-    >
-      <ActivitySteps items={steps} />
-      {children}
-    </ActivityDisclosure>
-  );
-}
 export interface AiTaskProps extends AiActivityProps {
   steps?: AiActivityStep[];
 }

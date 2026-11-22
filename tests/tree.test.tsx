@@ -7,7 +7,7 @@ import {
   act,
 } from "@testing-library/react";
 import { test, expect, vi } from "vitest";
-import { Tree, DirectoryTree, type TreeRef } from "../packages/mtone/src/tree";
+import { Tree, type TreeRef } from "../packages/mtone/src/tree";
 if (!window.PointerEvent)
   window.PointerEvent = MouseEvent as typeof PointerEvent;
 const items = [
@@ -152,7 +152,7 @@ test("keyboard skips disabled parents and recovers on removal", () => {
   expect(row("Parent")).toHaveAttribute("tabindex", "0");
 });
 test("directory expands with configured action", () => {
-  render(<DirectoryTree items={items} expandAction="doubleClick" />);
+  render(<Tree directory items={items} expandAction="doubleClick" />);
   fireEvent.click(row("Parent"));
   expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
   fireEvent.doubleClick(row("Parent"));

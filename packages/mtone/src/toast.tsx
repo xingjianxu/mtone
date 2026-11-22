@@ -261,4 +261,3 @@ export function ToastProvider({
     </BToast.Provider>
   );
 }
-export const Toast = ToastProvider;

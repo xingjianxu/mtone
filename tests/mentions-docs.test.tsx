@@ -4,16 +4,15 @@ import { expect, test } from "vitest";
 import { componentDocs } from "../apps/docs/catalog";
 import { ComponentExample } from "../apps/docs/examples";
 import { parseRoute } from "../apps/docs/docs-app";
-test("documents Mentions as one data-input component with alias and plain-text limitations", () => {
+test("documents Mentions as one data-input component with plain-text limitations", () => {
   const doc = componentDocs.find((doc) => doc.name === "Mentions");
   expect(doc?.category).toBe("表单输入");
   expect(doc?.importNames).toEqual(
-    expect.arrayContaining(["Mentions", "Mention", "getMentions"]),
+    expect.arrayContaining(["Mentions", "getMentions"]),
   );
   expect(doc?.notes.join(" ")).toContain("纯文本");
   expect(parseRoute("#/components/Mention")).toEqual({
-    kind: "component",
-    name: "Mentions",
+    kind: "not-found",
   });
 });
 test("provides basic, asynchronous and form examples with real string values", async () => {

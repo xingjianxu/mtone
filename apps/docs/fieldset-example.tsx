@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Fieldset,
-  FormField,
+  Form,
   Input,
   Select,
   Button,
@@ -16,12 +16,12 @@ export function FieldsetExample() {
         <h3>基础分组</h3>
         <Fieldset legend="个人信息">
           <div style={stack}>
-            <FormField label="姓名">
+            <Form.Item label="姓名">
               <Input placeholder="请输入姓名" />
-            </FormField>
-            <FormField label="邮箱">
+            </Form.Item>
+            <Form.Item label="邮箱">
               <Input type="email" placeholder="name@example.com" />
-            </FormField>
+            </Form.Item>
           </div>
         </Fieldset>
       </section>

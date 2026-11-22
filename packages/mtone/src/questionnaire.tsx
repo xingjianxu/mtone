@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, cn, useMtone } from "./basic";
-import { Input, Textarea } from "./input";
+import { Input } from "./input";
 import { Checkbox, RadioGroup } from "./interactive";
 import { Progress } from "./progress";
 
@@ -322,7 +322,7 @@ export function Questionnaire({
             </div>
           )}
           {item.type === "text" && (
-            <Textarea
+            <Input.TextArea
               rows={3}
               aria-label={item.label ?? item.title}
               aria-describedby={described}

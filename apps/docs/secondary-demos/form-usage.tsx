@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Button,
   Form,
-  FormField,
   Input,
   MultiSelect,
   Select,
@@ -38,7 +37,7 @@ export default function Demo() {
           setResult(`校验未通过：${error.errorFields.length} 个字段需要修改。`)
         }
       >
-        <FormField
+        <Form.Item
           name="username"
           label="用户名"
           description="输入 admin 后离开输入框可查看异步错误。"
@@ -55,7 +54,7 @@ export default function Demo() {
           ]}
         >
           <Input autoComplete="off" placeholder="例如：xiaoming" />
-        </FormField>
+        </Form.Item>
         <Form.Item
           name="email"
           label="邮箱"
@@ -66,15 +65,15 @@ export default function Demo() {
         >
           <Input type="email" placeholder="name@example.com" />
         </Form.Item>
-        <FormField
+        <Form.Item
           name="role"
           label="角色"
           validateTrigger="onChange"
           rules={[{ required: true, message: "请选择角色" }]}
         >
           <Select options={roleOptions} placeholder="选择角色" />
-        </FormField>
-        <FormField
+        </Form.Item>
+        <Form.Item
           name="topics"
           label="关注主题"
           validateTrigger="onChange"
@@ -88,7 +87,7 @@ export default function Demo() {
           ]}
         >
           <MultiSelect options={topicOptions} placeholder="选择关注主题" />
-        </FormField>
+        </Form.Item>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <Button type="submit" variant="blue">
             提交示例表单

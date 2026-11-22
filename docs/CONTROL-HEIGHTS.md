@@ -7,7 +7,7 @@ This is the rendered outer **border-box**, including borders, rather than a chil
 | --- | --- |
 | Button, including inherited ButtonGroup size and icon-only mode | 32px normal |
 | Tabs item in every variant, size and placement | 32px |
-| Input, SearchInput, DatePicker input | 32px |
+| Input, Input.Search, DatePicker input | 32px |
 | Select, TreeSelect, Cascader and AutoComplete trigger/input | 32px |
 | NumberInput complete group | 32px |
 | Table column filter input | 32px |
@@ -26,7 +26,7 @@ Navigation row gaps, group headings and the collapsed sidebar controls are uncha
   attributes are removed. Theme light/dark/system and language remain independent.
 - This describes the current source. Updating the website does not publish npm;
   consult the installed declarations for an older release.
-- The 32px baseline does not resize typography, icons, Textarea, option lists,
+- The 32px baseline does not resize typography, icons, Input.TextArea, option lists,
   calendar popups, badges, checkbox/radio controls, switches, sliders or layout regions.
   Tabs use the same item height at every size; size changes typography only.
 - Independent component size variants remain supported. TreeSelect, Cascader and

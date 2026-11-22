@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Button,
   Form,
-  FormField,
   Input,
   MultiSelect,
   Select,
@@ -37,7 +36,7 @@ export function FormExample() {
         setResult(`校验未通过：${error.errorFields.length} 个字段需要修改。`)
       }
     >
-      <FormField
+      <Form.Item
         name="username"
         label="用户名"
         description="输入 admin 后离开输入框可查看异步错误。"
@@ -54,7 +53,7 @@ export function FormExample() {
         ]}
       >
         <Input autoComplete="off" placeholder="例如：xiaoming" />
-      </FormField>
+      </Form.Item>
       <Form.Item
         name="email"
         label="邮箱"
@@ -65,15 +64,15 @@ export function FormExample() {
       >
         <Input type="email" placeholder="name@example.com" />
       </Form.Item>
-      <FormField
+      <Form.Item
         name="role"
         label="角色"
         validateTrigger="onChange"
         rules={[{ required: true, message: "请选择角色" }]}
       >
         <Select options={roleOptions} placeholder="选择角色" />
-      </FormField>
-      <FormField
+      </Form.Item>
+      <Form.Item
         name="topics"
         label="关注主题"
         validateTrigger="onChange"
@@ -87,7 +86,7 @@ export function FormExample() {
         ]}
       >
         <MultiSelect options={topicOptions} placeholder="选择关注主题" />
-      </FormField>
+      </Form.Item>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         <Button type="submit" variant="blue">
           提交示例表单
@@ -131,7 +130,7 @@ export function FormExample() {
   );
 }
 
-export function FormFieldExample() {
+export function FormItemExample() {
   const [message, setMessage] = useState(
     "输入内容或点击校验，查看关联的错误信息。",
   );
@@ -141,7 +140,7 @@ export function FormFieldExample() {
       onFinishFailed={() => setMessage("请修改下方提示的字段。")}
       style={{ display: "grid", gap: 12, width: "100%", maxWidth: 460 }}
     >
-      <FormField
+      <Form.Item
         name="title"
         label="文档名称"
         description="至少 3 个字符，不能只输入空格。"
@@ -151,7 +150,7 @@ export function FormFieldExample() {
         ]}
       >
         <Input placeholder="例如：阅读笔记" />
-      </FormField>
+      </Form.Item>
       <Button type="submit">校验文档名称</Button>
       <span role="status">{message}</span>
     </Form>

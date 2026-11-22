@@ -25,7 +25,7 @@ export interface FormFieldProps {
   trigger?: string;
   getValueFromEvent?: (...args: any[]) => unknown;
 }
-export function FormField({ label, error, description, required, children, name, rules, initialValue,
+function FormField({ label, error, description, required, children, name, rules, initialValue,
   validateTrigger, valuePropName = "value", trigger: triggerProp, getValueFromEvent }: FormFieldProps) {
   const context = React.useContext(Context);
   const form = name !== undefined ? context?.form : undefined;
