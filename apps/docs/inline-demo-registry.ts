@@ -1,3 +1,5 @@
+import SidebarTabsDemo from "./inline-demos/sidebar-tabs";
+import SidebarTabsDemoRaw from "./inline-demos/sidebar-tabs.tsx?raw";
 import SelectTags from "./inline-demos/select-tags";
 import SelectTagsSource from "./inline-demos/select-tags.tsx?raw";
 import SelectSearchable from "./inline-demos/select-searchable";
@@ -340,6 +342,13 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example10_0,
       source: source(Example10_0Raw),
+    },
+    {
+      id: "tabs",
+      title: "顶部标签导航",
+      note: "工作区、项目和收藏只切换侧栏内容，不改变应用路由。给侧栏提供有限高度，滚动中间导航时，标题、标签和底部仍留在原处。用方向键移动焦点，按 Enter 或空格切换标签。",
+      Demo: SidebarTabsDemo,
+      source: source(SidebarTabsDemoRaw),
     },
     {
       id: "section-group",

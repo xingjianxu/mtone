@@ -9,11 +9,17 @@ import {
 import { Popover as BPopover } from "@base-ui/react/popover";
 import { Button, cn, MtoneScope, useMtone } from "./basic";
 import { Popover, type PopoverMenuProps, Tooltip } from "./interactive";
+import { Tabs, type TabItem, type TabsProps } from "./tabs";
 const SidebarContext = React.createContext(false);
 const NavSubmenuSelectionContext = React.createContext<(() => void) | null>(null);
+export interface SidebarTabsOptions extends Pick<TabsProps, "label" | "value" | "defaultValue" | "onValueChange"> {
+  items: readonly Pick<TabItem, "value" | "label" | "content" | "disabled" | "icon">[];
+}
 export type SidebarProps = React.HTMLAttributes<HTMLElement> & {
   header?: React.ReactNode | ((collapsed: boolean) => React.ReactNode);
   footer?: React.ReactNode | ((collapsed: boolean) => React.ReactNode);
+  /** A nonempty list replaces children with tabbed local navigation. */
+  tabs?: SidebarTabsOptions;
   collapsePlacement?: "header" | "footer";
   collapsible?: boolean;
   collapsed?: boolean;
@@ -27,6 +33,7 @@ export function Sidebar({
   children,
   header,
   footer,
+  tabs,
   collapsePlacement = "header",
   collapsible = false,
   collapsed,
@@ -39,6 +46,11 @@ export function Sidebar({
   const [internal, setInternal] = React.useState(defaultCollapsed);
   const isCollapsed = collapsible && (collapsed ?? internal);
   const contentId = React.useId();
+  const items = React.useMemo(() => tabs?.items.map(({ content, ...item }) => ({
+    ...item,
+    content: <div className="mt-sidebar-content">{content}</div>,
+  })), [tabs?.items]);
+  const hasTabs = !!items?.length;
   const toggle = collapsible && (
     <Button iconOnly
       className="mt-sidebar-toggle"
@@ -63,7 +75,7 @@ export function Sidebar({
     <SidebarContext.Provider value={isCollapsed}>
       <aside
         {...p}
-        className={cn("mt-sidebar", className)}
+        className={cn("mt-sidebar", hasTabs && "mt-sidebar-with-tabs", className)}
         data-collapsed={isCollapsed}
       >
         {header !== undefined ? (
@@ -76,7 +88,14 @@ export function Sidebar({
         ) : (
           collapsePlacement === "header" && toggle
         )}
-        {collapsible || header !== undefined ? (
+        {tabs && items?.length ? (
+          <div id={contentId} className="mt-sidebar-tab-region">
+            <Tabs className="mt-sidebar-tabs"
+              items={items} label={tabs.label} value={tabs.value} defaultValue={tabs.defaultValue}
+              onValueChange={tabs.onValueChange} placement="top" variant="line" size="small"
+              indicatorColor="blue" destroyOnHidden={false} />
+          </div>
+        ) : collapsible || header !== undefined ? (
           <div id={contentId} className="mt-sidebar-content">
             {children}
           </div>

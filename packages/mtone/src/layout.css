@@ -90,6 +90,46 @@
 .mt-layout-sider :is(.mt-nav-item:not(.mt-nav-item-row > .mt-nav-item), .mt-nav-item-row) {
   margin-bottom: 3px;
 }
+.mt-sidebar-with-tabs {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+.mt-sidebar-with-tabs > :is(.mt-sidebar-heading, .mt-sidebar-footer, .mt-sidebar-toggle),
+.mt-sidebar-tab-region > .mt-sidebar-tabs > .mt-tab-bar {
+  flex: none;
+}
+.mt-sidebar-with-tabs > .mt-sidebar-tab-region,
+.mt-sidebar-tab-region > .mt-sidebar-tabs,
+.mt-sidebar-tab-region > .mt-sidebar-tabs > .mt-tab-panel:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  min-block-size: 0;
+  flex: 1 1 auto;
+}
+.mt-sidebar-tab-region > .mt-sidebar-tabs > .mt-tab-panel > .mt-sidebar-content {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+/* In tabbed navigation, reserve the blue cue for the category underline. */
+.mt-sidebar-tab-region > .mt-sidebar-tabs > .mt-tab-panel > .mt-sidebar-content .mt-nav-item.mt-active::before {
+  content: none;
+}
+.mt-sidebar-with-tabs:not(.mt-layout-sider) > .mt-sidebar-tab-region {
+  margin-block: 8px;
+}
+.mt-sidebar-with-tabs:not(.mt-layout-sider)
+  > .mt-sidebar-tab-region > .mt-sidebar-tabs > .mt-tab-panel > .mt-sidebar-content {
+  padding-block-start: 8px;
+}
+.mt-sidebar-with-tabs[data-collapsed="true"] > .mt-sidebar-tab-region > .mt-sidebar-tabs > .mt-tab-bar {
+  display: none;
+}
 .mt-layout-header {
   display: flex;
   align-items: center;
