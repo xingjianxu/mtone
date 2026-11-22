@@ -22,7 +22,7 @@ export default function Demo() {
         <M.Button onClick={() => setNotice("已选择导出 PDF")}>
           导出 PDF
         </M.Button>
-        <M.Menu
+        <M.Popover.Menu
           trigger={
             <M.Button iconOnly aria-label="更多导出格式">
               <ChevronDown size={14} />

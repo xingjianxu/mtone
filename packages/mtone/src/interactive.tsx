@@ -11,6 +11,7 @@ import { Slider as BSlider } from "@base-ui/react/slider";
 import { NumberField } from "@base-ui/react/number-field";
 import { Menubar as BMenubar } from "@base-ui/react/menubar";
 import { Menu as BMenu } from "@base-ui/react/menu";
+import { useDirection } from "@base-ui/react/direction-provider";
 import { ContextMenu as BContextMenu } from "@base-ui/react/context-menu";
 import { Popover as BPopover } from "@base-ui/react/popover";
 import { Tooltip as BTooltip } from "@base-ui/react/tooltip";
@@ -430,13 +431,21 @@ export interface MenuRadioGroup {
 }
 export type MenuEntry =
   MenuItem | MenuGroup | MenuDivider | MenuCheckboxItem | MenuRadioGroup;
-export interface MenuProps extends OpenProps, FloatingLayoutProps {
+export interface MenuProps {
+  items: MenuEntry[];
+  onSelect?: (key: string) => void;
+  /** Accessible name for an inline menu. */
+  label?: string;
+  className?: string;
+}
+export interface PopoverMenuProps
+  extends OpenProps, FloatingLayoutProps, Omit<MenuProps, "className"> {
   trigger: string | React.ReactElement;
   /** Whether a mouse hover can open the menu in addition to normal presses. */
   triggerMode?: "click" | "hover";
-  items: MenuEntry[];
-  onSelect?: (key: string) => void;
 }
+const InlineMenuContext = React.createContext(false);
+
 function MenuItemLabel({ item }: { item: Pick<MenuItem, "label" | "icon"> }) {
   return (
     <span className="mt-menu-label">
@@ -447,14 +456,205 @@ function MenuItemLabel({ item }: { item: Pick<MenuItem, "label" | "icon"> }) {
     </span>
   );
 }
+type InlineRowProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  className: string;
+};
+function InlineMenuButton({ className, ...props }: InlineRowProps) {
+  return (
+    <button
+      {...props}
+      type="button"
+      role={props.role ?? "menuitem"}
+      tabIndex={-1}
+      data-disabled={props.disabled ? "" : undefined}
+      className={cn(className, "mt-inline-menu-item")}
+    />
+  );
+}
+function InlineMenuGroup({
+  label,
+  children,
+}: {
+  label: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const id = useId();
+  return (
+    <div role="group" aria-labelledby={id} className="mt-menu-group">
+      <div className="mt-menu-group-label" id={id}>
+        {label}
+      </div>
+      {children}
+    </div>
+  );
+}
+function InlineMenuCheckbox({
+  item,
+  className,
+}: {
+  item: MenuCheckboxItem;
+  className: string;
+}) {
+  const [local, setLocal] = useState(item.defaultChecked ?? false);
+  const checked = item.checked ?? local;
+  return (
+    <InlineMenuButton
+      className={className}
+      role="menuitemcheckbox"
+      aria-checked={checked}
+      disabled={item.disabled}
+      onClick={() => {
+        if (item.checked === undefined) setLocal(!checked);
+        item.onCheckedChange?.(!checked);
+      }}
+    >
+      <MenuItemLabel item={item} />
+      {item.shortcut && <span className="mt-shortcut">{item.shortcut}</span>}
+      {checked && <span aria-hidden="true">✓</span>}
+    </InlineMenuButton>
+  );
+}
+function InlineMenuRadioGroup({ item }: { item: MenuRadioGroup }) {
+  const [local, setLocal] = useState(item.defaultValue);
+  return (
+    <InlineMenuGroup label={item.label}>
+      {item.children.map((option) => {
+        const checked = (item.value ?? local) === option.key;
+        return (
+          <InlineMenuButton
+            key={option.key}
+            className={cn("mt-menu-item", option.danger && "mt-danger")}
+            role="menuitemradio"
+            aria-checked={checked}
+            disabled={option.disabled}
+            onClick={() => {
+              if (checked) return;
+              if (item.value === undefined) setLocal(option.key);
+              item.onValueChange?.(option.key);
+            }}
+          >
+            <MenuItemLabel item={option} />
+            {option.shortcut && (
+              <span className="mt-shortcut">{option.shortcut}</span>
+            )}
+            {checked && <span aria-hidden="true">●</span>}
+          </InlineMenuButton>
+        );
+      })}
+    </InlineMenuGroup>
+  );
+}
+const inlineMenuItemSelector =
+  '[role="menuitem"]:not(:disabled, [data-disabled]), [role="menuitemcheckbox"]:not(:disabled, [data-disabled]), [role="menuitemradio"]:not(:disabled, [data-disabled])';
+
+function InlineSubmenu({
+  item,
+  className,
+  onSelect,
+}: {
+  item: MenuItem;
+  className: string;
+  onSelect?: MenuProps["onSelect"];
+}) {
+  const [open, setOpen] = useState(false);
+  const direction = useDirection();
+  const popup = React.useRef<HTMLDivElement>(null);
+  const trigger = React.useRef<HTMLButtonElement>(null);
+  const focusOnOpen = React.useRef(false);
+  const restoreOnClose = React.useRef(false);
+  const firstItem = () =>
+    popup.current?.querySelector<HTMLElement>(inlineMenuItemSelector);
+  return (
+    <BMenu.Root
+      open={open}
+      modal={false}
+      onOpenChange={(next, details) => {
+        if (next) {
+          const event = details.event;
+          focusOnOpen.current =
+            details.reason !== "trigger-hover" &&
+            (event instanceof KeyboardEvent ||
+              (event instanceof MouseEvent && event.detail === 0));
+          restoreOnClose.current = false;
+        } else {
+          const focused = trigger.current?.ownerDocument.activeElement;
+          restoreOnClose.current =
+            (details.reason === "escape-key" || details.reason === "item-press") &&
+            (focused === trigger.current || !!popup.current?.contains(focused ?? null));
+        }
+        setOpen(next);
+      }}
+    >
+      <BMenu.Trigger
+        ref={trigger}
+        disabled={item.disabled}
+        openOnHover
+        render={({ onKeyDown: _triggerKeys, ...props }) => (
+          <InlineMenuButton
+            {...props}
+            role="menuitem"
+            className={className}
+            onKeyDown={(event) => {
+              if (
+                event.key !== (direction === "rtl" ? "ArrowLeft" : "ArrowRight")
+              )
+                return;
+              event.preventDefault();
+              focusOnOpen.current = true;
+              if (open) firstItem()?.focus();
+              else setOpen(true);
+            }}
+          >
+            <MenuItemLabel item={item} />
+            <ChevronRight
+              className="mt-menu-submenu-arrow"
+              aria-hidden="true"
+            />
+          </InlineMenuButton>
+        )}
+      />
+      <FloatingSurface
+        kind="submenu"
+        popupRef={popup}
+        finalFocus={() => restoreOnClose.current ? trigger.current : false}
+        onKeyDown={(event) => {
+          if (
+            event.key !== (direction === "rtl" ? "ArrowRight" : "ArrowLeft") ||
+            !(event.target instanceof Element) ||
+            event.target.closest('[role="menu"]') !== event.currentTarget
+          )
+            return;
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen(false);
+          trigger.current?.focus();
+        }}
+        initialFocus={() =>
+          focusOnOpen.current ? (firstItem() ?? true) : false
+        }
+      >
+        <PopupMenuItems items={item.children ?? []} onSelect={onSelect} />
+      </FloatingSurface>
+    </BMenu.Root>
+  );
+}
 function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
+  const inline = React.useContext(InlineMenuContext);
   return (
     <>
       {items.map((item, index) => {
         if (item.type === "divider")
-          return <BMenu.Separator key={item.key} className="mt-menu-divider" />;
+          return inline ? (
+            <hr key={item.key} className="mt-menu-divider" />
+          ) : (
+            <BMenu.Separator key={item.key} className="mt-menu-divider" />
+          );
         if (item.type === "group")
-          return (
+          return inline ? (
+            <InlineMenuGroup key={item.key} label={item.label}>
+              <MenuItems items={item.children} onSelect={onSelect} />
+            </InlineMenuGroup>
+          ) : (
             <BMenu.Group key={item.key} className="mt-menu-group">
               <BMenu.GroupLabel className="mt-menu-group-label">
                 {item.label}
@@ -463,7 +663,9 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
             </BMenu.Group>
           );
         if (item.type === "radio-group")
-          return (
+          return inline ? (
+            <InlineMenuRadioGroup key={item.key} item={item} />
+          ) : (
             <BMenu.Group key={item.key} className="mt-menu-group">
               <BMenu.GroupLabel className="mt-menu-group-label">
                 {item.label}
@@ -505,7 +707,13 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
           item.danger && "mt-danger",
         );
         if (item.type === "checkbox")
-          return (
+          return inline ? (
+            <InlineMenuCheckbox
+              key={item.key}
+              item={item}
+              className={className}
+            />
+          ) : (
             <BMenu.CheckboxItem
               key={item.key}
               className={className}
@@ -523,7 +731,14 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
             </BMenu.CheckboxItem>
           );
         if (item.children?.length)
-          return (
+          return inline ? (
+            <InlineSubmenu
+              key={item.key}
+              item={item}
+              className={className}
+              onSelect={onSelect}
+            />
+          ) : (
             <BMenu.SubmenuRoot key={item.key}>
               <BMenu.SubmenuTrigger
                 className={className}
@@ -540,15 +755,28 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
               </FloatingSurface>
             </BMenu.SubmenuRoot>
           );
-        return (
+        const select = () => {
+          item.onSelect?.();
+          onSelect?.(item.key);
+        };
+        return inline ? (
+          <InlineMenuButton
+            key={item.key}
+            className={className}
+            disabled={item.disabled}
+            onClick={select}
+          >
+            <MenuItemLabel item={item} />
+            {item.shortcut && (
+              <span className="mt-shortcut">{item.shortcut}</span>
+            )}
+          </InlineMenuButton>
+        ) : (
           <BMenu.Item
             key={item.key}
             className={className}
             disabled={item.disabled}
-            onClick={() => {
-              item.onSelect?.();
-              onSelect?.(item.key);
-            }}
+            onClick={select}
           >
             <MenuItemLabel item={item} />
             {item.shortcut && (
@@ -560,7 +788,102 @@ function MenuItems({ items, onSelect }: Pick<MenuProps, "items" | "onSelect">) {
     </>
   );
 }
-export function Menu({
+/** Commands in normal document flow, without a trigger or a floating surface. */
+export function Menu({ items, onSelect, label, className }: MenuProps) {
+  const { locale } = useMtone();
+  const [itemFocused, setItemFocused] = useState(false);
+  const root = React.useRef<HTMLDivElement>(null);
+  const typed = React.useRef({ text: "", time: 0 });
+  React.useLayoutEffect(() => {
+    const menu = root.current;
+    if (menu && !menu.contains(menu.ownerDocument.activeElement))
+      setItemFocused(false);
+  }, [items]);
+  return (
+    <div
+      ref={root}
+      role="menu"
+      aria-label={label ?? (locale === "zh" ? "菜单" : "Menu")}
+      tabIndex={itemFocused ? -1 : 0}
+      className={cn("mt-inline-menu", className)}
+      onFocus={(event) => {
+        if (event.currentTarget.contains(event.target))
+          setItemFocused(event.target !== event.currentTarget);
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setItemFocused(false);
+      }}
+      onKeyDown={(event) => {
+        const menu = event.currentTarget;
+        if (
+          event.defaultPrevented ||
+          !(event.target instanceof Element) ||
+          event.target.closest('[role="menu"]') !== menu
+        )
+          return;
+        const rows = Array.from(
+          menu.querySelectorAll<HTMLElement>(inlineMenuItemSelector),
+        ).filter((row) => row.closest('[role="menu"]') === menu);
+        if (!rows.length) return;
+        const index = rows.findIndex((row) => row === event.target);
+        let next: HTMLElement | undefined;
+        if (event.key === "ArrowDown") next = rows[(index + 1) % rows.length];
+        else if (event.key === "ArrowUp")
+          next = rows[index <= 0 ? rows.length - 1 : index - 1];
+        else if (event.key === "Home") next = rows[0];
+        else if (event.key === "End") next = rows[rows.length - 1];
+        else if (
+          event.key.length === 1 &&
+          event.key !== " " &&
+          !event.ctrlKey &&
+          !event.altKey &&
+          !event.metaKey &&
+          !event.nativeEvent.isComposing
+        ) {
+          const time = Date.now();
+          const key = event.key.toLocaleLowerCase();
+          const text =
+            time - typed.current.time < 500 ? typed.current.text + key : key;
+          typed.current = { text, time };
+          const repeated = [...text].every((letter) => letter === key);
+          const query = repeated ? key : text;
+          const start = repeated ? index + 1 : Math.max(0, index);
+          for (let offset = 0; offset < rows.length; offset++) {
+            const row = rows[(start + offset) % rows.length];
+            if (
+              row
+                .querySelector(".mt-menu-text")
+                ?.textContent?.trim()
+                .toLocaleLowerCase()
+                .startsWith(query)
+            ) {
+              next = row;
+              break;
+            }
+          }
+        }
+        if (next) {
+          event.preventDefault();
+          next.focus();
+        }
+      }}
+    >
+      <InlineMenuContext.Provider value={true}>
+        <MenuItems items={items} onSelect={onSelect} />
+      </InlineMenuContext.Provider>
+    </div>
+  );
+}
+function PopupMenuItems(props: Pick<MenuProps, "items" | "onSelect">) {
+  return (
+    <InlineMenuContext.Provider value={false}>
+      <MenuItems {...props} />
+    </InlineMenuContext.Provider>
+  );
+}
+
+function PopoverMenu({
   trigger,
   triggerMode = "click",
   items,
@@ -568,8 +891,9 @@ export function Menu({
   onSelect,
   width,
   align,
+  label,
   ...props
-}: MenuProps) {
+}: PopoverMenuProps) {
   const hover = triggerMode === "hover";
   // Base UI normally focuses the popup; a mouse hover must not move focus.
   const [openedByHover, setOpenedByHover] = useState(false);
@@ -621,9 +945,10 @@ export function Menu({
         kind="menu"
         width={width}
         align={align}
+        label={label}
         initialFocus={hover && openedByHover ? false : undefined}
       >
-        <MenuItems items={items} onSelect={onSelect} />
+        <PopupMenuItems items={items} onSelect={onSelect} />
       </FloatingSurface>
     </BMenu.Root>
   );
@@ -764,7 +1089,7 @@ export function Menubar({
               width={menu.width ?? width}
               align={menu.align ?? align}
             >
-              <MenuItems
+              <PopupMenuItems
                 items={menu.items}
                 onSelect={(key) => onSelect?.(key, menu.key)}
               />
@@ -780,13 +1105,17 @@ export function ContextMenu({
   items,
   onSelect,
   width,
+  label,
   ...props
-}: Omit<MenuProps, "trigger" | "align"> & { children: React.ReactNode }) {
+}: OpenProps & Omit<MenuProps, "className"> & {
+  children: React.ReactNode;
+  width?: FloatingLayoutProps["width"];
+}) {
   return (
     <BContextMenu.Root {...props}>
       <BContextMenu.Trigger>{children}</BContextMenu.Trigger>
-      <FloatingSurface kind="context" width={width}>
-        <MenuItems items={items} onSelect={onSelect} />
+      <FloatingSurface kind="context" width={width} label={label}>
+        <PopupMenuItems items={items} onSelect={onSelect} />
       </FloatingSurface>
     </BContextMenu.Root>
   );
@@ -803,7 +1132,7 @@ export interface PopoverProps
   /** Remove the Popup frame, padding and background, keeping positioning and focus. */
   unstyled?: boolean;
 }
-export function Popover({
+function PopoverRoot({
   trigger,
   content,
   title,
@@ -844,6 +1173,8 @@ export function Popover({
     </BPopover.Root>
   );
 }
+export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu });
+
 export function Tooltip({
   children,
   content,

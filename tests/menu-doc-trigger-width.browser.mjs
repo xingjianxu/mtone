@@ -53,7 +53,7 @@ try {
   const stringTriggerName = "默认文字触发";
   for (const viewport of [1440, 390]) {
     await page.setViewportSize({ width: viewport, height: 840 });
-    await page.goto(new URL("#/components/Menu", base).href);
+    await page.goto(new URL("#/components/Popover", base).href);
     const plain = page.getByRole("button", { name: menuName, exact: true });
     const aligned = page.getByRole("button", { name: alignedName, exact: true });
     await assertContentWidth(plain);
@@ -96,7 +96,7 @@ try {
   await page.setViewportSize({ width: 1440, height: 840 });
   await page.goto(new URL("#/gallery", base).href);
   const card = page.locator(".gallery-card").filter({
-    has: page.getByRole("link", { name: "Menu", exact: true }),
+    has: page.getByRole("link", { name: "Popover", exact: true }),
   });
   await assertContentWidth(card.getByRole("button", { name: menuName, exact: true }));
   await assertContentWidth(card.getByRole("button", { name: alignedName, exact: true }));
@@ -110,14 +110,18 @@ try {
   await expect(page.getByRole("menu")).toHaveCount(0);
 
   const mobile = await browser.newPage({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 840 } });
-  await mobile.goto(new URL("#/components/Menu?section=trigger-options", base).href);
+  await mobile.goto(new URL("#/components/Popover?section=trigger-options", base).href);
   await mobile.getByRole("button", { name: stringTriggerName, exact: true }).tap();
   await expect(mobile.getByRole("menuitem", { name: "导出 PDF", exact: true })).toBeVisible();
   await mobile.getByRole("menuitem", { name: "导出 PDF", exact: true }).tap();
   await expect(mobile.getByRole("status").filter({ hasText: "默认文字：pdf" })).toBeVisible();
   await mobile.close();
 
-  console.log("Menu docs: content-sized triggers on desktop/mobile and in the gallery; popup widths and alignment preserved");
+  await page.goto(new URL("#/components/Menu?section=trigger-mode", base).href);
+  await expect(page.getByRole("button", { name: "悬停打开", exact: true })).toBeVisible();
+  await expect(page.getByRole("menu", { name: "文档操作", exact: true })).toBeVisible();
+
+  console.log("Popover.Menu docs: content-sized triggers on desktop/mobile and in the gallery; popup widths and alignment preserved");
 } finally {
   await browser?.close();
   await server?.close();

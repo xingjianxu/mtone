@@ -26,7 +26,7 @@ export default function Demo() {
   return (
     <div style={stackStyle}>
       <M.Menu
-        trigger={<M.Button>文档操作</M.Button>}
+        label="文档操作"
         items={[
           {
             type: "group",

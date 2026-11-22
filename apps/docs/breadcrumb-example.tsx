@@ -55,7 +55,7 @@ export function BreadcrumbExample() {
           ]}
         />
         <Text muted>
-          复用 Menu 的键盘操作、分组和二级菜单；当前目录：{project}。
+          复用 Popover.Menu 的键盘操作、分组和二级菜单；当前目录：{project}。
         </Text>
       </section>
       <section aria-label="链接和菜单">

@@ -2282,7 +2282,7 @@ export default function Demo() {
         name: "AdminLayout.Header.extra",
         type: "ReactNode",
         description:
-          "顶部右对齐操作插槽，可组合 Button、Menu、Avatar 等。",
+          "顶部右对齐操作插槽，可组合 Button、Popover.Menu、Avatar 等。",
       },
       {
         name: "AdminLayout.Header.children",
@@ -2419,10 +2419,10 @@ export default function Demo() {
   {
     name: "ButtonGroup",
     description: "将关联按钮组织为一个操作组，支持默认分开排列或相连组合。",
-    importNames: ["ButtonGroup", "Button", "Menu"],
-    code: "import { useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { ButtonGroup, Button, Menu } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [message, setMessage] = useState(\"\");\n  return (\n    <div>\n      <ButtonGroup connected aria-label=\"导出文档\">\n        <Button onClick={() => setMessage(\"已选择导出 PDF\")}>导出 PDF</Button>\n        <Menu\n          trigger={<Button iconOnly aria-label=\"更多导出格式\"><ChevronDown size={14} /></Button>}\n          items={[\n            { key: \"markdown\", label: \"导出 Markdown\", onSelect: () => setMessage(\"已选择导出 Markdown\") },\n            { key: \"html\", label: \"导出 HTML\", onSelect: () => setMessage(\"已选择导出 HTML\") },\n          ]}\n        />\n      </ButtonGroup>\n      <p role=\"status\">{message}</p>\n    </div>\n  );\n}",
+    importNames: ["ButtonGroup", "Button", "Popover"],
+    code: "import { useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { ButtonGroup, Button, Popover } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [message, setMessage] = useState(\"\");\n  return (\n    <div>\n      <ButtonGroup connected aria-label=\"导出文档\">\n        <Button onClick={() => setMessage(\"已选择导出 PDF\")}>导出 PDF</Button>\n        <Popover.Menu\n          trigger={<Button iconOnly aria-label=\"更多导出格式\"><ChevronDown size={14} /></Button>}\n          items={[\n            { key: \"markdown\", label: \"导出 Markdown\", onSelect: () => setMessage(\"已选择导出 Markdown\") },\n            { key: \"html\", label: \"导出 HTML\", onSelect: () => setMessage(\"已选择导出 HTML\") },\n          ]}\n        />\n      </ButtonGroup>\n      <p role=\"status\">{message}</p>\n    </div>\n  );\n}",
     props: [
-      { name: "size", type: "ButtonSize", description: "未单独设置尺寸的 Button 会继承，含 Menu 的 Button 触发器；支持 small / normal / large 与 sm / md / lg，外层未设置时为 normal。" },
+      { name: "size", type: "ButtonSize", description: "未单独设置尺寸的 Button 会继承，含 Popover.Menu 的 Button 触发器；支持 small / normal / large 与 sm / md / lg，外层未设置时为 normal。" },
       { name: "connected", type: "boolean", default: "false", description: "相连样式：移除间距、共享边框，仅保留外侧圆角。" },
       {
         name: "children",
@@ -2436,7 +2436,7 @@ export default function Demo() {
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ['Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置 Button（可使用 iconOnly）；在 ButtonGroup 设置 size 可统一尺寸，子按钮显式 size 会覆盖继承值。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
+    notes: ['Popover.Menu 的 trigger 直接渲染为组内按钮，无需外层包裹；主按钮执行默认动作，箭头按钮打开其他选项。示例只展示操作反馈，不下载真实文件。', '默认保留 4px 间距。相连模式请直接放置 Button（可使用 iconOnly）；在 ButtonGroup 设置 size 可统一尺寸，子按钮显式 size 会覆盖继承值。', '使用 aria-label 为操作组命名；保留各按钮的原生 Tab 导航，不是单选分段控件。', '危险实心按钮使用 <Button danger variant="solid">删除</Button>。'],
   },
   {
   "name": "Input",
@@ -3490,8 +3490,8 @@ export default function Demo() {
         },
         {
           "name": "items[].menu",
-          "type": "Omit<MenuProps, 'trigger'>",
-          "description": "复用本库 Menu：items、onSelect、open/defaultOpen/onOpenChange、width、align。支持分组、禁用及二级菜单；默认内容自适应宽度。空菜单不渲染按钮。"
+          "type": "Omit<PopoverMenuProps, 'trigger'>",
+          "description": "复用本库 Popover.Menu：items、onSelect、open/defaultOpen/onOpenChange、width、align。支持分组、禁用及二级菜单；默认内容自适应宽度。空菜单不渲染按钮。"
         },
         {
           "name": "items[].onClick",
@@ -3514,7 +3514,7 @@ export default function Demo() {
       "notes": [
         "保持 label/href API 与最后一项 aria-current=\"page\" 的行为；无 href/onClick/menu 的祖先项是普通文本，不创建无目标链接。",
         "链接或操作同时带 menu 时文字与箭头按钮独立；末项带菜单时仍单独保留当前页文本。不要在 label 内嵌入链接或按钮。",
-        "菜单通过点击、Enter/Space 或 ArrowDown 展开，复用 Menu 的方向键、Esc 和焦点返回。菜单项导航通过 onSelect 交给应用路由；本组件不拼接路由参数。",
+        "菜单通过点击、Enter/Space 或 ArrowDown 展开，复用 Popover.Menu 的方向键、Esc 和焦点返回。菜单项导航通过 onSelect 交给应用路由；本组件不拼接路由参数。",
         "灰色 hover、无下划线，保留可见键盘焦点。紧凑图标与正文居中，窄容器自动换行。"
       ]
   },
@@ -3918,7 +3918,7 @@ export default function Demo() {
     ],
     notes: [
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。",
-      "Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一操作入口用 Menu，任意自定义浮层内容用 Popover。三者共享浮层样式，Menubar 与 Menu 保留菜单语义，不嵌套额外 dialog。",
+      "Menubar 是多个命令菜单的协调容器，一次打开一个顶层菜单；单一浮层操作入口用 Popover.Menu，页面内操作列表用 Menu，自定义浮层内容用 Popover。Menubar 与 Popover.Menu 保留菜单语义，不嵌套额外 dialog。",
       "菜单栏作为一个 Tab 停靠点，左右方向键移动顶层焦点；Enter、Space 或向下键进入菜单，Escape 退出并返回触发项。键盘逻辑由 Base UI 管理。快捷键文字仅展示，不注册全局快捷键。",
       "RTL 同时提供 @base-ui/react/direction-provider 的 DirectionProvider direction=rtl 与 DOM dir=rtl；start/end 和左右方向键按方向上下文工作。",
       "菜单栏保持单行，窄屏时横向滚动；浮层受可用视口宽高限制。保留 mtone 紧凑高度、灰色背景与淡蓝色细边框。",
@@ -3928,58 +3928,38 @@ export default function Demo() {
   },
   {
     name: "Menu",
-    description: "默认点击打开的操作菜单，可启用悬停，支持分组与多级子菜单。",
-    importNames: ["Menu", "Button"],
-    code: 'import { Menu } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu trigger="文档操作" items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
+    description: "不带触发器的内联操作菜单，支持分组、子菜单和方向键导航。",
+    importNames: ["Menu"],
+    code: 'import { Menu } from "@bixlab/mtone";\nimport { FileText } from "lucide-react";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Menu label="文档操作" items={[{type:"group",key:"files",label:"文档",children:[{key:"open",label:"打开",icon:<FileText />},{key:"export",label:"导出",children:[{key:"pdf",label:"PDF"},{key:"markdown",label:"Markdown"}]}]},{type:"divider",key:"divider"},{key:"delete",label:"移至回收站",danger:true}]} onSelect={(key) => console.log(key)} />\n  );\n}',
     props: [
-      { name: "width", type: "CSSProperties['width']", description: "主菜单默认按内容宽度（最小160px），不再与trigger等宽；可指定number像素或CSS宽度，受可用视口宽度限制。子菜单独立按内容宽度，不继承此值。" },
-      { name: "align", type: "'start' | 'end' | 'left' | 'right'", default: "start", description: "主菜单与trigger对齐边；left/right是物理左右，start/end随DirectionProvider的RTL方向变化，碰撞时可自动调整。" },
-      {
-        name: "trigger",
-        type: "string | ReactElement",
-        description: "必填。文字使用内容宽度的预设下拉按钮；传 React 元素可完全自定义触发外观。",
-      },
-      {
-        name: "triggerMode",
-        type: '"click" | "hover"',
-        default: "click",
-        description: "主菜单触发方式。hover 启用桌面鼠标悬停，仍支持点击、键盘和触屏；仅悬停打开时不移动键盘焦点。",
-      },
       {
         name: "items",
         type: "MenuEntry[]",
-        description:
-          "必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；分组 {type: 'group', key, label, children}；分隔线 {type: 'divider', key}；复选项 type: 'checkbox'；单选组 type: 'radio-group'。",
+        description: "必填；普通项 key、label，可选 icon、shortcut、disabled、danger、onSelect、children（非空时为子菜单）；也支持 group 分组、divider 分隔线、checkbox 复选项、radio-group 单选组。",
+      },
+      {
+        name: "label",
+        type: "string",
+        description: "菜单的可访问名称，默认随语言显示为“菜单”或 Menu；同一页面有多个菜单时分别命名。",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "菜单容器的附加样式类。",
       },
       {
         name: "onSelect",
         type: "(key: string) => void",
-        description: "选中叶子项时调用；展开子菜单不触发。先执行项自己的 onSelect，再执行此回调。",
-      },
-      {
-        name: "open",
-        type: "boolean",
-        description: "受控开关。",
-      },
-      {
-        name: "defaultOpen",
-        type: "boolean",
-        description: "非受控初始开关。",
-      },
-      {
-        name: "onOpenChange",
-        type: "(open: boolean) => void",
-        description: "开关变化回调。",
+        description: "普通叶子命令选中时调用；先执行条目的 onSelect。打开子菜单或切换复选/单选项不触发。",
       },
     ],
     notes: [
-      "悬停时鼠标可以从触发器跨过间隙进入菜单并继续进入子菜单；离开菜单区域后关闭。受控 open / onOpenChange 与条目选择规则不变。",
+      "Menu 不渲染触发按钮或外层浮层；点击或悬停触发的操作菜单请使用 Popover.Menu。",
+      "可以把 Menu 作为普通 Popover 自定义内容的一部分；选中菜单项不会替应用关闭外层 Popover，需要时在 onSelect 中更新外层的受控 open。",
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。",
-      "Menu 与 Popover 共用浮层定位和外观基础，但 Menu 保留菜单语义、方向键与选择关闭。通用自定义内容使用 Popover。默认不再跟随trigger宽度，需旧等宽效果时传具体width。RTL同时提供Base UI DirectionProvider与DOM dir。",
-      "同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。",
-      "快捷键文字仅作提示，不注册全局快捷键。自定义 trigger 需转发 ref 与 DOM props。",
-      "复选项 type: checkbox 支持 checked/defaultChecked、onCheckedChange 与 closeOnClick（默认 false）。单选组 type: radio-group 支持 label、value/defaultValue、onValueChange 与 children，子项 key 是选择值；选择后保持打开。两类选择使用各自变更回调，不调用 Menu 的 onSelect。",
-      "子菜单支持悬停、点击与左右方向键；Escape 关闭当前子菜单，再次 Escape 关闭主菜单并返回触发器。空 children 按普通叶子项处理，父项 onSelect 和 shortcut 不用于子菜单。key 请在每个同级列表内保持唯一。菜单项高亮使用灰色背景与 1px 淡蓝边框，不改变 Select 样式。",
+      "同一菜单面板任意项渲染左侧图标时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。渲染 null 的图标不计入。支持分组、分隔线、多级子菜单及空 children 叶子项。",
+      "快捷键文字仅作提示，不注册全局快捷键；条目 key 在同级内唯一。子菜单可用鼠标、方向键与 Escape 操作；内联菜单始终可用，不需要先打开。",
+      "复选项支持 checked/defaultChecked、onCheckedChange；在浮层中默认不关闭，可显式设置 closeOnClick。单选组用 value/defaultValue、onValueChange，值对应子项 key；两类选项用各自的回调，不触发外层 onSelect。",
     ],
   },
   {
@@ -4021,13 +4001,13 @@ export default function Demo() {
         description: "开关变化回调。",
       },
     ],
-    notes: ["同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。", "children 为右键区域；不要向其传 Menu 的 trigger 属性。"],
+    notes: ["同一菜单面板任意项渲染左侧 icon 时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。动态变化会同步对齐，shortcut 不参与图标判断。支持 children 子菜单、type: group 分组（label + children）与 type: divider 分隔线。icon 渲染为 null 时不占列；若自定义 icon 输出空元素或隐藏元素，仍视作图标内容。", "children 为右键区域；不接受 Popover.Menu 的 trigger 或 triggerMode。"],
   },
   {
     name: "Popover",
-    description: "点击打开的非模态浮层，适合信息、表单和自定义卡片。",
+    description: "非模态自定义浮层，以及保留菜单语义的 Popover.Menu 操作浮层。",
     importNames: ["Popover"],
-    code: 'import { Popover } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />\n  );\n}',
+    code: 'import { Popover } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <>\n      <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />\n      <Popover.Menu trigger="文档操作" items={[{ key: "open", label: "打开文档" }]} onSelect={(key) => console.log(key)} />\n    </>\n  );\n}',
     props: [
       {
         name: "trigger",
@@ -4087,9 +4067,33 @@ export default function Demo() {
         type: "(open: boolean) => void",
         description: "开关变化回调。",
       },
+      {
+        name: "Popover.Menu.items / label / onSelect",
+        type: "MenuEntry[] / string / (key: string) => void",
+        description: "操作浮层的必填条目、可访问名称及普通叶子命令选择回调；条目定义与内联 Menu 相同。",
+      },
+      {
+        name: "Popover.Menu.trigger / triggerMode",
+        type: 'string | ReactElement / "click" | "hover"',
+        description: "必填触发器及触发方式（默认 click）；hover 仍支持点击、键盘与触屏。",
+      },
+      {
+        name: "Popover.Menu.width / align",
+        type: 'CSSProperties["width"] / "start" | "end" | "left" | "right"',
+        description: "菜单面板默认随内容且最小 160px；对齐默认为 start。子菜单独立定宽。",
+      },
+      {
+        name: "Popover.Menu.open / defaultOpen / onOpenChange",
+        type: "boolean / boolean / (open: boolean) => void",
+        description: "菜单浮层的受控开关、非受控初始开关及变更回调。",
+      },
     ],
     notes: [
-      "Popover 是非模态 dialog，可使用 Tab 操作表单，Escape 关闭并恢复焦点；命令菜单请使用 Menu。自定义触发器需转发 ref 与 DOM props，浮层继承 MtoneProvider 上下文。",
+      "Popover 是非模态 dialog，可使用 Tab 操作自定义内容，Escape 关闭并恢复焦点。自定义触发器需转发 ref 与 DOM props，浮层继承 MtoneProvider 上下文。",
+      "Popover.Menu（PopoverMenuProps）适合纯操作菜单：传 trigger、items 与可选 label / onSelect；保留方向键、分组、子菜单、焦点恢复和叶子选择关闭，不另嵌套 dialog。",
+      "Popover.Menu 的 triggerMode 默认为 click，可选 hover。悬停支持鼠标跨间隙和进入子菜单，不抢占键盘焦点；点击、键盘与触屏仍可用。字符串用内容宽度的下拉预设 Button，也可传自定义元素。",
+      "Popover.Menu 的 width 默认随内容且最小 160px，align 默认 start，可传 start/end（随方向）或 left/right（物理边）；子菜单单独定宽。受控开关用 open / onOpenChange，或用 defaultOpen 设置初始状态。",
+      "普通 Popover 的 content 可组合触发器无关的 Menu 和其他内容；内联 Menu 不改变外层 Popover 的开关，应用可在 onSelect 中控制。",
     ],
   },
   {
@@ -4925,7 +4929,7 @@ export default function Demo() {
         name: "rowSelection",
         type: "TableRowSelection<T>",
         description:
-          "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用库内 Menu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。标准 checkbox 和 radio 列默认保持约 32px；有批量操作菜单时为约 56px，表头和各行对齐。更宽的自定义表头或单元格可用 columnWidth 指定宽度。",
+          "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用 Popover.Menu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。标准 checkbox 和 radio 列默认保持约 32px；有批量操作菜单时为约 56px，表头和各行对齐。更宽的自定义表头或单元格可用 columnWidth 指定宽度。",
       },
       {
         name: "expandable",

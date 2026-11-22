@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { Button, Menu, Text } from "../../../packages/mtone/src";
+import { Button, Popover, Text } from "../../../packages/mtone/src";
 
 const items = [
   { key: "pdf", label: "导出 PDF" },
@@ -13,13 +13,13 @@ export default function Demo() {
     setChoice(`${name}：${key}`);
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <Menu
+      <Popover.Menu
         trigger="默认文字触发"
         items={items}
         onSelect={select("默认文字")}
       />
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <Menu
+        <Popover.Menu
           trigger={
             <Button variant="soft" preset="dropdown">
               预设按钮触发
@@ -28,7 +28,7 @@ export default function Demo() {
           items={items}
           onSelect={select("预设按钮")}
         />
-        <Menu
+        <Popover.Menu
           trigger={
             <Button
               variant="ghost"

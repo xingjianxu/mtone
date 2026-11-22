@@ -33,7 +33,7 @@ Navigation row gaps, group headings and the collapsed sidebar controls are uncha
   AutoComplete keep 24px small and 34px large variants; their default is now 32px.
 - Button and ButtonGroup use `small` / `normal` / `large` (28 / 32 / 36px).
   The aliases `sm` / `md` / `lg` are still accepted. Explicit Button sizes
-  override an inherited group size, including for Menu triggers.
+  override an inherited group size, including for `Popover.Menu` triggers.
 - Single-line control text uses a 20px line height without resizing its font.
   For a normal 32px control, each block inset is 6px inclusive of any
   border (5px padding if a 1px border is present). Icon-only Button stays

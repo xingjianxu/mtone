@@ -54,7 +54,7 @@ export const buttonDocSections = [
   {
     id: "dropdown-preset",
     title: "下拉按钮外观",
-    note: 'preset="dropdown" 只添加装饰箭头。示例仍是普通按钮，点击不会打开菜单；需要下拉行为时请组合 Menu。',
+    note: 'preset="dropdown" 只添加装饰箭头。示例仍是普通按钮，点击不会打开菜单；需要下拉行为时请组合 Popover.Menu。',
     Demo: PresetDemo,
     source: presetSource.replace("../../../packages/mtone/src", "@bixlab/mtone"),
   },

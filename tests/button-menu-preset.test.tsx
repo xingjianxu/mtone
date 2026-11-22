@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Button } from "../packages/mtone/src/basic";
-import { Menu } from "../packages/mtone/src/interactive";
+import { Popover } from "../packages/mtone/src/interactive";
 
 const items = [{ key: "edit", label: "Edit document" }];
 
@@ -60,7 +60,7 @@ describe("Dropdown preset and string Menu trigger", () => {
     const user = userEvent.setup();
     const selected = vi.fn();
     render(
-      <Menu trigger="Document actions" items={items} onSelect={selected} />,
+      <Popover.Menu trigger="Document actions" items={items} onSelect={selected} />,
     );
     const trigger = screen.getByRole("button", { name: "Document actions" });
     expect(trigger).toHaveClass("mt-btn");
@@ -91,8 +91,8 @@ describe("Dropdown preset and string Menu trigger", () => {
     render(
       <>
         <button>Current focus</button>
-        <Menu trigger="Hover actions" triggerMode="hover" items={items} />
-        <Menu
+        <Popover.Menu trigger="Hover actions" triggerMode="hover" items={items} />
+        <Popover.Menu
           trigger={<button className="custom">Custom trigger</button>}
           items={items}
         />

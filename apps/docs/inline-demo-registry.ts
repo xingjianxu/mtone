@@ -47,8 +47,14 @@ import Example16_0 from "./inline-demos/pagination-usage";
 import Example16_0Raw from "./inline-demos/pagination-usage.tsx?raw";
 import Example17_0 from "./inline-demos/menu-usage";
 import Example17_0Raw from "./inline-demos/menu-usage.tsx?raw";
-import Example17_1 from "./inline-demos/menu-alignment";
-import Example17_1Raw from "./inline-demos/menu-alignment.tsx?raw";
+import Menu0 from "./secondary-demos/menu-usage";
+import Menu0Source from "./secondary-demos/menu-usage.tsx?raw";
+import Menu1 from "./secondary-demos/menu-alignment";
+import Menu1Source from "./secondary-demos/menu-alignment.tsx?raw";
+import MenuTriggerOptions from "./secondary-demos/menu-trigger-options";
+import MenuTriggerOptionsSource from "./secondary-demos/menu-trigger-options.tsx?raw";
+import MenuTriggerMode from "./secondary-demos/menu-trigger-mode";
+import MenuTriggerModeSource from "./secondary-demos/menu-trigger-mode.tsx?raw";
 import Example18_0 from "./inline-demos/context-menu-usage";
 import Example18_0Raw from "./inline-demos/context-menu-usage.tsx?raw";
 import Example19_0 from "./inline-demos/popover-usage";
@@ -140,6 +146,29 @@ import TagChoice from "./inline-demos/tag-select-usage";
 import TagChoiceRaw from "./inline-demos/tag-select-usage.tsx?raw";
 import TagDisclosure from "./inline-demos/tag-select-disclosure";
 import TagDisclosureRaw from "./inline-demos/tag-select-disclosure.tsx?raw";
+
+const popoverMenuTriggerSections: readonly DocSection[] = [
+  {
+    id: "trigger-options",
+    title: "三种触发按钮",
+    note: "Popover.Menu 的文字触发使用内容宽度按钮；也可传预设按钮或任意自定义触发元素。",
+    Demo: MenuTriggerOptions,
+    source: source(MenuTriggerOptionsSource),
+  },
+  {
+    id: "trigger-mode",
+    title: "点击与悬停触发",
+    note: "默认点击打开。悬停模式支持鼠标从触发按钮移动到菜单和子菜单，不抢占键盘焦点；点击、键盘与触屏仍可使用。",
+    Demo: MenuTriggerMode,
+    source: source(MenuTriggerModeSource),
+  },
+  {
+    id: "alignment",
+    title: "对齐与宽度",
+    Demo: Menu1,
+    source: source(Menu1Source),
+  },
+];
 
 export const inlineDocSections: Readonly<
   Record<string, readonly DocSection[]>
@@ -301,16 +330,12 @@ export const inlineDocSections: Readonly<
   Menu: [
     {
       id: "usage",
-      title: "分组与子菜单",
+      title: "内联分组与子菜单",
+      note: "Menu 只渲染菜单内容，不生成触发按钮，也不控制外层浮层。按 Tab 进入菜单后可用方向键浏览。",
       Demo: Example17_0,
       source: source(Example17_0Raw),
     },
-    {
-      id: "alignment",
-      title: "对齐与宽度",
-      Demo: Example17_1,
-      source: source(Example17_1Raw),
-    },
+    ...popoverMenuTriggerSections,
   ],
   ContextMenu: [
     {
@@ -339,6 +364,14 @@ export const inlineDocSections: Readonly<
       note: "有边框的 Card 自带外观。使用 unstyled 去掉 Popover 的外框，保留定位、键盘操作和开关行为。",
       Demo: PopoverCard,
       source: source(PopoverCardSource),
+    },
+    {
+      id: "menu",
+      title: "操作菜单 Popover.Menu",
+      note: "操作浮层保留菜单语义、方向键和选择关闭，不在非模态 dialog 中另嵌一层菜单。",
+      Demo: Menu0,
+      source: source(Menu0Source),
+      children: popoverMenuTriggerSections,
     },
   ],
   Tooltip: [

@@ -5,12 +5,15 @@ import { it, expect } from "vitest";
 import { componentDocs } from "../apps/docs/catalog";
 import { docSections } from "../apps/docs/docs-app";
 
-it("documents Popover and Menu width and alignment without a standalone Dropdown", () => {
+it("documents width and alignment on the Popover hosts, not on inline Menu", () => {
   expect(componentDocs.some((doc) => doc.name === "Dropdown")).toBe(false);
-  for (const name of ["Popover", "Menu"]) {
-    const props = componentDocs.find((doc) => doc.name === name)!.props.map((prop) => prop.name);
-    expect(props).toEqual(expect.arrayContaining(["width", "align"]));
-  }
+  const propNames = (name: string) =>
+    componentDocs.find((doc) => doc.name === name)!.props.map((prop) => prop.name);
+  expect(propNames("Popover")).toEqual(
+    expect.arrayContaining(["width", "align", "Popover.Menu.width / align"]),
+  );
+  expect(propNames("Menu")).toContain("items");
+  for (const name of ["width", "align", "trigger"]) expect(propNames("Menu")).not.toContain(name);
 });
 
 it("the Popover card demo opens a named dialog containing an editable form", async () => {

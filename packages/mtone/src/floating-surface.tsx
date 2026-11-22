@@ -27,6 +27,8 @@ export function FloatingSurface({
   unstyled,
   finalFocus,
   initialFocus,
+  popupRef,
+  onKeyDown,
 }: Omit<FloatingLayoutProps, "align"> & {
   children: React.ReactNode;
   kind?: "popover" | "menu" | "submenu" | "context";
@@ -34,8 +36,10 @@ export function FloatingSurface({
   side?: "top" | "bottom" | "left" | "right";
   unstyled?: boolean;
   label?: string;
-  finalFocus?: boolean | (() => boolean);
-  initialFocus?: boolean;
+  finalFocus?: BPopover.Popup.Props["finalFocus"];
+  initialFocus?: BPopover.Popup.Props["initialFocus"];
+  popupRef?: React.Ref<HTMLDivElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
 }) {
   const direction = useDirection();
   const owner = React.useContext(MenuSurfaceOwnerContext);
@@ -72,6 +76,8 @@ export function FloatingSurface({
           align={kind === "submenu" ? "start" : resolvedAlign}
         >
           <Primitive.Popup
+            ref={popupRef}
+            onKeyDown={onKeyDown}
             finalFocus={finalFocus}
             initialFocus={initialFocus}
             data-menu-owner={kind === "popover" ? undefined : owner}

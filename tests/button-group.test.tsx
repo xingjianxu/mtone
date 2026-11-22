@@ -3,7 +3,7 @@ import { expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import postcss from "postcss";
 import { Button, ButtonGroup } from "../packages/mtone/src/basic";
-import { Menu } from "../packages/mtone/src";
+import { Popover } from "../packages/mtone/src";
 
 it("keeps separated groups as the default and supports connected groups without forwarding the prop", () => {
   const { rerender } = render(<ButtonGroup aria-label="Actions"><Button>Copy</Button></ButtonGroup>);
@@ -46,7 +46,7 @@ it("inherits canonical sizes through composed triggers and nested groups; explic
   render(
     <ButtonGroup size="small" aria-label="Outer">
       <Button>Primary</Button>
-      <Menu trigger={<Button iconOnly aria-label="More">+</Button>} items={[{ key: "open", label: "Open" }]} />
+      <Popover.Menu trigger={<Button iconOnly aria-label="More">+</Button>} items={[{ key: "open", label: "Open" }]} />
       <Button size="lg">Large override</Button>
       <ButtonGroup aria-label="Inner">
         <Button>Nested inherited</Button>

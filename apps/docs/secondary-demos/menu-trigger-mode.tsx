@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { Button, Menu, Text, type MenuItem } from "../../../packages/mtone/src";
+import { Button, Popover, Text, type MenuItem } from "../../../packages/mtone/src";
 
 const items: MenuItem[] = [
   { key: "open", label: "打开文档" },
@@ -20,14 +20,14 @@ export default function Demo() {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <Menu
+        <Popover.Menu
           trigger={
             <Button rightSection={<ChevronDown size={14} />}>点击打开</Button>
           }
           items={items}
           onSelect={(key) => setSelected(`点击菜单：${key}`)}
         />
-        <Menu
+        <Popover.Menu
           triggerMode="hover"
           trigger={
             <Button rightSection={<ChevronDown size={14} />}>悬停打开</Button>
