@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.10.0
+
+### Breaking changes
+- Use `Popover.Menu` for a triggered menu. `Menu` renders menu content on its own; `ContextMenu` and `Menubar` reuse that content without giving up their trigger behavior.
+- Consolidate Badge, FilterChip and FilterBar into Tag and the filter composition example; use Upload in place of Dropzone and the segmented RadioGroup variant in place of Segmented.
+- Remove overlapping aliases for Toast, DirectoryTree, AiChainOfThought, Modal, DropdownMenu, Mention, SearchInput, Textarea and FormField. See the [upgrade notes](docs/MIGRATION.md) for replacements.
+
+### Added
+- `SectionGroup` for titled content sections with trailing controls and evenly spaced separators.
+- `PageLayout` supports an optional left or right Sidebar, and can span the entire header and Tabs, span the heading area only, or keep both in the main column. Tabs are optional.
+- Nonvirtual data Lists can opt into controlled reordering with a whole-row drag preview and live insertion feedback.
+
+### Fixed
+- Keep the default Table selection column compact, with extra room only when needed for batch actions.
+- Restore the Popover card example's default frame and shadow, and fix soft Button hover feedback.
+- Reuse TableOfContents for the docs outline, and center the active sidebar link on direct navigation without disturbing manual sidebar navigation.
+
 ## 0.9.0
 
 ### Breaking and migration

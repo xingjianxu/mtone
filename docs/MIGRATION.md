@@ -1,19 +1,33 @@
-# Changes on master after 0.9.0
+# Upgrade notes for 0.10.0
 
-Use the guidance for your installed version. The following removals apply to
-the current repository version, not to the published 0.9.0 package.
+This release consolidates overlapping components and removes the old names without compatibility aliases.
 
 | Removed export | Use instead |
 | --- | --- |
+| `Badge` | `Tag` |
+| `FilterChip` | `Tag variant="filter"` |
+| `FilterBar` | Compose filter tags and controls; see the Tag documentation example |
+| `Dropzone` | `Upload` |
+| `Segmented` | `RadioGroup variant="segmented"` |
 | `Toast` | `ToastProvider` with `useToast` |
-| `DirectoryTree` | `<Tree directory />` |
+| `DirectoryTree` | `Tree directory` |
 | `AiChainOfThought` / `AiChainOfThoughtProps` | `AiTask` / `AiTaskProps`; set a summary title explicitly |
 | `Modal` / `ModalProps` | `Dialog` / `DialogProps` |
-| `DropdownMenu` / `DropdownMenuProps` | `Menu` / `MenuProps` |
+| `DropdownMenu` / `DropdownMenuProps` | `Popover.Menu` / `PopoverMenuProps` for a triggered menu |
 | `Mention` | `Mentions` |
 | `SearchInput` | `Input.Search` |
 | `Textarea` | `Input.TextArea` |
 | `FormField` | `Form.Item` |
+
+## Menu triggers
+
+`Menu` now renders the menu content only. If you used `<Menu trigger={...} items={...} />`, switch to `<Popover.Menu trigger={...} items={...} />` and use `PopoverMenuProps` for the trigger-based API. For mixed content such as a card, use `Popover` with a custom `content` node. An inline `Menu` inside a generic `Popover` does not automatically dismiss it when an item is selected; use controlled open state if needed.
+
+```tsx
+import { Popover } from "@bixlab/mtone";
+
+const actions = <Popover.Menu trigger="Actions" items={[{ key: "edit", label: "Edit" }]} />;
+```
 
 # Upgrade notes for 0.9.0
 
