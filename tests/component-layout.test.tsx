@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { DocsApp, parseRoute, docSections, componentDocHref } from "../apps/docs/docs-app";
 
 import type { DocSection } from "../apps/docs/doc-section";
@@ -74,4 +74,38 @@ test("docs use one library TOC with nested links and refocus the same routed sec
   fireEvent.click(searchLink);
   await waitFor(() => expect(document.activeElement).toBe(target));
   expect(window.location.hash).toBe("#/components/Input?section=input-search-submit");
+});
+
+test("PageLayout sidebar demo uses NavGroup for the category links", () => {
+  window.location.hash = "#/components/PageLayout?section=sidebar";
+  render(<DocsApp />);
+  const sidebar = screen.getByRole("complementary", { name: "资料分类" });
+  const group = within(sidebar).getByRole("button", { name: "全部资料" }).closest(".mt-nav-group");
+  expect(group).toContainElement(within(sidebar).getByRole("button", { name: "参考材料" }));
+});
+
+test("demo disclosure uses Typography.Code and copies the exact source", async () => {
+  window.location.hash = "#/components/PageLayout?section=sidebar";
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  const clipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+  try {
+    render(<DocsApp />);
+    const demo = document.getElementById("sidebar")!.parentElement!;
+    const disclosure = within(demo).getByText("查看代码", { exact: true }).closest("details")!;
+    expect(disclosure.open).toBe(false);
+    fireEvent.click(disclosure.querySelector("summary")!);
+    expect(disclosure.open).toBe(true);
+    const block = disclosure.querySelector("pre");
+    const expected = docSections.PageLayout.find(({ id }) => id === "sidebar")!.source;
+    expect(block).toHaveClass("mt-typography-code-block");
+    expect(block).toHaveAttribute("tabindex", "0");
+    expect(block?.querySelector("code")?.textContent).toBe(expected);
+    fireEvent.click(within(disclosure).getByRole("button", { name: "复制代码" }));
+    await waitFor(() => expect(within(disclosure).getByRole("status")).toHaveTextContent("已复制"));
+    expect(writeText).toHaveBeenCalledWith(expected);
+  } finally {
+    if (clipboard) Object.defineProperty(navigator, "clipboard", clipboard);
+    else Reflect.deleteProperty(navigator, "clipboard");
+  }
 });

@@ -1,4 +1,4 @@
-# Upgrade notes for 0.10.0
+# Upgrade notes for 0.10.x
 
 This release consolidates overlapping components and removes the old names without compatibility aliases.
 

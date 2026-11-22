@@ -1,6 +1,6 @@
 {
   "name": "@bixlab/mtone",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "type": "module",
   "description": "Compact, ready-styled React components powered by Base UI",
   "files": [

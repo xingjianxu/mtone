@@ -76,11 +76,19 @@ it('keeps the topbar at 48px and both layout footers at 42px',()=>{
 
 it('uses border color only for all bordered input focus surfaces', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
-  const rules = css.slice(css.indexOf('/* Bordered input surfaces:'));
-  expect(rules).toContain('border-color: var(--mt-focus, #93b4dc)');
-  expect(rules).toContain('outline: none');
-  expect(rules).not.toMatch(/border-width|padding|height|box-shadow/);
-  expect(rules).toContain(':not([aria-invalid="true"])');
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(([, selector]) =>
+    selector.includes(':is(.mt-input, .mt-select)') &&
+    selector.includes(':is(.mt-number-group, .mt-multiselect)') &&
+    selector.includes(':focus-within')
+  );
+  const colorRule = rules.find(([, , declarations]) =>
+    declarations.includes('border-color: var(--mt-focus, #93b4dc)')
+  );
+  expect(colorRule?.[1] ?? '').toContain(':not([aria-invalid="true"])');
+  expect(rules.some(([, , declarations]) => declarations.includes('outline: none'))).toBe(true);
+  for (const [, , declarations] of rules) {
+    expect(declarations).not.toMatch(/border-width|padding|height|box-shadow/);
+  }
 });
 
 it('uses border-box standard single-line surfaces without fixing multiline chips', () => {
@@ -101,10 +109,14 @@ it('uses border-box standard single-line surfaces without fixing multiline chips
  expect(filter).toContain('height: var(--mt-height, 32px)');expect(filter).toContain('box-sizing: border-box');
 });
 
-it('reserves menu icon columns for all grouped rows of a panel with rendered icons',()=>{
- const css=readFileSync('packages/mtone/src/interactive.css','utf8');
- expect(css).toContain('.mt-menu-popup:has(.mt-menu-icon:not(:empty)) .mt-menu-icon');
- const icon=css.slice(css.indexOf('.mt-menu-icon {')).split('}')[0];expect(icon).toContain('display: none');expect(icon).toContain('flex: 0 0 16px');
+it('reserves menu icon columns for all grouped rows of popup and inline menus with rendered icons', () => {
+  const css = readFileSync('packages/mtone/src/interactive.css', 'utf8');
+  const icon = css.slice(css.indexOf('.mt-menu-icon {')).split('}')[0];
+  expect(icon).toContain('display: none');
+  expect(icon).toContain('flex: 0 0 16px');
+  const selector = ':is(.mt-menu-popup, .mt-inline-menu):has(.mt-menu-icon:not(:empty)) .mt-menu-icon';
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+  expect(rules.find(([, rule]) => rule.trim().endsWith(selector))?.[2] ?? '').toContain('display: inline-flex');
 });
 
 it('keeps Select and MultiSelect highlights background-only, including forced colors', () => {

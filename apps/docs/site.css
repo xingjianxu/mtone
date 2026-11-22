@@ -324,30 +324,13 @@ section:not(:where(.example-stage *)) > p {
 .example-stage > * {
   max-width: 100%;
 }
-.source-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  background: var(--docs-sidebar);
-  border: 1px solid var(--docs-border);
-  border-top: 0;
-  padding: 9px;
-  color: var(--docs-muted);
-  font-size: 11px;
-}
 .code-box {
   border: 1px solid var(--docs-border);
   border-radius: 7px;
   overflow: hidden;
   background: var(--docs-code);
   margin: 15px 0;
-}
-.source-toggle + .code-box {
-  margin-top: 0;
-  border-top: 0;
-  border-radius: 0 0 7px 7px;
+  min-inline-size: 0;
 }
 .code-head {
   display: flex;
@@ -369,13 +352,11 @@ section:not(:where(.example-stage *)) > p {
   font-size: 11px;
   color: var(--docs-muted);
 }
-.code-box pre {
+.code-box > .mt-typography-code-block {
+  max-block-size: min(60vh, 32rem);
   overflow: auto;
-  margin: 0;
-  padding: 19px 20px;
-  font-size: 12px;
-  line-height: 1.85;
-  color: var(--docs-accent-code);
+  border: 0;
+  border-radius: 0;
   tab-size: 2;
 }
 .props-scroll {
@@ -569,10 +550,6 @@ section:not(:where(.example-stage *)) > p {
   .props-table th,
   .props-table td {
     padding: 10px 9px;
-  }
-  .code-box pre {
-    font-size: 11px;
-    padding: 14px;
   }
   .docs-footer {
     flex-wrap: wrap;

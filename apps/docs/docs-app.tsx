@@ -25,7 +25,7 @@ import { inlineDocSections } from "./inline-demo-registry";
 import { aiDocSections, aiSectionHref } from "./ai-demos";
 import { ShowcasePage } from "./showcase-page";
 import { ThemeSelect, useThemePreference } from "./theme-preference";
-import { CodeBlock } from "./code-block";
+import { CodeBlock, DemoSource } from "./code-block";
 import { ColorPresets, colorPresetsHeading, colorPresetsHref } from "./color-presets";
 export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "color-presets" | "not-found" }
@@ -86,7 +86,7 @@ function DocDemo({ item, level }: { item: DocSection; level: number }) {
     {item.relatedLink && <p>另见：<a className="docs-inline-link" href={item.relatedLink.href}>{item.relatedLink.label}</a>。</p>}
     {item.Demo && <div className="component-demo-card">
       <div className="component-demo-stage example-stage"><item.Demo /></div>
-      {item.source && <details className="component-demo-source"><summary>查看代码</summary><CodeBlock code={item.source} /></details>}
+      {item.source && <DemoSource code={item.source} />}
     </div>}
     {item.children?.map((child) => <DocDemo key={child.id} item={child} level={level + 1} />)}
   </section>;

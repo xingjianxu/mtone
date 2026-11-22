@@ -42,12 +42,36 @@ try {
     const targetTop = await page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top);
     assert(targetTop >= 70 && targetTop <= 105, `same-hash routed section at ${targetTop}`);
     const demo = page.locator(`#${id}`).locator("..");
-    const codeToggle = demo.getByText("查看代码", { exact: true });
-    await codeToggle.click();
-    const code = await demo.locator("pre > code").textContent();
+    const source = demo.locator("details.component-demo-source");
+    const codeToggle = source.locator("summary").filter({ hasText: "查看代码" });
+    const codeBlock = source.locator("pre.mt-typography-code-block");
+    assert.equal(await source.evaluate((element) => element.open), false);
+    assert.equal(await source.locator(".mt-code-token").count(), 0);
+    await codeToggle.press("Enter");
+    await codeBlock.waitFor();
+    const code = await codeBlock.locator("code").textContent();
     assert(code.includes("@bixlab/mtone") && code.includes("Table"));
-    await demo.getByRole("button", { name: "复制代码" }).click();
+    await codeBlock.locator(".mt-code-token").first().waitFor();
+    assert.equal(await codeBlock.locator("code").textContent(), code);
+    const copy = source.getByRole("button", { name: "复制代码" });
+    await codeToggle.press("Tab");
+    assert(await copy.evaluate((el) => el === document.activeElement));
+    await copy.press("Enter");
     await page.waitForFunction((code) => window.lastClipboardWrite === code, code);
+    await copy.press("Tab");
+    assert(await codeBlock.evaluate((el) => el === document.activeElement));
+    const geometry = await codeBlock.evaluate((el) => ({
+      scrollsVertically: el.scrollHeight > el.clientHeight && el.clientHeight <= window.innerHeight * .6,
+      scrollsHorizontally: el.scrollWidth > el.clientWidth && getComputedStyle(el).overflowX === "auto",
+      fitsDisclosure: el.getBoundingClientRect().right <= el.closest("details").getBoundingClientRect().right + 1,
+    }));
+    assert(geometry.scrollsVertically && geometry.fitsDisclosure, JSON.stringify(geometry));
+    if (width < 500) assert(geometry.scrollsHorizontally, JSON.stringify(geometry));
+    await codeToggle.press("Space");
+    await codeBlock.waitFor({ state: "hidden" });
+    await codeToggle.press("Enter");
+    await codeBlock.waitFor();
+    assert.equal(await codeBlock.locator("code").textContent(), code);
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await page.waitForFunction(() => {
@@ -60,7 +84,7 @@ try {
     await page.waitForFunction(() => document.activeElement?.id === "input-search");
     assert.equal(await page.getByRole("heading", { level: 1, name: "Input", exact: true }).count(), 1);
   }
-  console.log("Component docs: desktop/mobile outline, deep links, exact clipboard source and Input section links passed");
+  console.log("Component docs: desktop/mobile outline, deep links, keyboard code disclosure, exact clipboard source and Input section links passed");
 } finally {
   await browser?.close();
   await server.close();

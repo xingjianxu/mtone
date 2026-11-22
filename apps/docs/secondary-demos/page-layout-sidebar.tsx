@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, NavItem, PageLayout, Sidebar, Tabs } from "../../../packages/mtone/src";
+import { Button, NavGroup, NavItem, PageLayout, Sidebar, Tabs } from "../../../packages/mtone/src";
 
 const headerSpanOptions = [
   ["full", "跨整页"],
@@ -38,10 +38,12 @@ export default function Demo() {
         ]} />}
         sidebarPosition={position}
         headerSpan={span}
-        sidebar={<Sidebar aria-label="资料分类" header="资料分类">
-          <NavItem active>全部资料</NavItem>
-          <NavItem>项目文档</NavItem>
-          <NavItem>参考材料</NavItem>
+        sidebar={<Sidebar aria-label="资料分类">
+          <NavGroup label="资料分类">
+            <NavItem active>全部资料</NavItem>
+            <NavItem>项目文档</NavItem>
+            <NavItem>参考材料</NavItem>
+          </NavGroup>
         </Sidebar>}
       >
         <div style={{ padding: 12, background: "var(--mt-subtle)", borderRadius: 4 }}>

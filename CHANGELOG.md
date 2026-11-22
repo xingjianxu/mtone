@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.10.0
+## 0.10.1
+
+The 0.10.0 tag did not reach npm. This version contains the complete update from 0.9.0.
 
 ### Breaking changes
 - Use `Popover.Menu` for a triggered menu. `Menu` renders menu content on its own; `ContextMenu` and `Menubar` reuse that content without giving up their trigger behavior.
@@ -15,7 +17,7 @@
 ### Fixed
 - Keep the default Table selection column compact, with extra room only when needed for batch actions.
 - Restore the Popover card example's default frame and shadow, and fix soft Button hover feedback.
-- Reuse TableOfContents for the docs outline, and center the active sidebar link on direct navigation without disturbing manual sidebar navigation.
+- Reuse TableOfContents for the docs outline, NavGroup in the PageLayout sidebar demo, and Typography.Code for example source. Center the active sidebar link on direct navigation without disturbing manual sidebar navigation.
 
 ## 0.9.0
 
