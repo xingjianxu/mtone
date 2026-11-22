@@ -2,6 +2,8 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Button, Input, MtoneProvider, Toolbar } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
+import NarrowDemo from "../../apps/docs/inline-demos/toolbar-narrow";
+import WideDemo from "../../apps/docs/inline-demos/toolbar-table";
 
 function Example({ name, width, theme, dir, background, flexRow }: {
   name: string;
@@ -35,10 +37,19 @@ function Example({ name, width, theme, dir, background, flexRow }: {
   );
 }
 
-createRoot(document.getElementById("root")!).render(<>
-  <Example name="Wide light" width={680} theme="light" dir="ltr" background="white" />
-  <Example name="Narrow light" width={320} theme="light" dir="ltr" background="gray" />
-  <Example name="Wide dark RTL" width={680} theme="dark" dir="rtl" background="gray" />
-  <Example name="Narrow dark RTL" width={320} theme="dark" dir="rtl" background="white" />
-  <Example name="Auto-width flex row" width={680} theme="light" dir="ltr" background="white" flexRow />
-</>);
+createRoot(document.getElementById("root")!).render(
+  new URLSearchParams(location.search).has("framed") ? (
+    <MtoneProvider>
+      <div data-testid="wide-frame-demo" style={{ width: 720, maxWidth: "100%" }}><WideDemo /></div>
+      <div data-testid="narrow-frame-demo" style={{ width: 320, maxWidth: "100%" }}><NarrowDemo /></div>
+    </MtoneProvider>
+  ) : (
+    <>
+      <Example name="Wide light" width={680} theme="light" dir="ltr" background="white" />
+      <Example name="Narrow light" width={320} theme="light" dir="ltr" background="gray" />
+      <Example name="Wide dark RTL" width={680} theme="dark" dir="rtl" background="gray" />
+      <Example name="Narrow dark RTL" width={320} theme="dark" dir="rtl" background="white" />
+      <Example name="Auto-width flex row" width={680} theme="light" dir="ltr" background="white" flexRow />
+    </>
+  ),
+);

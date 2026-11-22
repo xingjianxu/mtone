@@ -14,9 +14,10 @@ export default function Demo() {
   const [status, setStatus] = useState(statuses[0]);
   const shown = rows.filter((row) => row.name.includes(query.trim()) && (status === statuses[0] || row.status === status));
   return (
-    <div style={{ width: 344, maxWidth: "100%", border: "1px solid var(--mt-border)", borderRadius: 8 }}>
+    <div style={{ width: 344, maxWidth: "100%", boxSizing: "border-box", border: "1px solid var(--mt-border)", borderRadius: 8, overflow: "clip" }}>
       <Toolbar
         aria-label="窄容器项目操作"
+        style={{ borderBlockEnd: "1px solid var(--mt-border)" }}
         background="gray"
         search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" value={query} onChange={(event) => setQuery(event.target.value)} />}
         start={<Popover.Menu trigger={status === statuses[0] ? "状态" : status} items={statuses.map((key) => ({ key, label: key }))} onSelect={setStatus} />}
@@ -30,7 +31,7 @@ export default function Demo() {
           }}>新建</Button>
         </>}
       />
-      <Table rowKey="id" rowSelection={{}} pagination={false} dataSource={shown}
+      <Table style={{ border: 0, borderRadius: 0 }} rowKey="id" rowSelection={{}} pagination={false} dataSource={shown}
         columns={[
           { title: "项目名称", dataIndex: "name" },
           { title: "状态", dataIndex: "status", render: (value: string) => <Status tone={value === "进行中" ? "blue" : "green"}>{value}</Status> },

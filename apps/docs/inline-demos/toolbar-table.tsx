@@ -33,9 +33,10 @@ export default function Demo() {
   }
 
   return (
-    <div style={{ width: "100%", minWidth: 0, border: "1px solid var(--mt-border)", borderRadius: 8 }}>
+    <div style={{ width: "100%", minWidth: 0, boxSizing: "border-box", border: "1px solid var(--mt-border)", borderRadius: 8, overflow: "clip" }}>
       <Toolbar
         aria-label="项目表格操作"
+        style={{ borderBlockEnd: "1px solid var(--mt-border)" }}
         search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" value={query} onChange={(event) => setQuery(event.target.value)} />}
         start={<Popover.Menu trigger={status === statuses[0] ? "状态" : status} items={statuses.map((key) => ({ key, label: key }))} onSelect={setStatus} />}
         end={<>
@@ -44,6 +45,7 @@ export default function Demo() {
         </>}
       />
       <Table
+        style={{ border: 0, borderRadius: 0 }}
         rowKey="id"
         rowSelection={{}}
         pagination={false}
