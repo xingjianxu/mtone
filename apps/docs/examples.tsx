@@ -161,6 +161,14 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <SpotlightExample />;
     case "PageLayout":
       return <PageLayoutExample />;
+    case "Toolbar":
+      return (
+        <div style={{ width: 240, maxWidth: "100%" }}>
+          <M.Toolbar aria-label="项目操作" background="gray"
+            search={<M.Input.Search aria-label="搜索项目" placeholder="搜索" />}
+            end={<M.Button variant="solid">新建</M.Button>} />
+        </div>
+      );
     case "AdminLayout":
       return <AdminLayoutExample compact={compact} />;
     case "Button":

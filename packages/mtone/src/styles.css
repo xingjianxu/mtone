@@ -30,6 +30,7 @@
 @import "./interactive.css";
 @import "./data.css";
 @import "./data-list.css";
+@import "./toolbar.css";
 @import "tailwindcss/theme.css" prefix(mt);
 @import "tailwindcss/utilities.css" prefix(mt);
 @source "./**/*.{ts,tsx}";

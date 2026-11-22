@@ -1,0 +1,42 @@
+.mt-toolbar {
+  box-sizing: border-box;
+  container: mt-toolbar / inline-size;
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding: 8px 12px;
+  background: var(--mt-bg, #fff);
+}
+.mt-toolbar[data-background="gray"] {
+  background: var(--mt-subtle, #f7f7f5);
+}
+.mt-toolbar-layout,
+.mt-toolbar-start,
+.mt-toolbar-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-inline-size: 0;
+  gap: 8px;
+}
+.mt-toolbar-search {
+  flex: 0 1 12.5rem;
+  min-inline-size: 0;
+}
+.mt-toolbar-search > * {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+.mt-toolbar-start,
+.mt-toolbar-end {
+  max-inline-size: 100%;
+}
+.mt-toolbar-end {
+  margin-inline-start: auto;
+  justify-content: flex-end;
+}
+@container mt-toolbar (max-width: 28rem) {
+  .mt-toolbar-layout > .mt-toolbar-search {
+    flex-basis: 100%;
+  }
+}

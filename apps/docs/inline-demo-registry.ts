@@ -1,3 +1,11 @@
+import ToolbarTable from "./inline-demos/toolbar-table";
+import ToolbarTableSource from "./inline-demos/toolbar-table.tsx?raw";
+import ToolbarList from "./inline-demos/toolbar-list";
+import ToolbarListSource from "./inline-demos/toolbar-list.tsx?raw";
+import ToolbarPage from "./inline-demos/toolbar-page";
+import ToolbarPageSource from "./inline-demos/toolbar-page.tsx?raw";
+import ToolbarNarrow from "./inline-demos/toolbar-narrow";
+import ToolbarNarrowSource from "./inline-demos/toolbar-narrow.tsx?raw";
 import SidebarTabsDemo from "./inline-demos/sidebar-tabs";
 import SidebarTabsDemoRaw from "./inline-demos/sidebar-tabs.tsx?raw";
 import SelectTags from "./inline-demos/select-tags";
@@ -342,6 +350,12 @@ export const inlineDocSections: Readonly<
       Demo: Example9_0,
       source: source(Example9_0Raw),
     },
+  ],
+  Toolbar: [
+    { id: "table", title: "表格", Demo: ToolbarTable, source: source(ToolbarTableSource) },
+    { id: "list", title: "列表", Demo: ToolbarList, source: source(ToolbarListSource) },
+    { id: "page", title: "普通页面", Demo: ToolbarPage, source: source(ToolbarPageSource) },
+    { id: "narrow", title: "窄容器", Demo: ToolbarNarrow, source: source(ToolbarNarrowSource) },
   ],
   Sidebar: [
     {

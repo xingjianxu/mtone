@@ -58,3 +58,5 @@ export * from "./ai-activity";
 export * from "./ai-evidence";
 
 export * from "./check-card";
+
+export * from "./toolbar";

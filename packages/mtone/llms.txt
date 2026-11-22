@@ -926,6 +926,27 @@ export default function Demo() {
 }
 ```
 
+### Toolbar
+
+- [Toolbar](https://xingjianxu.github.io/mtone/#/components/Toolbar): 独立排列搜索、筛选和操作，可放在表格、列表或普通页面。
+- Import: Toolbar from @bixlab/mtone
+- search: ReactNode. 可选搜索控件，空间不足时独占第一行。
+- start: ReactNode. 可选起始侧控件，例如筛选、分类或状态。
+- end: ReactNode. 可选末端控件，例如导出、视图切换或新建。在窄容器内可换行，沿逻辑末端对齐。
+- background: "white" | "gray" (default: "white"). 使用 mtone 正常或浅灰表面，随亮暗主题适配。
+- 原生属性 / ref: div 原生属性（不含 children）/ HTMLDivElement. 支持 className、style、ref 和可访问名称；有 aria-label 或 aria-labelledby 时默认作为 group。内容通过三个插槽传入。
+- 响应自己的容器宽度，而不是只看视口。start 和 end 使用逻辑方向，RTL 自动镜像。
+- 只负责布局；不执行搜索、过滤、数据更新或快捷键，也不接管 Tab 顺序。表格、列表、普通页面的状态由应用各自管理，不要求与 DataList 或 Table 绑定。
+
+```tsx
+import { Button, Input, Toolbar } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <Toolbar aria-label="项目操作" background="gray" search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" />} start={<Button>筛选</Button>} end={<Button variant="solid">新建</Button>} />;
+}
+```
+
 ### AdminLayout
 
 - [AdminLayout](https://xingjianxu.github.io/mtone/#/components/AdminLayout): 可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。

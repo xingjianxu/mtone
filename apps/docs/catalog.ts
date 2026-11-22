@@ -11,7 +11,7 @@ export type PropDoc = {
  */
 const taxonomy = {
   "布局容器": [
-    "AdminLayout", "PageLayout", "SectionGroup", "Splitter", "Affix", "Divider",
+    "AdminLayout", "PageLayout", "Toolbar", "SectionGroup", "Splitter", "Affix", "Divider",
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
@@ -2196,6 +2196,23 @@ export default function Demo() {
       "maxWidth 同时约束页头、标签页、侧栏和正文，不影响外层 AdminLayout 的侧栏或顶栏。",
       "PageLayout 本身的可用宽度达到 640px 时左右分栏；侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 和 header 模式的页头始终在最上方。",
       "只负责单页布局，不管理侧栏折叠、独立滚动、标签状态、路由或应用导航。",
+    ],
+  },
+  {
+    name: "Toolbar",
+    description: "独立排列搜索、筛选和操作，可放在表格、列表或普通页面。",
+    importNames: ["Toolbar"],
+    code: 'import { Button, Input, Toolbar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Toolbar aria-label="项目操作" background="gray" search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" />} start={<Button>筛选</Button>} end={<Button variant="solid">新建</Button>} />;\n}',
+    props: [
+      { name: "search", type: "ReactNode", description: "可选搜索控件，空间不足时独占第一行。" },
+      { name: "start", type: "ReactNode", description: "可选起始侧控件，例如筛选、分类或状态。" },
+      { name: "end", type: "ReactNode", description: "可选末端控件，例如导出、视图切换或新建。在窄容器内可换行，沿逻辑末端对齐。" },
+      { name: "background", type: '"white" | "gray"', default: '"white"', description: "使用 mtone 正常或浅灰表面，随亮暗主题适配。" },
+      { name: "原生属性 / ref", type: "div 原生属性（不含 children）/ HTMLDivElement", description: "支持 className、style、ref 和可访问名称；有 aria-label 或 aria-labelledby 时默认作为 group。内容通过三个插槽传入。" },
+    ],
+    notes: [
+      "响应自己的容器宽度，而不是只看视口。start 和 end 使用逻辑方向，RTL 自动镜像。",
+      "只负责布局；不执行搜索、过滤、数据更新或快捷键，也不接管 Tab 顺序。表格、列表、普通页面的状态由应用各自管理，不要求与 DataList 或 Table 绑定。",
     ],
   },
   {
