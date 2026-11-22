@@ -144,7 +144,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
     <M.PropertyList>
       <M.PropertyItem label="类型">文档</M.PropertyItem>
       <M.PropertyItem label="标签">
-        <M.Badge tone="green">研究</M.Badge>
+        <M.Tag tone="green">研究</M.Tag>
       </M.PropertyItem>
       <M.PropertyItem label="负责人">
         <M.Avatar name="林" />
@@ -594,7 +594,7 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           <M.ListItem
             icon={<FileText size={16} />}
             description="今天更新"
-            actions={<M.Badge>设计</M.Badge>}
+            actions={<M.Tag>设计</M.Tag>}
           >
             组件规范
           </M.ListItem>
@@ -619,18 +619,18 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Table":
       return <TableExample compact={compact} />;
-    case "Badge": {
+    case "Tag": {
       return (
         <div style={rowStyle}>
           {(
             ["neutral", "blue", "green", "orange", "red", "purple"] as const
           ).map((tone) => (
-            <M.Badge key={tone} tone={tone}>
+            <M.Tag key={tone} tone={tone}>
               {tone}
-            </M.Badge>
+            </M.Tag>
           ))}
           {visible ? (
-            <M.Badge onRemove={() => setVisible(false)}>可移除</M.Badge>
+            <M.Tag onRemove={() => setVisible(false)}>可移除</M.Tag>
           ) : (
             <M.Button onClick={() => setVisible(true)}>恢复标签</M.Button>
           )}

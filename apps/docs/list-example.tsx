@@ -4,7 +4,7 @@ import {
   List,
 
   ListItem,
-  Badge,
+  Tag,
   type ListHandle,
 } from "../../packages/mtone/src";
 const records = Array.from({ length: 10000 }, (_, id) => ({
@@ -45,7 +45,7 @@ export function ListExample({ compact = false }: { compact?: boolean }) {
       <List aria-label="基础列表">
         <ListItem
           description="现有 children 和 ListItem 继续可用"
-          actions={<Badge>文档</Badge>}
+          actions={<Tag>文档</Tag>}
         >
           设计规范
         </ListItem>

@@ -88,7 +88,7 @@ Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle
 
 ### Shared theme accents
 
-Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-green`, `--mt-accent-orange`, `--mt-accent-red`, `--mt-accent-purple`, `--mt-accent-teal`, and `--mt-accent-coral` tokens in component styles (for example, `color: var(--mt-accent-teal)`). The optional `MtoneAccent` type enumerates their keys. The palette follows light, dark or system mode. Override values under an application scope, for example `<MtoneProvider tokens={{ "--mt-accent-teal": "#25686c" }}>`. Existing components keep their colors unless they explicitly use these tokens. Coral uses `#D1634B` in light mode and `#FD8C73` in dark mode (including system dark). Treat it as a decorative accent by default and check contrast before using it for text; it is not a new Badge tone or a replacement for danger. In preset-aware values such as Tabs `indicatorColor`, `"coral"` means the mtone preset; use `"#ff7f50"` for the CSS keyword’s standard color.
+Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-green`, `--mt-accent-orange`, `--mt-accent-red`, `--mt-accent-purple`, `--mt-accent-teal`, and `--mt-accent-coral` tokens in component styles (for example, `color: var(--mt-accent-teal)`). The optional `MtoneAccent` type enumerates their keys. The palette follows light, dark or system mode. Override values under an application scope, for example `<MtoneProvider tokens={{ "--mt-accent-teal": "#25686c" }}>`. Existing components keep their colors unless they explicitly use these tokens. Coral uses `#D1634B` in light mode and `#FD8C73` in dark mode (including system dark). Treat it as a decorative accent by default and check contrast before using it for text; it is not a new Tag tone or a replacement for danger. In preset-aware values such as Tabs `indicatorColor`, `"coral"` means the mtone preset; use `"#ff7f50"` for the CSS keyword’s standard color.
 
 ## Buttons and forms
 
@@ -148,7 +148,7 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 
 - Card, Text(muted), Divider and ListItem(icon,description,actions): styled semantic wrappers. `List` retains children-based use and also supports grouped/virtual data rendering; see [List](#list).
 - DocumentList: items `{id,title,description?,updatedAt?,icon?,onClick?}`. DocumentCard accepts one item.
-- Badge: tone neutral/blue/green/orange/red/purple, onRemove optional.
+- Tag: tone neutral/blue/green/orange/red/purple, onRemove optional.
 - Status: tone, children. Avatar: name, src, size; falls back to initials on image error. AvatarGroup: items, max.
 - `Progress`: line, circle or dashboard progress, status, success segments, steps and custom information; see [Progress](#progress). PropertyList and PropertyItem(label): definition-list display.
 - Alert: tone info/success/warning/error, title, children, onClose.
@@ -332,7 +332,7 @@ This section describes the Table API introduced in **0.3.0**. Version 0.2.0 cont
       key: "status",
       title: "状态",
       dataIndex: "status",
-      render: (value) => <Badge>{String(value)}</Badge>,
+      render: (value) => <Tag>{String(value)}</Tag>,
     },
   ]}
   pagination={{ pageSize: 10 }}

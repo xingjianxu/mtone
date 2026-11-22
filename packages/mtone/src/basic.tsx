@@ -263,7 +263,7 @@ export type { InputProps, InputSearchProps, InputPasswordProps, InputTextAreaPro
 export { Form, FormField } from "./form";
 export type { FormProps, FormFieldProps, FormRule, FormInstance, FormValues, FormValidationError, FormValidateTrigger } from "./form";
 export type Tone = "neutral" | "blue" | "green" | "orange" | "red" | "purple";
-export function Badge({
+export function Tag({
   children,
   tone = "neutral",
   onRemove,
@@ -275,7 +275,7 @@ export function Badge({
 }) {
   const { locale } = useMtone();
   return (
-    <span {...p} className={cn("mt-badge", `mt-tone-${tone}`, className)}>
+    <span {...p} className={cn("mt-tag", `mt-tone-${tone}`, className)}>
       {children}
       {onRemove && (
         <button

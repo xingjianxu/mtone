@@ -6,7 +6,7 @@ export default function Demo() {
     <M.PropertyList>
       <M.PropertyItem label="类型">文档</M.PropertyItem>
       <M.PropertyItem label="标签">
-        <M.Badge tone="green">研究</M.Badge>
+        <M.Tag tone="green">研究</M.Tag>
       </M.PropertyItem>
       <M.PropertyItem label="负责人">
         <M.Avatar name="林" />

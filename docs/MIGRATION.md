@@ -104,20 +104,17 @@ continues to receive a single state argument. See [API guide](API.md#table) for 
 
 # Breaking changes in 0.2.0
 
-## Tag consolidated into Badge
+## Tag consolidated into Badge (0.2.0 through 0.9.0)
 
-`Tag` is no longer exported. Replace `import { Tag } from "@bixlab/mtone"` with
-`import { Badge } from "@bixlab/mtone"` and rename JSX `<Tag>` / `</Tag>` to
-`<Badge>` / `</Badge>`.
-
-Badge retains all previous behavior: six `tone` values, optional `onRemove`,
-children, native span attributes, and localized accessible removal labels.
-Applications still manage removal state themselves.
-
-If you override the internal CSS class `.mt-tag`, update it to `.mt-badge`.
-The documentation gallery now lists only Badge.
+Those releases exported `Badge` instead of `Tag`. Use this note only when
+targeting those releases; the current source uses `Tag` again.
 
 ## Unreleased: Upload and RadioGroup consolidation
 
 - Replace `Dropzone` with `Upload` without changing props. Click-to-select and drag-and-drop use the same upload area.
 - Replace `Segmented` with `RadioGroup variant="segmented"`. Keep the existing options and value props; the segmented style defaults to horizontal.
+
+## Unreleased: Badge renamed to Tag
+
+- Replace the `Badge` import and JSX with `Tag`. The `tone`, `onRemove`, children, and native span attributes are unchanged.
+- Replace custom selectors for `.mt-badge` with `.mt-tag`. Use the new Tag documentation page; the old page is not redirected.

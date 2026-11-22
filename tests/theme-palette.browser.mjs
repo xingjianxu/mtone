@@ -18,7 +18,7 @@ try {
       <button class="mt-checkbox" data-checked>✓</button>
       <div class="mt-popup">Overlay</div>
       <div class="mt-list-group">Group</div>
-      <div class="mt-badge mt-tone-red">Alert</div>
+      <div class="mt-tag mt-tone-red">Alert</div>
       <div class="mt-scope" data-mt-theme="light" id="nested"><input class="mt-input"></div>
     </div>
     <div class="mt-scope" data-mt-theme="system" id="system"><input class="mt-input"></div>
@@ -62,8 +62,8 @@ try {
   await expect(page.locator("#dark .mt-tone-red")).toHaveCSS("background-color", "rgb(73, 47, 45)");
   await expect(page.locator("#dark .mt-tone-red")).toHaveCSS("color", "rgb(255, 170, 164)");
 
-  await expect(page.locator("#dark .mt-badge")).toHaveCSS("background-color", "rgb(73, 47, 45)");
-  await expect(page.locator("#dark .mt-badge")).toHaveCSS("color", "rgb(255, 170, 164)");
+  await expect(page.locator("#dark .mt-tag")).toHaveCSS("background-color", "rgb(73, 47, 45)");
+  await expect(page.locator("#dark .mt-tag")).toHaveCSS("color", "rgb(255, 170, 164)");
   await page.emulateMedia({ colorScheme: "dark" });
   await expectCoral("#system", coralDark);
   await expectCoral("#nested", coralLight);

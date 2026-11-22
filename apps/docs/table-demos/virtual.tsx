@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Table, Button, Badge, Text } from "../../../packages/mtone/src";
+import { Table, Button, Tag, Text } from "../../../packages/mtone/src";
 import type { TableColumn, TableRef } from "../../../packages/mtone/src";
 
 type Row = {
@@ -42,7 +42,7 @@ export default function Demo() {
         <Button onClick={() => ref.current?.scrollTo({ top: 0 })}>
           回到顶部
         </Button>
-        <Badge>2000 行</Badge>
+        <Tag>2000 行</Tag>
       </div>
       <Table
         ref={ref}

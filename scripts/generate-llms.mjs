@@ -32,7 +32,7 @@ const lines = [
 "- Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact. Focus uses --mt-focus (#93B4DC): existing input borders change color only; other controls use a single 1px inset edge without changing layout. Select/MultiSelect option highlights remain background-only.",
 "- Shared theme accents: use --mt-accent-neutral/blue/green/orange/red/purple/teal/coral with CSS var() or override the matching keys via MtoneProvider tokens. Tabs indicatorColor accepts these preset names or a CSS color for the selected line only.",
 "- Prefer Dialog. Modal/ModalProps are deprecated aliases. Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.",
-"- Use Badge, not removed Tag. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.",
+"- Use Tag for content labels with optional removal, and Status for a state indicator. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.",
 "- Toast notifications need ToastProvider; useToast exposes add, success, error, info, update, promise and close (verify installed declarations before use).",
 "- Do not assume the live docs match an older npm package. Type-check generated code and run interaction tests.",
 "",

@@ -33,7 +33,7 @@ const taxonomy = {
     "Card", "CardGroup", "List", "ListItem", "DataList",
     "DocumentList", "DocumentCard", "Table", "Tree", "DirectoryTree",
     "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
-    "Avatar", "AvatarGroup", "Badge", "Calendar", "Timeline",
+    "Avatar", "AvatarGroup", "Tag", "Calendar", "Timeline",
   ],
   "弹层与菜单": [
     "Popover", "Menu", "ContextMenu", "Menubar", "HoverCard",
@@ -5191,10 +5191,10 @@ export default function Demo() {
     ],
   },
   {
-    name: "Badge",
+    name: "Tag",
     description: "紧凑的低饱和标签，支持语义颜色与可选移除操作。",
-    importNames: ["Badge"],
-    code: 'import { Badge } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Badge tone="green">已完成</Badge>\n  );\n}',
+    importNames: ["Tag"],
+    code: 'import { Tag } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tag tone="green">已完成</Tag>\n  );\n}',
     props: [
       {
         name: "tone",
@@ -5219,7 +5219,7 @@ export default function Demo() {
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["可移除标签的存在状态由应用管理。Badge 不是数字角标或未读计数容器。"],
+    notes: ["可移除标签的存在状态由应用管理。Tag 不是数字角标或未读计数容器。"],
   },
   {
     name: "Status",

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BookOpen, FileText, RotateCcw } from "lucide-react";
-import { Badge, Button, Splitter, Text } from "../../../packages/mtone/src";
+import { Tag, Button, Splitter, Text } from "../../../packages/mtone/src";
 
 const pane: React.CSSProperties = {
   padding: 14,
@@ -58,7 +58,7 @@ export default function Demo() {
           >
             {disabled ? "解锁调整" : "锁定分栏"}
           </Button>
-          <Badge>受控示例</Badge>
+          <Tag>受控示例</Tag>
         </div>
         <Splitter
           key={generation + String(vertical)}

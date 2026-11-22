@@ -1,7 +1,7 @@
 import CardCollapse from "./secondary-demos/card-collapse";
 import React, { useState } from "react";
 import { BookOpen, Bookmark, Check, MoreHorizontal } from "lucide-react";
-import { Avatar, Badge, Button, Card, Text } from "../../packages/mtone/src";
+import { Avatar, Tag, Button, Card, Text } from "../../packages/mtone/src";
 
 /** All actions below are local demo state; no account or server is changed. */
 export function CardExample() {
@@ -31,7 +31,7 @@ export function CardExample() {
         activeTabKey={activeTab}
         onTabChange={setActiveTab}
         tabList={[{ key: "overview", label: "概览" }, { key: "notes", label: "笔记" }]}
-        tabBarExtraContent={<Badge>本地示例</Badge>}
+        tabBarExtraContent={<Tag>本地示例</Tag>}
       >
         {activeTab === "overview" ? <Card.Meta avatar={<Avatar name="林" />} title="把想法组织成知识" description="记录设计决定、使用约定与可复用的经验。" /> : <div><strong>阅读笔记</strong><p style={{ marginBottom: 0 }}>先保持结构清晰，再逐步增加有价值的信息。</p></div>}
       </Card>

@@ -77,10 +77,10 @@ import Example23_0 from "./inline-demos/document-list-usage";
 import Example23_0Raw from "./inline-demos/document-list-usage.tsx?raw";
 import Example24_0 from "./inline-demos/document-card-usage";
 import Example24_0Raw from "./inline-demos/document-card-usage.tsx?raw";
-import Example25_0 from "./inline-demos/badge-usage";
-import Example25_0Raw from "./inline-demos/badge-usage.tsx?raw";
-import Example25_1 from "./inline-demos/badge-removable";
-import Example25_1Raw from "./inline-demos/badge-removable.tsx?raw";
+import Example25_0 from "./inline-demos/tag-usage";
+import Example25_0Raw from "./inline-demos/tag-usage.tsx?raw";
+import Example25_1 from "./inline-demos/tag-removable";
+import Example25_1Raw from "./inline-demos/tag-removable.tsx?raw";
 import Example26_0 from "./inline-demos/status-usage";
 import Example26_0Raw from "./inline-demos/status-usage.tsx?raw";
 import Example27_0 from "./inline-demos/avatar-group-usage";
@@ -434,7 +434,7 @@ export const inlineDocSections: Readonly<
       source: source(Example24_0Raw),
     },
   ],
-  Badge: [
+  Tag: [
     {
       id: "usage",
       title: "颜色",

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import {
   Avatar,
-  Badge,
+  Tag,
   Breadcrumb,
   Button,
   ConfirmDialog,
@@ -423,8 +423,8 @@ function KnowledgeWorkspace({ toolbarExtra }: { toolbarExtra?: React.ReactNode }
                       </button>
                       <div className="showcase-document-meta">
                         <span>
-                          <Badge>{doc.category}</Badge>
-                          {doc.draft && <Badge tone="orange">草稿</Badge>}
+                          <Tag>{doc.category}</Tag>
+                          {doc.draft && <Tag tone="orange">草稿</Tag>}
                         </span>
                         <time>{doc.updated}</time>
                       </div>

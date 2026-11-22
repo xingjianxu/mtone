@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Avatar,
-  Badge,
+  Tag,
   Button,
   CheckCard,
   Paragraph,
@@ -44,7 +44,7 @@ export default function Demo() {
           </Button>
         }
       >
-        <Badge>仅团队可见</Badge>
+        <Tag>仅团队可见</Tag>
       </CheckCard>
       <Paragraph role="status">
         {showDetails ? "含三类资料：笔记、数据与参考文献。" : "尚未展开资料。"}

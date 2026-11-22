@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BookOpen, Bookmark, Check, MoreHorizontal } from "lucide-react";
 import {
   Avatar,
-  Badge,
+  Tag,
   Button,
   Card,
 } from "../../../packages/mtone/src";
@@ -86,7 +86,7 @@ export default function Demo() {
           { key: "overview", label: "概览" },
           { key: "notes", label: "笔记" },
         ]}
-        tabBarExtraContent={<Badge>本地示例</Badge>}
+        tabBarExtraContent={<Tag>本地示例</Tag>}
       >
         {activeTab === "overview" ? (
           <Card.Meta

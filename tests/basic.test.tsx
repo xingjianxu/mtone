@@ -7,7 +7,7 @@ import {
   SearchInput,
   Textarea,
   FormField,
-  Badge,
+  Tag,
   MtoneProvider,
 } from "../packages/mtone/src/basic";
 describe("foundation", () => {
@@ -35,9 +35,9 @@ describe("foundation", () => {
       "Required",
     );
   });
-  it("removes badge", () => {
+  it("invokes Tag removal", () => {
     const fn = vi.fn();
-    render(<Badge onRemove={fn}>Work</Badge>);
+    render(<Tag onRemove={fn}>Work</Tag>);
     fireEvent.click(screen.getByRole("button"));
     expect(fn).toHaveBeenCalledOnce();
   });
@@ -69,15 +69,15 @@ it('renders blue buttons and preserves disabled/loading behavior', () => {
 });
 
 
-it("exports Badge without the removed Tag alias", async () => {
+it("exports Tag without a Badge compatibility alias", async () => {
   const api = await import("../packages/mtone/src");
-  expect(api).toHaveProperty("Badge");
-  expect(api).not.toHaveProperty("Tag");
+  expect(api).toHaveProperty("Tag");
+  expect(api).not.toHaveProperty("Badge");
 });
-it.each(["neutral", "blue", "green", "orange", "red", "purple"] as const)("preserves Badge %s tone and native attributes", (tone) => {
-  render(<Badge tone={tone} title="label" className="custom" data-testid="badge">Work</Badge>);
-  expect(screen.getByTestId("badge")).toHaveClass("mt-badge", `mt-tone-${tone}`, "custom");
-  expect(screen.getByTestId("badge")).toHaveAttribute("title", "label");
+it.each(["neutral", "blue", "green", "orange", "red", "purple"] as const)("preserves Tag %s tone and native attributes", (tone) => {
+  render(<Tag tone={tone} title="label" className="custom" data-testid="tag">Work</Tag>);
+  expect(screen.getByTestId("tag")).toHaveClass("mt-tag", `mt-tone-${tone}`, "custom");
+  expect(screen.getByTestId("tag")).toHaveAttribute("title", "label");
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
 

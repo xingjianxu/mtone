@@ -82,7 +82,7 @@ const [active, setActive] = useState('summary');
   ]}
   activeTabKey={active}
   onTabChange={setActive}
-  tabBarExtraContent={<Badge>Local</Badge>}
+  tabBarExtraContent={<Tag>Local</Tag>}
 >
   {active === 'summary' ? <Summary /> : <Notes />}
 </Card>

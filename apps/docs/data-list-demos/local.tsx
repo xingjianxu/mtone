@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Badge,
+  Tag,
   Button,
   DataList,
   Select,
@@ -87,7 +87,7 @@ export default function LocalDataListDemo() {
             }}
           >
             <Text>{item.title}</Text>
-            <Badge>{item.status === "active" ? "使用中" : "已归档"}</Badge>
+            <Tag>{item.status === "active" ? "使用中" : "已归档"}</Tag>
           </div>
         )}
         renderActions={(item) => (

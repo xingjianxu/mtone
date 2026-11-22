@@ -26,7 +26,7 @@ import tableSource11 from "./table-demos/virtual.tsx?raw";
 import TableExample12 from "./table-demos/edit";
 import tableSource12 from "./table-demos/edit.tsx?raw";
 import React, { useRef, useState } from "react";
-import { Table, Button, Badge, Text } from "../../packages/mtone/src";
+import { Table, Button, Tag, Text } from "../../packages/mtone/src";
 import type { TableColumn, TableRef } from "../../packages/mtone/src";
 
 type Row = {
@@ -214,7 +214,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
       },
       {
         ...basic[1],
-        render: (value) => <Badge>{String(value)}</Badge>,
+        render: (value) => <Tag>{String(value)}</Tag>,
         filterMode: "tree",
         filterSearch: true,
         filters: [
@@ -409,7 +409,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
           <Button onClick={() => ref.current?.scrollTo({ top: 0 })}>
             回到顶部
           </Button>
-          <Badge>2000 行</Badge>
+          <Tag>2000 行</Tag>
         </div>
         <Table
           ref={ref}

@@ -1,4 +1,4 @@
-import { Button, List, ListItem, Badge } from "../../../packages/mtone/src";
+import { Button, List, ListItem, Tag } from "../../../packages/mtone/src";
 const records = Array.from({ length: 10000 }, (_, id) => ({
   id,
   title: `记录 ${id + 1}`,
@@ -12,7 +12,7 @@ export default function Demo() {
       <List aria-label="基础列表">
         <ListItem
           description="现有 children 和 ListItem 继续可用"
-          actions={<Badge>文档</Badge>}
+          actions={<Tag>文档</Tag>}
         >
           设计规范
         </ListItem>

@@ -13,7 +13,7 @@ export default function Demo() {
   return (
     <div style={rowStyle}>
       {visible ? (
-        <M.Badge onRemove={() => setVisible(false)}>可移除</M.Badge>
+        <M.Tag onRemove={() => setVisible(false)}>可移除</M.Tag>
       ) : (
         <M.Button onClick={() => setVisible(true)}>恢复标签</M.Button>
       )}

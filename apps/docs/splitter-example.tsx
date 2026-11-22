@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BookOpen, FileText, RotateCcw } from "lucide-react";
-import { Badge, Button, Splitter, Text } from "../../packages/mtone/src";
+import { Tag, Button, Splitter, Text } from "../../packages/mtone/src";
 
 const pane: React.CSSProperties = { padding: 14, display: "grid", gap: 10, alignContent: "start" };
 
@@ -18,7 +18,7 @@ export function SplitterExample() {
         <Button icon={<RotateCcw size={14} />} onClick={() => { setSizes(["32%", "68%"]); setGeneration(value => value + 1); setNotice("已重置为 32% / 68%。"); }}>重置分栏</Button>
         <Button variant="ghost" onClick={() => { setSizes(["32%", "68%"]); setVertical(value => !value); }}>{vertical ? "切换横向" : "切换纵向"}</Button>
         <Button variant="ghost" onClick={() => setDisabled(value => !value)}>{disabled ? "解锁调整" : "锁定分栏"}</Button>
-        <Badge>受控示例</Badge>
+        <Tag>受控示例</Tag>
       </div>
       <Splitter key={generation + String(vertical)} orientation={vertical ? "vertical" : "horizontal"} sizes={sizes} onResize={setSizes} onResizeEnd={values => setNotice("调整完成：" + values.map(value => Math.round(value) + "px").join(" / "))} disabled={disabled} style={{ height: 320, border: "1px solid var(--mt-border, #e9e9e7)", borderRadius: 6, overflow: "hidden" }}>
         <Splitter.Panel id="library" label="知识库导航" defaultSize="32%" min="20%" collapsible>

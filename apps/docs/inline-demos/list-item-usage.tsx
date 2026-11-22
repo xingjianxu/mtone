@@ -8,7 +8,7 @@ export default function Demo() {
       <M.ListItem
         icon={<FileText size={16} />}
         description="今天更新"
-        actions={<M.Badge>设计</M.Badge>}
+        actions={<M.Tag>设计</M.Tag>}
       >
         组件规范
       </M.ListItem>

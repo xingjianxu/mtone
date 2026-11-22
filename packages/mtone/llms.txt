@@ -23,7 +23,7 @@ This file describes this package checkout, not necessarily the latest published 
 - Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact. Focus uses --mt-focus (#93B4DC): existing input borders change color only; other controls use a single 1px inset edge without changing layout. Select/MultiSelect option highlights remain background-only.
 - Shared theme accents: use --mt-accent-neutral/blue/green/orange/red/purple/teal/coral with CSS var() or override the matching keys via MtoneProvider tokens. Tabs indicatorColor accepts these preset names or a CSS color for the selected line only.
 - Prefer Dialog. Modal/ModalProps are deprecated aliases. Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.
-- Use Badge, not removed Tag. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.
+- Use Tag for content labels with optional removal, and Status for a state indicator. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.
 - Toast notifications need ToastProvider; useToast exposes add, success, error, info, update, promise and close (verify installed declarations before use).
 - Do not assume the live docs match an older npm package. Type-check generated code and run interaction tests.
 
@@ -2522,23 +2522,23 @@ export default function Demo() {
 }
 ```
 
-### Badge
+### Tag
 
-- [Badge](https://xingjianxu.github.io/mtone/#/components/Badge): 紧凑的低饱和标签，支持语义颜色与可选移除操作。
-- Import: Badge from @bixlab/mtone
+- [Tag](https://xingjianxu.github.io/mtone/#/components/Tag): 紧凑的低饱和标签，支持语义颜色与可选移除操作。
+- Import: Tag from @bixlab/mtone
 - tone: "neutral" | "blue" | "green" | "orange" | "red" | "purple" (default: neutral). 低饱和语义颜色。
 - onRemove: () => void. 提供后显示移除按钮，应用负责移除内容。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 可移除标签的存在状态由应用管理。Badge 不是数字角标或未读计数容器。
+- 可移除标签的存在状态由应用管理。Tag 不是数字角标或未读计数容器。
 
 ```tsx
-import { Badge } from "@bixlab/mtone";
+import { Tag } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return (
-    <Badge tone="green">已完成</Badge>
+    <Tag tone="green">已完成</Tag>
   );
 }
 ```

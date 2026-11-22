@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Badge } from "../../../packages/mtone/src";
+import { Table, Button, Tag } from "../../../packages/mtone/src";
 import type { TableColumn } from "../../../packages/mtone/src";
 
 type Row = {
@@ -60,7 +60,7 @@ export default function Demo() {
     },
     {
       ...basic[1],
-      render: (value) => <Badge>{String(value)}</Badge>,
+      render: (value) => <Tag>{String(value)}</Tag>,
       filterMode: "tree",
       filterSearch: true,
       filters: [

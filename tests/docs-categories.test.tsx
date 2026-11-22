@@ -29,7 +29,7 @@ const expected: Record<string, string[]> = {
     "Card", "CardGroup", "List", "ListItem", "DataList",
     "DocumentList", "DocumentCard", "Table", "Tree", "DirectoryTree",
     "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
-    "Avatar", "AvatarGroup", "Badge", "Calendar", "Timeline",
+    "Avatar", "AvatarGroup", "Tag", "Calendar", "Timeline",
   ],
   "弹层与菜单": [
     "Popover", "Menu", "ContextMenu", "Menubar", "HoverCard",
@@ -128,6 +128,16 @@ describe("documentation taxonomy", () => {
     expect(inlineDocSections[removed]).toBeUndefined();
     expect(inlineDocSections[owner]?.find((section) => section.id === id)?.source)
       .toContain(snippet);
+  });
+  it("documents Tag without a Badge route or search entry", () => {
+    expect(parseRoute("#/components/Badge?section=removable")).toEqual({ kind: "not-found" });
+    expect(searchDocs("Badge").map((doc) => doc.name)).not.toContain("Badge");
+    expect(inlineDocSections.Badge).toBeUndefined();
+    expect(inlineDocSections.Tag?.find((section) => section.id === "removable")?.source)
+      .toContain("<M.Tag");
+    window.location.hash = "#/components/Tag?section=removable";
+    render(<DocsApp />);
+    expect(screen.getByRole("heading", { name: "Tag", level: 1 })).toBeInTheDocument();
   });
   it("keeps the Button icon-only docs and canonical deep link", () => {
     window.location.hash = "#/components/Button?section=icon-only";

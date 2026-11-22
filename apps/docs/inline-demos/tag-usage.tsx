@@ -12,9 +12,9 @@ export default function Demo() {
     <div style={rowStyle}>
       {(["neutral", "blue", "green", "orange", "red", "purple"] as const).map(
         (tone) => (
-          <M.Badge key={tone} tone={tone}>
+          <M.Tag key={tone} tone={tone}>
             {tone}
-          </M.Badge>
+          </M.Tag>
         ),
       )}
     </div>
