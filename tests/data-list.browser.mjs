@@ -32,8 +32,98 @@ try {
       await page.goto("http://127.0.0.1:5239/tests/fixtures/data-list.html");
       const local = page.getByTestId("local");
       const search = local.getByRole("textbox", { name: "Find records" });
+      const frame = local.locator(".mt-data-list");
+      const header = frame.locator(":scope > .mt-data-list-toolbar");
+      const selectAll = header.getByRole("checkbox", {
+        name: "Select visible items",
+        exact: true,
+      });
+      const controls = header.locator(".mt-data-list-controls");
+      const measureFrame = () =>
+        frame.evaluate((root) => {
+          const header = root.querySelector(":scope > .mt-data-list-toolbar");
+          const rows = [
+            ...root.querySelectorAll(":scope > .mt-list > .mt-list-row"),
+          ];
+          const footer = root.querySelector(
+            ":scope > .mt-data-list-pagination",
+          );
+          const scope = getComputedStyle(root);
+          return {
+            frameBorders: [
+              scope.borderTopWidth,
+              scope.borderRightWidth,
+              scope.borderBottomWidth,
+              scope.borderLeftWidth,
+            ],
+            radius: Number.parseFloat(scope.borderTopLeftRadius),
+            clip: [
+              scope.overflowX,
+              scope.overflowY,
+              getComputedStyle(header).overflowY,
+            ],
+            dividerWidths: [
+              getComputedStyle(header).borderBottomWidth,
+              ...rows.map((row) => getComputedStyle(row).borderBottomWidth),
+              getComputedStyle(footer).borderTopWidth,
+            ],
+            frameColor: scope.borderTopColor,
+            rowColor: getComputedStyle(rows[0]).borderBottomColor,
+            headerTint: getComputedStyle(header).backgroundColor,
+            bodyTint: scope.backgroundColor,
+          };
+        });
+      let lightTint;
+      for (const colorScheme of ["light", "dark"]) {
+        await page.emulateMedia({ colorScheme });
+        const style = await measureFrame();
+        expect(style.frameBorders).toEqual(["1px", "1px", "1px", "1px"]);
+        expect(style.radius).toBeGreaterThan(0);
+        expect(style.clip).toEqual(["visible", "visible", "visible"]);
+        expect(style.dividerWidths).toEqual(["1px", "1px", "0px", "1px"]);
+        expect(style.frameColor).toBe(style.rowColor);
+        expect(style.headerTint).not.toBe(style.bodyTint);
+        if (colorScheme === "light") lightTint = style.headerTint;
+        else expect(style.headerTint).not.toBe(lightTint);
+      }
+      await page.emulateMedia({ colorScheme: "light", forcedColors: "active" });
+      if (
+        await page.evaluate(() => matchMedia("(forced-colors: active)").matches)
+      ) {
+        const style = await measureFrame();
+        expect(style.dividerWidths).toEqual(["1px", "1px", "0px", "1px"]);
+        expect(style.frameColor).toBe(style.rowColor);
+        expect(style.frameColor).not.toBe(style.bodyTint);
+      }
+      await page.emulateMedia({ colorScheme: "light", forcedColors: "none" });
+      const selectionGroup = header.locator(".mt-data-list-selection");
+      async function expectHeaderOrder({ stackedOnly = false } = {}) {
+        const selection = await selectionGroup.boundingBox();
+        const actions = await controls.boundingBox();
+        // Intrinsic widths differ by engine and font: controls may start a new
+        // flex line even at the desktop viewport. Check both axes, not x alone.
+        const stacked = selection.y + selection.height <= actions.y + 0.05;
+        const beside = selection.x + selection.width <= actions.x + 0.05;
+        expect(
+          stacked || (!stackedOnly && beside),
+          `expected selection before controls without overlap: ${JSON.stringify({ selection, actions, stackedOnly })}`,
+        ).toBe(true);
+      }
+      await expectHeaderOrder();
+      const filterTrigger = header.getByRole("button", {
+        name: "Filter records",
+        exact: true,
+      });
+      await filterTrigger.click();
+      await expect(
+        page.getByRole("dialog", { name: "Filter options" }),
+      ).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(filterTrigger).toBeFocused();
       // Traverse via real Tab presses rather than only programmatically focusing controls.
       await page.getByTestId("before").focus();
+      await page.keyboard.press("Tab");
+      await expect(selectAll).toBeFocused();
       await page.keyboard.press("Tab");
       await expect(search).toBeFocused();
       async function tabTo(target) {
@@ -145,6 +235,7 @@ try {
       ).toBeVisible();
       for (const width of [375, 320]) {
         await page.setViewportSize({ width, height: 900 });
+        await expectHeaderOrder({ stackedOnly: true });
         await alpha.check();
         await expect(page.getByTestId("batch-count")).toBeVisible();
         expect(
@@ -162,6 +253,12 @@ try {
           path: `artifacts/data-list-browser/${name}-${width}.png`,
         });
       }
+      await expect(
+        page.getByTestId("empty").locator(".mt-data-list-toolbar"),
+      ).toHaveCount(0);
+      await expect(
+        page.getByTestId("loading").locator(".mt-data-list-toolbar"),
+      ).toHaveCount(0);
       expect(errors).toEqual([]);
     } catch (error) {
       failed = true;
