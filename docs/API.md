@@ -159,9 +159,12 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 ## Typography.Code
 
 Use `<Typography.Code>` inline or `<Typography.Code block>` for a semantic preformatted block.
-Add `language="tsx"` (or `js`, `ts`, `jsx`, `json`, `html`, `css`, `bash`) to opt into
-Shiki syntax highlighting for a string child. The engine and individual grammars
-load only when such a block is used. SSR, the initial client view, unsupported
+Set `language="tsx"`, `"python"`, or any language or alias bundled with the pinned
+Shiki version (for example `py`, `rs`, or `yml`) to highlight a string child. A
+runtime string works; IDs are trimmed and compared case-insensitively. The engine
+and required grammars load on demand from the application's build assets, not
+from the Shiki site or a third-party CDN. Deploy the emitted assets with your
+app, using its configured asset base. SSR, the initial client view, unsupported
 languages, and loading failures all retain plain text. Inline code and element
 children keep their previous rendering. Colors follow the current light, dark, or
 system mtone theme without changing the underlying code text.

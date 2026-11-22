@@ -105,3 +105,15 @@ it("renders plain escaped HTML on the server", () => {
   expect(markup).not.toContain("<script>");
   expect(markup).not.toContain("mt-code-token");
 });
+
+it.each([
+  ["python", "def answer():\r\n    return 42\r", "def"],
+  ["  RS ", 'fn main() {\n    println!("hello");\n}', "fn"],
+  ["yml", "language: yaml\n", "language"],
+])("highlights runtime language %s while preserving the exact text", async (language, source, keyword) => {
+  const { container } = render(<Typography.Code block language={language}>{source}</Typography.Code>);
+  const rendered = container.querySelector("code")!;
+  await waitFor(() => expect([...rendered.querySelectorAll(".mt-code-token")]
+    .some((token) => token.textContent === keyword)).toBe(true));
+  expect(rendered.textContent).toBe(source);
+});

@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Check, Copy, Pencil } from "lucide-react";
 import { cn, useMtone } from "./basic";
-import { CodeTokens, codeLanguages, type CodeLanguage, type CodeToken } from "./typography-code-tokens";
+import { CodeTokens, type CodeToken } from "./typography-code-tokens";
+import { resolveCodeLanguage } from "./typography-language";
 
 export type TypographyTone = "secondary" | "success" | "warning" | "danger";
 export interface TypographyCopyable {
@@ -450,11 +451,10 @@ const Code = React.forwardRef<HTMLElement, TypographyCodeProps>(function Code(
   const [overflows, setOverflows] = React.useState(false);
   const [highlight, setHighlight] = React.useState<{
     text: string;
-    language: CodeLanguage;
+    language: string;
     tokens: CodeToken[];
   }>();
-  const candidateLanguage = language?.trim().toLowerCase();
-  const supported = block && codeLanguages.find((value) => value === candidateLanguage);
+  const supported = block && language ? resolveCodeLanguage(language) : undefined;
   const text = typeof children === "string" ? children : undefined;
   React.useEffect(() => {
     if (!supported || !text) return;

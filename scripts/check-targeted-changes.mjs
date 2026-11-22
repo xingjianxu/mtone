@@ -182,6 +182,12 @@ export function makePlan(changes, testFiles) {
     ) {
       build({ typecheck: false });
       add(["tests/llms.test.ts"]);
+    } else if (
+      path === "scripts/generate-typography-languages.mjs" ||
+      /^packages\/mtone\/src\/typography-(?:languages\.generated|language-loaders\.generated|language|highlight|code-tokens)\.tsx?$/.test(path)
+    ) {
+      build({ packageSmoke: true });
+      component("typography");
     } else if (ciFiles(path)) {
       add(ciUnits);
     } else if (

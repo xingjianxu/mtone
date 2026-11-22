@@ -702,7 +702,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
     {
       id: "typography-code-highlight",
       title: "语法高亮",
-      note: "代码块可选指定语言。上方 TSX 示例在文档构建时已着色；下方示例默认是纯文本，点击按钮才加载实时语法高亮。",
+      note: "代码块可选指定语言。上方 TSX 示例在文档构建时已着色；下方 Python 示例默认是纯文本，点击按钮才从本站加载实时着色资源。支持 Shiki 内置语言及其别名；切换至 Vue 可编辑输入，观察模板与 TypeScript 混合着色。",
       Demo: TypographyCodeHighlightDemo,
       source: `import { Typography } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";

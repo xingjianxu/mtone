@@ -4322,7 +4322,7 @@ export default function Demo() {
   "code": "import { Typography } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <section>\n    <Typography.Title level={2}>工作笔记</Typography.Title>\n    <Typography.Paragraph copyable>让内容清晰、有层次。</Typography.Paragraph>\n    <Typography.Text muted>更新于今天</Typography.Text>\n    <Typography.Link href=\"/docs\">查看文档</Typography.Link>\n  </section>;\n}",
   "props": [
     {"name":"Title.divider", "type":"boolean", "default":"level === 2", "description":"标题下方的整行分隔线，仅二级标题默认启用；不同于给文字添加下划线的 underline。"},
-    {"name":"Code.language", "type":"string", "description":"可选语法高亮语言。仅代码块的字符串内容启用；支持 js、ts、jsx、tsx、json、html、css、bash。默认、行内、其他语言及加载失败均保持纯文本或原有子内容。"},
+    {"name":"Code.language", "type":"string", "description":"可选语法高亮语言。仅代码块的字符串内容启用；支持当前 Shiki 依赖的所有内置语言和别名，值可在运行时指定。省略、行内、未知语言及加载失败均保持纯文本或原有子内容。"},
     {"name":"Code.block", "type":"boolean", "default":"false", "description":"Typography.Code 默认渲染行内 <code>；block 渲染 <pre><code> 并保留缩进和换行。长行在块内滚动，溢出时可用 Tab 聚焦并按左右方向键滚动。"},
     {"name":"Blockquote", "type":"BlockquoteProps", "description":"引用子组件；支持 cite 可见署名、citeUrl 来源 URL、icon、iconSize（默认 28）、color（CSS 色值）、radius（默认 4）、textWrap（默认 wrap）。它不支持 Text 的复制、编辑或省略属性；完整 API 见 Blockquote 条目。"},
     {
@@ -4368,7 +4368,7 @@ export default function Demo() {
   ],
   "notes": [
     "保持已有 Text 与 muted 用法兼容。文字、标题和段落可单独导入，也可使用 Typography.Text / Typography.Title / Typography.Paragraph / Typography.Link / Typography.Blockquote；Typography 是命名空间对象，不能直接作为 JSX 元素。",
-    "Typography.Code 只从 Typography 命名空间使用，支持原生属性和 ref（指向外层 code 或 pre）；可用 tabIndex 覆盖默认 Tab 顺序。使用 block language=\"tsx\" 等可按需启用 Shiki。服务端和首次显示保留原文，浏览器按需着色并随最近主题切换，文本、缩进和换行不变。不内置复制按钮；Typography.Text 的 code 用法保持不变。",
+    "Typography.Code 只从 Typography 命名空间使用，支持原生属性和 ref（指向外层 code 或 pre）；可用 tabIndex 覆盖默认 Tab 顺序。代码块使用 language=\"tsx\"、\"python\"、\"rust\" 等启用 Shiki。支持随依赖安装的所有内置语言及别名（如 py、rs、yml）；从应用部署的本地构建资源按需加载，不访问 Shiki 站点或 CDN。服务端、首次显示、未知语言及加载失败均保留原文。着色随最近主题切换，文本、缩进和换行不变。不内置复制按钮；Typography.Text 的 code 用法保持不变。",
     "编辑采用纯文本 textarea；Enter 保存、Shift + Enter 换行、Escape 取消、blur 保存，中文输入法组合输入期间不提交。受控 editing 必须配合 onEditingChange 更新；onChange 可用于业务保存。富内容请显式提供 editable.text，编辑结果不保留富文本标记。",
     "复制使用 Clipboard API，需要安全上下文及浏览器权限；失败有屏幕阅读器提示并调用 onError，不会伪报成功。富组件无法可靠提取文本时请提供 copyable.text。内置操作名称跟随 MtoneProvider 的 zh/en，可自定义 label。",
     "省略采用 CSS 裁切，不测量是否真的溢出；expandable 的展开/收起按钮始终存在。单行省略需要约束容器宽度；操作按钮位于裁切内容之外，窄容器可能换行。rows 取正整数，非法值回退 1。",

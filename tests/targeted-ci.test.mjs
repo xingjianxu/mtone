@@ -27,6 +27,8 @@ const tests = [
   "tests/page-layout.test.tsx",
   "tests/secondary-demo-registry.test.tsx",
   "tests/targeted-ci.test.mjs",
+  "tests/typography-languages.test.ts",
+  "tests/typography-code.browser.mjs",
   "tests/tree-model.test.ts",
   "tests/tree.browser.mjs",
   "tests/tree.test.tsx",
@@ -51,6 +53,21 @@ describe("Targeted CI selection", () => {
       docsBuild: true,
       unit: ["tests/llms.test.ts"],
       browser: [],
+    });
+  });
+
+  it.each([
+    "scripts/generate-typography-languages.mjs",
+    "packages/mtone/src/typography-languages.generated.ts",
+    "packages/mtone/src/typography-language-loaders.generated.ts",
+  ])("covers catalog consistency and built asset loading for %s", (path) => {
+    const plan = makePlan([path], tests);
+    expect(plan).toMatchObject({
+      unmatched: [],
+      docsBuild: true,
+      packageSmoke: true,
+      unit: ["tests/typography-languages.test.ts"],
+      browser: ["tests/typography-code.browser.mjs"],
     });
   });
 

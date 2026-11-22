@@ -83,6 +83,9 @@ try {
     html: "<b>text</b>",
     css: "b { color: red; }",
     bash: "if true; then echo example; fi",
+    py: "def y(): return 1",
+    rust: 'fn main() { println!("example"); }',
+    yml: "answer: 42",
   };
   for (const [language, source] of Object.entries(examples)) {
     const exactText = `  ${source}\r\n\r\n`;
@@ -90,6 +93,7 @@ try {
     assert.equal(tokens.map((token) => token.text).join(""), exactText);
     assert(tokens.some(({ light, dark }) => light && dark && light !== dark), `Missing theme colors for ${language}`);
   }
+  assert.deepEqual(await highlightCode("unknown\r\n", "not-a-shiki-language"), [{ text: "unknown\r\n" }]);
   writeFileSync(
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
