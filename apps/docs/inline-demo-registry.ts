@@ -270,6 +270,7 @@ export const inlineDocSections: Readonly<
     {
       id: "searchable",
       title: "搜索、分组与清空",
+      note: "选中后，悬停控件或用 Tab 聚焦清除按钮，可在箭头位置看到 ×；触屏可直接点 ×。点击其余部分仍会打开选项。",
       Demo: SelectSearchable,
       source: source(SelectSearchableSource),
     },

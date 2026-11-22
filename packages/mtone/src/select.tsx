@@ -332,15 +332,17 @@ function SelectMultiple({ options, clearable, emptyContent, placeholder, classNa
           aria-busy={busy} aria-label={label} aria-required={required || undefined}
           placeholder={placeholder ?? (locale === "zh" ? "搜索…" : "Search…")}
           className="mt-combobox-input" />
-        {clearable && !disabled && locked.length < selection.value.length && (
-          <Combobox.Clear className="mt-select-clear" tabIndex={popup.open ? -1 : 0}
-            aria-label={locale === "zh" ? "清除选择" : "Clear selection"}>
-            <X size={14} aria-hidden="true" />
-          </Combobox.Clear>
-        )}
-        <Combobox.Trigger className="mt-combobox-trigger" aria-label={locale === "zh" ? "展开选项" : "Show options"}>
-          <ChevronDown size={16} aria-hidden="true" />
-        </Combobox.Trigger>
+        <span className="mt-select-action-slot">
+          {clearable && !disabled && locked.length < selection.value.length && (
+            <Combobox.Clear className="mt-select-clear" tabIndex={popup.open ? -1 : 0}
+              aria-label={locale === "zh" ? "清除选择" : "Clear selection"}>
+              <X size={14} aria-hidden="true" />
+            </Combobox.Clear>
+          )}
+          <Combobox.Trigger className="mt-combobox-trigger" aria-label={locale === "zh" ? "展开选项" : "Show options"}>
+            <ChevronDown size={16} aria-hidden="true" />
+          </Combobox.Trigger>
+        </span>
       </Combobox.Chips>
       <ComboboxPopup data={optionData} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")} />
     </Combobox.Root>

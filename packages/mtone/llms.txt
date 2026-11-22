@@ -1310,7 +1310,7 @@ export default function Demo() {
 - className: string. 附加样式类。
 - mode: "single" | "multiple" (default: "single"). 选择模式；单选为 string | null，多选为 string[] 且默认可搜索。
 - searchable / searchPlaceholder: boolean / string. 仅单选使用。启用后在下拉面板内提供本地搜索；可设置搜索框占位符。
-- clearable: boolean (default: false). 提供清除按钮；单选清除为 null，多选保留已选禁用项。
+- clearable: boolean (default: false). 有可清除的选中值时，桌面悬停或键盘聚焦清除按钮会在箭头原位显示 ×；无悬停的触屏可直接点 ×。清除不打开下拉；单选变为 null，多选保留已选禁用项。
 - emptyContent: ReactNode. 替换空列表或搜索无结果的默认提示。
 - required / form: boolean / string. 原生必填校验、可选外部表单 ID；多选通过重复 name 提交已选值。
 - options: readonly (SelectOption | SelectOptionGroup)[]. 必填。选项包含唯一字符串 value、可渲染 label、可选 disabled 和 searchText；分组为 { label, options }，可与未分组选项混用。
