@@ -99,12 +99,14 @@ try {
   for (const options of ["", "&narrow", "&rtl"]) {
     const narrow = options === "&narrow";
     await page.goto(`http://127.0.0.1:5284/tests/fixtures/page-layout.html?sidebar${options}`);
-    for (const id of ["left-full", "right-main"]) {
+    for (const id of ["left-full", "right-main", "left-header", "right-header", "left-header-no-tabs"]) {
       const root = page.getByTestId(id);
       await expect(root.getByRole("complementary", { name: "Filters" })).toBeVisible({ timeout: 1500 });
       const geometry = await root.evaluate((el) => {
         function box(selector) {
-          const { x, y, right, bottom, width } = el.querySelector(selector).getBoundingClientRect();
+          const target = el.querySelector(selector);
+          if (!target) return null;
+          const { x, y, right, bottom, width } = target.getBoundingClientRect();
           return { x, y, right, bottom, width };
         }
         return {
@@ -118,20 +120,34 @@ try {
       });
       const { sidebar, header, tabs, body } = geometry;
       const context = JSON.stringify({ options, id, geometry });
-      const left = id === "left-full";
+      const [side, span] = id.split("-");
+      const left = side === "left";
       assert(geometry.fits, context);
       assert.equal(geometry.root, narrow ? 360 : 840, context);
-      assert.equal(header.width, tabs.width, context);
-      assert.equal(header.width, left ? geometry.root : body.width, context);
-      assert.equal(header.x, left ? Math.min(sidebar.x, body.x) : body.x, context);
+      const layoutStart = Math.min(sidebar.x, body.x);
+      assert.equal(header.width, span === "main" ? body.width : geometry.root, context);
+      assert.equal(header.x, span === "main" ? body.x : layoutStart, context);
+      if (id.endsWith("no-tabs")) {
+        assert.equal(tabs, null, context);
+      } else {
+        assert.equal(tabs.width, span === "full" ? geometry.root : body.width, context);
+        assert.equal(tabs.x, span === "full" ? layoutStart : body.x, context);
+      }
       if (narrow) {
         assert.equal(sidebar.width, body.width, context);
-        assert(left ? tabs.bottom < sidebar.y && sidebar.bottom < body.y : body.bottom < sidebar.y, context);
+        if (left) {
+          assert(sidebar.bottom < body.y, context);
+          if (span === "full") assert(tabs.bottom < sidebar.y, context);
+          if (span === "header") assert(header.bottom < sidebar.y && (!tabs || sidebar.bottom < tabs.y), context);
+        } else {
+          assert(body.bottom < sidebar.y, context);
+        }
       } else {
         assert.equal(sidebar.width, left ? 240 : 200, context);
         assert(left ? sidebar.right < body.x : body.right < sidebar.x, context);
-        assert.equal(sidebar.y, left ? body.y : header.y, context);
-        if (left) assert(tabs.bottom < sidebar.y, context);
+        assert.equal(sidebar.y, span === "main" ? header.y : span === "header" && tabs ? tabs.y : body.y, context);
+        if (span === "full") assert(tabs.bottom < sidebar.y, context);
+        if (span === "header") assert(header.bottom < sidebar.y && (!tabs || tabs.bottom < body.y), context);
       }
     }
   }

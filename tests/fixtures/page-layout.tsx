@@ -60,16 +60,22 @@ function SidebarFixture() {
   const narrow = query.has("narrow");
   return (
     <div dir={query.has("rtl") ? "rtl" : undefined} style={{ width: narrow ? 360 : 1100, maxWidth: "100%" }}>
-      {([{}, { sidebarPosition: "right", headerSpan: "main" }] as const).map((options, index) => (
-        <PageLayout {...options} key={index}
-          data-testid={index === 0 ? "left-full" : "right-main"}
+      {([
+        ["left-full", {}],
+        ["right-main", { sidebarPosition: "right", headerSpan: "main" }],
+        ["left-header", { headerSpan: "header" }],
+        ["right-header", { sidebarPosition: "right", headerSpan: "header" }],
+        ["left-header-no-tabs", { headerSpan: "header" }],
+      ] as const).map(([id, options]) => (
+        <PageLayout {...options} key={id}
+          data-testid={id}
           maxWidth={840}
-          style={index === 1 ? { "--mt-page-layout-sidebar-width": "200px" } as React.CSSProperties : undefined}
+          style={id.startsWith("right") ? { "--mt-page-layout-sidebar-width": "200px" } as React.CSSProperties : undefined}
           title="Project overview"
           actions={<Button>Share</Button>}
           description="Latest progress"
           extra="Updated today"
-          tabs={<Tabs items={[{ value: "recent", label: "Recent", content: null }]} />}
+          tabs={id.endsWith("no-tabs") ? undefined : <Tabs items={[{ value: "recent", label: "Recent", content: null }]} />}
           sidebar={<Sidebar aria-label="Filters"><Button>Open filters</Button></Sidebar>}
         >
           Project tasks

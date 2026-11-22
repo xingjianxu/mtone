@@ -15,8 +15,9 @@ export interface PageLayoutProps
   sidebar?: React.ReactNode;
   /** Physical side of the main column when there is room. */
   sidebarPosition?: "left" | "right";
-  /** Whether the header and tabs span both columns or only the main column. */
-  headerSpan?: "full" | "main";
+  /** Span both columns with the header and tabs ("full"), only the header
+   * ("header"), or keep both in the main column ("main"). */
+  headerSpan?: "full" | "header" | "main";
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   /** Center the entire layout in its parent, with a preset or maximum pixel width. */
   maxWidth?: keyof typeof pageLayoutWidths | number;
@@ -54,37 +55,37 @@ export function PageLayout({
     ? { "--mt-page-layout-max-width": `${width}px`, ...style } as React.CSSProperties
     : style;
   const header = (
-    <>
-      <div className="mt-page-layout-header">
-        <div className="mt-page-layout-row">
-          {hasContent(icon) && <div className="mt-page-layout-icon">{icon}</div>}
-          <div className="mt-page-layout-heading">
-            <Heading className="mt-page-layout-title">{title}</Heading>
-            {hasContent(subtitle) && <div className="mt-page-layout-subtitle">{subtitle}</div>}
-          </div>
-          {hasContent(actions) && <div className="mt-page-layout-actions">{actions}</div>}
+    <div className="mt-page-layout-header">
+      <div className="mt-page-layout-row">
+        {hasContent(icon) && <div className="mt-page-layout-icon">{icon}</div>}
+        <div className="mt-page-layout-heading">
+          <Heading className="mt-page-layout-title">{title}</Heading>
+          {hasContent(subtitle) && <div className="mt-page-layout-subtitle">{subtitle}</div>}
         </div>
-        {(showDescription || showExtra) && (
-          <div className="mt-page-layout-details">
-            {showDescription && <div className="mt-page-layout-description">{description}</div>}
-            {showExtra && <div className="mt-page-layout-extra">{extra}</div>}
-          </div>
-        )}
+        {hasContent(actions) && <div className="mt-page-layout-actions">{actions}</div>}
       </div>
-      {hasContent(tabs) && <div className="mt-page-layout-tabs">{tabs}</div>}
-    </>
+      {(showDescription || showExtra) && (
+        <div className="mt-page-layout-details">
+          {showDescription && <div className="mt-page-layout-description">{description}</div>}
+          {showExtra && <div className="mt-page-layout-extra">{extra}</div>}
+        </div>
+      )}
+    </div>
   );
+  const tabsSlot = hasContent(tabs) && <div className="mt-page-layout-tabs">{tabs}</div>;
   const body = hasContent(children) && <div className="mt-page-layout-body">{children}</div>;
   const sidebarSlot = showSidebar && <div className="mt-page-layout-sidebar">{sidebar}</div>;
 
   return (
     <div {...rootProps} className={rootClassName} style={rootStyle}>
-      {(!showSidebar || headerSpan === "full") && header}
+      {(!showSidebar || headerSpan !== "main") && header}
+      {(!showSidebar || headerSpan === "full") && tabsSlot}
       {showSidebar ? (
         <div className="mt-page-layout-columns">
           {sidebarPosition === "left" && sidebarSlot}
           <div className="mt-page-layout-main">
             {headerSpan === "main" && header}
+            {headerSpan !== "full" && tabsSlot}
             {body}
           </div>
           {sidebarPosition === "right" && sidebarSlot}

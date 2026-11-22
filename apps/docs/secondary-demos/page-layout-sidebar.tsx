@@ -1,18 +1,29 @@
 import { useState } from "react";
 import { Button, NavItem, PageLayout, Sidebar, Tabs } from "../../../packages/mtone/src";
 
+const headerSpanOptions = [
+  ["full", "跨整页"],
+  ["header", "页头跨整页，标签留在主栏"],
+  ["main", "仅主栏"],
+] as const;
+
 export default function Demo() {
   const [position, setPosition] = useState<"left" | "right">("left");
-  const [span, setSpan] = useState<"full" | "main">("full");
+  const [span, setSpan] = useState<(typeof headerSpanOptions)[number][0]>("full");
   return (
     <div style={{ width: "100%", display: "grid", gap: 16 }}>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <Button onClick={() => setPosition(position === "left" ? "right" : "left")}>
           侧栏：{position === "left" ? "左侧" : "右侧"}
         </Button>
-        <Button onClick={() => setSpan(span === "full" ? "main" : "full")}>
-          页头：{span === "full" ? "跨整页" : "仅主栏"}
-        </Button>
+        <div role="group" aria-label="页头跨度" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {headerSpanOptions.map(([value, label]) => (
+            <Button key={value} variant={span === value ? "solid" : "outline"}
+              aria-pressed={span === value} onClick={() => setSpan(value)}>
+              {label}
+            </Button>
+          ))}
+        </div>
       </div>
       <PageLayout
         headingLevel={3}

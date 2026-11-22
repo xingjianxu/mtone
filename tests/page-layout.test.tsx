@@ -78,6 +78,8 @@ test.each([
   [{}, "TitleSaveDescriptionExtraTabsFiltersRows"],
   [{ sidebarPosition: "right" }, "TitleSaveDescriptionExtraTabsRowsFilters"],
   [{ headerSpan: "main" }, "FiltersTitleSaveDescriptionExtraTabsRows"],
+  [{ headerSpan: "header" }, "TitleSaveDescriptionExtraFiltersTabsRows"],
+  [{ sidebarPosition: "right", headerSpan: "header" }, "TitleSaveDescriptionExtraTabsRowsFilters"],
   [{ sidebarPosition: "right", headerSpan: "main" }, "TitleSaveDescriptionExtraTabsRowsFilters"],
 ] as const)("preserves focus and reading order with sidebar options %j", (options, expected) => {
   const { container } = render(
@@ -94,13 +96,23 @@ test.each([
   expect(container.firstElementChild).not.toHaveAttribute("headerspan");
 });
 
-test("empty sidebar preserves the original direct slots", () => {
+test.each(["full", "header", "main"] as const)("empty sidebar preserves the original direct slots (%s)", (headerSpan) => {
   const { container } = render(
     <Mtone.PageLayout title="Title" sidebar={<>{[false, null]}</>} sidebarPosition="right"
-      headerSpan="main" tabs={<button>Tabs</button>}>
+      headerSpan={headerSpan} tabs={<button>Tabs</button>}>
       Rows
     </Mtone.PageLayout>,
   );
   expect([...container.firstElementChild!.children].map((child) => child.className))
     .toEqual(["mt-page-layout-header", "mt-page-layout-tabs", "mt-page-layout-body"]);
+});
+
+test("renders a full-width header with a sidebar and no empty tabs slot", () => {
+  const { container } = render(
+    <Mtone.PageLayout title="Project" headerSpan="header" sidebar={<span>Filters</span>}>
+      Rows
+    </Mtone.PageLayout>,
+  );
+  expect(container.firstElementChild?.textContent).toBe("ProjectFiltersRows");
+  expect(container.querySelector(".mt-page-layout-tabs")).not.toBeInTheDocument();
 });

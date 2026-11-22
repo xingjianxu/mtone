@@ -65,6 +65,7 @@ try {
       return {
         side: box(".mt-sidebar"),
         header: box(".mt-page-layout-header"),
+        tabs: box(".mt-page-layout-tabs"),
         body: box(".mt-page-layout-body"),
         width: layout.getBoundingClientRect().width,
         fits: layout.scrollWidth <= layout.clientWidth &&
@@ -72,15 +73,22 @@ try {
       };
     });
     const before = await layoutBoxes();
-    assert(before.fits && before.header.width === before.width, JSON.stringify(before));
+    assert(before.fits && before.header.width === before.width && before.tabs.width === before.width, JSON.stringify(before));
     assert(viewport === 1440 ? before.side.right < before.body.x : before.side.bottom < before.body.y,
       JSON.stringify(before));
     await sidebarStage.getByRole("button", { name: "侧栏：左侧" }).click();
-    await sidebarStage.getByRole("button", { name: "页头：跨整页" }).click();
+    await sidebarStage.getByRole("button", { name: "仅主栏", exact: true }).click();
     const after = await layoutBoxes();
-    assert(after.fits && after.header.width === after.body.width, JSON.stringify(after));
+    assert(after.fits && after.header.width === after.body.width && after.tabs.width === after.body.width, JSON.stringify(after));
     assert(viewport === 1440 ? after.body.right < after.side.x : after.body.bottom < after.side.y,
       JSON.stringify(after));
+    await sidebarStage.getByRole("button", { name: "页头跨整页，标签留在主栏" }).click();
+    const split = await layoutBoxes();
+    assert(split.fits && split.header.width === split.width && split.tabs.width === split.body.width,
+      JSON.stringify(split));
+    assert(split.tabs.x === split.body.x && split.header.bottom < split.side.y, JSON.stringify(split));
+    assert(viewport === 1440 ? split.tabs.right < split.side.x && split.tabs.y === split.side.y :
+      split.body.bottom < split.side.y, JSON.stringify(split));
     await sidebarStage.getByRole("tab", { name: "交付记录" }).click();
     await expect(sidebarStage.getByRole("tabpanel", { name: "交付记录" })).toContainText("最近交付");
   }
