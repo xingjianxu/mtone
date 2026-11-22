@@ -6,7 +6,7 @@ const server=await createServer({root:'apps/docs',server:{host:'127.0.0.1',port:
 await server.listen();let browser;
 try {
  browser=await ({chromium,firefox,webkit}[process.env.BROWSER||'chromium']).launch({headless:true,executablePath:process.env.CHROMIUM_PATH});
- const page=await browser.newPage({viewport:{width:1280,height:900}});
+ const page=await browser.newPage({viewport:{width:1280,height:900},colorScheme:"light"});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:5223/#/components/List');
  const virtual=page.getByRole('list',{name:'虚拟列表',exact:true});
@@ -98,6 +98,40 @@ try {
  const last = sorting.locator('[data-list-key="项目归档"]');
  const description = sorting.locator('xpath=preceding-sibling::p');
  await description.scrollIntoViewIfNeeded();
+
+ // Force the native-drag crossover deterministically: a browser can retain
+ // :hover on the source even after the moving state disables hit testing.
+ const hoverStyles = await page.addStyleTag({content:
+   '.mt-list[data-list-sort-active] > [data-list-sort-moving] { pointer-events: auto !important }',
+ });
+ const themeFill = await sourceRow.evaluate(el => {
+   const probe = document.createElement('span');
+   probe.style.cssText = 'display:none;background-color:var(--mt-bg,#fff)';
+   el.append(probe);
+   const fill = getComputedStyle(probe).backgroundColor;
+   probe.remove();
+   return fill;
+ });
+ try {
+   await sourceRow.hover({position:{x:3,y:17}});
+   assert(await sourceRow.evaluate(el => el.matches(':hover')));
+   assert.notEqual(await sourceRow.evaluate(el => getComputedStyle(el).backgroundColor), themeFill,
+     'a normal hovered row still uses the hover fill');
+   await sourceRow.evaluate(el => {
+     el.parentElement.setAttribute('data-list-sort-active','');
+     el.setAttribute('data-list-sort-moving','');
+   });
+   assert(await sourceRow.evaluate(el => el.matches(':hover')), 'the moving row still matches :hover in this probe');
+   await expect(sourceRow).toHaveCSS('background-color', themeFill);
+ } finally {
+   await sourceRow.evaluate(el => {
+     el.removeAttribute('data-list-sort-moving');
+     el.parentElement.removeAttribute('data-list-sort-active');
+   });
+   await hoverStyles.evaluate(el => el.remove());
+   await page.mouse.move(0,0);
+ }
+
  const begin = async () => {
    const grip = await source.boundingBox();
    const first = await sourceRow.boundingBox();
@@ -127,8 +161,61 @@ try {
        {message:'neighbor shifts one row into the vacated position'}).toBeLessThan(2);
    assert.deepEqual(await order(), originalOrder, 'preview never mutates DOM order');
  };
+ const luminance = color => {
+   // CSSOM serializes a computed mix as color(srgb ...), and familiar
+   // background/system colors as rgb(...). Don't round-trip through canvas.
+   const srgb = color.match(/^color\(srgb\s+([^)]+)\)$/i);
+   const rgb = color.match(/^rgba?\(([^)]+)\)$/i);
+   assert(srgb || rgb, `unexpected computed sRGB color: ${color}`);
+   const values = (srgb || rgb)[1].trim().split(/[\s,/]+/);
+   const normalized = (value, divisor) => value.endsWith('%')
+     ? Number(value.slice(0, -1)) / 100
+     : Number(value) / divisor;
+   assert(values.length === 3 || (values.length === 4 && normalized(values[3], 1) === 1),
+     `expected an opaque computed color: ${color}`);
+   const channels = values.slice(0, 3).map(value => {
+     const channel = normalized(value, srgb ? 1 : 255);
+     assert(Number.isFinite(channel) && channel >= 0 && channel <= 1, `invalid color channel: ${color}`);
+     return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+   });
+   return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+ };
+ const assertLiftedPaint = async ({forced = false} = {}) => {
+   const lift = await sourceRow.evaluate(el => {
+     const style = getComputedStyle(el);
+     return {
+       outline: [style.outlineStyle, style.outlineWidth, style.outlineOffset],
+       outlineColor: style.outlineColor,
+       backgroundColor: style.backgroundColor,
+       radius: style.borderTopLeftRadius,
+       shadow: style.boxShadow,
+     };
+   });
+   assert.deepEqual(lift.outline, ['solid', '1px', '-1px'], 'the actual dragged row has a crisp inset outline');
+   assert.equal(lift.radius, '4px');
+   const tones = [luminance(lift.outlineColor), luminance(lift.backgroundColor)];
+   const contrast = (Math.max(...tones) + 0.05) / (Math.min(...tones) + 0.05);
+   assert(contrast > 2.2, `the moving edge must be visible: ${lift.outlineColor} on ${lift.backgroundColor} (contrast ${contrast.toFixed(2)})`);
+   if (forced) {
+     assert.equal(lift.shadow, 'none', 'the system outline replaces decorative elevation');
+   } else {
+     assert(lift.shadow.includes('0px 1px 2px') && lift.shadow.includes('0px 2px 3px'),
+       'compact shadow layers lift the moving row without a diffuse halo');
+   }
+   await expect(neighbor).toHaveCSS('outline-style', 'none');
+   await expect(neighbor).toHaveCSS('box-shadow', 'none');
+   return tones[1];
+ };
  const first = await begin();
  await assertPreview(first);
+ const lightBackground = await assertLiftedPaint();
+ await mkdir('artifacts/list',{recursive:true});
+ await page.screenshot({path:`artifacts/list/${process.env.BROWSER||'chromium'}-drag.png`});
+ if (!process.env.BROWSER || process.env.BROWSER === 'chromium') {
+   await page.emulateMedia({forcedColors:'active'});
+   await assertLiftedPaint({forced:true});
+   await page.emulateMedia({forcedColors:'none'});
+ }
  assert(await neighbor.evaluate(el => getComputedStyle(el).transitionDuration.split(',').some(t => parseFloat(t) > 0)),
    'neighbor transition is enabled normally');
  const outside = await description.boundingBox();
@@ -138,10 +225,14 @@ try {
  await expect.poll(async () => Math.abs((await neighbor.boundingBox()).y - first.middle.y)).toBeLessThan(2);
  await page.mouse.up();
  assert.deepEqual(await order(), originalOrder, 'drop outside does not reorder');
+ await expect(sourceRow).toHaveCSS('outline-style', 'none');
+ await expect(sourceRow).toHaveCSS('box-shadow', 'none');
 
- await page.emulateMedia({reducedMotion:'reduce'});
+ await page.emulateMedia({reducedMotion:'reduce',colorScheme:'dark'});
  const reduced = await begin();
  await assertPreview(reduced);
+ const darkBackground = await assertLiftedPaint();
+ assert(darkBackground + 0.5 < lightBackground, 'the outline remains visible under actual dark theme tokens');
  assert(await neighbor.evaluate(el => getComputedStyle(el).transitionDuration.split(',').every(t => parseFloat(t) === 0)),
    'reduced motion removes neighbor animation without removing the preview');
  await page.keyboard.press('Escape');
@@ -155,7 +246,6 @@ try {
  await expect.poll(order).toEqual(['设计规范', '项目归档', '研究笔记']);
  await page.setViewportSize({width:360,height:800});
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- await mkdir('artifacts/list',{recursive:true});
  await virtual.scrollIntoViewIfNeeded();
  await page.screenshot({path:`artifacts/list/${process.env.BROWSER||'chromium'}.png`});
  assert.deepEqual(errors,[]);
