@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { createFormStore, type FormInstance, type FormRule, type FormValues, type FormValidationError } from "./form-store";
+import { createFormStore, emptyStringIsValue, type FormInstance, type FormRule, type FormValues, type FormValidationError } from "./form-store";
 export type { FormInstance, FormRule, FormValues, FormValidationError } from "./form-store";
 export type FormValidateTrigger = "onChange" | "onBlur" | ("onChange" | "onBlur")[] | false;
 const Context = React.createContext<{ form: FormInstance; validateTrigger: FormValidateTrigger; onValuesChange?: (changed: FormValues, values: FormValues) => void } | null>(null);
@@ -33,14 +33,26 @@ function FormField({ label, error, description, required, children, name, rules,
   const generatedId = React.useId();
   const child = children as React.ReactElement<Record<string, any>>;
   const inputId = child.props.id || generatedId;
-  const kind = (child.type as unknown as { formValueType?: string }).formValueType;
+  const valueType = (child.type as unknown as {
+    formValueType?: string | ((props: Readonly<{ mode?: unknown }>) => string);
+  }).formValueType;
+  const kind = typeof valueType === "function" ? valueType(child.props) : valueType;
   const trigger = triggerProp ?? (kind ? "onValueChange" : "onChange");
-  const rulesRef = React.useRef({ rules, required });
-  rulesRef.current = { rules, required };
+  const preserveEmptyString = kind === "select-single" && valuePropName === "value";
+  const rulesRef = React.useRef({ rules, required, preserveEmptyString });
+  rulesRef.current = { rules, required, preserveEmptyString };
   // Registration lifetime is independent of inline rule-array identities.
   React.useEffect(() => {
     if (!form || name === undefined) return;
-    return form.register(name, { get rules() { const latest = rulesRef.current; return latest.required && !latest.rules?.some(rule => rule.required) ? [{ required: true }, ...(latest.rules ?? [])] : latest.rules ?? []; }, initialValue });
+    return form.register(name, {
+      get rules() {
+        const latest = rulesRef.current;
+        return latest.required && !latest.rules?.some(rule => rule.required)
+          ? [{ required: true }, ...(latest.rules ?? [])] : latest.rules ?? [];
+      },
+      get [emptyStringIsValue]() { return rulesRef.current.preserveEmptyString; },
+      initialValue,
+    });
   }, [form, name]);
   const messages = form && name !== undefined ? form.getFieldError(name) : [];
   const managedError = messages.length ? messages.join(" ") : undefined;
@@ -59,7 +71,7 @@ function FormField({ label, error, description, required, children, name, rules,
   };
   if (form && name !== undefined) {
     const value = form.getFieldValue(name);
-    props[valuePropName] = value ?? (valuePropName === "checked" ? false : trigger === "onValueChange" ? (kind === "array" || Array.isArray(initialValue) ? [] : null) : "");
+    props[valuePropName] = value ?? (valuePropName === "checked" ? false : trigger === "onValueChange" ? (kind === "array" || (kind !== "select-single" && Array.isArray(initialValue)) ? [] : null) : "");
     props.name = name;
     const modes = validateTrigger ?? context?.validateTrigger ?? "onChange";
     const shouldValidate = (mode: "onChange" | "onBlur") => modes !== false && (Array.isArray(modes) ? modes.includes(mode) : modes === mode);

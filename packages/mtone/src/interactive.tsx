@@ -5,8 +5,6 @@ import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BSwitch } from "@base-ui/react/switch";
 import { Radio as BRadio } from "@base-ui/react/radio";
 import { RadioGroup as BRadioGroup } from "@base-ui/react/radio-group";
-import { Select as BSelect } from "@base-ui/react/select";
-import { Combobox } from "@base-ui/react/combobox";
 import { Slider as BSlider } from "@base-ui/react/slider";
 import { NumberField } from "@base-ui/react/number-field";
 import { Menubar as BMenubar } from "@base-ui/react/menubar";
@@ -48,19 +46,6 @@ export interface OpenProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-}
-// Keep Base UI consistently controlled when fieldset disabling closes a popup.
-function useFieldsetOpen(props: OpenProps & { disabled?: boolean }) {
-  const [localOpen, setLocalOpen] = React.useState(props.defaultOpen ?? false);
-  React.useEffect(() => { if (props.disabled) setLocalOpen(false); }, [props.disabled]);
-  return {
-    open: !props.disabled && (props.open ?? localOpen),
-    onOpenChange: (next: boolean) => {
-      if (next && props.disabled) return;
-      if (props.open === undefined) setLocalOpen(next);
-      props.onOpenChange?.(next);
-    },
-  };
 }
 export interface CheckboxProps extends Common {
   checked?: boolean;
@@ -151,194 +136,8 @@ export function RadioGroup({
     </BRadioGroup>
   );
 }
-interface FieldControlProps {
-  id?: string;
-  "aria-invalid"?: React.AriaAttributes["aria-invalid"];
-  "aria-describedby"?: string;
-  "aria-labelledby"?: string;
-  "aria-busy"?: boolean;
-  onBlur?: React.FocusEventHandler<HTMLElement>;
-}
-export interface SelectProps
-  extends Common, ValueProps<string | null>, OpenProps, FieldControlProps {
-  options: Option[];
-  placeholder?: string;
-}
-export function Select({
-  options,
-  label,
-  placeholder,
-  className,
-  id,
-  onBlur,
-  "aria-invalid": invalid,
-  "aria-describedby": describedBy,
-  "aria-labelledby": labelledBy,
-  "aria-busy": busy,
-  ...props
-}: SelectProps) {
-  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
-  const popup = useFieldsetOpen(props);
-  const { locale } = useMtone();
-  return (
-    <BSelect.Root items={options} {...props} {...popup}>
-      <BSelect.Trigger
-        id={id}
-        onBlur={onBlur}
-        aria-invalid={invalid}
-        aria-describedby={describedBy}
-        aria-labelledby={labelledBy}
-        aria-busy={busy}
-        aria-label={label}
-        className={cn("mt-select", className)}
-      >
-        <BSelect.Value
-          className="mt-select-value"
-          placeholder={placeholder ?? (locale === "zh" ? "请选择" : "Select…")}
-        />
-        <BSelect.Icon className="mt-select-icon">
-          <ChevronDown size={16} aria-hidden="true" />
-        </BSelect.Icon>
-      </BSelect.Trigger>
-      <BSelect.Portal>
-        <MtoneScope>
-          <BSelect.Positioner
-            className="mt-positioner"
-            sideOffset={4}
-            alignItemWithTrigger={false}
-          >
-            <BSelect.Popup className="mt-popup">
-              <BSelect.List>
-                {options.map((o) => (
-                  <BSelect.Item
-                    className="mt-option"
-                    key={o.value}
-                    value={o.value}
-                    disabled={o.disabled}
-                  >
-                    <BSelect.ItemText>{o.label}</BSelect.ItemText>
-                    <BSelect.ItemIndicator
-                      className="mt-select-item-indicator"
-                      aria-hidden="true"
-                    >
-                      <Check size={16} strokeWidth={1.5} aria-hidden="true" />
-                    </BSelect.ItemIndicator>
-                  </BSelect.Item>
-                ))}
-              </BSelect.List>
-            </BSelect.Popup>
-          </BSelect.Positioner>
-        </MtoneScope>
-      </BSelect.Portal>
-    </BSelect.Root>
-  );
-}
-Select.formValueType = "nullable" as const;
-
-export interface MultiSelectProps
-  extends Common, ValueProps<string[]>, OpenProps, FieldControlProps {
-  options: Option[];
-  placeholder?: string;
-}
-export function MultiSelect({
-  options,
-  label,
-  placeholder,
-  className,
-  id,
-  onBlur,
-  "aria-invalid": invalid,
-  "aria-describedby": describedBy,
-  "aria-labelledby": labelledBy,
-  "aria-busy": busy,
-  ...props
-}: MultiSelectProps) {
-  props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
-  const popup = useFieldsetOpen(props);
-  const { locale } = useMtone();
-  const values = options.map((o) => o.value);
-  const labelFor = (v: string) =>
-    String(options.find((o) => o.value === v)?.label ?? v);
-  return (
-    <Combobox.Root
-      multiple
-      items={values}
-      itemToStringLabel={labelFor}
-      {...props}
-      {...popup}
-    >
-      <Combobox.Chips
-        aria-invalid={invalid}
-        className={cn("mt-multiselect", className)}
-      >
-        <Combobox.Value>
-          {(selected: string[]) => (
-            <>
-              {selected.map((v) => (
-                <Combobox.Chip className="mt-chip" key={v}>
-                  {labelFor(v)}
-                  <Combobox.ChipRemove
-                    aria-label={`${locale === "zh" ? "移除" : "Remove"} ${labelFor(v)}`}
-                    className="mt-chip-remove"
-                  >
-                    ×
-                  </Combobox.ChipRemove>
-                </Combobox.Chip>
-              ))}
-            </>
-          )}
-        </Combobox.Value>
-        <Combobox.Input
-          id={id}
-          onBlur={onBlur}
-          aria-invalid={invalid}
-          aria-describedby={describedBy}
-          aria-labelledby={labelledBy}
-          aria-busy={busy}
-          aria-label={label}
-          placeholder={placeholder ?? (locale === "zh" ? "搜索…" : "Search…")}
-          className="mt-combobox-input"
-        />
-        <Combobox.Trigger
-          className="mt-combobox-trigger"
-          aria-label={locale === "zh" ? "展开选项" : "Show options"}
-        >
-          <ChevronDown size={16} aria-hidden="true" />
-        </Combobox.Trigger>
-      </Combobox.Chips>
-      <Combobox.Portal>
-        <MtoneScope>
-          <Combobox.Positioner className="mt-positioner" sideOffset={4}>
-            <Combobox.Popup className="mt-popup">
-              <Combobox.Empty className="mt-combobox-empty">
-                {locale === "zh" ? "无匹配结果" : "No results"}
-              </Combobox.Empty>
-              <Combobox.List>
-                {(v: string) => (
-                  <Combobox.Item
-                    className="mt-option"
-                    key={v}
-                    value={v}
-                    disabled={options.find((o) => o.value === v)?.disabled}
-                  >
-                    {labelFor(v)}
-                    <Combobox.ItemIndicator
-                      className="mt-select-item-indicator"
-                      aria-hidden="true"
-                    >
-                      <Check size={16} strokeWidth={1.5} aria-hidden="true" />
-                    </Combobox.ItemIndicator>
-                  </Combobox.Item>
-                )}
-              </Combobox.List>
-            </Combobox.Popup>
-          </Combobox.Positioner>
-        </MtoneScope>
-      </Combobox.Portal>
-    </Combobox.Root>
-  );
-}
-MultiSelect.formValueType = "array" as const;
+export { Select, MultiSelect } from "./select";
+export type { SelectProps, SelectSingleProps, SelectMultipleProps, SelectOption, SelectOptionGroup, MultiSelectProps } from "./select";
 
 export interface SliderProps extends Common, ValueProps<number> {
   min?: number;

@@ -1,3 +1,17 @@
+# Changes on master after 0.10.3
+
+These changes are not in 0.10.3. Use the guidance for your installed version.
+
+## Select multiple mode
+
+When your installed mtone includes unified Select, replace `MultiSelect` with `Select` and add `mode="multiple"`. `MultiSelect` and `MultiSelectProps` remain deprecated compatibility exports. Values and callbacks remain `string[]` for multiple fields; the default single mode continues to use `string | null`.
+
+```tsx
+import { Select } from "@bixlab/mtone";
+
+const roles = <Select mode="multiple" label="Roles" defaultValue={["read"]} options={[{ value: "read", label: "Read" }]} />;
+```
+
 # Upgrade notes for 0.10.x
 
 This release consolidates overlapping components and removes the old names without compatibility aliases.

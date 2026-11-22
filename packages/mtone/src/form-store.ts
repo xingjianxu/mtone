@@ -24,7 +24,10 @@ export interface FormValidationError {
   errorFields: FormFieldError[];
   outOfDate: boolean;
 }
+// Private registration policy: a single Select can have a genuine "" option.
+export const emptyStringIsValue = Symbol("emptyStringIsValue");
 export interface FieldRegistration {
+  [emptyStringIsValue]?: boolean;
   rules?: FormRule[];
   initialValue?: unknown;
 }
@@ -47,24 +50,26 @@ export interface FormInstance {
 interface Field {
   token: symbol;
   rules: FormRule[];
+  emptyStringIsValue: boolean;
   epoch: number;
   validating: boolean;
   errors: string[];
 }
 const own = (value: object, key: string) =>
   Object.prototype.hasOwnProperty.call(value, key);
-const empty = (value: unknown) =>
-  value == null || value === "" || (Array.isArray(value) && value.length === 0);
 
 async function validateRule(
   name: string,
   rule: FormRule,
   value: unknown,
   values: FormValues,
+  preserveEmptyString: boolean,
 ): Promise<string | undefined> {
   const failure = (message: string) => rule.message ?? message;
-  if (empty(value) && rule.required) return failure(`${name} is required`);
-  if (!empty(value)) {
+  const missing = value == null || (!preserveEmptyString && value === "") ||
+    (Array.isArray(value) && value.length === 0);
+  if (missing && rule.required) return failure(`${name} is required`);
+  if (!missing) {
     if (rule.whitespace && typeof value === "string" && value.trim() === "")
       return failure(`${name} cannot be blank`);
     let typeValid = true;
@@ -205,6 +210,9 @@ export function createFormStore(initialValues: FormValues = {}): FormInstance {
         get rules() {
           return config.rules ?? [];
         },
+        get emptyStringIsValue() {
+          return config[emptyStringIsValue] === true;
+        },
         epoch: 0,
         validating: false,
         errors: previous?.errors ?? [],
@@ -280,6 +288,7 @@ export function createFormStore(initialValues: FormValues = {}): FormInstance {
       const results = await Promise.all(
         targets.map(async (target) => {
           let error: string | undefined;
+          const preserveEmptyString = target.field.emptyStringIsValue;
           for (const rule of target.field.rules) {
             if (stale(target)) break;
             error = await validateRule(
@@ -287,6 +296,7 @@ export function createFormStore(initialValues: FormValues = {}): FormInstance {
               rule,
               own(snapshot, target.name) ? snapshot[target.name] : undefined,
               snapshot,
+              preserveEmptyString,
             );
             if (error !== undefined) break;
           }

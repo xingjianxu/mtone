@@ -6,8 +6,26 @@ import { MtoneProvider } from "../../packages/mtone/src/basic";
 import "../../packages/mtone/dist/styles.css";
 const text =
   "A very long selected option that must not push the dropdown arrow outside the trigger";
+const pickerOptions = [
+  { value: "", label: <strong>Default project</strong>, searchText: "fallback" },
+  { label: "Repository", options: [
+    { value: "locked", label: "Locked repository", disabled: true },
+    ...Array.from({ length: 20 }, (_, i) => ({ value: `repo-${i}`, label: `Repository ${i}` })),
+  ] },
+];
+function UnifiedFixture() {
+  return (
+    <MtoneProvider locale="en">
+      <form aria-label="Select example" style={{ display: "grid", justifyItems: "start", gap: 12, padding: 12 }}>
+        <Select label="Project" searchable clearable required name="project" options={pickerOptions} defaultValue="repo-0" />
+        <Select mode="multiple" label="Projects" clearable name="projects" options={pickerOptions} defaultValue={["", "locked"]} />
+        <button type="reset">Reset selection</button>
+      </form>
+    </MtoneProvider>
+  );
+}
 createRoot(document.getElementById("root")!).render(
-  <>
+  new URLSearchParams(location.search).has("unified") ? <UnifiedFixture /> : <>
     <style>{`.case .mt-select { width: var(--width); min-width: 0; box-sizing: border-box; } .case { margin: 12px; } .case .tall { width: 200px; height: 48px; font-size: 24px; }`}</style>
     {(["light", "dark"] as const).map((theme) => (
       <MtoneProvider key={theme} theme={theme}>

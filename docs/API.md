@@ -112,8 +112,8 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 
 - `Checkbox`, `Switch`: `checked`, `defaultChecked`, `onCheckedChange`, `label` or children, disabled; Checkbox also indeterminate.
 - `RadioGroup`: options, value/defaultValue/onValueChange, label and form name. The default radio style is vertical; `variant="segmented"` shows compact buttons and defaults to horizontal. Override either with `orientation`.
-- `Select`: options, string/null value, defaultValue, onValueChange, placeholder, label, disabled, open/defaultOpen/onOpenChange. The dropdown chevron is a fixed 16px vector icon; long selected labels and placeholders truncate within constrained trigger widths without stretching or pushing out the icon. Selected options use a vertically centered 16px Lucide Check with a thin 1.5px stroke; selection semantics and APIs are unchanged.
-- `MultiSelect`: options, string[] value, defaultValue, onValueChange, placeholder, label; searchable with removable chips. Use textual option labels for reliable filtering.
+- `Select` uses a `string | null` value by default; set `mode="multiple"` for a searchable chip field with `string[]` values. Options have unique string values, renderable labels, and optional `disabled` and `searchText`. Mix options with groups shaped as `{ label, options }`. Single mode supports `searchable` with `searchPlaceholder` for local filtering in the popup. Matching uses `searchText`, plain label text, then the value. Set `emptyContent` to replace the empty/no-results state. `clearable` clears to `null` in single mode and retains any selected disabled options in multiple mode. Retains controlled/default value and open state, native form naming and constraints, and managed Form.Item integration. A selected option with value `""` satisfies both native and Form.Item required checks; clearing to `null` does not. Multi mode submits repeated form entries; an uncontrolled field resets to its initial value on native form reset.
+- `MultiSelect` remains a deprecated compatibility entry for `<Select mode="multiple" />`.
 - `Slider`: number value/defaultValue/onValueChange, min/max/step, label, disabled.
 - `NumberInput`: number/null value/defaultValue/onValueChange, min/max/step, label, disabled.
 - `DatePicker`: single ISO `YYYY-MM-DD` value/defaultValue/onValueChange, min/max, disabledDate, label, disabled, name, clearable. **Uses the browser's native date calendar**: appearance and keyboard controls vary by platform; custom disabledDate is rejected on selection, not painted as disabled in the native calendar. No date range/time support.
@@ -260,7 +260,10 @@ the base list contract. Provide `items: readonly T[]`, stable unique
 a `ListItem` or `li`; the index is zero-based within the current page). Use
 `getLabel(item)` for readable selection and disclosure names; it defaults to
 the key as a string. Numeric keys must be finite. The root accepts section attributes such as `aria-label`,
-`className` and `style`.
+`className` and `style`. The frame surrounds the rows and any pagination. When
+controls are present, a single tinted header places selection and bulk actions
+at the start and search, filters and custom controls at the end. Controls wrap
+in narrow layouts; when none are supplied the header is omitted.
 
 - `search` enables a search input. Use `value` with `onChange` for controlled
   search or `defaultValue` for the initial query. Set `placeholder`/`label` and
