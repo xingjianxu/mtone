@@ -20,6 +20,8 @@ import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
 import { Button, MtoneScope, useMtone, cn } from "./basic";
 import { runConfirmTransaction } from "./confirm-transaction";
+import { PopoverSelectContent, type PopoverSelectProps } from "./popover-select";
+export type { PopoverSelectItem, PopoverSelectProps } from "./popover-select";
 import {
   MenuSurfaceOwnerContext,
   FloatingSurface,
@@ -1132,7 +1134,7 @@ export interface PopoverProps
   /** Remove the Popup frame, padding and background, keeping positioning and focus. */
   unstyled?: boolean;
 }
-function PopoverRoot({
+function PopoverFrame({
   trigger,
   content,
   title,
@@ -1141,8 +1143,9 @@ function PopoverRoot({
   align = "center",
   width,
   unstyled,
+  initialFocus,
   ...props
-}: PopoverProps) {
+}: PopoverProps & { initialFocus?: BPopover.Popup.Props["initialFocus"] }) {
   const { locale } = useMtone();
   const hasTitle = title != null && title !== false && title !== "";
   const popupLabel =
@@ -1161,6 +1164,7 @@ function PopoverRoot({
         align={align}
         width={width}
         unstyled={unstyled}
+        initialFocus={initialFocus}
         label={popupLabel}
       >
         {hasTitle && (label !== undefined ? (
@@ -1173,7 +1177,43 @@ function PopoverRoot({
     </BPopover.Root>
   );
 }
-export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu });
+function PopoverRoot(props: PopoverProps) {
+  return <PopoverFrame {...props} />;
+}
+
+function PopoverSelect({
+  items, value, defaultValue, onValueChange,
+  open, defaultOpen, onOpenChange, searchPlaceholder, title,
+  width = 320, align = "start", ...props
+}: PopoverSelectProps) {
+  const { locale } = useMtone();
+  const [localValue, setLocalValue] = useState(defaultValue);
+  const [localOpen, setLocalOpen] = useState(defaultOpen ?? false);
+  const input = React.useRef<HTMLInputElement>(null);
+  const isOpen = open ?? localOpen;
+  const selected = value === undefined ? localValue : value;
+  function changeOpen(next: boolean) {
+    if (open === undefined) setLocalOpen(next);
+    onOpenChange?.(next);
+  }
+  return (
+    <PopoverFrame {...props} width={width} align={align} open={isOpen} onOpenChange={changeOpen}
+      title={title ?? (locale === "zh" ? "选择选项" : "Choose an option")}
+      initialFocus={input}
+      content={<PopoverSelectContent items={items} value={selected} open={isOpen}
+        searchPlaceholder={searchPlaceholder} inputRef={input}
+        select={(next) => {
+          if (next !== selected) {
+            if (value === undefined) setLocalValue(next);
+            onValueChange?.(next);
+          }
+          changeOpen(false);
+        }} />}
+    />
+  );
+}
+
+export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu, Select: PopoverSelect });
 
 export function Tooltip({
   children,

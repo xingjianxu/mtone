@@ -71,6 +71,55 @@ try{for(const [engineName,engine] of [['chromium',chromium],['firefox',firefox],
   const context=page.getByRole('menu');await expect(context).toBeVisible();
   const contextBox=await context.boundingBox();assert(contextBox.x>=-1&&contextBox.x+contextBox.width<=181,'context panel constrained at pointer edge');
   await page.keyboard.press('Escape');await expect(context).toHaveCount(0);
+  await page.setViewportSize({width:390,height:540});
+  await page.goto('http://127.0.0.1:5199/tests/fixtures/dropdown.html?select');
+  const repoTrigger=page.getByRole('button',{name:'Repository',exact:true});
+  await repoTrigger.press('Enter');
+  const picker=page.getByRole('dialog',{name:'Switch repository'});
+  const search=picker.getByRole('combobox');
+  const list=picker.getByRole('listbox');
+  await expect(search).toBeFocused();
+  const listId=await list.getAttribute('id');
+  await expect(search).toHaveAttribute('aria-controls',listId);
+  await expect(list.getByRole('option',{name:'Repository 0',exact:true,selected:true})).toBeVisible();
+  let measurements=await list.evaluate(el=>({
+    top:el.getBoundingClientRect().top, scroll:el.scrollHeight, client:el.clientHeight,
+    panelScroll:el.closest('[role=dialog]').scrollHeight,
+    panelClient:el.closest('[role=dialog]').clientHeight,
+  }));
+  const searchBox=await search.boundingBox();
+  const panelBox=await picker.boundingBox();
+  assert(measurements.scroll>measurements.client && measurements.panelScroll<=measurements.panelClient+1,
+    `${engineName} only the list scrolls: ${JSON.stringify(measurements)}`);
+  assert(searchBox.y+searchBox.height<measurements.top && panelBox.width===320);
+  await search.press('ArrowDown');
+  const option2=list.getByRole('option',{name:'Repository 2',exact:true});
+  await expect(search).toHaveAttribute('aria-activedescendant',await option2.getAttribute('id'));
+  for(let i=0;i<15;i++) await search.press('ArrowDown');
+  assert(await list.evaluate(el=>el.scrollTop>0));
+  assert.equal((await search.boundingBox()).y,searchBox.y,'keyboard scrolling keeps search fixed');
+  await search.fill('19');
+  await expect(list.getByRole('option')).toHaveCount(1);
+  await search.press('Enter');
+  await expect(page.getByLabel('Selected repository')).toHaveText('19');
+  await expect(picker).toHaveCount(0);
+  await expect(repoTrigger).toBeFocused();
+  await repoTrigger.click();
+  await expect(search).toHaveValue('');
+  await expect(list.getByRole('option',{name:'Repository 19',exact:true,selected:true})).toBeVisible();
+  await search.fill('not found');
+  await expect(picker.getByRole('status')).toBeVisible();
+  await search.press('Escape');
+  await expect(picker).toHaveCount(0);
+  await expect(repoTrigger).toBeFocused();
+  const otherTrigger=page.getByRole('button',{name:'Another picker'});
+  await otherTrigger.click();
+  const other=page.getByRole('dialog',{name:'Other options'});
+  await expect(other.getByRole('combobox')).toBeFocused();
+  assert.notEqual(await other.getByRole('listbox').getAttribute('id'),listId);
+  await other.getByRole('option',{name:'Repository 5',exact:true,selected:true}).click();
+  await expect(other).toHaveCount(0);
+  await expect(otherTrigger).toBeFocused();
   console.log(`${engineName}: Popover/Menu content sizing, explicit widths, LTR/RTL physical/logical alignment, focus and narrow-screen collision checks passed`);
  }finally{await browser.close();}
 }}finally{await server.close();}

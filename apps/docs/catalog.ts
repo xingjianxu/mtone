@@ -4031,9 +4031,9 @@ export default function Demo() {
   },
   {
     name: "Popover",
-    description: "非模态自定义浮层，以及保留菜单语义的 Popover.Menu 操作浮层。",
+    description: "非模态自定义浮层，另提供 Popover.Menu 操作菜单和 Popover.Select 可搜索单选。",
     importNames: ["Popover"],
-    code: 'import { Popover } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <>\n      <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />\n      <Popover.Menu trigger="文档操作" items={[{ key: "open", label: "打开文档" }]} onSelect={(key) => console.log(key)} />\n    </>\n  );\n}',
+    code: 'import { Popover } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <>\n      <Popover trigger="查看说明" title="提示" content="这里放置相关内容。" />\n      <Popover.Menu trigger="文档操作" items={[{ key: "open", label: "打开文档" }]} onSelect={(key) => console.log(key)} />\n      <Popover.Select trigger="切换仓库" title="仓库" items={[{ value: "mtone", label: "mtone" }]} defaultValue="mtone" />\n    </>\n  );\n}',
     props: [
       {
         name: "trigger",
@@ -4113,12 +4113,33 @@ export default function Demo() {
         type: "boolean / boolean / (open: boolean) => void",
         description: "菜单浮层的受控开关、非受控初始开关及变更回调。",
       },
+      {
+        name: "Popover.Select.items",
+        type: "readonly PopoverSelectItem[]",
+        description: "必填；每项为 { value: string, label: string, icon?: ReactNode, disabled?: boolean }。value 必须唯一；label 用于显示和搜索，图标可选。",
+      },
+      {
+        name: "Popover.Select.value / defaultValue / onValueChange",
+        type: "string | null / string | null / (value: string) => void",
+        description: "受控值、非受控初始值及值变更回调；null 表示没有选中项。确认后关闭，选择当前项也关闭但不触发值变更。",
+      },
+      {
+        name: "Popover.Select.trigger / title / label / searchPlaceholder",
+        type: "string | ReactElement / ReactNode / string / string",
+        description: "复用普通 Popover 的触发器、可见标题和可访问名称。默认标题为“选择选项”，搜索占位符为“搜索选项”（随语言切换）。",
+      },
+      {
+        name: "Popover.Select.width / align / side / open",
+        type: "同 Popover",
+        description: "默认 width=320px、align=start、side=bottom。亦支持 defaultOpen 和 onOpenChange；不接受 content 或 unstyled。",
+      },
     ],
     notes: [
       "Popover 是非模态 dialog，可使用 Tab 操作自定义内容，Escape 关闭并恢复焦点。自定义触发器需转发 ref 与 DOM props，浮层继承 MtoneProvider 上下文。",
       "Popover.Menu（PopoverMenuProps）适合纯操作菜单：传 trigger、items 与可选 label / onSelect；保留方向键、分组、子菜单、焦点恢复和叶子选择关闭，不另嵌套 dialog。",
       "Popover.Menu 的 triggerMode 默认为 click，可选 hover。悬停支持鼠标跨间隙和进入子菜单，不抢占键盘焦点；点击、键盘与触屏仍可用。字符串用内容宽度的下拉预设 Button，也可传自定义元素。",
       "Popover.Menu 的 width 默认随内容且最小 160px，align 默认 start，可传 start/end（随方向）或 left/right（物理边）；子菜单单独定宽。受控开关用 open / onOpenChange，或用 defaultOpen 设置初始状态。",
+      "Popover.Select 按标签做忽略大小写的子串过滤，标题与搜索框不随列表滚动。打开聚焦搜索，按方向键浏览并跳过禁用项，Enter 或点击确认，Escape 关闭；关闭后重置查询，不改变已选值。",
       "普通 Popover 的 content 可组合触发器无关的 Menu 和其他内容；内联 Menu 不改变外层 Popover 的开关，应用可在 onSelect 中控制。",
     ],
   },

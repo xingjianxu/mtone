@@ -10,6 +10,7 @@ The 0.10.0 tag did not reach npm. This version contains the complete update from
 - Remove overlapping aliases for Toast, DirectoryTree, AiChainOfThought, Modal, DropdownMenu, Mention, SearchInput, Textarea and FormField. See the [upgrade notes](docs/MIGRATION.md) for replacements.
 
 ### Added
+- `Popover.Select` opens a searchable single-selection list with a separate trigger, optional option icons, and keyboard navigation.
 - `SectionGroup` for titled content sections with trailing controls and evenly spaced separators.
 - `PageLayout` supports an optional left or right Sidebar, and can span the entire header and Tabs, span the heading area only, or keep both in the main column. Tabs are optional.
 - Nonvirtual data Lists can opt into controlled reordering with a whole-row drag preview and live insertion feedback.
