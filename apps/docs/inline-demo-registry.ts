@@ -1,3 +1,5 @@
+import SelectTags from "./inline-demos/select-tags";
+import SelectTagsSource from "./inline-demos/select-tags.tsx?raw";
 import SelectSearchable from "./inline-demos/select-searchable";
 import SelectSearchableSource from "./inline-demos/select-searchable.tsx?raw";
 import PopoverSearchableSelect from "./inline-demos/popover-select";
@@ -279,6 +281,13 @@ export const inlineDocSections: Readonly<
       title: "多选模式",
       Demo: Example6_0,
       source: source(Example6_0Raw),
+    },
+    {
+      id: "tags",
+      title: "搜索与创建标签",
+      note: "从列表选择，也可以输入自定义标签，按 Enter 或点击「创建」添加。输入法确认文字后，再按一次 Enter；离开输入框不会添加。",
+      Demo: SelectTags,
+      source: source(SelectTagsSource),
     },
   ],
   TagSelect: [

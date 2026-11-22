@@ -2935,7 +2935,7 @@ export default function Demo() {
   },
   {
     name: "Select",
-    description: "带浮层列表的单选和多选表单控件，支持搜索、分组与清除。",
+    description: "带浮层列表的单选、多选与标签创建控件，支持搜索、分组与清除。",
     importNames: ["Select"],
     code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const options = [{value:"design",label:"设计"},{value:"code",label:"开发"}];\n  return (\n    <>\n      <Select label="分类" searchable clearable defaultValue="design" options={options} />\n      <Select mode="multiple" label="标签" clearable defaultValue={["design"]} options={options} />\n    </>\n  );\n}',
     props: [
@@ -2959,11 +2959,11 @@ export default function Demo() {
         type: "string",
         description: "附加样式类。",
       },
-      { name: "mode", type: '"single" | "multiple"', default: '"single"', description: "选择模式；单选为 string | null，多选为 string[] 且默认可搜索。" },
+      { name: "mode", type: '"single" | "multiple" | "tags"', default: '"single"', description: "单选值为 string | null，多选与标签模式均为可搜索的 string[]；只有 tags 可以创建自定义值。" },
       { name: "searchable / searchPlaceholder", type: "boolean / string", description: "仅单选使用。启用后在下拉面板内提供本地搜索；可设置搜索框占位符。" },
-      { name: "clearable", type: "boolean", default: "false", description: "有可清除的选中值时，桌面悬停或键盘聚焦清除按钮会在箭头原位显示 ×；无悬停的触屏可直接点 ×。清除不打开下拉；单选变为 null，多选保留已选禁用项。" },
+      { name: "clearable", type: "boolean", default: "false", description: "有可清除的选中值时，桌面悬停或键盘聚焦清除按钮会在箭头原位显示 ×；无悬停的触屏可直接点 ×。清除不打开下拉；单选变为 null，多选与标签模式保留已选禁用项。" },
       { name: "emptyContent", type: "ReactNode", description: "替换空列表或搜索无结果的默认提示。" },
-      { name: "required / form", type: "boolean / string", description: "原生必填校验、可选外部表单 ID；多选通过重复 name 提交已选值。" },
+      { name: "required / form", type: "boolean / string", description: "原生必填校验、可选外部表单 ID；多选与标签模式通过重复 name 提交已选值。" },
       {
         name: "options",
         type: "readonly (SelectOption | SelectOptionGroup)[]",
@@ -3009,6 +3009,7 @@ export default function Demo() {
     notes: [
       "保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择。",
       "默认值和受控值按 mode 区分。空字符串可以作为显式选项值，原生和 Form.Item 的必填检查都将其视为已选；未选择单项用 null，多选未选择用 []。Form.Item 随 mode 集成。",
+      '标签模式（SelectTagsProps）通过 Enter 或点击“创建”添加去掉首尾空白的输入。已有选项的精确 value 或纯文本标签不另建，包括禁用选项；重复输入不会添加。失焦或输入法确认不创建，不按逗号等分隔符拆分批量输入。仅更新已选值数组，不修改 options。外部传入而不在 options 中的已选值显示原字符串。',
       '原 MultiSelect 保留为兼容入口，新代码使用 Select mode="multiple"。多选标签可换行；已选的禁用标签不由用户删除。',
 
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 32px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],

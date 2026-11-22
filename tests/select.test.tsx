@@ -1,8 +1,8 @@
 import React from "react";
-import { act, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
-import { Form, Input, MtoneProvider, Select } from "../packages/mtone/src";
+import { Form, Input, MtoneProvider, MultiSelect, Select } from "../packages/mtone/src";
 
 const grouped = [
   { label: "Systems", options: [
@@ -155,4 +155,114 @@ test("multiple clear and dropdown share a trailing slot without taking away eith
   expect(input).toHaveFocus();
   expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "Clear selection" })).not.toBeInTheDocument();
+});
+
+test("tags select existing choices and commit trimmed custom strings by Enter or option click without mutating options", async () => {
+  const user = userEvent.setup();
+  const change = vi.fn();
+  const options = [...grouped, { value: "saved-roadmaps", label: "roadmaps" }];
+  const { container } = render(<MtoneProvider locale="en"><form>
+    <Select mode="tags" label="Topic tags" name="topics" required clearable
+      options={options} defaultValue={["older tag"]} onValueChange={change} />
+  </form></MtoneProvider>);
+  const field = screen.getByRole("combobox", { name: "Topic tags" });
+  const form = container.querySelector("form")!;
+  expect(screen.getByText("older tag")).toBeVisible();
+  await user.type(field, "  roadmap  ");
+  expect(await screen.findByRole("option", { name: "Create “roadmap”" })).toBeVisible();
+  expect(screen.getByRole("option", { name: "roadmaps" })).toBeVisible();
+  await user.keyboard("{Enter}");
+  expect(change).toHaveBeenLastCalledWith(["older tag", "roadmap"]);
+  expect(field).toHaveValue("");
+
+  await user.type(field, "Help desk");
+  expect(screen.queryByRole("option", { name: "Create “Help desk”" })).not.toBeInTheDocument();
+  await user.click(screen.getByRole("option", { name: "Help desk" }));
+  expect(change).toHaveBeenLastCalledWith(["older tag", "roadmap", "desk"]);
+  await user.type(field, "green, blue");
+  await user.click(await screen.findByRole("option", { name: "Create “green, blue”" }));
+  expect(new FormData(form).getAll("topics")).toEqual(["older tag", "roadmap", "desk", "green, blue"]);
+  expect(options.map((option) => "options" in option ? option.options.map((entry) => entry.value) : option.value))
+    .toEqual([["", "vault", "locked"], ["desk"], "saved-roadmaps"]);
+
+  await user.type(field, "uncommitted");
+  await act(async () => form.reset());
+  expect(field).toHaveValue("");
+  expect(new FormData(form).getAll("topics")).toEqual(["older tag"]);
+});
+
+test("tags do not create empty, selected, known-id, or disabled plain-label duplicates, or on blur", async () => {
+  const user = userEvent.setup();
+  const change = vi.fn();
+  render(<MtoneProvider locale="en">
+    <Select mode="tags" label="Tags" defaultValue={["custom", "FIRST"]} onValueChange={change}
+      options={[{ value: "LOCK", label: "Restricted", disabled: true }, { value: "ID-2", label: "Second" }, { value: "FIRST", label: "First" }]} />
+    <button type="button">Outside</button>
+  </MtoneProvider>);
+  const field = screen.getByRole("combobox", { name: "Tags" });
+  const outside = screen.getByRole("button", { name: "Outside" });
+  for (const draft of ["  ", "custom", "LOCK", "Restricted", "FIRST", "First"]) {
+    await user.clear(field);
+    await user.type(field, draft);
+    expect(screen.queryByRole("option", { name: /^Create/ })).not.toBeInTheDocument();
+    await user.keyboard("{Enter}");
+    expect(change).not.toHaveBeenCalled();
+  }
+  await user.clear(field);
+  await user.type(field, "ID-2");
+  expect(screen.getByRole("option", { name: "Second" })).toBeVisible();
+  expect(screen.queryByRole("option", { name: /^Create/ })).not.toBeInTheDocument();
+  await user.clear(field);
+  await user.type(field, "just a draft");
+  await user.click(outside);
+  expect(change).not.toHaveBeenCalled();
+});
+
+test("tags wait for explicit Enter after the IME confirms text", async () => {
+  const user = userEvent.setup();
+  const change = vi.fn();
+  render(<MtoneProvider locale="en"><Select mode="tags" label="Tags" options={[]} onValueChange={change} /></MtoneProvider>);
+  const field = screen.getByRole("combobox", { name: "Tags" });
+  await user.click(field);
+  fireEvent.compositionStart(field);
+  fireEvent.input(field, { target: { value: "内蒙古" }, inputType: "insertCompositionText", isComposing: true });
+  fireEvent.keyDown(field, { key: "Enter", isComposing: true, keyCode: 229 });
+  expect(change).not.toHaveBeenCalled();
+  fireEvent.compositionEnd(field, { data: "内蒙古" });
+  expect(await screen.findByRole("option", { name: "Create “内蒙古”" })).toBeVisible();
+  fireEvent.keyDown(field, { key: "Enter", keyCode: 229 });
+  expect(change).not.toHaveBeenCalled();
+  await user.keyboard("{Enter}");
+  expect(change).toHaveBeenCalledExactlyOnceWith(["内蒙古"]);
+});
+
+test("Form.Item collects tags as string arrays and treats an empty array as required", async () => {
+  const user = userEvent.setup();
+  const finish = vi.fn(), failed = vi.fn();
+  render(<MtoneProvider locale="en"><Form onFinish={finish} onFinishFailed={failed}>
+    <Form.Item name="topics" label="Tags" required>
+      <Select mode="tags" options={[]} clearable />
+    </Form.Item>
+    <button type="submit">Submit</button>
+  </Form></MtoneProvider>);
+  const field = screen.getByRole("combobox", { name: "Tags" });
+  await user.click(screen.getByRole("button", { name: "Submit" }));
+  expect(failed).toHaveBeenCalledOnce();
+  await user.type(field, "paper{Enter}");
+  await user.click(screen.getByRole("button", { name: "Submit" }));
+  expect(finish).toHaveBeenCalledExactlyOnceWith({ topics: ["paper"] });
+});
+
+test("ordinary multiple and its compatibility alias never offer a custom option", async () => {
+  const user = userEvent.setup();
+  const changed = vi.fn();
+  render(<MtoneProvider locale="en">
+    <Select mode="multiple" label="Fixed choices" options={[]} onValueChange={changed} />
+    <MultiSelect label="Legacy choices" options={[]} onValueChange={changed} />
+  </MtoneProvider>);
+  for (const label of ["Fixed choices", "Legacy choices"]) {
+    await user.type(screen.getByRole("combobox", { name: label }), "new choice{Enter}");
+    expect(screen.queryByRole("option", { name: /^Create/ })).not.toBeInTheDocument();
+  }
+  expect(changed).not.toHaveBeenCalled();
 });

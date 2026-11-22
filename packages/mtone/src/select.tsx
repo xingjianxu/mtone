@@ -47,7 +47,10 @@ export interface SelectMultipleProps extends SelectCommonProps {
   defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
 }
-export type SelectProps = SelectSingleProps | SelectMultipleProps;
+export interface SelectTagsProps extends Omit<SelectMultipleProps, "mode"> {
+  mode: "tags";
+}
+export type SelectProps = SelectSingleProps | SelectMultipleProps | SelectTagsProps;
 
 /** @deprecated Use SelectMultipleProps and Select with mode="multiple". */
 export type MultiSelectProps = Omit<SelectMultipleProps, "mode">;
@@ -244,18 +247,19 @@ function SelectSingle({ options, searchable = false, searchPlaceholder, clearabl
 
 type OptionData = ReturnType<typeof useOptions>;
 type ComboGroup = { items: string[]; section: OptionSection; index: number };
-function ComboboxPopup({ data, empty, popupRef, label, children }: {
+function ComboboxPopup({ data, empty, popupRef, label, children, createOption }: {
   data: OptionData;
   empty: React.ReactNode;
   popupRef?: React.Ref<HTMLDivElement>;
   label?: string;
   children?: React.ReactNode;
+  createOption?: { value: string; label: string };
 }) {
   const item = (value: string) => {
     const option = data.byValue.get(value);
     return (
       <Combobox.Item className="mt-option" key={value} value={value} disabled={option?.disabled}>
-        <span className="mt-select-option-label">{option?.label ?? value}</span>
+        <span className="mt-select-option-label">{option?.label ?? (value === createOption?.value ? createOption.label : value)}</span>
         <Combobox.ItemIndicator className="mt-select-item-indicator" aria-hidden="true">{marker}</Combobox.ItemIndicator>
       </Combobox.Item>
     );
@@ -292,21 +296,70 @@ function ComboboxPopup({ data, empty, popupRef, label, children }: {
   );
 }
 
-function SelectMultiple({ options, clearable, emptyContent, placeholder, className, name, form, label, id, onBlur,
+function SelectMultiple({ mode, options, clearable, emptyContent, placeholder, className, name, form, label, id, onBlur,
   required, "aria-invalid": invalid, "aria-busy": busy,
   "aria-describedby": describedBy, "aria-labelledby": labelledBy, ...props
-}: MultiSelectProps) {
+}: SelectMultipleProps | SelectTagsProps) {
+  const tags = mode === "tags";
   const { locale } = useMtone();
   const disabled = useFieldsetDisabled(props.disabled);
   const popup = useSelectPopup(props, disabled);
-  const selection = useSelection({ ...props, form }, noValues, popup.reset);
+  const [inputValue, setInputValue] = React.useState("");
+  const [composing, setComposing] = React.useState(false);
+  const composingRef = React.useRef(false);
+  const resetPopup = React.useCallback(() => {
+    popup.reset();
+    setInputValue("");
+  }, [popup.reset]);
+  const selection = useSelection({ ...props, form }, noValues, tags ? resetPopup : popup.reset);
   const optionData = useOptions(options);
+  const draft = tags ? inputValue.trim() : "";
+  const exactValues = React.useMemo(() => {
+    const values = new Set<string>();
+    if (!draft) return values;
+    for (const option of optionData.items) {
+      if (option.value === draft ||
+        ((typeof option.label === "string" || typeof option.label === "number") && String(option.label).trim() === draft)) {
+        values.add(option.value);
+      }
+    }
+    return values;
+  }, [draft, optionData]);
+  // Use the actual draft as the option value: it is disjoint from every known
+  // or selected value, so no marker string can leak into form data or collide.
+  const createValue = draft && !composing && !exactValues.size && !selection.value.includes(draft) ? draft : undefined;
+  const items = React.useMemo(() => {
+    if (createValue === undefined) return optionData.comboItems;
+    if (optionData.sections.some((section) => section.grouped)) {
+      const section = { items: [], grouped: false };
+      const createGroup: ComboGroup = { items: [createValue], section, index: -1 };
+      return [createGroup, ...optionData.comboItems];
+    }
+    return [createValue, ...optionData.comboItems];
+  }, [optionData, createValue]);
+  const { contains } = Combobox.useFilter({ multiple: true });
+  const tagsFilter = (value: string, query: string, getLabel?: (value: string) => string) => {
+    const trimmed = query.trim();
+    if (trimmed && trimmed === draft && exactValues.size) return exactValues.has(value);
+    return value === createValue || contains(value, query, getLabel);
+  };
   const locked = selection.value.filter((value) => optionData.byValue.get(value)?.disabled);
   const labelFor = (value: string) => optionText(optionData.byValue.get(value), value);
   return (
-    <Combobox.Root<string, true> multiple items={optionData.comboItems} itemToStringLabel={labelFor}
+    <Combobox.Root<string, true> multiple items={items} itemToStringLabel={labelFor}
+      {...(tags ? { inputValue, onInputValueChange: setInputValue, filter: tagsFilter, autoHighlight: true } : {})}
       value={selection.value} inputRef={selection.inputRef} name={name} form={form} disabled={disabled} required={required}
       onValueChange={(next, details) => {
+        if (tags && details.reason === "item-press") {
+          const event = details.event;
+          const repeat = "key" in event && event.key === "Enter" &&
+            selection.value.some((value) => exactValues.has(value) && !next.includes(value));
+          if (composingRef.current || repeat) {
+            details.cancel();
+            return;
+          }
+          setInputValue("");
+        }
         if (details.reason === "clear-press") {
           if (locked.length < selection.value.length) selection.change(locked);
         } else if (locked.some((value) => !next.includes(value))) {
@@ -328,9 +381,28 @@ function SelectMultiple({ options, clearable, emptyContent, placeholder, classNa
           );
         })}
         <Combobox.Input id={id} onBlur={onBlur}
+          {...(tags ? {
+            onCompositionStart: () => { composingRef.current = true; setComposing(true); },
+            onCompositionEnd: () => { composingRef.current = false; setComposing(false); },
+          } : {})}
+          onKeyDown={tags ? (event) => {
+            if (event.key !== "Enter") return;
+            if (composingRef.current || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) {
+              // Let the platform confirm the composition, but do not let Base UI
+              // convert this keystroke into an option click.
+              event.preventBaseUIHandler();
+            } else if (inputValue && (popup.open || !draft)) {
+              // Typed text is a draft, not an implicit submit. Leave an enabled
+              // active option to Base UI; do not toggle it when retyping its label.
+              event.preventDefault();
+              if (!draft || (!exactValues.size && selection.value.includes(draft))) event.preventBaseUIHandler();
+            }
+          } : undefined}
           aria-invalid={invalid} aria-describedby={describedBy} aria-labelledby={labelledBy}
           aria-busy={busy} aria-label={label} aria-required={required || undefined}
-          placeholder={placeholder ?? (locale === "zh" ? "搜索…" : "Search…")}
+          placeholder={placeholder ?? (tags
+            ? (locale === "zh" ? "搜索或创建标签…" : "Search or create tags…")
+            : (locale === "zh" ? "搜索…" : "Search…"))}
           className="mt-combobox-input" />
         <span className="mt-select-action-slot">
           {clearable && !disabled && locked.length < selection.value.length && (
@@ -344,15 +416,18 @@ function SelectMultiple({ options, clearable, emptyContent, placeholder, classNa
           </Combobox.Trigger>
         </span>
       </Combobox.Chips>
-      <ComboboxPopup data={optionData} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")} />
+      <ComboboxPopup data={optionData} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
+        createOption={createValue === undefined ? undefined : {
+          value: createValue, label: locale === "zh" ? `创建“${createValue}”` : `Create “${createValue}”`,
+        }} />
     </Combobox.Root>
   );
 }
 
 export function Select(props: SelectProps) {
-  return props.mode === "multiple" ? <SelectMultiple {...props} /> : <SelectSingle {...props} />;
+  return props.mode === "multiple" || props.mode === "tags" ? <SelectMultiple {...props} /> : <SelectSingle {...props} />;
 }
-Select.formValueType = (props: { mode?: unknown }) => props.mode === "multiple" ? "array" : "select-single";
+Select.formValueType = (props: { mode?: unknown }) => props.mode === "multiple" || props.mode === "tags" ? "array" : "select-single";
 
 /** @deprecated Use <Select mode="multiple" />. */
 export function MultiSelect(props: MultiSelectProps) {

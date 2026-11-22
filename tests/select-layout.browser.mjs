@@ -328,7 +328,36 @@ try {
   } finally {
     await touch.close();
   }
-  console.log("Select geometry, shared clear slot, keyboard, touch and unified form checks passed");
+  await page.goto("http://127.0.0.1:5187/tests/fixtures/select-layout.html?tags");
+  const tagsForm = page.getByRole("form", { name: "Tags example" });
+  const tags = tagsForm.getByRole("combobox", { name: "Topics" });
+  const tagsValues = () => tagsForm.evaluate((node) => new FormData(node).getAll("topic"));
+  const create = (name) => page.getByRole("option", { name: `Create “${name}”` });
+
+  await tags.click();
+  await tags.fill("  plan, notes  ");
+  await expect(create("plan, notes")).toBeVisible();
+  await tags.press("Enter");
+  await expect(tags).toHaveValue("");
+  await expect(tags).toBeFocused();
+  assert.deepEqual(await tagsValues(), ["plan, notes"]);
+
+  await tags.fill("Repository 1");
+  await expect(create("Repository 1")).toHaveCount(0);
+  await page.getByRole("option", { name: "Repository 1", exact: true }).click();
+  await tags.fill("quick idea");
+  await create("quick idea").click();
+  assert.deepEqual(await tagsValues(), ["plan, notes", "repo-1", "quick idea"]);
+  await tags.fill("Locked repository");
+  await expect(page.getByRole("option", { name: "Locked repository" })).toHaveAttribute("aria-disabled", "true");
+  await tags.press("Enter");
+  await tags.fill("not committed");
+  await tagsForm.getByRole("button", { name: "Outside tags", includeHidden: true }).click();
+  assert.deepEqual(await tagsValues(), ["plan, notes", "repo-1", "quick idea"]);
+  await tagsForm.getByRole("button", { name: "Reset tags" }).click();
+  assert.deepEqual(await tagsValues(), []);
+
+  console.log("Select geometry, shared clear slot, keyboard, touch, tags and unified form checks passed");
 } finally {
   await browser?.close();
   await server.close();

@@ -24,6 +24,17 @@ function UnifiedFixture() {
     </MtoneProvider>
   );
 }
+function TagsFixture() {
+  return (
+    <MtoneProvider locale="en">
+      <form aria-label="Tags example" style={{ display: "grid", justifyItems: "start", gap: 12, padding: 12 }}>
+        <Select mode="tags" label="Topics" name="topic" clearable options={pickerOptions} />
+        <button type="reset">Reset tags</button>
+        <button type="button">Outside tags</button>
+      </form>
+    </MtoneProvider>
+  );
+}
 function ClearSlotFixture() {
   const options = [
     { value: "alpha", label: "Alpha" },
@@ -47,7 +58,7 @@ function ClearSlotFixture() {
 }
 const query = new URLSearchParams(location.search);
 createRoot(document.getElementById("root")!).render(
-  query.has("clearSlot") ? <ClearSlotFixture /> : query.has("unified") ? <UnifiedFixture /> : <>
+  query.has("tags") ? <TagsFixture /> : query.has("clearSlot") ? <ClearSlotFixture /> : query.has("unified") ? <UnifiedFixture /> : <>
     <style>{`.case .mt-select { width: var(--width); min-width: 0; box-sizing: border-box; } .case { margin: 12px; } .case .tall { width: 200px; height: 48px; font-size: 24px; }`}</style>
     {(["light", "dark"] as const).map((theme) => (
       <MtoneProvider key={theme} theme={theme}>
