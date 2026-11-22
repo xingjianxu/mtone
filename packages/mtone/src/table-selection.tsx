@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
+import { INTERNAL_COL_DEFINE } from "@rc-component/table";
 import { Menu } from "./interactive";
 import type {
   TableColumn,
@@ -40,7 +41,11 @@ export function useTableSelection<T>({
   onSelectionChange,
   zh,
   locale = {},
-}: Options<T>): { column: TableColumn<T> | null; selectedKeys: React.Key[] } {
+}: Options<T>): {
+  column: TableColumn<T> | null;
+  compactWidth?: number;
+  selectedKeys: React.Key[];
+} {
   const config = rowSelection ?? {};
   const enabled = !!rowSelection || !!selectable;
   const [internalKeys, setInternalKeys] = React.useState<React.Key[]>(
@@ -327,18 +332,32 @@ export function useTableSelection<T>({
       )}
     </span>
   );
+  const compactWidth =
+    config.columnWidth == null &&
+    config.columnTitle == null &&
+    config.renderCell == null
+      ? (hasActions ? 56 : 32)
+      : undefined;
+  const compactColumn = compactWidth !== undefined
+    ? { [INTERNAL_COL_DEFINE]: { className: "mt-table-compact-selection-col" } }
+    : {};
   return {
     selectedKeys: effectiveKeys,
+    compactWidth,
     column: {
+      ...compactColumn,
       key: "__mtone_selection__",
       title:
         typeof config.columnTitle === "function"
           ? config.columnTitle(title)
           : (config.columnTitle ?? title),
-      width: config.columnWidth ?? (hasActions ? 64 : 40),
+      width: config.columnWidth ?? compactWidth ?? (hasActions ? 64 : 40),
       fixed: config.fixed,
       align: config.align ?? "center",
-      className: "mt-table-selection-column",
+      className:
+        compactWidth === undefined
+          ? "mt-table-selection-column"
+          : "mt-table-selection-column mt-table-selection-column-compact",
       onCell: config.onCell,
       render: (_value, row, index) => {
         const key = getRowKey(row),

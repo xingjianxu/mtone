@@ -69,6 +69,61 @@ function Demo() {
             )}
           />
         </section>
+        {(
+          [
+            "default",
+            "radio",
+            "actions",
+            "fixed",
+            "fixed-viewport",
+            "empty",
+            "intrinsic",
+            "explicit",
+            "virtual",
+          ] as const
+        ).map((kind) => (
+          <section data-testid={`column-width-${kind}`} key={kind}>
+            <Table
+              dataSource={kind === "empty" ? [] : rows.slice(0, 3)}
+              bordered
+              columns={
+                kind === "explicit"
+                  ? [{ ...columns[0], width: undefined }, columns[1], columns[2]]
+                  : kind === "intrinsic"
+                    ? [{ ...columns[0], width: 1050 }, columns[1], columns[2]]
+                    : columns
+              }
+              rowSelection={{
+                type: kind === "radio" ? "radio" : "checkbox",
+                selections: kind === "actions",
+                fixed:
+                  kind === "fixed" ||
+                  kind === "empty" ||
+                  kind === "virtual" ||
+                  kind === "intrinsic",
+                columnWidth: kind === "explicit" ? 88 : undefined,
+                columnTitle:
+                  kind === "explicit"
+                    ? (original) => (
+                        <span style={{ display: "inline-flex", gap: 4 }}>
+                          {original} Pick
+                        </span>
+                      )
+                    : undefined,
+              }}
+              scroll={
+                kind === "fixed" || kind === "empty" || kind === "virtual"
+                  ? { x: 1100, y: 120 }
+                  : kind === "fixed-viewport"
+                    ? { y: 120 }
+                    : kind === "intrinsic"
+                      ? { x: "max-content" }
+                      : undefined
+              }
+              virtual={kind === "virtual"}
+            />
+          </section>
+        ))}
         <section data-testid="controls">
           <h2>Filter and selection</h2>
           <Button

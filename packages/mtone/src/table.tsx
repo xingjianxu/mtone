@@ -86,6 +86,170 @@ function useResponsive() {
   }, []);
   return width;
 }
+// Automatic native layouts can reserve a percent share equivalent to a
+// compact width. Fixed layouts need a fully assigned pixel budget: WebKit
+// redistributes spare width to the selection track despite that percent.
+function useCompactSelectionWidth(
+  ref: React.RefObject<Reference | null>,
+  compactWidth: number | undefined,
+  virtual: boolean,
+  separateHeader: boolean,
+  empty: boolean,
+  scrollX: NonNullable<TableProps<unknown>["scroll"]>["x"],
+  layoutKey: string,
+  tableComponent: unknown,
+) {
+  const [fitWidth, setFitWidth] = React.useState(0);
+  React.useLayoutEffect(() => {
+    if (compactWidth === undefined) return;
+    const root = ref.current?.nativeElement;
+    if (!root) return;
+    const container = ":scope > .mt-table-container > ";
+    const body =
+      !virtual &&
+      root.querySelector<HTMLTableElement>(
+        container + ":is(.mt-table-body, .mt-table-content) > table",
+      );
+    // Empty fixed holders fall back to the original, unmeasured colgroup.
+    const holders =
+      !virtual && empty && separateHeader
+        ? root.querySelectorAll<HTMLTableElement>(
+            container + ":is(.mt-table-header, .mt-table-summary) > table",
+          )
+        : [];
+    const tables = body ? [body, ...holders] : [...holders];
+    if (!virtual && !tables.length) return;
+    const variable = "--_mt-table-selection-width-percent";
+    const attribute = "data-mtone-compact-selection";
+    const update = () => {
+      if (virtual) {
+        setFitWidth(root.offsetWidth);
+        return;
+      }
+      const viewport = body ? (body.parentElement?.clientWidth ?? 0) : 0;
+      let pixels = 0;
+      if (body && body.style.tableLayout === "fixed" && viewport > 0) {
+        // Use the viewport/request, not the already fitted table width, so
+        // a change in the requested or available width can shrink columns.
+        const width =
+          scrollX == null
+            ? viewport
+            : typeof scrollX === "number"
+              ? scrollX
+              : typeof scrollX === "string" &&
+                  /^(?:\d+\.?\d*|\.\d+)(?:px|%)$/.test(scrollX)
+                ? parseFloat(scrollX) *
+                  (scrollX.endsWith("%") ? viewport / 100 : 1)
+                : 0;
+        if (width > 0) pixels = Math.ceil(Math.max(viewport, width));
+      }
+      setFitWidth(pixels);
+      for (const table of tables) {
+        const width = table.offsetWidth;
+        // Once an intrinsic max-content table exceeds its scroll viewport,
+        // it has no surplus to apportion and must not feed its own width back.
+        if (
+          pixels ||
+          (scrollX === "max-content" &&
+            width > (table.parentElement?.clientWidth ?? width) + 1)
+        ) {
+          table.removeAttribute(attribute);
+          table.style.removeProperty(variable);
+          continue;
+        }
+        if (width > 0) {
+          const percentage = `${(compactWidth / width) * 100}%`;
+          if (table.style.getPropertyValue(variable) !== percentage) {
+            table.style.setProperty(variable, percentage);
+            table.setAttribute(attribute, "");
+          }
+        }
+      }
+    };
+    update();
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? undefined
+        : new ResizeObserver(update);
+    for (const target of virtual ? [root] : tables) observer?.observe(target);
+    if (body && body.parentElement) observer?.observe(body.parentElement);
+    return () => {
+      observer?.disconnect();
+      for (const table of tables) {
+        table.removeAttribute(attribute);
+        table.style.removeProperty(variable);
+      }
+    };
+  }, [
+    compactWidth,
+    empty,
+    layoutKey,
+    ref,
+    scrollX,
+    separateHeader,
+    tableComponent,
+    virtual,
+  ]);
+  return fitWidth;
+}
+
+// Give surplus to data columns before native fixed layout or rc-table's
+// virtual grid scales all columns. If there's an auto column, either engine
+// already has a flexible track to take that space.
+function reserveSelectionWidth<T>(
+  columns: TableColumn<T>[],
+  selection: TableColumn<T>,
+  selectionWidth: number,
+  targetWidth: number,
+  percentBasis: number,
+  expandable: TableProps<T>["expandable"],
+  virtual: boolean,
+): TableColumn<T>[] {
+  const parseWidth = (width: TableColumn<T>["width"]) =>
+    typeof width === "number"
+      ? width
+      : width?.endsWith("%")
+        ? (percentBasis * parseFloat(width)) / 100
+        : !virtual && width?.endsWith("px")
+          ? parseFloat(width)
+          : 0;
+  const expandWidth =
+    expandable?.expandedRowRender && expandable.showExpandColumn !== false
+      ? parseWidth(expandable.columnWidth)
+      : 0;
+  if (
+    expandable?.expandedRowRender &&
+    expandable.showExpandColumn !== false &&
+    !expandWidth
+  )
+    return columns;
+  const widths = new Map<TableColumn<T>, number>();
+  let total = 0;
+  for (const column of flattenColumns(columns)) {
+    if (column === selection || column === EXPAND_COLUMN) continue;
+    const width = parseWidth(column.width);
+    if (!width || !Number.isFinite(width) || width < 0) return columns;
+    widths.set(column, width);
+    total += width;
+  }
+  const target = targetWidth - selectionWidth - expandWidth;
+  if (!widths.size || target <= total) return columns;
+  let remaining = target;
+  let count = widths.size;
+  const fit = (cols: TableColumn<T>[]): TableColumn<T>[] =>
+    cols.map((column) => {
+      if (column.children?.length)
+        return { ...column, children: fit(column.children) };
+      const width = widths.get(column);
+      if (!width) return column;
+      const next =
+        --count === 0 ? remaining : Math.floor((width / total) * target);
+      remaining -= next;
+      return { ...column, width: next };
+    });
+  return fit(columns);
+}
+
 function TableInner<T>(
   props: TableProps<T>,
   forwardedRef: React.ForwardedRef<Reference>,
@@ -507,7 +671,8 @@ function TableInner<T>(
     renderedColumns.unshift(selection.column);
   // Tree controls belong to data, not to the injected selection column.
   // Work in leaf coordinates, matching rc-table after grouped columns flatten.
-  const treeExpandColumnIndex = flattenColumns(renderedColumns)
+  const renderedLeaves = flattenColumns(renderedColumns);
+  const treeExpandColumnIndex = renderedLeaves
     .filter((column) => column !== EXPAND_COLUMN)
     .findIndex((column) => column !== selection.column);
   const resolvedExpandable = !expandable?.expandedRowRender
@@ -581,13 +746,40 @@ function TableInner<T>(
           <span className="mt-table-expand-placeholder" />
         )),
   };
+  const layoutKey =
+    engineProps.tableLayout ??
+    `${!!expandable?.fixed}/${renderedLeaves.some((column) => column.fixed)}/${renderedLeaves.some((column) => column.ellipsis)}`;
+  const fitWidth = useCompactSelectionWidth(
+    tableRef,
+    selection.compactWidth,
+    !!virtual,
+    scroll?.y != null || !!engineProps.sticky,
+    pageData.length === 0,
+    scroll?.x,
+    layoutKey,
+    components?.table,
+  );
+  const virtualScrollWidth = typeof scroll?.x === "number" ? scroll.x : 1000;
+  const targetWidth = virtual ? Math.max(virtualScrollWidth, fitWidth) : fitWidth;
+  const engineColumns =
+    targetWidth && selection.column && selection.compactWidth !== undefined
+      ? reserveSelectionWidth(
+          renderedColumns,
+          selection.column,
+          selection.compactWidth,
+          targetWidth,
+          virtual ? virtualScrollWidth : targetWidth,
+          resolvedExpandable,
+          !!virtual,
+        )
+      : renderedColumns;
   const rcProps = {
     ...engineProps,
     ref: tableRef,
     prefixCls: "mt-table",
     className: cn("mt-table-engine", showLoading && "mt-table-is-loading"),
     data: pageData,
-    columns: renderedColumns as ColumnsType<T>,
+    columns: engineColumns as ColumnsType<T>,
     rowKey,
     scroll,
     expandable: resolvedExpandable,
@@ -650,7 +842,7 @@ function TableInner<T>(
           <VirtualEngine
             {...rcProps}
             scroll={{
-              x: typeof scroll?.x === "number" ? scroll.x : 1000,
+              x: virtualScrollWidth,
               y: typeof scroll?.y === "number" ? scroll.y : 400,
             }}
             listItemHeight={virtualItemHeight}
