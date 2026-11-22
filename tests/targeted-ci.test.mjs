@@ -14,6 +14,7 @@ import { join } from "node:path";
 const tests = [
   "tests/basic.test.tsx",
   "tests/control-height.browser.mjs",
+  "tests/component-layout.test.tsx",
   "tests/docs-categories.test.tsx",
   "tests/docs-search.browser.mjs",
   "tests/docs-regression-proof.test.mjs",
@@ -65,6 +66,13 @@ describe("Targeted CI selection", () => {
     expect(plan.browser).toContain("tests/docs-search.browser.mjs");
     expect(plan.unit).not.toContain("tests/tree.test.tsx");
   });
+
+  it.each(["apps/docs/catalog.ts", "apps/docs/docs-app.tsx"])(
+    "validates canonical component documentation routes when %s changes",
+    (path) => {
+      expect(makePlan([path], tests).unit).toContain("tests/component-layout.test.tsx");
+    },
+  );
 
   it("maps navigation and fixtures to their actual component/browser tests, not unrelated checks", () => {
     const plan = makePlan(

@@ -1,10 +1,11 @@
 import React from "react";
 import { render, screen, within } from "@testing-library/react";
 import { expect, test } from "vitest";
-import { DocsApp, parseRoute, docSections } from "../apps/docs/docs-app";
+import { DocsApp, parseRoute, docSections, componentDocHref } from "../apps/docs/docs-app";
 
 import type { DocSection } from "../apps/docs/doc-section";
 import { componentDocs } from "../apps/docs/catalog";
+import { typographySectionId } from "../apps/docs/typography-navigation";
 test("accepts directly linked demo and API anchors", () => {
   expect(parseRoute("#/components/Table?section=row-selection")).toEqual(
     { kind: "component", name: "Table", section: "row-selection" }
@@ -18,14 +19,16 @@ test("component page gives access to a shareable API anchor", () => {
   expect(within(outline).getByRole("link", { name: "API" }).getAttribute("href")).toBe("#/components/Button?section=props");
 });
 
-test("every route has labeled docs with standalone source for every preview", () => {
+test("every canonical doc link lands on a labeled page or nested section with source for each preview", () => {
+  const sectionIds = new Map<string, Set<string>>();
   for (const doc of componentDocs) {
-    const route = parseRoute(`#/components/${doc.name}`);
-    expect(route.kind).toBe("component");
+    const href = componentDocHref(doc.name);
+    const route = parseRoute(href);
+    expect(route.kind, `${doc.name} → ${href}`).toBe("component");
     if (route.kind !== "component") continue;
     const sections = docSections[route.name];
     expect(sections?.length, route.name).toBeGreaterThan(0);
-    const ids = new Set();
+    const ids = sectionIds.get(route.name) ?? new Set<string>();
     const visit = (items: readonly DocSection[]) => {
       for (const item of items) {
         expect(ids.has(item.id), `${route.name} #${item.id}`).toBe(false);
@@ -36,6 +39,21 @@ test("every route has labeled docs with standalone source for every preview", ()
         if (item.children) visit(item.children);
       }
     };
-    visit(sections);
+    if (!sectionIds.has(route.name)) {
+      visit(sections);
+      sectionIds.set(route.name, ids);
+    }
+    if (route.section) {
+      const target = route.name === "Typography"
+        ? typographySectionId(route.section)
+        : route.section;
+      expect(ids.has(target), href).toBe(true);
+    }
+    if (doc.sidebarSection) {
+      expect(route).toEqual({
+        kind: "component", name: doc.sidebarParent, section: doc.sidebarSection,
+      });
+      expect(parseRoute(`#/components/${doc.name}`)).toEqual({ kind: "not-found" });
+    }
   }
 });

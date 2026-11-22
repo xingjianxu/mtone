@@ -63,7 +63,7 @@ const sidebarGroups = componentDocGroups.map(({ label, members }) => ({
     !doc.sidebarParent && !isTypographySection(doc.name),
   ),
 }));
-const componentDocHref = (name: string) => familyDocHref(name) ?? aiSectionHref(name) ?? baseComponentDocHref(name);
+export const componentDocHref = (name: string) => familyDocHref(name) ?? aiSectionHref(name) ?? baseComponentDocHref(name);
 function ImportLine({ code }: { code: string }) {
   const [status, setStatus] = useState("");
   return <div className="component-import">

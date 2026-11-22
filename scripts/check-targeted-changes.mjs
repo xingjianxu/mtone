@@ -95,6 +95,7 @@ const ciUnits = [
   "tests/targeted-ci.test.mjs",
 ];
 const appUnits = [
+  "tests/component-layout.test.tsx",
   "tests/docs-categories.test.tsx",
   "tests/secondary-demo-registry.test.tsx",
   "tests/llms.test.ts",
