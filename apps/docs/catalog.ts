@@ -2173,7 +2173,7 @@ export default function Demo() {
 },
   {
     name: "PageLayout",
-    description: "组织单页标题、操作、标签页和内容，也可限制整页宽度并在父容器内居中。",
+    description: "组织单页标题、操作、标签页和正文，可添加页面侧栏，也可限制整页宽度并在父容器内居中。",
     importNames: ["PageLayout"],
     code: 'import { PageLayout } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <PageLayout title="项目总览" maxWidth="md">本周有 3 项任务待处理。</PageLayout>;\n}',
     props: [
@@ -2185,11 +2185,18 @@ export default function Demo() {
       { name: "description", type: "ReactNode", description: "标题行下方的补充内容。" },
       { name: "extra", type: "ReactNode", description: "与描述同组的附加信息。" },
       { name: "tabs", type: "ReactNode", description: "标题区之后、正文之前的内容，可传入完整 Tabs。" },
+      { name: "sidebar", type: "ReactNode", description: "页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。" },
+      { name: "sidebarPosition", type: '"left" | "right"', default: '"left"', description: "侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。" },
+      { name: "headerSpan", type: '"full" | "main"', default: '"full"', description: "标题（含图标和副标题）、操作、描述、附加信息和标签页一起跨整页或仅占主栏；无侧栏时忽略。" },
       { name: "maxWidth", type: '"sm" | "md" | "lg" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
       { name: "children", type: "ReactNode", description: "正文。" },
       { name: "HTML div 属性", type: 'Omit<ComponentPropsWithRef<"div">, "title">', description: "className、style、ref 等传给根元素。" },
     ],
-    notes: ["maxWidth 同时约束标题、操作、标签页与正文，不影响外层 AdminLayout 的侧栏或顶栏。", "只负责单页布局，不管理标签状态、路由或应用导航。"],
+    notes: [
+      "maxWidth 同时约束页头、标签页、侧栏和正文，不影响外层 AdminLayout 的侧栏或顶栏。",
+      "PageLayout 本身的可用宽度达到 640px 时左右分栏；侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 模式的页头始终在最上方。",
+      "只负责单页布局，不管理侧栏折叠、独立滚动、标签状态、路由或应用导航。",
+    ],
   },
   {
     name: "AdminLayout",

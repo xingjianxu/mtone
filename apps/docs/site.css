@@ -213,10 +213,11 @@ p {
   align-items: center;
   gap: 4px;
 }
-section {
+/* Docs prose spacing must not leak into rendered component examples. */
+section:not(:where(.example-stage *)) {
   margin: 40px 0 50px;
 }
-section > p {
+section:not(:where(.example-stage *)) > p {
   font-size: 13px;
 }
 .intro-actions {
@@ -672,7 +673,7 @@ section > p {
 }
 .component-content-layout [id][tabindex="-1"]:not(main) { scroll-margin-top: 88px; }
 .component-content-layout .component-doc-section > .component-doc-section { margin-top: 22px; }
-.component-doc-section h3, .component-doc-section h4 { margin: 0 0 8px; }
+.component-doc-section :is(h3, h4):not(:where(.example-stage *)) { margin: 0 0 8px; }
 .component-demo-card { border: 1px solid var(--docs-border); border-radius: 7px; min-width: 0; }
 .component-demo-stage { margin: 0; display: block; border: 0; border-radius: 0; background: transparent; padding: 16px; min-width: 0; min-height: 0; overflow: visible; }
 .component-demo-source { border-top: 1px solid var(--docs-border); }

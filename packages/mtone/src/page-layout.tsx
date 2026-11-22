@@ -11,6 +11,12 @@ export interface PageLayoutProps
   description?: React.ReactNode;
   extra?: React.ReactNode;
   tabs?: React.ReactNode;
+  /** Optional page-local sidebar. Pass a Sidebar or any other content. */
+  sidebar?: React.ReactNode;
+  /** Physical side of the main column when there is room. */
+  sidebarPosition?: "left" | "right";
+  /** Whether the header and tabs span both columns or only the main column. */
+  headerSpan?: "full" | "main";
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   /** Center the entire layout in its parent, with a preset or maximum pixel width. */
   maxWidth?: keyof typeof pageLayoutWidths | number;
@@ -27,11 +33,13 @@ function hasContent(node: React.ReactNode): boolean {
 
 export function PageLayout({
   title, subtitle, icon, actions, description, extra, tabs, children,
+  sidebar, sidebarPosition = "left", headerSpan = "full",
   headingLevel = 1, maxWidth, className, style, ...rootProps
 }: PageLayoutProps) {
   const Heading = `h${headingLevel}` as const;
   const showDescription = hasContent(description);
   const showExtra = hasContent(extra);
+  const showSidebar = hasContent(sidebar);
   const width = typeof maxWidth === "number"
     ? maxWidth
     : maxWidth && pageLayoutWidths[maxWidth];
@@ -39,13 +47,14 @@ export function PageLayout({
   const rootClassName = [
     "mt-page-layout",
     constrained && "mt-page-layout-constrained",
+    showSidebar && "mt-page-layout-with-sidebar",
     className,
   ].filter(Boolean).join(" ");
   const rootStyle = constrained
     ? { "--mt-page-layout-max-width": `${width}px`, ...style } as React.CSSProperties
     : style;
-  return (
-    <div {...rootProps} className={rootClassName} style={rootStyle}>
+  const header = (
+    <>
       <div className="mt-page-layout-header">
         <div className="mt-page-layout-row">
           {hasContent(icon) && <div className="mt-page-layout-icon">{icon}</div>}
@@ -63,7 +72,24 @@ export function PageLayout({
         )}
       </div>
       {hasContent(tabs) && <div className="mt-page-layout-tabs">{tabs}</div>}
-      {hasContent(children) && <div className="mt-page-layout-body">{children}</div>}
+    </>
+  );
+  const body = hasContent(children) && <div className="mt-page-layout-body">{children}</div>;
+  const sidebarSlot = showSidebar && <div className="mt-page-layout-sidebar">{sidebar}</div>;
+
+  return (
+    <div {...rootProps} className={rootClassName} style={rootStyle}>
+      {(!showSidebar || headerSpan === "full") && header}
+      {showSidebar ? (
+        <div className="mt-page-layout-columns">
+          {sidebarPosition === "left" && sidebarSlot}
+          <div className="mt-page-layout-main">
+            {headerSpan === "main" && header}
+            {body}
+          </div>
+          {sidebarPosition === "right" && sidebarSlot}
+        </div>
+      ) : body}
     </div>
   );
 }

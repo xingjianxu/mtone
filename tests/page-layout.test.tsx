@@ -73,3 +73,34 @@ test.each([
   expect(root).not.toHaveClass("mt-page-layout-constrained");
   expect(root.style.getPropertyValue("--mt-page-layout-max-width")).toBe("");
 });
+
+test.each([
+  [{}, "TitleSaveDescriptionExtraTabsFiltersRows"],
+  [{ sidebarPosition: "right" }, "TitleSaveDescriptionExtraTabsRowsFilters"],
+  [{ headerSpan: "main" }, "FiltersTitleSaveDescriptionExtraTabsRows"],
+  [{ sidebarPosition: "right", headerSpan: "main" }, "TitleSaveDescriptionExtraTabsRowsFilters"],
+] as const)("preserves focus and reading order with sidebar options %j", (options, expected) => {
+  const { container } = render(
+    <Mtone.PageLayout title="Title" actions={<button>Save</button>}
+      description="Description" extra="Extra" tabs={<button>Tabs</button>}
+      sidebar={<Mtone.Sidebar aria-label="Page filters"><button>Filters</button></Mtone.Sidebar>}
+      {...options}>
+      <button>Rows</button>
+    </Mtone.PageLayout>,
+  );
+  expect(container.firstElementChild?.textContent).toBe(expected);
+  expect(screen.getAllByRole("complementary", { name: "Page filters" })).toHaveLength(1);
+  expect(container.firstElementChild).not.toHaveAttribute("sidebarposition");
+  expect(container.firstElementChild).not.toHaveAttribute("headerspan");
+});
+
+test("empty sidebar preserves the original direct slots", () => {
+  const { container } = render(
+    <Mtone.PageLayout title="Title" sidebar={<>{[false, null]}</>} sidebarPosition="right"
+      headerSpan="main" tabs={<button>Tabs</button>}>
+      Rows
+    </Mtone.PageLayout>,
+  );
+  expect([...container.firstElementChild!.children].map((child) => child.className))
+    .toEqual(["mt-page-layout-header", "mt-page-layout-tabs", "mt-page-layout-body"]);
+});

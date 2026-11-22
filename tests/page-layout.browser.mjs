@@ -95,6 +95,46 @@ try {
       assert(dimensions.fits && dimensions.documentFits, context);
     }
   }
+  await page.setViewportSize({ width: 1280, height: 700 });
+  for (const options of ["", "&narrow", "&rtl"]) {
+    const narrow = options === "&narrow";
+    await page.goto(`http://127.0.0.1:5284/tests/fixtures/page-layout.html?sidebar${options}`);
+    for (const id of ["left-full", "right-main"]) {
+      const root = page.getByTestId(id);
+      await expect(root.getByRole("complementary", { name: "Filters" })).toBeVisible({ timeout: 1500 });
+      const geometry = await root.evaluate((el) => {
+        function box(selector) {
+          const { x, y, right, bottom, width } = el.querySelector(selector).getBoundingClientRect();
+          return { x, y, right, bottom, width };
+        }
+        return {
+          root: el.getBoundingClientRect().width,
+          fits: el.scrollWidth <= el.clientWidth,
+          sidebar: box(".mt-sidebar"),
+          header: box(".mt-page-layout-header"),
+          tabs: box(".mt-page-layout-tabs"),
+          body: box(".mt-page-layout-body"),
+        };
+      });
+      const { sidebar, header, tabs, body } = geometry;
+      const context = JSON.stringify({ options, id, geometry });
+      const left = id === "left-full";
+      assert(geometry.fits, context);
+      assert.equal(geometry.root, narrow ? 360 : 840, context);
+      assert.equal(header.width, tabs.width, context);
+      assert.equal(header.width, left ? geometry.root : body.width, context);
+      assert.equal(header.x, left ? Math.min(sidebar.x, body.x) : body.x, context);
+      if (narrow) {
+        assert.equal(sidebar.width, body.width, context);
+        assert(left ? tabs.bottom < sidebar.y && sidebar.bottom < body.y : body.bottom < sidebar.y, context);
+      } else {
+        assert.equal(sidebar.width, left ? 240 : 200, context);
+        assert(left ? sidebar.right < body.x : body.right < sidebar.x, context);
+        assert.equal(sidebar.y, left ? body.y : header.y, context);
+        if (left) assert(tabs.bottom < sidebar.y, context);
+      }
+    }
+  }
   assert.deepEqual(errors, []);
   console.log("PageLayout responsive geometry, dark theme, and live actions/tabs passed");
 } finally {

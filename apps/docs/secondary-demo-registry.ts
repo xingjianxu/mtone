@@ -7,6 +7,8 @@ import PageLayoutUsage from "./secondary-demos/page-layout-usage";
 import PageLayoutUsageSource from "./secondary-demos/page-layout-usage.tsx?raw";
 import PageLayoutComposed from "./secondary-demos/page-layout-composed";
 import PageLayoutComposedSource from "./secondary-demos/page-layout-composed.tsx?raw";
+import PageLayoutSidebar from "./secondary-demos/page-layout-sidebar";
+import PageLayoutSidebarSource from "./secondary-demos/page-layout-sidebar.tsx?raw";
 import CheckCardUsage from "./secondary-demos/check-card-usage";
 import CheckCardUsageSource from "./secondary-demos/check-card-usage.tsx?raw";
 import CheckCardSingle from "./secondary-demos/check-card-single";
@@ -394,6 +396,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
   PageLayout: [
     { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },
     { id: "actions-and-tabs", title: "居中限宽、操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
+    { id: "sidebar", title: "页面侧栏与页头跨度", Demo: PageLayoutSidebar, source: source(PageLayoutSidebarSource) },
   ],
   AdminLayout: [
     {

@@ -220,6 +220,22 @@ try {
       assert.deepEqual(await demo.getByRole("region").evaluateAll(nodes => nodes.map(node =>
         getComputedStyle(node).borderBlockStartWidth
       )), ["0px", "1px", "1px"]);
+      const spacing = await demo.getByRole("region").evaluateAll(nodes => ({
+        start: getComputedStyle(nodes[0]).marginBlockStart,
+        end: getComputedStyle(nodes.at(-1)).marginBlockEnd,
+        dividers: nodes.slice(1).map((node, index) => {
+          const line = node.getBoundingClientRect();
+          return [
+            line.top - nodes[index].getBoundingClientRect().bottom,
+            node.firstElementChild.getBoundingClientRect().top - line.top - parseFloat(getComputedStyle(node).borderBlockStartWidth),
+          ];
+        }),
+      }));
+      assert.deepEqual(spacing, {
+        start: "0px",
+        end: "0px",
+        dividers: [[12, 12], [12, 12]],
+      }, "docs styles leave each divider centered without extra outer section space");
       const geometry = await deploy.evaluate(node => {
         const parent = node.getBoundingClientRect();
         const title = node.querySelector("h3").getBoundingClientRect();

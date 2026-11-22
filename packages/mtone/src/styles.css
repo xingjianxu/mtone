@@ -954,6 +954,9 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 .mt-section-group-section {
   min-inline-size: 0;
 }
+.mt-section-group-section {
+  margin-block: 0;
+}
 .mt-section-group > .mt-section-group-section:not([hidden]) ~ .mt-section-group-section:not([hidden]) {
   margin-block-start: 12px;
   padding-block-start: 12px;

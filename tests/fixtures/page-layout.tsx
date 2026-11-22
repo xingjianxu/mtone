@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { AdminLayout, Button, PageLayout, Tabs } from "../../packages/mtone/src";
+import { AdminLayout, Button, PageLayout, Sidebar, Tabs } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 
 function Fixture() {
@@ -55,6 +55,31 @@ function MaxWidthFixture() {
   );
 }
 
+function SidebarFixture() {
+  const query = new URLSearchParams(window.location.search);
+  const narrow = query.has("narrow");
+  return (
+    <div dir={query.has("rtl") ? "rtl" : undefined} style={{ width: narrow ? 360 : 1100, maxWidth: "100%" }}>
+      {([{}, { sidebarPosition: "right", headerSpan: "main" }] as const).map((options, index) => (
+        <PageLayout {...options} key={index}
+          data-testid={index === 0 ? "left-full" : "right-main"}
+          maxWidth={840}
+          style={index === 1 ? { "--mt-page-layout-sidebar-width": "200px" } as React.CSSProperties : undefined}
+          title="Project overview"
+          actions={<Button>Share</Button>}
+          description="Latest progress"
+          extra="Updated today"
+          tabs={<Tabs items={[{ value: "recent", label: "Recent", content: null }]} />}
+          sidebar={<Sidebar aria-label="Filters"><Button>Open filters</Button></Sidebar>}
+        >
+          Project tasks
+        </PageLayout>
+      ))}
+    </div>
+  );
+}
+
+const query = new URLSearchParams(window.location.search);
 createRoot(document.getElementById("root")!).render(
-  new URLSearchParams(window.location.search).has("max-width") ? <MaxWidthFixture /> : <Fixture />,
+  query.has("sidebar") ? <SidebarFixture /> : query.has("max-width") ? <MaxWidthFixture /> : <Fixture />,
 );
