@@ -155,7 +155,7 @@ try {
   await responsive.close();
   const spacing = await browser.newPage();
   await spacing.goto("http://127.0.0.1:5286/tests/fixtures/nav-submenu.html?groups");
-  for (const [parent, expected] of [["standalone", ["0px", "12px"]], ["wrapped", ["0px", "12px"]], ["after-item", ["12px"]]]) {
+  for (const [parent, expected] of [["standalone", ["0px", "12px", "12px"]], ["wrapped", ["0px", "12px"]], ["after-item", ["12px"]]]) {
     const groups = spacing.getByTestId(parent).locator(":scope > .mt-nav-group");
     await expect(groups).toHaveCount(expected.length);
     const margins = await groups.evaluateAll((elements) => elements.map((group) => getComputedStyle(group).marginTop));
@@ -170,11 +170,26 @@ try {
     const rule = getComputedStyle(node, "::before");
     return rule.content === "none" ? [false, null] : [true, rule.borderBlockStartWidth];
   });
+  const assertDividerCentered = async (group, firstVisible, expectedGap, label) => {
+    const actual = await group.evaluate((node, selector) => {
+      const line = getComputedStyle(node, "::before");
+      const top = node.getBoundingClientRect().top + Number.parseFloat(line.insetBlockStart);
+      const bottom = top + Number.parseFloat(line.borderBlockStartWidth);
+      const previousRow = node.previousElementSibling.lastElementChild.getBoundingClientRect();
+      const nextContent = node.querySelector(selector).getBoundingClientRect();
+      return [top - previousRow.bottom, nextContent.top - bottom];
+    }, firstVisible);
+    assert(actual.every((gap) => Math.abs(gap - expectedGap) < 0.02),
+      `${label}: expected two ${expectedGap}px gaps; got ${actual.join("px and ")}px`);
+  };
   assert.deepEqual(await divider(standaloneGroups.first()), [false, null]);
   assert.deepEqual(await divider(standaloneGroups.last()), [true, "1px"]);
+  await assertDividerCentered(standaloneGroups.nth(1), ":scope > .mt-nav-label", 5.5, "standalone heading");
+  await assertDividerCentered(standaloneGroups.last(), ":scope > .mt-nav-item", 5.5, "standalone without heading");
   assert.deepEqual(await divider(afterItemGroup), [false, null]);
   const wrappedGroup = wrappedGroups.last();
   assert.deepEqual(await divider(wrappedGroup), [true, "1px"]);
+  await assertDividerCentered(wrappedGroup, ":scope > .mt-nav-group-header", 5.5, "expanded Sidebar");
   const action = spacing.getByRole("button", { name: "Add view" });
   await action.focus();
   await spacing.keyboard.press("Enter");
@@ -196,6 +211,7 @@ try {
   await spacing.getByTestId("sidebar").locator(".mt-sidebar-toggle").click();
   await expect(action).toHaveCount(0);
   assert.deepEqual(await divider(wrappedGroup), [true, "1px"]);
+  await assertDividerCentered(wrappedGroup, ":scope > .mt-nav-item", 10, "collapsed Sidebar");
   const railBefore = (await lowerRow.boundingBox()).y;
   await toggleDivider.click();
   assert.deepEqual(await divider(wrappedGroup), [false, null]);

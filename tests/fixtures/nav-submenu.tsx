@@ -45,6 +45,7 @@ function GroupSpacing() {
       <nav data-testid="standalone">
         {group("First group")}
         {group("Second group")}
+        <NavGroup><NavItem>Group without a title</NavItem></NavGroup>
       </nav>
       <Sidebar data-testid="sidebar" collapsible>
         <nav data-testid="wrapped" dir="rtl" style={{ width: "100%", maxWidth: 160 }}>
