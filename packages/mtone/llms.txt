@@ -1851,7 +1851,7 @@ export default function Demo() {
 - label: string. 浮层的可访问名称，优先于可见 title。无 title 和 label 时默认使用浮层内容 / Popover content。
 - width: number | string. 浮层宽度，数字为 px；默认随内容而非触发按钮，且自动约束在视口内。
 - align: "start" | "center" | "end" | "left" | "right" (default: center). 沿边对齐。上下浮层的 start/end 随布局方向，left/right 为物理边；左右浮层用 start/end 对齐上/下边。
-- unstyled: boolean (default: false). 去除浮层自身的背景、边框、阴影和内边距，保留定位及非模态行为；适合让 Card 绘制外框。
+- unstyled: boolean (default: false). 移除 Popover 自身的背景、边框、阴影和内边距，但保留定位、键盘操作和开关行为。仅在内容自行绘制外观时启用；省略此属性则保留默认外壳。
 - side: "top" | "bottom" | "left" | "right" (default: bottom). 优先显示位置。
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。

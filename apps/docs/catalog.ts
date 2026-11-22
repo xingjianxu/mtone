@@ -4044,7 +4044,7 @@ export default function Demo() {
         name: "unstyled",
         type: "boolean",
         default: "false",
-        description: "去除浮层自身的背景、边框、阴影和内边距，保留定位及非模态行为；适合让 Card 绘制外框。",
+        description: "移除 Popover 自身的背景、边框、阴影和内边距，但保留定位、键盘操作和开关行为。仅在内容自行绘制外观时启用；省略此属性则保留默认外壳。",
       },
       {
         name: "side",

@@ -9,7 +9,6 @@ export default function Demo() {
       label="项目设置"
       width={272}
       align="start"
-      unstyled
       content={
         <Card title="项目设置">
           <div style={{ display: "grid", gap: 8 }}>

@@ -16,10 +16,22 @@ it("documents width and alignment on the Popover hosts, not on inline Menu", () 
   for (const name of ["width", "align", "trigger"]) expect(propNames("Menu")).not.toContain(name);
 });
 
-it("the Popover card demo opens a named dialog containing an editable form", async () => {
-  const Demo = docSections.Popover.find((section) => section.id === "card")!.Demo!;
+it("the Popover card demo keeps the default frame and editable form", async () => {
+  const card = docSections.Popover.find((section) => section.id === "card")!;
+  const Demo = card.Demo!;
+  const user = userEvent.setup();
   render(<Demo />);
-  await userEvent.click(screen.getByRole("button", { name: "打开设置卡片" }));
-  expect(await screen.findByRole("dialog", { name: "项目设置" })).toBeVisible();
-  expect(screen.getByRole("textbox", { name: "项目名称" })).toBeVisible();
+  const trigger = screen.getByRole("button", { name: "打开设置卡片" });
+  await user.click(trigger);
+  const popup = await screen.findByRole("dialog", { name: "项目设置" });
+  expect(popup).toBeVisible();
+  expect(popup).toHaveClass("mt-popover");
+  expect(popup).not.toHaveClass("mt-popover-unstyled");
+  const input = screen.getByRole("textbox", { name: "项目名称" });
+  await user.clear(input);
+  await user.type(input, "研究计划");
+  expect(input).toHaveValue("研究计划");
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog", { name: "项目设置" })).not.toBeInTheDocument();
+  expect(trigger).toHaveFocus();
 });

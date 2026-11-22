@@ -361,7 +361,7 @@ export const inlineDocSections: Readonly<
     {
       id: "card",
       title: "卡片浮层",
-      note: "有边框的 Card 自带外观。使用 unstyled 去掉 Popover 的外框，保留定位、键盘操作和开关行为。",
+      note: "示例保留 Popover 默认的外框和阴影。只有在内容自行绘制外观时才设 unstyled：它移除浮层的背景、边框、阴影和内边距，但保留定位、键盘操作和开关行为。",
       Demo: PopoverCard,
       source: source(PopoverCardSource),
     },
