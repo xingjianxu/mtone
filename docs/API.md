@@ -127,7 +127,6 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - Breadcrumb: items `{label,href?}`; final item is current page.
 - Tree (set `directory` for file and folder behavior): legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
 - Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card/attached variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. Every tab item is 32px tall including borders, in every variant, size and placement. The default inter-item gap is 6px for line and 4px for both card variants; explicit `gap` overrides the default. Line labels have 6px inline margins. Selected card and editable-card labels retain their background on hover. `indicatorColor` styles only the selected line indicator, using an accent preset or a CSS color (including a CSS variable); it defaults to `currentColor` and does not recolor the list divider, text, or cards. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
-- FilterBar: flexible layout; FilterChip(children,onRemove).
 - Pagination: total, pageSize (default10), **controlled** page/onPageChange.
 
 ## Menus and overlays
@@ -147,7 +146,7 @@ Triggers use Base UI's `render` composition. Custom trigger components must forw
 
 - Card, Text(muted), Divider and ListItem(icon,description,actions): styled semantic wrappers. `List` retains children-based use and also supports grouped/virtual data rendering; see [List](#list).
 - DocumentList: items `{id,title,description?,updatedAt?,icon?,onClick?}`. DocumentCard accepts one item.
-- Tag: tone neutral/blue/green/orange/red/purple, onRemove optional.
+- `Tag` (`TagProps`): six neutral/blue/green/orange/red/purple tones and optional `onRemove`. Use `variant="filter"` for applied conditions: 32px by default via `--mt-height`, single-line ellipsis, and a localized remove action. Keep filter state in the app and lay out several tags in a wrapping flex container.
 - Status: tone, children. Avatar: name, src, size; falls back to initials on image error. AvatarGroup: items, max.
 - `Progress`: line, circle or dashboard progress, status, success segments, steps and custom information; see [Progress](#progress). PropertyList and PropertyItem(label): definition-list display.
 - Alert: tone info/success/warning/error, title, children, onClose.

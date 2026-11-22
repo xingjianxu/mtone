@@ -314,6 +314,22 @@
   color: inherit;
   cursor: pointer;
 }
+.mt-tag-filter {
+  box-sizing: border-box;
+  height: var(--mt-height, 32px);
+  max-width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding-left: 7px;
+  background: var(--mt-subtle, #f7f7f5);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.mt-tag-filter-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-tag-filter > button { flex-shrink: 0; }
 .mt-tone-blue {
   background: var(--mt-badge-blue-bg, #e7f0f9);
   color: var(--mt-badge-blue-fg, #32679b);
@@ -783,29 +799,6 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 .mt-breadcrumb-menu-trigger { min-height: 20px; }
 .mt-breadcrumb-menu-arrow, .mt-breadcrumb-menu-trigger > svg { flex-shrink: 0; }
 .mt-breadcrumb-content:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
-.mt-filter-chip {
-  box-sizing: border-box;
-  height: var(--mt-height, 32px);
-  max-width: 100%;
-  min-width: 0;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding-left: 7px;
-  background: var(--mt-subtle, #f7f7f5);
-  border-radius: 4px;
-  font-size: 12px;
-}
-.mt-filter-chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mt-filter-chip > button { flex-shrink: 0; }
-.mt-filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 .mt-sidebar[data-collapsed="true"] {
   width: 52px;
   min-width: 52px;
@@ -840,7 +833,7 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 /* Non-field controls retain a distinct keyboard focus indicator. */
 :is(.mt-slider-thumb, .mt-chip, .mt-chip-remove, .mt-combobox-trigger, .mt-dialog-close,
   .mt-tab-panel, .mt-table-sort):not(:disabled):not([data-disabled]):not([aria-disabled="true"]):focus-visible,
-:is(.mt-tag, .mt-filter-chip) > button:focus-visible,
+:is(.mt-tag, .mt-tag-filter) > button:focus-visible,
 .mt-breadcrumb a:focus-visible,
 .mt-table input:focus-visible,
 .mt-dropzone input:focus-visible {

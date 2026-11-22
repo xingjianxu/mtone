@@ -1727,48 +1727,6 @@ export default function Demo() {
 }
 ```
 
-### FilterBar
-
-- [FilterBar](https://xingjianxu.github.io/mtone/#/components/FilterBar): 筛选控件的弹性布局容器。
-- Import: FilterBar, FilterChip, Button from @bixlab/mtone
-- children: ReactNode. 组件内容。
-- 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 仅负责布局，不定义筛选查询或服务器协议。
-
-```tsx
-import { FilterBar, FilterChip, Button } from "@bixlab/mtone";
-import "@bixlab/mtone/styles.css";
-
-export default function Demo() {
-  return (
-    <FilterBar><FilterChip onRemove={() => console.log("remove")}>分类：设计</FilterChip><Button>添加筛选</Button></FilterBar>
-  );
-}
-```
-
-### FilterChip
-
-- [FilterChip](https://xingjianxu.github.io/mtone/#/components/FilterChip): 展示已生效条件并提供移除操作。
-- Import: FilterChip from @bixlab/mtone
-- children: ReactNode. 组件内容。
-- onRemove: () => void. 必填；移除请求，由应用更新条件。
-- 默认单行外框高度为 32px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。
-- 点击移除不会自行隐藏，应用负责更新状态。
-
-```tsx
-import { useState } from "react";
-import { FilterChip } from "@bixlab/mtone";
-import "@bixlab/mtone/styles.css";
-
-export default function Demo() {
-  const [visible, setVisible] = useState(true);
-  if (!visible) return <span>筛选已移除</span>;
-  return (
-    <FilterChip onRemove={() => setVisible(false)}>分类：设计</FilterChip>
-  );
-}
-```
-
 ### Pagination
 
 - [Pagination](https://xingjianxu.github.io/mtone/#/components/Pagination): 完全受控的分页导航。
@@ -2414,13 +2372,15 @@ export default function Demo() {
 
 ### Tag
 
-- [Tag](https://xingjianxu.github.io/mtone/#/components/Tag): 紧凑的低饱和标签，支持语义颜色与可选移除操作。
+- [Tag](https://xingjianxu.github.io/mtone/#/components/Tag): 紧凑的低饱和标签，支持筛选变体、语义颜色与可选移除操作。
 - Import: Tag from @bixlab/mtone
+- variant: "default" | "filter" (default: default). filter 用于显示已生效的筛选条件，默认高 32px，长文本单行省略；普通标签不变。
 - tone: "neutral" | "blue" | "green" | "orange" | "red" | "purple" (default: neutral). 低饱和语义颜色。
 - onRemove: () => void. 提供后显示移除按钮，应用负责移除内容。
 - children: ReactNode. 组件内容。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
-- 可移除标签的存在状态由应用管理。Tag 不是数字角标或未读计数容器。
+- 可移除标签的存在状态由应用管理；filter 变体的移除按钮读作「移除筛选」。Tag 不是数字角标或未读计数容器。
+- 默认筛选标签使用中性色并跟随 --mt-height；使用普通 flex 容器组合多个标签，例如 flex-wrap: wrap 与 gap: 8px。
 
 ```tsx
 import { Tag } from "@bixlab/mtone";

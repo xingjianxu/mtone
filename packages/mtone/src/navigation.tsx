@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   ChevronRight,
   ChevronDown,
-  X,
   PanelLeftClose,
   PanelLeftOpen,
   Circle,
@@ -507,31 +506,3 @@ export function Breadcrumb({
     </nav>
   );
 }
-export function FilterChip({
-  children,
-  onRemove,
-}: {
-  children: React.ReactNode;
-  onRemove: () => void;
-}) {
-  const { locale } = useMtone();
-  return (
-    <span className="mt-filter-chip">
-      <span className="mt-filter-chip-label">{children}</span>
-      <Button iconOnly
-        size="sm"
-        variant="ghost"
-        aria-label={locale === "zh" ? "移除筛选" : "Remove filter"}
-        onClick={onRemove}
-      >
-        <X size={12} aria-hidden="true" />
-      </Button>
-    </span>
-  );
-}
-export const FilterBar = ({
-  className,
-  ...p
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div {...p} className={cn("mt-filter-bar", className)} />
-);

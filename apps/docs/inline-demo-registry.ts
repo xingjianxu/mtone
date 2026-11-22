@@ -43,12 +43,6 @@ import Example12_0 from "./inline-demos/nav-item-usage";
 import Example12_0Raw from "./inline-demos/nav-item-usage.tsx?raw";
 import RadioGroupSegmented from "./inline-demos/radiogroup-segmented";
 import RadioGroupSegmentedRaw from "./inline-demos/radiogroup-segmented.tsx?raw";
-import Example14_0 from "./inline-demos/filter-bar-usage";
-import Example14_0Raw from "./inline-demos/filter-bar-usage.tsx?raw";
-import Example14_1 from "./inline-demos/filter-bar-chip";
-import Example14_1Raw from "./inline-demos/filter-bar-chip.tsx?raw";
-import Example15_0 from "./inline-demos/filter-chip-usage";
-import Example15_0Raw from "./inline-demos/filter-chip-usage.tsx?raw";
 import Example16_0 from "./inline-demos/pagination-usage";
 import Example16_0Raw from "./inline-demos/pagination-usage.tsx?raw";
 import Example17_0 from "./inline-demos/menu-usage";
@@ -81,6 +75,8 @@ import Example25_0 from "./inline-demos/tag-usage";
 import Example25_0Raw from "./inline-demos/tag-usage.tsx?raw";
 import Example25_1 from "./inline-demos/tag-removable";
 import Example25_1Raw from "./inline-demos/tag-removable.tsx?raw";
+import TagFilter from "./inline-demos/tag-filter";
+import TagFilterRaw from "./inline-demos/tag-filter.tsx?raw";
 import Example26_0 from "./inline-demos/status-usage";
 import Example26_0Raw from "./inline-demos/status-usage.tsx?raw";
 import Example28_0 from "./inline-demos/property-list-usage";
@@ -294,28 +290,6 @@ export const inlineDocSections: Readonly<
     { id: "link", title: "原生链接", Demo: NavItemLink, source: source(NavItemLinkSource) },
     { id: "actions", title: "尾部操作", Demo: NavItemActions, source: source(NavItemActionsSource) },
   ],
-  FilterBar: [
-    {
-      id: "usage",
-      title: "组合筛选",
-      Demo: Example14_0,
-      source: source(Example14_0Raw),
-    },
-    {
-      id: "chip",
-      title: "可移除的筛选条件",
-      Demo: Example14_1,
-      source: source(Example14_1Raw),
-    },
-  ],
-  FilterChip: [
-    {
-      id: "usage",
-      title: "基础用法",
-      Demo: Example15_0,
-      source: source(Example15_0Raw),
-    },
-  ],
   Pagination: [
     {
       id: "usage",
@@ -442,6 +416,7 @@ export const inlineDocSections: Readonly<
       Demo: Example25_1,
       source: source(Example25_1Raw),
     },
+    { id: "filter", title: "筛选标签", Demo: TagFilter, source: source(TagFilterRaw) },
   ],
   Status: [
     {

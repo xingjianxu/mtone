@@ -421,30 +421,6 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <TreeExample compact={compact} />;
     case "Tabs":
       return <TabsExample compact={compact} />;
-    case "FilterBar":
-      return (
-        <M.FilterBar>
-          <M.Input.Search aria-label="按名称筛选" placeholder="筛选名称" />
-          <M.Select label="分类筛选" options={options} defaultValue="design" />
-          {visible && (
-            <M.FilterChip onRemove={() => setVisible(false)}>
-              状态：进行中
-            </M.FilterChip>
-          )}
-        </M.FilterBar>
-      );
-    case "FilterChip":
-      return (
-        <div style={rowStyle}>
-          {visible ? (
-            <M.FilterChip onRemove={() => setVisible(false)}>
-              分类：设计
-            </M.FilterChip>
-          ) : (
-            <M.Button onClick={() => setVisible(true)}>重新添加筛选</M.Button>
-          )}
-        </div>
-      );
     case "Pagination":
       return (
         <div style={stackStyle}>

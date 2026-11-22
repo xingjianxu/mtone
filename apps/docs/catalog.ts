@@ -25,7 +25,7 @@ const taxonomy = {
     "Form", "Fieldset", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
     "MultiSelect", "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
-    "Slider", "Rate", "DatePicker", "FilterBar", "FilterChip",
+    "Slider", "Rate", "DatePicker",
     "Upload", "Questionnaire",
   ],
   "数据展示": [
@@ -3833,45 +3833,6 @@ export default function Demo() {
     ],
   },
   {
-    name: "FilterBar",
-    description: "筛选控件的弹性布局容器。",
-    importNames: ["FilterBar", "FilterChip", "Button"],
-    code: 'import { FilterBar, FilterChip, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <FilterBar><FilterChip onRemove={() => console.log("remove")}>分类：设计</FilterChip><Button>添加筛选</Button></FilterBar>\n  );\n}',
-    props: [
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "组件内容。",
-      },
-      {
-        name: "原生属性",
-        type: "HTMLAttributes",
-        description:
-          "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
-      },
-    ],
-    notes: ["仅负责布局，不定义筛选查询或服务器协议。"],
-  },
-  {
-    name: "FilterChip",
-    description: "展示已生效条件并提供移除操作。",
-    importNames: ["FilterChip"],
-    code: 'import { useState } from "react";\nimport { FilterChip } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [visible, setVisible] = useState(true);\n  if (!visible) return <span>筛选已移除</span>;\n  return (\n    <FilterChip onRemove={() => setVisible(false)}>分类：设计</FilterChip>\n  );\n}',
-    props: [
-      {
-        name: "children",
-        type: "ReactNode",
-        description: "组件内容。",
-      },
-      {
-        name: "onRemove",
-        type: "() => void",
-        description: "必填；移除请求，由应用更新条件。",
-      },
-    ],
-    notes: ["默认单行外框高度为 32px，与输入及选择控件对齐。可通过宿主 CSS 覆盖 .mt-filter-chip 的尺寸，不新增 size 属性。", "点击移除不会自行隐藏，应用负责更新状态。"],
-  },
-  {
     name: "Pagination",
     description: "完全受控的分页导航。",
     importNames: ["Pagination"],
@@ -5050,10 +5011,16 @@ export default function Demo() {
   },
   {
     name: "Tag",
-    description: "紧凑的低饱和标签，支持语义颜色与可选移除操作。",
+    description: "紧凑的低饱和标签，支持筛选变体、语义颜色与可选移除操作。",
     importNames: ["Tag"],
     code: 'import { Tag } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tag tone="green">已完成</Tag>\n  );\n}',
     props: [
+      {
+        name: "variant",
+        type: '"default" | "filter"',
+        default: "default",
+        description: "filter 用于显示已生效的筛选条件，默认高 32px，长文本单行省略；普通标签不变。",
+      },
       {
         name: "tone",
         type: '"neutral" | "blue" | "green" | "orange" | "red" | "purple"',
@@ -5077,7 +5044,10 @@ export default function Demo() {
           "支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。",
       },
     ],
-    notes: ["可移除标签的存在状态由应用管理。Tag 不是数字角标或未读计数容器。"],
+    notes: [
+      "可移除标签的存在状态由应用管理；filter 变体的移除按钮读作「移除筛选」。Tag 不是数字角标或未读计数容器。",
+      "默认筛选标签使用中性色并跟随 --mt-height；使用普通 flex 容器组合多个标签，例如 flex-wrap: wrap 与 gap: 8px。",
+    ],
   },
   {
     name: "Status",

@@ -97,7 +97,7 @@ it('uses border-box standard single-line surfaces without fixing multiline chips
  expect(multi).toContain('min-height: var(--mt-height, 32px)');
  expect(multi).not.toMatch(/^\s*height:/m);
  const base=readFileSync('packages/mtone/src/styles.css','utf8');
- const filter=base.slice(base.indexOf('.mt-filter-chip {')).split('}')[0];
+ const filter=base.slice(base.indexOf('.mt-tag-filter {')).split('}')[0];
  expect(filter).toContain('height: var(--mt-height, 32px)');expect(filter).toContain('box-sizing: border-box');
 });
 

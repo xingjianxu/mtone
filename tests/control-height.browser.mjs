@@ -5,7 +5,7 @@ const server=await createServer({root:process.cwd(),server:{host:'127.0.0.1',por
 try {for(const [name,engine,dpi] of [['chromium',chromium,1],['chromium-hidpi',chromium,2],['firefox',firefox,1],['webkit',webkit,1]]){
  if(process.env.BROWSER && !name.startsWith(process.env.BROWSER)) continue;
  const browser=await engine.launch({headless:true, ...(name.startsWith('chromium') && process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {})});try {const page=await browser.newPage({viewport:{width:360,height:1200},deviceScaleFactor:dpi});page.setDefaultTimeout(10000);await page.goto('http://127.0.0.1:5196/tests/fixtures/control-height.html');
- const selectors=['main > .mt-auto-complete','main > .mt-btn','main > .mt-tree-select-root > .mt-tree-select','main > .mt-cascader','main .mt-tag-select-option','main > .mt-input-wrap:not(.mt-search) .mt-input-control','main > .mt-search','main > .mt-select','main > .mt-multiselect','main > .mt-number .mt-number-group','main .mt-date-field input','main > .mt-filter-chip','.mt-table-filter'];
+ const selectors=['main > .mt-auto-complete','main > .mt-btn','main > .mt-tree-select-root > .mt-tree-select','main > .mt-cascader','main .mt-tag-select-option','main > .mt-input-wrap:not(.mt-search) .mt-input-control','main > .mt-search','main > .mt-select','main > .mt-multiselect','main > .mt-number .mt-number-group','main .mt-date-field input','main > .mt-tag-filter','.mt-table-filter'];
  const measure=el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};};
  for(const selector of selectors){const el=page.locator(selector).first();assert.equal((await el.evaluate(measure)).height,32,name+' '+selector);}
  for(const selector of ['.mt-input-control','.mt-select','.mt-multiselect .mt-combobox-input','.mt-number-input','.mt-auto-complete-input','.mt-tree-select-value','.mt-cascader-value','.mt-tag-select-option']){
@@ -32,7 +32,9 @@ try {for(const [name,engine,dpi] of [['chromium',chromium,1],['chromium-hidpi',c
  assert.equal((await tagViewport.evaluate(measure)).height,32,name+' re-collapsed TagSelect');
  const wrap=page.locator('[data-case="wrap"] .mt-multiselect');assert((await wrap.evaluate(measure)).height>32,name+' wraps');assert((await wrap.evaluate(measure)).width<=180,name+' narrow container');assert.equal(await wrap.locator('.mt-chip').count(),8);
  for(const chip of await wrap.locator('.mt-chip').all()){assert(await chip.evaluate(el=>el.getBoundingClientRect().right<=el.parentElement.getBoundingClientRect().right),name+' chip bounds');}
- const filter=page.locator('[data-case="wrap"] .mt-filter-chip');assert.equal((await filter.evaluate(measure)).height,32);assert((await filter.evaluate(measure)).width<=180);assert(await filter.getByRole('button').isVisible());
+ const filter=page.locator('[data-case="wrap"] .mt-tag-filter');assert.equal((await filter.evaluate(measure)).height,32);assert((await filter.evaluate(measure)).width<=180);assert(await filter.getByRole('button').isVisible());
+ const filterLabel=filter.locator('.mt-tag-filter-label');
+ assert(await filterLabel.evaluate(el=>el.scrollWidth>el.clientWidth&&getComputedStyle(el).textOverflow==='ellipsis'),name+' filter label truncates before the visible remove button');
  for(const selector of ['.mt-btn','.mt-input','.mt-select','.mt-number-group']) assert.equal((await page.locator('[data-case="unscoped"] '+selector).evaluate(measure)).height,32,name+' without Provider: '+selector);
  for(const [label,height] of [['Small input',24],['Large input',36]]) assert.equal((await page.getByLabel(label).evaluate(measure)).height,height,name+' '+label);
  for(const step of await page.locator('main > .mt-number .mt-number-step').all()) assert.equal((await step.evaluate(measure)).height,30,name+' number steps fill the inside');

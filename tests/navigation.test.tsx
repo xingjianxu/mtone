@@ -7,7 +7,6 @@ import {
   Sidebar,
   NavGroup,
   NavItem,
-  FilterChip,
 } from "../packages/mtone/src/navigation";
 it("marks current breadcrumb", () => {
   render(
@@ -19,13 +18,6 @@ it("marks selected navigation", () => {
   render(<NavItem active>Inbox</NavItem>);
   expect(screen.getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-current", "page");
 });
-it("removes filters", () => {
-  const f = vi.fn();
-  render(<FilterChip onRemove={f}>Work</FilterChip>);
-  fireEvent.click(screen.getByRole("button"));
-  expect(f).toHaveBeenCalledOnce();
-});
-
 it('toggles an opt-in sidebar and retains accessible navigation labels', () => {
   const onChange = vi.fn();
   render(<Sidebar collapsible onCollapsedChange={onChange}><NavGroup label="Workspace"><NavItem icon={<span aria-hidden="true">★</span>} active>Inbox</NavItem></NavGroup></Sidebar>);

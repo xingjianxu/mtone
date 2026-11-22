@@ -263,17 +263,38 @@ export type { InputProps, InputSearchProps, InputPasswordProps, InputTextAreaPro
 export { Form } from "./form";
 export type { FormProps, FormFieldProps, FormRule, FormInstance, FormValues, FormValidationError, FormValidateTrigger } from "./form";
 export type Tone = "neutral" | "blue" | "green" | "orange" | "red" | "purple";
+export interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
+  tone?: Tone;
+  variant?: "default" | "filter";
+  onRemove?: () => void;
+}
 export function Tag({
   children,
   tone = "neutral",
+  variant = "default",
   onRemove,
   className,
   ...p
-}: React.HTMLAttributes<HTMLSpanElement> & {
-  tone?: Tone;
-  onRemove?: () => void;
-}) {
+}: TagProps) {
   const { locale } = useMtone();
+  if (variant === "filter") {
+    return (
+      <span {...p} className={cn("mt-tag-filter", `mt-tone-${tone}`, className)}>
+        <span className="mt-tag-filter-label">{children}</span>
+        {onRemove && (
+          <Button
+            iconOnly
+            size="sm"
+            variant="ghost"
+            aria-label={locale === "zh" ? "移除筛选" : "Remove filter"}
+            onClick={onRemove}
+          >
+            <X size={12} aria-hidden="true" />
+          </Button>
+        )}
+      </span>
+    );
+  }
   return (
     <span {...p} className={cn("mt-tag", `mt-tone-${tone}`, className)}>
       {children}

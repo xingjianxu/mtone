@@ -12,7 +12,7 @@ This is the rendered outer **border-box**, including borders, rather than a chil
 | NumberInput complete group | 32px |
 | Table column filter input | 32px |
 | MultiSelect chips/input container | minimum 32px |
-| FilterChip | 32px |
+| Tag with `variant="filter"` | 32px |
 | TagSelect option, expansion trigger and collapsed viewport | 32px |
 | NavItem (including Sidebar, NavGroup and AdminLayout.Sider) and docs sidebar links | 32px |
 
@@ -27,7 +27,7 @@ Navigation row gaps, group headings and the collapsed sidebar controls are uncha
 - This describes the current source. Updating the website does not publish npm;
   consult the installed declarations for an older release.
 - The 32px baseline does not resize typography, icons, Input.TextArea, option lists,
-  calendar popups, badges, checkbox/radio controls, switches, sliders or layout regions.
+  calendar popups, plain tags, checkbox/radio controls, switches, sliders or layout regions.
   Tabs use the same item height at every size; size changes typography only.
 - Independent component size variants remain supported. TreeSelect, Cascader and
   AutoComplete keep 24px small and 34px large variants; their default is now 32px.
@@ -41,8 +41,8 @@ Navigation row gaps, group headings and the collapsed sidebar controls are uncha
 - Focus, errors and disabled states do not increase outer dimensions. Keyboard
   focus and forced-colors indicators remain available.
 - `--mt-height` controls the shared baseline. Consult each component's declared
-  props before using className/style; FilterChip has no size prop and can be
-  customized through a scoped `.mt-filter-chip` CSS rule.
+  props before using className/style; Tag in the filter variant has no size prop
+  and uses the shared token.
 
 ## Verification
 

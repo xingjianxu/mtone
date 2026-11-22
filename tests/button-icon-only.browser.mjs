@@ -64,7 +64,7 @@ try {
     );
   }
   console.log(
-    `${engine}: named icon-only squares, Alert close and FilterChip remove; ordinary RTL section geometry preserved`,
+    `${engine}: named icon-only squares, Alert close and filter Tag remove; ordinary RTL section geometry preserved`,
   );
 } finally {
   await browser?.close();

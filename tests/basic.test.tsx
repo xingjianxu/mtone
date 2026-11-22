@@ -96,3 +96,35 @@ it("keeps Alert close accessible, icon-only, and non-submitting", () => {
   expect(close).toHaveBeenCalledOnce();
   expect(submit).not.toHaveBeenCalled();
 });
+
+it.each(["zh", "en"] as const)("keeps the filter Tag removable by the application in %s", (locale) => {
+  const remove = vi.fn();
+  const submit = vi.fn((event) => event.preventDefault());
+  render(
+    <MtoneProvider locale={locale}>
+      <form onSubmit={submit}>
+        <Tag variant="filter" title="Active condition" data-testid="filter-tag" onRemove={remove}>
+          分类：设计
+        </Tag>
+      </form>
+    </MtoneProvider>,
+  );
+  const trigger = screen.getByRole("button", { name: locale === "zh" ? "移除筛选" : "Remove filter" });
+  const tag = screen.getByTestId("filter-tag");
+  expect(trigger).toHaveClass("mt-icon-btn");
+  expect(tag).toHaveAttribute("title", "Active condition");
+  expect(tag).not.toHaveAttribute("variant");
+  fireEvent.click(trigger);
+  expect(remove).toHaveBeenCalledOnce();
+  expect(submit).not.toHaveBeenCalled();
+  expect(screen.getByText("分类：设计")).toBeInTheDocument();
+});
+
+it("exports only Tag for filtering and omits the optional remove button when unused", async () => {
+  const api = await import("../packages/mtone/src");
+  expect(api).not.toHaveProperty("FilterChip");
+  expect(api).not.toHaveProperty("FilterBar");
+  render(<Tag variant="filter">Status: open</Tag>);
+  expect(screen.getByText("Status: open")).toBeInTheDocument();
+  expect(screen.queryByRole("button")).not.toBeInTheDocument();
+});

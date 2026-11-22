@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Search } from "lucide-react";
-import { Alert, Button, FilterChip, MtoneProvider } from "../../packages/mtone/src";
+import { Alert, Button, Tag, MtoneProvider } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 
 const icon = <Search size={14} aria-hidden="true" />;
@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
     </div>
     <Button size="normal">Normal text</Button>
     <Alert title="Review" onClose={() => {}}>A message</Alert>
-    <FilterChip onRemove={() => {}}>Project</FilterChip>
+    <Tag variant="filter" onRemove={() => {}}>Project</Tag>
     <div style={{ "--mt-height": "40px" } as React.CSSProperties}>
       <Button iconOnly aria-label="Themed icon">
         {icon}

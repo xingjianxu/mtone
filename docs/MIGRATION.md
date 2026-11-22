@@ -135,3 +135,9 @@ targeting those releases; the current source uses `Tag` again.
 
 - Replace the `Badge` import and JSX with `Tag`. The `tone`, `onRemove`, children, and native span attributes are unchanged.
 - Replace custom selectors for `.mt-badge` with `.mt-tag`. Use the new Tag documentation page; the old page is not redirected.
+
+## Unreleased: filter controls are composed with Tag
+
+- Replace `<FilterChip onRemove={remove}>…</FilterChip>` with `<Tag variant="filter" onRemove={remove}>…</Tag>`. A filter tag does not remove itself.
+- Replace `FilterBar` with a regular flex container (`display: flex`, `align-items: center`, `flex-wrap: wrap`, `gap: 8px`). Neither old component name remains exported. See the [Tag filter example](https://xingjianxu.github.io/mtone/#/components/Tag?section=filter).
+- If you customized the old filter-chip CSS selector, use `.mt-tag-filter`.
