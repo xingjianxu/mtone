@@ -192,8 +192,10 @@ try {
     assert.equal(await direct.evaluate(() => scrollY), 0);
     assert(await direct.evaluate(() => document.activeElement === document.body));
     await openDirect("#/components/MtoneScope", "MtoneScope");
-    assert.equal(await scrollTop(), await scrollport.evaluate((node) => node.scrollHeight - node.clientHeight),
-      "the last component clamps to the bottom");
+    // scrollTop can be fractional even though scrollHeight/clientHeight are integers.
+    const bottom = await scrollport.evaluate((node) => node.scrollHeight - node.clientHeight);
+    const bottomOffset = Math.abs(bottom - await scrollTop());
+    assert(bottomOffset <= 1, `the last component clamps to the bottom (offset ${bottomOffset}px)`);
     assert.equal(await direct.evaluate(() => scrollY), 0);
 
     await direct.setViewportSize({ width: 390, height: 740 });
