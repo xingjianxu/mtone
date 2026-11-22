@@ -10,7 +10,32 @@ import {
 } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 
-createRoot(document.getElementById("root")!).render(
+function SidebarTabsFixture() {
+  const icon = <House size={16} aria-hidden="true" />;
+  return (
+    <AdminLayout hasSider style={{ height: 320 }}>
+      <AdminLayout.Sider aria-label="Tabbed Admin" width={240} breakpoint={560}
+        logo="Team identity" collapsedLogo={icon} version="Fixture version" collapsible
+        tabs={{
+          label: "Local categories",
+          items: [
+            { value: "work", label: "Workspace", content: <NavGroup label="General">
+              <NavItem icon={icon} active>Dashboard</NavItem>
+              {Array.from({ length: 24 }, (_, index) => <NavItem icon={icon} key={index}>Work item {index + 1}</NavItem>)}
+            </NavGroup> },
+            { value: "projects", label: "Projects", content: <NavGroup label="Projects nav"><NavItem icon={icon}>Project inbox</NavItem></NavGroup> },
+            { value: "favorites", label: "Favorites", content: <NavItem icon={icon}>Starred</NavItem> },
+          ],
+        }} />
+      <AdminLayout.Content>Main page</AdminLayout.Content>
+    </AdminLayout>
+  );
+}
+
+const tabbed = new URLSearchParams(location.search).has("tabs");
+createRoot(document.getElementById("root")!).render(tabbed ? (
+  <MtoneProvider theme="light"><SidebarTabsFixture /></MtoneProvider>
+) : (
   <MtoneProvider>
     <div style={{ width: 180 }}>
       <Sidebar aria-label="Library" collapsible>
@@ -48,5 +73,5 @@ createRoot(document.getElementById("root")!).render(
       </AdminLayout.Sider>
       <AdminLayout.Content>Content</AdminLayout.Content>
     </AdminLayout>
-  </MtoneProvider>,
-);
+  </MtoneProvider>
+));

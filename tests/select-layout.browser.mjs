@@ -202,6 +202,13 @@ try {
   const options = page.getByRole("listbox", { name: "Project", exact: true });
   const scroller = page.locator(".mt-select-inline-popup");
   const outsideSelect = form.getByRole("button", { name: "Outside select", includeHidden: true });
+  const inlineSurface = form.locator(".mt-select-inline-search");
+  // Reproduce the docs/consumer focus rule overriding an unqualified input class.
+  await page.addStyleTag({ content: "input:focus-visible { outline: 1px solid rgb(147, 180, 220); outline-offset: 4px; }" });
+  const idleFocusStyles = await inlineSurface.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { border: style.borderInlineStart, background: style.backgroundColor };
+  });
   await form.evaluate((node) => node.addEventListener("submit", (event) => {
     event.preventDefault();
     node.dataset.submitted = "true";
@@ -213,6 +220,11 @@ try {
   await expect(field).toBeFocused();
   await expect(field).toHaveValue("");
   await expect(field).toHaveAttribute("placeholder", "Search projects");
+  await expect(inlineSurface).toHaveCSS("border-inline-start", idleFocusStyles.border);
+  await expect(inlineSurface).toHaveCSS("outline-style", "none");
+  await expect(inlineSurface).not.toHaveCSS("background-color", idleFocusStyles.background);
+  await expect(field).toHaveCSS("border-inline-start-width", "0px");
+  await expect(field).toHaveCSS("outline-style", "none");
   await expect(scroller.locator("input")).toHaveCount(0);
   assert(await scroller.evaluate((node) => node.scrollHeight > node.clientHeight));
   const inputBox = await field.boundingBox(), panelBox = await scroller.boundingBox();
@@ -248,7 +260,9 @@ try {
   await field.press("Enter");
   await expect(options).toBeHidden();
   await expect(field).toBeFocused();
-  await expect(form.locator(".mt-select-rich-label")).toHaveText("Default project");
+  const richLabel = form.locator(".mt-select-rich-label");
+  await expect(richLabel).toHaveText("Default project");
+  await expect(richLabel).toHaveCSS("text-decoration-line", "underline");
   assert.deepEqual(await selectionValue("project"), [""]);
   assert(await form.evaluate((node) => node.checkValidity()));
   assert.equal(await form.getAttribute("data-submitted"), null);
@@ -285,6 +299,51 @@ try {
       `Clear and chevron use one center: (${x}, ${y}) vs (${clearX}, ${clearY})`);
   };
   await page.goto(slotURL);
+  // Measure the entire reserved area, not just whether the two glyphs overlap.
+  const compactSearch = slotParts(page, "searchable");
+  // The open combobox hides sibling controls from the accessibility tree.
+  // This assertion measures its pointer-only clear action in the rendered DOM.
+  const openClear = compactSearch.surface.locator("button.mt-select-clear");
+  await compactSearch.surface.evaluate((node) => {
+    node.style.width = "104px";
+    node.style.minWidth = "0";
+  });
+  await expect(compactSearch.surface).toHaveCSS("width", "104px");
+  for (const direction of ["ltr", "rtl"]) {
+    await compactSearch.wrapper.evaluate((node, dir) => { node.dir = dir; }, direction);
+    await page.mouse.move(0, 0);
+    await expect(compactSearch.arrow).toHaveCSS("opacity", "1");
+    const metrics = () => compactSearch.surface.evaluate((node) => {
+      const bounds = node.getBoundingClientRect();
+      const value = node.querySelector(".mt-select-inline-value").getBoundingClientRect();
+      const style = getComputedStyle(node);
+      const rtl = style.direction === "rtl";
+      return [
+        rtl ? (bounds.left + parseFloat(style.borderLeftWidth) + value.left) / 2
+          : (value.right + bounds.right - parseFloat(style.borderRightWidth)) / 2,
+        (bounds.top + bounds.bottom) / 2,
+      ];
+    });
+    const assertCentered = async (glyph) => {
+      const [x, y] = center(await glyph.boundingBox());
+      const [midX, midY] = await metrics();
+      assert(Math.abs(x - midX) < 0.5 && Math.abs(y - midY) < 0.5,
+        `${direction}: glyph center (${x}, ${y}) must match the full action strip center (${midX}, ${midY})`);
+    };
+    await assertCentered(compactSearch.arrow.locator("svg"));
+    await compactSearch.field.click();
+    await expect(page.getByRole("listbox")).toBeVisible();
+    await expect(openClear).toHaveCSS("opacity", "1");
+    await expect(openClear).toHaveCSS("pointer-events", "auto");
+    await assertCentered(openClear.locator("svg"));
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+  }
+  await compactSearch.wrapper.evaluate((node) => { node.removeAttribute("dir"); });
+  await compactSearch.surface.evaluate((node) => {
+    node.style.removeProperty("width");
+    node.style.removeProperty("min-width");
+  });
   for (const id of ["plain", "searchable", "multiple"]) {
     const { wrapper, field, surface, arrow, clear } = slotParts(page, id);
     await page.mouse.move(0, 0);

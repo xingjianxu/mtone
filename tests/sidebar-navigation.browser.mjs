@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { chromium, firefox, webkit } from "@playwright/test";
+import { chromium, expect, firefox, webkit } from "@playwright/test";
 import { createServer } from "vite";
 
 const serve = async (root, cacheDir) => {
@@ -50,6 +50,20 @@ const assertGroupStartInset = async (group) => {
     Math.abs(inset - 12) < 0.01,
     `Sidebar padding stays 12px (got ${inset}px)`,
   );
+};
+const assertPinnedNavigation = async (sidebar, content, name, minimumScrollRange) => {
+  const pinned = sidebar.locator(".mt-sidebar-heading, .mt-tab-bar, .mt-sidebar-footer");
+  const bounds = () => pinned.evaluateAll((elements) =>
+    elements.map((element) => element.getBoundingClientRect().toJSON()));
+  const beforeScroll = await bounds();
+  assert.equal(beforeScroll.length, 3);
+  const range = await content.evaluate((element) => element.scrollHeight - element.clientHeight);
+  assert.ok(range > minimumScrollRange, `${name}: only the middle active panel is independently scrollable`);
+  const scrollTop = Math.min(180, range);
+  await content.evaluate((element, position) => { element.scrollTop = position; }, scrollTop);
+  await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(scrollTop);
+  assert.deepEqual(await bounds(), beforeScroll, `${name}: header, tabs and footer stay pinned`);
+  assert.equal(await sidebar.evaluate((element) => element.scrollTop), 0);
 };
 const alignment = (row) =>
   row.evaluate((element) => {
@@ -154,6 +168,7 @@ try {
         );
       }
       assert.equal(await overview.getAttribute("aria-current"), "page");
+      assert.notEqual(await overview.evaluate((element) => getComputedStyle(element, "::before").content), "none");
 
       await sidebar.getByRole("button", { name: "收起侧边栏" }).press("Enter");
       assert.equal(await sidebar.getAttribute("data-collapsed"), "true");
@@ -199,8 +214,61 @@ try {
       await gallery.click();
       await nav.waitFor({ state: "hidden" });
       assert.equal(new URL(docs.url()).hash, "#/gallery");
+      await page.goto(`${fixtureURL}tests/fixtures/sidebar-navigation.html?tabs`);
+      const tabbed = page.getByRole("complementary", { name: "Tabbed Admin" });
+      const list = tabbed.getByRole("tablist", { name: "Local categories" });
+      const work = list.getByRole("tab", { name: "Workspace" });
+      const projects = list.getByRole("tab", { name: "Projects" });
+      const dashboard = tabbed.getByRole("button", { name: "Dashboard" });
+      const panel = tabbed.getByRole("tabpanel", { name: "Workspace" });
+      const content = panel.locator(".mt-sidebar-content");
+      await expect(work).toHaveAttribute("aria-selected", "true");
+      await expect(panel).toHaveAttribute("aria-labelledby", await work.getAttribute("id"));
+      await expect(dashboard).toHaveAttribute("aria-current", "page");
+      assert.deepEqual(await sizes(list.getByRole("tab")), [32, 32, 32]);
+      assert.equal(await work.evaluate((element) => getComputedStyle(element, "::after").backgroundColor),
+        "rgb(37, 99, 173)", `${name}: selected Sidebar tab is blue`);
+      const neutralColor = await dashboard.evaluate((element) => {
+        const color = getComputedStyle(element).backgroundColor;
+        const channels = color.match(/\d+/g)?.slice(0, 3).map(Number);
+        return channels && channels[0] > 100 && channels[0] < 253 && Math.max(...channels) - Math.min(...channels) <= 6;
+      });
+      assert.ok(neutralColor, `${name}: current navigation row keeps its neutral fill`);
+      assert.equal(await dashboard.evaluate((element) => getComputedStyle(element, "::before").content), "none");
+
+
+      await assertPinnedNavigation(tabbed, content, `${name} AdminLayout.Sider`, 200);
+
+      await work.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(projects).toBeFocused();
+      await expect(work).toHaveAttribute("aria-selected", "true");
+      await page.keyboard.press("Space");
+      await expect(projects).toHaveAttribute("aria-selected", "true");
+      const projectButton = tabbed.getByRole("button", { name: "Project inbox" });
+      await expect(projectButton).toBeVisible();
+      await expect(dashboard).toBeHidden();
+
+      await page.setViewportSize({ width: 390, height: 850 });
+      await expect(tabbed).toHaveAttribute("data-collapsed", "true");
+      assert.equal((await tabbed.boundingBox()).width, 52);
+      await expect(list).toBeHidden();
+      await expect(projectButton).toBeVisible();
+      await page.setViewportSize({ width: 1200, height: 850 });
+      await expect(list).toBeVisible();
+      await expect(projects).toHaveAttribute("aria-selected", "true");
+      await expect(projectButton).toBeVisible();
+
+      await docs.goto(`${docsURL}#/components/Sidebar?section=tabs`);
+      const demo = docs.getByRole("complementary", { name: "工作区侧栏" });
+      await expect(demo.getByRole("tab", { name: "工作区" })).toHaveAttribute("aria-selected", "true");
+      await assertPinnedNavigation(demo,
+        demo.getByRole("tabpanel", { name: "工作区" }).locator(".mt-sidebar-content"), `${name} standalone docs Sidebar`, 30);
+      await demo.getByRole("tab", { name: "收藏" }).click();
+      await expect(demo.getByRole("button", { name: "设计素材" })).toBeVisible();
+      assert.equal(new URL(docs.url()).hash, "#/components/Sidebar?section=tabs");
       console.log(
-        `${name}: 32px sidebar, AdminLayout and docs navigation; spacing, alignment and collapse preserved`,
+        `${name}: 32px sidebar, pinned tabs, local navigation, keyboard, spacing and collapse preserved`,
       );
     } finally {
       await browser.close();

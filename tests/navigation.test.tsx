@@ -209,3 +209,65 @@ it("keeps trailing actions separate from NavItem link and button activation", ()
   fireEvent.click(button);
   expect(navigate).toHaveBeenCalledTimes(2);
 });
+
+const sidebarTabs = [
+  { value: "workspace", label: "Workspace", content: <NavGroup label="Work"><NavItem active>Home</NavItem></NavGroup> },
+  { value: "projects", label: "Projects", content: <NavGroup label="Projects nav"><NavItem>Active projects</NavItem></NavGroup> },
+  { value: "favorites", label: "Favorites", content: <NavItem>Starred</NavItem> },
+];
+
+it("uses small local tabs to switch the Sidebar nav panel without opening another route", async () => {
+  const user = userEvent.setup();
+  const change = vi.fn();
+  render(<Sidebar header="Team identity" footer="v1.0" tabs={{
+    label: "Sidebar categories", items: sidebarTabs, defaultValue: "projects", onValueChange: change,
+  }}>
+    <NavItem>Untabbed fallback</NavItem>
+  </Sidebar>);
+  const list = screen.getByRole("tablist", { name: "Sidebar categories" });
+  expect(list.closest(".mt-tabs")).toHaveAttribute("data-size", "small");
+  const projectEntry = screen.getByRole("button", { name: "Active projects" });
+  expect(screen.getByRole("tabpanel", { name: "Projects" })).toContainElement(projectEntry);
+  expect(screen.getByText("Team identity")).toBeVisible();
+  expect(screen.getByText("v1.0")).toBeVisible();
+  expect(screen.queryByText("Untabbed fallback")).not.toBeInTheDocument();
+  const projects = screen.getByRole("tab", { name: "Projects" });
+  const favorites = screen.getByRole("tab", { name: "Favorites" });
+  projects.focus();
+  await user.keyboard("{ArrowRight}");
+  expect(favorites).toHaveFocus();
+  expect(projects).toHaveAttribute("aria-selected", "true");
+  await user.keyboard("{Enter}");
+  expect(favorites).toHaveAttribute("aria-selected", "true");
+  expect(screen.getByRole("tabpanel", { name: "Favorites" })).toContainElement(screen.getByRole("button", { name: "Starred" }));
+  expect(screen.queryByRole("button", { name: "Active projects" })).not.toBeInTheDocument();
+  expect(change).toHaveBeenCalledExactlyOnceWith("favorites");
+  await user.click(projects);
+  expect(screen.getByRole("button", { name: "Active projects" })).toBe(projectEntry);
+});
+
+it("honors the controlled tab value and retains its content when the sidebar collapses", async () => {
+  const user = userEvent.setup();
+  const change = vi.fn();
+  const example = (value: string) => <Sidebar collapsible tabs={{ items: sidebarTabs, value, onValueChange: change }} />;
+  const { rerender } = render(example("workspace"));
+  await user.click(screen.getByRole("tab", { name: "Projects" }));
+  expect(change).toHaveBeenCalledExactlyOnceWith("projects");
+  expect(screen.getByRole("tab", { name: "Workspace" })).toHaveAttribute("aria-selected", "true");
+  rerender(example("projects"));
+  await user.click(screen.getByRole("button", { name: "收起侧边栏" }));
+  expect(screen.getByRole("complementary")).toHaveAttribute("data-collapsed", "true");
+  expect(screen.getByRole("button", { name: "Active projects" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Active projects" })).toHaveClass("mt-nav-item-collapsed");
+  await user.click(screen.getByRole("button", { name: "展开侧边栏" }));
+  expect(screen.getByRole("tab", { name: "Projects" })).toHaveAttribute("aria-selected", "true");
+});
+
+it("keeps the direct legacy Sidebar children when tabs are omitted or empty", () => {
+  const { rerender } = render(<Sidebar><NavItem>Inbox</NavItem></Sidebar>);
+  const navigation = screen.getByRole("button", { name: "Inbox" });
+  expect(navigation.parentElement).toBe(screen.getByRole("complementary"));
+  rerender(<Sidebar tabs={{ items: [] }}><NavItem>Inbox</NavItem></Sidebar>);
+  expect(screen.getByRole("button", { name: "Inbox" }).parentElement).toBe(screen.getByRole("complementary"));
+  expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+});
