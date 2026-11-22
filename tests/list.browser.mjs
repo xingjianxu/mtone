@@ -7,6 +7,25 @@ await server.listen();let browser;
 try {
  browser=await ({chromium,firefox,webkit}[process.env.BROWSER||'chromium']).launch({headless:true,executablePath:process.env.CHROMIUM_PATH});
  const page=await browser.newPage({viewport:{width:1280,height:900}});
+ await page.addInitScript(() => {
+   const nativeSetDragImage = DataTransfer.prototype.setDragImage;
+   window.listDragImages = [];
+   let start;
+   document.addEventListener('dragstart', event => { start = event; }, true);
+   DataTransfer.prototype.setDragImage = function(element, x, y) {
+     const bounds = element.getBoundingClientRect();
+     window.listDragImages.push({
+       key: element.getAttribute('data-list-key'),
+       width: bounds.width,
+       text: element.textContent,
+       x, y,
+       expectedX: Math.round(start.clientX - bounds.left),
+       expectedY: Math.round(start.clientY - bounds.top),
+       trusted: start.isTrusted,
+     });
+     return nativeSetDragImage.call(this, element, x, y);
+   };
+ });
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:5223/#/components/List');
  const virtual=page.getByRole('list',{name:'虚拟列表',exact:true});
@@ -80,13 +99,36 @@ try {
  await loading.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event('scroll'));});
  await page.getByText('已加载 60 条',{exact:true}).waitFor();
  const sorting=page.getByRole('list',{name:'排序列表',exact:true});
- await sorting.getByRole('button',{name:'研究笔记上移'}).click();
- assert((await sorting.locator('[data-list-key]').first().textContent()).startsWith('研究笔记'));
+ const rows=sorting.getByRole('listitem');
+ const order=() => rows.evaluateAll(items => items.map(item => item.getAttribute('data-list-key')));
+ await sorting.getByRole('button',{name:'研究笔记上移'}).press('Enter');
+ assert.deepEqual(await order(), ['研究笔记', '设计规范', '项目归档']);
  const handles = sorting.locator('[draggable=true]');
  assert.equal(await handles.count(), 3);
  assert(await handles.first().evaluate(el => el.parentElement.firstElementChild === el && !!el.querySelector('svg.lucide-grip-vertical')));
- await handles.first().dragTo(sorting.locator('[data-list-key]').last());
- assert((await sorting.locator('[data-list-key]').last().textContent()).startsWith('研究笔记'));
+ assert(await rows.evaluateAll(items => items.every(item => !item.hasAttribute('draggable'))));
+ assert.equal(await virtual.locator('[draggable]').count(), 0);
+
+ // Drop outside the list without changing the order, then sort normally.
+ const description = sorting.locator('xpath=preceding-sibling::p');
+ const source = handles.first();
+ await description.scrollIntoViewIfNeeded();
+ await source.dragTo(description);
+ assert.deepEqual(await order(), ['研究笔记', '设计规范', '项目归档']);
+
+ const target = rows.last().getByRole('button', { name: '项目归档上移' });
+ await source.dragTo(target, { sourcePosition: { x: 6, y: 8 } });
+ assert.deepEqual(await order(), ['设计规范', '项目归档', '研究笔记']);
+ const previews=await page.evaluate(() => window.listDragImages);
+ assert.equal(previews.length, 2, 'both real pointer drags choose a custom preview');
+ for (const image of previews) {
+   assert.equal(image.key, '研究笔记', 'preview is the source row, not the handle or drop target');
+   assert(image.text.includes('研究笔记') && image.text.includes('下移') && image.width > 100,
+     'the native image includes the row content, not just the leading grip');
+   assert.equal(image.trusted, true);
+   assert.equal(image.x, image.expectedX, 'horizontal hotspot is relative to row');
+   assert.equal(image.y, image.expectedY, 'vertical hotspot is relative to row');
+ }
  await page.setViewportSize({width:360,height:800});
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await mkdir('artifacts/list',{recursive:true});

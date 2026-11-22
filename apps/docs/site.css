@@ -645,7 +645,7 @@ section > p {
 
 /* Only component detail pages use the shared on-page navigation. */
 .component-content-layout main { position: relative; padding-right: 216px; }
-.component-outline-desktop {
+.component-outline {
   position: fixed;
   top: 112px;
   right: max(24px, calc(100vw - 1816px));
@@ -653,22 +653,20 @@ section > p {
   max-height: calc(100vh - 136px);
   overflow: auto;
 }
-.component-outline-desktop nav { border-left: 1px solid var(--docs-border); }
-.component-outline-mobile { display: none; }
-.component-outline-desktop ul, .component-outline-mobile ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.component-outline-desktop ul ul, .component-outline-mobile ul ul { padding-inline-start: 14px; }
-.component-outline-desktop a, .component-outline-mobile a {
-  display: block;
+.component-outline .mt-toc { border-left: 1px solid var(--docs-border); }
+.component-outline .mt-toc-item + .mt-toc-item { margin-top: 0; }
+.component-outline .mt-toc-link {
   padding: 4px 10px;
   color: var(--docs-component-muted);
   font-size: 13px;
+  line-height: inherit;
+  border-radius: 0;
+  transition: none;
 }
-.component-outline-desktop a[aria-current="location"], .component-outline-mobile a[aria-current="location"] {
+.component-outline .mt-toc-link:hover { background: transparent; }
+.component-outline .mt-toc-link[aria-current="location"] {
   color: var(--docs-fg);
+  background: transparent;
   font-weight: 600;
   box-shadow: inset 1px 0 var(--docs-fg);
 }
@@ -689,9 +687,14 @@ section > p {
 .component-import { display: inline-block; max-width: 100%; }
 @media (max-width: 1110px) {
   .component-content-layout main { padding-right: 32px; }
-  .component-outline-desktop { display: none; }
-  .component-outline-mobile { display: block; margin: 8px 0 24px; }
-  .component-outline-mobile summary { cursor: pointer; }
+  .component-outline {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 8px 0 24px;
+    overflow: visible;
+  }
+  .component-outline .mt-toc { border-left: 0; }
 }
 @media (max-width: 760px) {
   .component-content-layout main { padding-right: 18px; }

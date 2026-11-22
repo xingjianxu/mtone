@@ -128,6 +128,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - Tree (set `directory` for file and folder behavior): legacy items `{id,label,children?,disabled?,icon?}`, value/defaultValue/onValueChange and expanded/defaultExpanded/onExpandedChange remain supported. New `treeData`, `selectedKeys` / `onSelect`, checkboxes with associated/strict checking, `loadData`, `draggable` / `onDrop`, virtual scrolling and ref navigation are available. Dragging reports intent; the application must update its data. Use stable unique string or finite-number keys. See [Tree reference](https://xingjianxu.github.io/mtone/#/components/Tree), installed declarations and [0.4.0 migration notes](MIGRATION.md).
 - Tabs: items `{value,label,content,disabled?}`, value/defaultValue/onValueChange. Also supports line/card/editable-card/attached variants, placement, sizes, overflow navigation, add/remove callbacks and panel lifecycle controls. Every tab item is 32px tall including borders, in every variant, size and placement. The default inter-item gap is 6px for line and 4px for both card variants; explicit `gap` overrides the default. Line labels have 6px inline margins. Selected card and editable-card labels retain their background on hover. `indicatorColor` styles only the selected line indicator, using an accent preset or a CSS color (including a CSS variable); it defaults to `currentColor` and does not recolor the list divider, text, or cards. The application owns item changes; see [Tabs reference](https://xingjianxu.github.io/mtone/#/components/Tabs).
 - Pagination: total, pageSize (default10), **controlled** page/onPageChange.
+- `TableOfContents` discovers headings by default. Supply ordered `items` to use explicit IDs and levels, `listStyle="nested"` for semantic hierarchy, and `getHref` for native links to app routes instead of built-in scrolling. The optional `collapseBelow` breakpoint creates one responsive native disclosure; normal activation closes it on narrow screens and modified links stay native. Set a measured `offset`, `fallbackActiveId` or `highlightLastAtEnd` to adjust scroll tracking; page routing and same-route focus remain application concerns.
 
 ## Menus and overlays
 
@@ -245,7 +246,7 @@ Existing `<List><ListItem ... /></List>` usage remains supported. Data mode uses
 - Sorting is application-controlled, illustrated with drag and keyboard-accessible
   buttons; the component does not persist ordering or fetch data.
 
-For controlled drag sorting, render `List.SortHandle` first in each data-row flex layout or use `ListItem.sortHandle` in children mode. Only the six-dot grip starts dragging; handle drop/reordering in the application and provide keyboard-accessible move controls.
+For controlled drag sorting, render `List.SortHandle` first in each data-row flex layout or use `ListItem.sortHandle` in children mode. Only the six-dot grip starts dragging, but the native drag preview shows the entire row. Handle drop/reordering in the application and provide keyboard-accessible move controls. An application can still cancel the drag or supply its own preview in `onDragStart`.
 
 See [List examples and full API](https://xingjianxu.github.io/mtone/#/components/List).
 

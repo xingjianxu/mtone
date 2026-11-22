@@ -31,7 +31,11 @@ try {
     await page.screenshot({ path: `artifacts/typography-navigation/${process.env.BROWSER || "chromium"}-${width}.png` });
     const outline = page.getByRole("navigation", { name: "本页目录", exact: true });
     async function openOutline() {
-      if (width < 1111 && !await page.locator(".component-outline-mobile").evaluate(el => el.open)) await page.locator(".component-outline-mobile > summary").click();
+      if (width < 1111) {
+        const disclosure = page.locator(".component-outline .mt-toc-disclosure[data-collapsible]");
+        await disclosure.waitFor();
+        if (!await disclosure.evaluate(el => el.open)) await disclosure.locator("summary").click();
+      }
     }
     for (const name of names) {
       await openOutline();

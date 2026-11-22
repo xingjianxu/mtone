@@ -115,6 +115,9 @@
   background: var(--mt-subtle, #f7f7f5);
   border-color: transparent;
 }
+.mt-btn-soft:hover:not(:disabled, [data-disabled], [aria-disabled="true"]) {
+  background: var(--mt-hover, #f1f1ef);
+}
 .mt-btn-ghost {
   background: transparent;
   border-color: transparent;

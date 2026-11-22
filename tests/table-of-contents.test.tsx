@@ -266,3 +266,61 @@ test("observe=false does not recollect a React content update until refresh", ()
   act(() => ref.current!.refresh());
   expect(screen.getByRole("link", { name: "B" })).toBeTruthy();
 });
+
+test("renders authoritative nested items using native custom links", () => {
+  const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+  const items = [
+    { id: "start", label: "Intro label", level: 2 },
+    { id: "child", label: "Child label", level: 3 },
+    { id: "end", label: "End label", level: 2 },
+  ];
+  const clicked = vi.fn();
+  render(<>
+    <h2 id="start">Intro heading</h2>
+    <h3 id="child" tabIndex={-1}>Child heading</h3>
+    <h2 id="end">End heading</h2>
+    <h2>Not listed</h2>
+    <TableOfContents
+      items={items}
+      listStyle="nested"
+      getHref={({ id }) => `#/docs?section=${id}`}
+      onItemClick={clicked}
+    />
+  </>);
+  const parent = screen.getByRole("link", { name: "Intro label" });
+  const child = screen.getByRole("link", { name: "Child label" });
+  expect(parent.closest("li")).toContainElement(child);
+  expect(child).toHaveAttribute("href", "#/docs?section=child");
+  expect(screen.queryByRole("link", { name: "Not listed" })).toBeNull();
+  expect(fireEvent.click(child)).toBe(true);
+  expect(fireEvent.click(child, { ctrlKey: true })).toBe(true);
+  expect(clicked).toHaveBeenCalledTimes(2);
+  expect(scroll).not.toHaveBeenCalled();
+  expect(document.activeElement?.id).not.toBe("child");
+});
+
+test("uses a measured cutoff, route fallback, and the last entry at the bottom when requested", async () => {
+  let scrollY = 0;
+  let cutoff = 30;
+  vi.spyOn(window, "scrollY", "get").mockImplementation(() => scrollY);
+  vi.spyOn(window, "innerHeight", "get").mockReturnValue(300);
+  vi.spyOn(document.documentElement, "scrollHeight", "get").mockReturnValue(1000);
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+    function (this: HTMLElement) {
+      return { top: (this.id === "a" ? 150 : this.id === "b" ? 300 : 940) - scrollY } as DOMRect;
+    },
+  );
+  render(<>
+    <h2 id="a">Initial heading</h2>
+    <h2 id="b">Linked heading</h2>
+    <h2 id="c">Final heading</h2>
+    <TableOfContents offset={() => cutoff} fallbackActiveId="b" highlightLastAtEnd />
+  </>);
+  expect(screen.getByRole("link", { name: "Linked heading" })).toHaveAttribute("aria-current", "location");
+  cutoff = 175;
+  fireEvent.resize(window);
+  await waitFor(() => expect(screen.getByRole("link", { name: "Initial heading" })).toHaveAttribute("aria-current", "location"));
+  scrollY = 700;
+  fireEvent.scroll(window);
+  await waitFor(() => expect(screen.getByRole("link", { name: "Final heading" })).toHaveAttribute("aria-current", "location"));
+});

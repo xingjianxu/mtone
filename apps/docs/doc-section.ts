@@ -13,3 +13,15 @@ export interface DocSection extends OutlineEntry {
   relatedLink?: { href: string; label: string };
   children?: readonly DocSection[];
 }
+
+export function componentSectionHref(name: string, id: string) {
+  const legacy = name === "Typography" ? /^typography-([a-z]+)$/.exec(id)?.[1] : undefined;
+  const section = legacy ? legacy[0].toUpperCase() + legacy.slice(1) : id;
+  return `#/components/${name}?section=${section}`;
+}
+
+export function focusDocSection(id: string) {
+  const section = document.getElementById(id);
+  section?.scrollIntoView?.({ block: "start" });
+  section?.focus({ preventScroll: true });
+}

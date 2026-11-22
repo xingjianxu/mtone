@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, createEvent, fireEvent, act } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 import { List, ListItem } from "../packages/mtone/src/basic";
 const items = Array.from({ length: 1000 }, (_, id) => ({
@@ -327,5 +327,40 @@ it("opts into a leading grip without making the rest of the item draggable", () 
   fireEvent.dragStart(screen.getByText("Sortable"));
   expect(onDragStart).not.toHaveBeenCalled();
   fireEvent.dragStart(handle);
+  expect(onDragStart).toHaveBeenCalledOnce();
+});
+
+it("previews a children-mode row without overriding the caller's image or cancel action", () => {
+  const preview = document.createElement("span");
+  const setDragImage = vi.fn();
+  render(
+    <List>
+      <ListItem sortHandle={{
+        onDragStart(event) {
+          event.dataTransfer.setDragImage(preview, 1, 2);
+          event.preventDefault();
+        },
+      }}>
+        Row content
+      </ListItem>
+    </List>,
+  );
+  const row = screen.getByRole("listitem");
+  const handle = row.querySelector("[draggable]")!;
+  vi.spyOn(row, "getBoundingClientRect").mockReturnValue(new DOMRect(20, 30, 240, 40));
+  const event = createEvent.dragStart(handle, { dataTransfer: { setDragImage } });
+  // JSDOM lacks DragEvent; coordinates are populated by a real browser.
+  Object.defineProperties(event, { clientX: { value: 31 }, clientY: { value: 42 } });
+  fireEvent(handle, event);
+  expect(setDragImage.mock.calls).toEqual([[row, 11, 12], [preview, 1, 2]]);
+  expect(event.defaultPrevented).toBe(true);
+});
+
+it("uses the browser's own preview when a standalone sort grip has no List row", () => {
+  const setDragImage = vi.fn();
+  const onDragStart = vi.fn();
+  const { container } = render(<List.SortHandle onDragStart={onDragStart} />);
+  fireEvent.dragStart(container.querySelector("[draggable]")!, { dataTransfer: { setDragImage } });
+  expect(setDragImage).not.toHaveBeenCalled();
   expect(onDragStart).toHaveBeenCalledOnce();
 });

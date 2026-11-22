@@ -21,12 +21,63 @@ try {
       await page.goto(
         "http://127.0.0.1:5237/tests/fixtures/button-toggle.html",
       );
-      // Do not measure in-flight transitions after a keyboard press.
+      await expect(page.getByRole("group", { name: "dark" })).toBeVisible();
+      // Do not measure in-flight transitions after pointer or keyboard input.
       await page.addStyleTag({
         content: ".mt-btn { transition: none !important }",
       });
       for (const theme of ["light", "dark"]) {
         const group = page.getByRole("group", { name: theme });
+        const gallery = (label) =>
+          group.getByRole("button", { name: label, exact: true });
+        const background = (button) =>
+          button.evaluate((node) => getComputedStyle(node).backgroundColor);
+        const viewGallery = gallery("View gallery");
+        const idleColor = await background(viewGallery);
+        await viewGallery.hover();
+        assert.notEqual(
+          await background(viewGallery),
+          idleColor,
+          `${theme}: soft Button should visibly change background on hover`,
+        );
+        await page.mouse.move(0, 0);
+        assert.equal(await background(viewGallery), idleColor);
+
+        for (const label of [
+          "Disabled gallery",
+          "Loading gallery",
+          "Focusable gallery",
+          "Composed gallery",
+          "Pressed gallery",
+        ]) {
+          const button = gallery(label);
+          if (label === "Pressed gallery") {
+            await expect(button).toHaveAttribute("aria-pressed", "true");
+          } else {
+            await expect(button).toBeDisabled();
+            if (label === "Focusable gallery" || label === "Composed gallery") {
+              await expect(button).toHaveAttribute("aria-disabled", "true");
+              assert.equal(
+                await button.evaluate((node) => node.matches(":disabled")),
+                false,
+              );
+            }
+          }
+          const before = await background(button);
+          // Pointer coordinates also work for native disabled buttons.
+          const bounds = await button.boundingBox();
+          await page.mouse.move(
+            bounds.x + bounds.width / 2,
+            bounds.y + bounds.height / 2,
+          );
+          assert.equal(
+            await background(button),
+            before,
+            `${theme}: ${label} should keep its background`,
+          );
+          await page.mouse.move(0, 0);
+        }
+
         for (const label of [
           "Filter",
           "Solid filter",

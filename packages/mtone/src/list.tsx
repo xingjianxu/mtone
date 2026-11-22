@@ -484,9 +484,23 @@ function ListRoot<T = unknown>({
 /** Drag grip for a controlled sortable list. Supply keyboard reordering separately. */
 export type ListSortHandleProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children" | "draggable">;
 
-function ListSortHandle({ className, title = "拖动排序", ...props }: ListSortHandleProps) {
+function ListSortHandle({ className, title = "拖动排序", onDragStart, ...props }: ListSortHandleProps) {
+  const handleDragStart: React.DragEventHandler<HTMLSpanElement> = (event) => {
+    const row = event.currentTarget.closest("li.mt-list-row, li.mt-list-item");
+    if (row && !event.defaultPrevented && event.dataTransfer?.setDragImage) {
+      const bounds = row.getBoundingClientRect();
+      // Preview the original row without turning its other controls into drag targets.
+      event.dataTransfer.setDragImage(
+        row,
+        Math.round(event.clientX - bounds.left),
+        Math.round(event.clientY - bounds.top),
+      );
+    }
+    // Callers can still cancel the native drag or replace its preview.
+    onDragStart?.(event);
+  };
   return (
-    <span {...props} title={title} aria-hidden="true" draggable className={cn("mt-list-sort-handle", className)}>
+    <span {...props} title={title} aria-hidden="true" draggable onDragStart={handleDragStart} className={cn("mt-list-sort-handle", className)}>
       <GripVertical size={16} focusable="false" />
     </span>
   );

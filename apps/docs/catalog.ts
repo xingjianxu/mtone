@@ -1045,6 +1045,38 @@ export default function Demo() {
       "description": "SSR 和首次渲染使用的 { id, label, level } 列表；挂载后由真实 DOM 采集结果替换，不是受控 items。"
     },
     {
+      "name": "items",
+      "type": "readonly TableOfContentsItem[]",
+      "description": "显式提供有序的 { id, label, level }，替代 DOM 采集；活动项仍按 root 中同名 ID 的元素计算。"
+    },
+    {
+      "name": "listStyle",
+      "type": "\"flat\" | \"nested\"",
+      "default": "\"flat\"",
+      "description": "flat 保持原有平铺并缩进样式；nested 按 level 组织为真正的嵌套列表。"
+    },
+    {
+      "name": "getHref",
+      "type": "(item: TableOfContentsItem) => string | undefined",
+      "description": "返回自定义链接时由浏览器原生导航，不执行内置滚动；返回 undefined 时仍按默认页内滚动。"
+    },
+    {
+      "name": "fallbackActiveId",
+      "type": "string",
+      "description": "没有标题越过高亮阈值时优先选中的可用目标 ID；缺省选择首项。"
+    },
+    {
+      "name": "highlightLastAtEnd",
+      "type": "boolean",
+      "default": "false",
+      "description": "可滚动容器滚到末尾时高亮最后一个有效目标。"
+    },
+    {
+      "name": "collapseBelow",
+      "type": "number",
+      "description": "在该视口宽度（CSS px）及以下使用原生可折叠目录；较宽时保持展开。正常激活链接时收起，修饰点击不收起。"
+    },
+    {
       "name": "observe",
       "type": "boolean",
       "default": "true",
@@ -1052,9 +1084,9 @@ export default function Demo() {
     },
     {
       "name": "offset",
-      "type": "number",
+      "type": "number | (() => number)",
       "default": "0",
-      "description": "跳转与激活判定距离滚动容器顶部的像素偏移，可避开固定工具栏。"
+      "description": "跳转与激活判定距离滚动容器顶部的像素偏移，可避开固定工具栏；也可用 getter 在跳转或测量时读取当前位置。"
     },
     {
       "name": "behavior",
@@ -1066,7 +1098,7 @@ export default function Demo() {
       "name": "indent",
       "type": "number",
       "default": "12",
-      "description": "每级缩进像素，以采集结果的最小层级为基准；最多缩进 12 级。"
+      "description": "每级缩进像素。平铺模式以最小层级为基准，最多缩进 12 级；嵌套模式按实际深度缩进。"
     },
     {
       "name": "variant",
@@ -1120,14 +1152,14 @@ export default function Demo() {
   ],
   "notes": [
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。",
-    "功能参考 Mantine，API 独立设计，不是其直接替代。组件只负责页内目录，不自动提供 sticky 固定定位、折叠导航或全文检索。",
+    "功能参考 Mantine，API 独立设计，不是其直接替代。组件支持按视口宽度启用原生折叠导航；固定定位和全文检索由应用处理。",
     "默认跳转不修改 location.hash，适合 hash 路由；Ctrl/Cmd 等修饰点击保留原生链接行为。需要分享固定锚点时应自行给标题指定稳定、唯一的 id。",
     "没有 id 的匹配元素会被分配唯一 id，并保留在 DOM 上。自动 id 不保证跨页面重新挂载稳定；已有 id 不改写。重复 authored id 仅保留第一个匹配标题，请保证全页面唯一。",
     "目录自己的标题与后代、hidden 元素及其后代、空白标签不会被采集；显示样式隐藏的标题需要通过 selector 或应用逻辑排除。",
-    "层级只影响缩进，目录使用平铺有序列表；aria-current=\"location\" 标记活动链接。点击后焦点移至目标标题，自动添加的 tabindex 在失焦时移除。",
-    "滚动监听以当前滚动容器顶部加 offset 为阈值，按 DOM 顺序取最后经过阈值的标题；尚未到达任何标题时选择首项。标题应按页面垂直阅读顺序排列。",
+    "默认层级仅影响平铺列表的缩进；listStyle 为 nested 时生成嵌套列表。aria-current=\"location\" 标记活动链接。内置跳转将焦点移至目标标题，自动添加的 tabindex 在失焦时移除；自定义链接不执行此焦点操作。",
+    "滚动监听以当前滚动容器顶部加 offset 为阈值，按采集到的 DOM 顺序或 items 顺序取最后经过阈值的标题；尚未越过任何标题时使用 fallbackActiveId 或首项；可选滚动到底时激活末项。标题应按页面垂直阅读顺序排列。",
     "自动观察当前 root 中节点、文本和属性变化。React 重新渲染时会重新解析 root 与 scrollContainer getter；在 React 外部替换作用域或滚动容器后请调用 refresh()。",
-    "initialItems 仅供服务端及首次渲染；挂载后以 DOM 为准。自定义 getLabel/getLevel 建议保持引用稳定。"
+    "未提供 items 时，initialItems 仅供服务端及首次渲染；挂载后以 DOM 为准。自定义 getLabel/getLevel 建议保持引用稳定。"
   ]
 },
 {
@@ -2291,7 +2323,7 @@ export default function Demo() {
       {
         name: "variant",
         type: '"blue" | "solid" | "outline" | "soft" | "ghost"',
-        description: "按钮外观。",
+        description: "按钮外观。soft 使用浅底，悬停采用当前主题的中性色反馈；禁用或加载时不变色。",
         default: "outline",
       },
       {
@@ -4686,7 +4718,7 @@ export default function Demo() {
     notes: [
       "List 的数据渲染仍使用 ul/li；renderItem 仅返回条目内容。ListItem 和 DocumentList 既有用法保持不变。",
       "虚拟列表通过估算未挂载行和测量可见行支持不等高内容；跳到尚未测量的位置是估算定位，滚动过程中总高度可能修正。需要精确定位时使用固定高度或关闭虚拟滚动。",
-      "List 不内置网络请求、分页、选择或排序库。加载与排序由外部受控数据组合；数据模式可在 renderItem 的起始位置放置 List.SortHandle（接受 span 拖放事件）；保留上移和下移按钮供键盘操作。",
+      "List 不内置网络请求、分页、选择或排序库。加载与排序由外部受控数据组合；数据模式可在 renderItem 的起始位置放置 List.SortHandle（接受 span 拖放事件）。拖动仍只从手柄开始，原生预览显示整行；保留上移和下移按钮供键盘操作。",
       "自定义内容的按钮、链接与拖放可访问性由调用方负责；可为滚动容器设置 aria-label 和 tabIndex。",
     ],
   },
@@ -4742,7 +4774,7 @@ export default function Demo() {
     importNames: ["ListItem", "List", "Button"],
     code: 'import { ListItem, List, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <List><ListItem description="记录项目过程" actions={<Button size="sm">打开</Button>}>研究笔记</ListItem></List>\n  );\n}',
     props: [
-      { name: "sortHandle", type: "ListSortHandleProps", description: "可选拖拽手柄，默认在条目起始侧显示六点图标；传入 onDragStart、onDragEnd 等事件，排序由应用维护。" },
+      { name: "sortHandle", type: "ListSortHandleProps", description: "可选拖拽手柄，在条目起始侧显示六点图标，拖动预览显示整行。传入 onDragStart、onDragEnd 等事件，排序由应用维护。" },
       {
         name: "children",
         type: "ReactNode",

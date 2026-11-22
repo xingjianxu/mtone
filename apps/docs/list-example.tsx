@@ -164,7 +164,7 @@ export function ListExample({ compact = false }: { compact?: boolean }) {
       />
       <small role="status">已加载 {count} 条</small>
       <h3>受控排序</h3>
-      <p>拖动条目左侧的手柄，或使用上移、下移按钮，排序由外部状态维护。</p>
+      <p>从条目左侧的六点手柄开始拖动，整行预览随鼠标移动；也可用上移、下移按钮。排序由外部状态维护。</p>
       <List
         aria-label="排序列表"
         items={order}

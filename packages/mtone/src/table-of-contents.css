@@ -56,3 +56,10 @@
 .mt-toc-item + .mt-toc-item {
   margin-top: 3px;
 }
+
+.mt-toc-disclosure:not([data-collapsible]) > summary {
+  display: none;
+}
+.mt-toc-disclosure[data-collapsible] > summary {
+  cursor: pointer;
+}

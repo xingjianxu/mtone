@@ -1,5 +1,5 @@
 import packageInfo from "../../packages/mtone/package.json";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Menu,
@@ -14,9 +14,8 @@ import {
 import * as M from "../../packages/mtone/src";
 import { componentCategories, componentDocGroups, componentDocs, familyDocHref, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
-import { standaloneTypographySections, focusTypographySection, isTypographySection, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
-import { ComponentOutline, focusDocSection } from "./component-outline";
-import type { DocSection } from "./doc-section";
+import { standaloneTypographySections, focusTypographySection, isTypographySection, typographySectionId, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
+import { componentSectionHref, focusDocSection, type DocSection, type OutlineEntry } from "./doc-section";
 import { inputDocSections } from "./input-demos";
 import { buttonDocSections } from "./button-demos";
 import { tableDocSections } from "./table-example";
@@ -102,6 +101,15 @@ export const docSections: Record<string, readonly DocSection[]> = {
   DataList: dataListDocSections,
 };
 
+const outlineOffset = () => (document.querySelector(".topbar")?.getBoundingClientRect().bottom ?? 68) + 32;
+
+function outlineItems(entries: readonly OutlineEntry[], level = 2): M.TableOfContentsItem[] {
+  return entries.flatMap(({ id, title, children }) => [
+    { id, label: title, level },
+    ...outlineItems(children ?? [], level + 1),
+  ]);
+}
+
 function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }) {
   const sections = docSections[doc.name] ?? [];
   const apiChildren = doc.name === "Typography"
@@ -109,17 +117,43 @@ function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }
     : componentDocs.filter((item) => item.sidebarParent === doc.name)
         .map((item) => ({ name: item.name, label: item.name }));
 
-  const entries = [
-    ...sections,
+  const items = useMemo(() => outlineItems([
+    ...(docSections[doc.name] ?? []),
     { id: "props", title: "API" },
     ...(doc.notes.length ? [{ id: "notes", title: "使用注意" }] : []),
-  ];
+  ]), [doc.name, doc.notes.length]);
+  const fallbackActiveId =
+    doc.name === "Typography" && section && isTypographySection(section)
+      ? typographySectionId(section)
+      : section;
   const importCode = doc.importNames.length ? `import { ${doc.importNames.join(", ")} } from "@bixlab/mtone";` : undefined;
   return (
     <>
       <h1>{doc.name}</h1>
       {importCode && <ImportLine code={importCode} />}
-      <ComponentOutline name={doc.name} entries={entries} section={section} />
+      <aside className="component-outline">
+        <M.TableOfContents
+          aria-label="本页目录"
+          title={null}
+          items={items}
+          listStyle="nested"
+          indent={14}
+          collapseBelow={1110}
+          observe={false}
+          offset={outlineOffset}
+          fallbackActiveId={fallbackActiveId}
+          highlightLastAtEnd
+          getHref={({ id }) => componentSectionHref(doc.name, id)}
+          onItemClick={({ id }, event) => {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            if (window.location.hash === componentSectionHref(doc.name, id)) {
+              // No hashchange will fire. Let the TOC close its mobile disclosure
+              // before measuring and scrolling to the target.
+              queueMicrotask(() => focusDocSection(id));
+            }
+          }}
+        />
+      </aside>
       {sections.map((item) => <DocDemo key={item.id} item={item} level={2} />)}
       <section id="props" tabIndex={-1}>
         <h2>API</h2>

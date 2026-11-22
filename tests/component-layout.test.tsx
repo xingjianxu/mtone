@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { expect, test } from "vitest";
 import { DocsApp, parseRoute, docSections, componentDocHref } from "../apps/docs/docs-app";
 
@@ -56,4 +56,22 @@ test("every canonical doc link lands on a labeled page or nested section with so
       expect(parseRoute(`#/components/${doc.name}`)).toEqual({ kind: "not-found" });
     }
   }
+});
+
+test("docs use one library TOC with nested links and refocus the same routed section", async () => {
+  window.location.hash = "#/components/Input?section=input-search-submit";
+  render(<DocsApp />);
+  const outline = screen.getByRole("navigation", { name: "本页目录" });
+  expect(outline).toHaveAttribute("data-mt-toc");
+  const target = document.getElementById("input-search-submit")!;
+  expect(document.activeElement).toBe(target);
+  const searchLink = outline.querySelector('a[href="#/components/Input?section=input-search-submit"]')!;
+  expect(searchLink.closest("li")?.parentElement?.closest("li")).not.toBeNull();
+
+  screen.getByRole("link", { name: "快速开始" }).focus();
+  fireEvent.click(searchLink, { ctrlKey: true });
+  expect(document.activeElement).not.toBe(target);
+  fireEvent.click(searchLink);
+  await waitFor(() => expect(document.activeElement).toBe(target));
+  expect(window.location.hash).toBe("#/components/Input?section=input-search-submit");
 });
