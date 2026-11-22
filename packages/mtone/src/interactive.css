@@ -125,23 +125,53 @@
   width: 16px;
   height: 16px;
 }
-.mt-select-clearable {
+/* Keep a single trailing slot; the popup trigger and clear button stay
+ * separate native actions. Transparency leaves clear in the keyboard order. */
+.mt-select-clearable,
+.mt-select-action-slot {
+  --_mt-select-clear-opacity: 0;
+  --_mt-select-clear-hit: none;
   display: inline-flex;
   position: relative;
+}
+.mt-select-clearable {
   max-inline-size: 100%;
 }
-.mt-select-clearable > .mt-select {
-  padding-inline-end: 31px;
+.mt-select-action-slot {
+  flex: none;
 }
-.mt-select-clearable > .mt-select-clear {
+.mt-select-clearable > .mt-select-clear,
+.mt-select-action-slot > .mt-select-clear {
   position: absolute;
-  inset-inline-end: 5px;
+  z-index: 1;
   inset-block-start: 50%;
   transform: translateY(-50%);
 }
+.mt-select-clearable > .mt-select-clear {
+  /* Center the 22px hit area on the 16px icon inside the 9px field inset. */
+  inset-inline-end: 7px;
+}
+.mt-select-action-slot > .mt-select-clear {
+  inset-inline-end: -1px;
+}
+.mt-select-clearable > .mt-select .mt-select-icon,
+.mt-select-action-slot > .mt-combobox-trigger > svg {
+  opacity: calc(1 - var(--_mt-select-clear-opacity, 0));
+}
+.mt-select-clearable:hover:has(> .mt-select-clear),
+.mt-multiselect:hover .mt-select-action-slot:has(> .mt-select-clear),
+:is(.mt-select-clearable, .mt-select-action-slot):has(> .mt-select-clear:focus-visible) {
+  --_mt-select-clear-opacity: 1;
+  --_mt-select-clear-hit: auto;
+}
+@media (hover: none), (pointer: coarse) {
+  :is(.mt-select-clearable, .mt-select-action-slot):has(> .mt-select-clear) {
+    --_mt-select-clear-opacity: 1;
+    --_mt-select-clear-hit: auto;
+  }
+}
 .mt-select-clear {
   display: inline-grid;
-  flex: 0 0 22px;
   place-items: center;
   inline-size: 22px;
   block-size: 22px;
@@ -151,6 +181,8 @@
   color: var(--mt-muted, #787774);
   background: transparent;
   cursor: pointer;
+  opacity: var(--_mt-select-clear-opacity, 0);
+  pointer-events: var(--_mt-select-clear-hit, none);
 }
 .mt-select-clear:hover { background: var(--mt-hover, #f1f1ef); }
 .mt-select-clear:focus-visible {

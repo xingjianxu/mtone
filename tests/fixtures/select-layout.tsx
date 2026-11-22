@@ -24,8 +24,30 @@ function UnifiedFixture() {
     </MtoneProvider>
   );
 }
+function ClearSlotFixture() {
+  const options = [
+    { value: "alpha", label: "Alpha" },
+    { value: "beta", label: "Beta" },
+    { value: "locked", label: "Locked", disabled: true },
+  ];
+  return (
+    <MtoneProvider locale="en">
+      <div className="clear-slots" style={{ display: "grid", gap: 12, padding: 12 }}>
+        <style>{".clear-slots .mt-select, .clear-slots .mt-multiselect { width: 220px; min-width: 0; }"}</style>
+        <div data-testid="plain"><Select label="Plain" clearable options={options} defaultValue="alpha" /></div>
+        <div data-testid="searchable"><Select label="Searchable" searchable clearable options={options} defaultValue="alpha" /></div>
+        <div data-testid="multiple"><Select mode="multiple" label="Multiple" clearable options={options} defaultValue={["alpha", "locked"]} /></div>
+        <div data-testid="empty"><Select label="Empty" clearable options={options} /></div>
+        <div data-testid="disabled"><Select label="Disabled" clearable disabled options={options} defaultValue="alpha" /></div>
+        <div data-testid="non-clearable"><Select label="Not clearable" options={options} defaultValue="alpha" /></div>
+        <div data-testid="locked"><Select mode="multiple" label="Locked only" clearable options={options} defaultValue={["locked"]} /></div>
+      </div>
+    </MtoneProvider>
+  );
+}
+const query = new URLSearchParams(location.search);
 createRoot(document.getElementById("root")!).render(
-  new URLSearchParams(location.search).has("unified") ? <UnifiedFixture /> : <>
+  query.has("clearSlot") ? <ClearSlotFixture /> : query.has("unified") ? <UnifiedFixture /> : <>
     <style>{`.case .mt-select { width: var(--width); min-width: 0; box-sizing: border-box; } .case { margin: 12px; } .case .tall { width: 200px; height: 48px; font-size: 24px; }`}</style>
     {(["light", "dark"] as const).map((theme) => (
       <MtoneProvider key={theme} theme={theme}>

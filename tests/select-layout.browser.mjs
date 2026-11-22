@@ -217,6 +217,7 @@ try {
   await expect(field).toBeFocused();
   assert.deepEqual(await selectionValue("project"), [""]);
   assert(await form.evaluate((node) => node.checkValidity()));
+  await field.hover();
   await form.getByRole("button", { name: "Clear selection" }).first().click();
   assert.equal(await form.evaluate((node) => node.checkValidity()), false);
 
@@ -224,12 +225,93 @@ try {
   await multiselect.press("Backspace");
   assert.deepEqual(await selectionValue("projects"), ["", "locked"]);
   await multiselect.press("Escape");
+  await multiselect.hover();
   await form.getByRole("button", { name: "Clear selection" }).click();
   assert.deepEqual(await selectionValue("projects"), ["locked"]);
   await form.getByRole("button", { name: "Reset selection" }).click();
   await expect(field).toHaveText("Repository 0");
   assert.deepEqual(await selectionValue("projects"), ["", "locked"]);
-  console.log("Select geometry, open, selection, disabled and unified form checks passed");
+  const slotURL = "http://127.0.0.1:5187/tests/fixtures/select-layout.html?clearSlot";
+  const slotParts = (host, id) => {
+    const wrapper = host.getByTestId(id);
+    return {
+      wrapper,
+      field: wrapper.getByRole("combobox"),
+      arrow: wrapper.locator(".mt-select-icon, .mt-combobox-trigger > svg"),
+      clear: wrapper.getByRole("button", { name: "Clear selection", exact: true }),
+    };
+  };
+  const center = ({ x, y, width, height }) => [x + width / 2, y + height / 2];
+  const sameCenter = async (arrow, clear) => {
+    const [x, y] = center(await arrow.boundingBox());
+    const [clearX, clearY] = center(await clear.locator("svg").boundingBox());
+    assert(Math.abs(x - clearX) < 1 && Math.abs(y - clearY) < 1,
+      `Clear and chevron use one center: (${x}, ${y}) vs (${clearX}, ${clearY})`);
+  };
+  await page.goto(slotURL);
+  for (const id of ["plain", "searchable", "multiple"]) {
+    const { wrapper, field, arrow, clear } = slotParts(page, id);
+    await page.mouse.move(0, 0);
+    await expect(arrow).toHaveCSS("opacity", "1");
+    await expect(clear).toHaveCSS("opacity", "0");
+    await expect(clear).toHaveCSS("pointer-events", "none");
+    await sameCenter(arrow, clear);
+    const initial = await arrow.boundingBox();
+
+    if (id === "multiple") {
+      // The hover action covers the arrow, but the editable field still opens.
+      await field.click();
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("listbox")).toHaveCount(0);
+    }
+    await field.hover();
+    await expect(arrow).toHaveCSS("opacity", "0");
+    await expect(clear).toHaveCSS("opacity", "1");
+    await expect(clear).toHaveCSS("pointer-events", "auto");
+    await clear.click();
+    await expect(clear).toHaveCount(0);
+    await expect(field).toBeFocused();
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(arrow).toHaveCSS("opacity", "1");
+    const after = await arrow.boundingBox();
+    assert(Math.abs(after.x - initial.x) < 1 && Math.abs(after.y - initial.y) < 1,
+      `${id}: clearing does not move the chevron slot`);
+    if (id === "multiple") await expect(wrapper.getByText("Locked", { exact: true })).toBeVisible();
+  }
+  for (const id of ["empty", "disabled", "non-clearable", "locked"]) {
+    const { wrapper, arrow, clear } = slotParts(page, id);
+    await wrapper.hover();
+    await expect(arrow).toHaveCSS("opacity", "1");
+    await expect(clear).toHaveCount(0);
+  }
+  await page.reload();
+  const keyboard = slotParts(page, "plain");
+  await page.mouse.move(0, 0);
+  await keyboard.field.focus();
+  await page.keyboard.press("Tab");
+  await expect(keyboard.clear).toBeFocused();
+  await expect(keyboard.clear).toHaveCSS("opacity", "1");
+  await expect(keyboard.arrow).toHaveCSS("opacity", "0");
+  await page.keyboard.press("Enter");
+  await expect(keyboard.field).toBeFocused();
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+
+  const touch = await browser.newPage({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 550 } });
+  try {
+    await touch.goto(slotURL);
+    const target = slotParts(touch, "plain");
+    await expect(target.clear).toHaveCSS("opacity", "1");
+    await expect(target.arrow).toHaveCSS("opacity", "0");
+    await target.clear.tap();
+    await expect(target.clear).toHaveCount(0);
+    await expect(target.arrow).toHaveCSS("opacity", "1");
+    await target.field.tap();
+    await expect(touch.getByRole("listbox")).toBeVisible();
+  } finally {
+    await touch.close();
+  }
+  console.log("Select geometry, shared clear slot, keyboard, touch and unified form checks passed");
 } finally {
   await browser?.close();
   await server.close();

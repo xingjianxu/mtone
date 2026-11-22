@@ -126,3 +126,33 @@ test.each(["inferred required", "explicit rule"])("managed Select treats an empt
     errorFields: [{ name: "workspace", errors: [expect.any(String)] }],
   });
 });
+
+test("multiple clear and dropdown share a trailing slot without taking away either keyboard action", async () => {
+  const user = userEvent.setup();
+  const change = vi.fn();
+  const openChange = vi.fn();
+  render(<MtoneProvider locale="en">
+    <Select mode="multiple" label="Shared actions" clearable
+      options={grouped} defaultValue={["vault", "locked"]} onValueChange={change} onOpenChange={openChange} />
+  </MtoneProvider>);
+
+  const input = screen.getByRole("combobox", { name: "Shared actions" });
+  const open = screen.getByRole("button", { name: "Show options" });
+  const clear = screen.getByRole("button", { name: "Clear selection" });
+  const slot = clear.parentElement;
+  expect(slot).toHaveClass("mt-select-action-slot");
+  expect(open.parentElement).toBe(slot);
+  expect(clear).toHaveAttribute("tabindex", "0");
+
+  await user.click(input);
+  expect(await screen.findByRole("listbox")).toBeVisible();
+  await user.keyboard("{Escape}");
+  openChange.mockClear();
+  clear.focus();
+  await user.keyboard("{Enter}");
+  expect(change).toHaveBeenCalledExactlyOnceWith(["locked"]);
+  expect(openChange).not.toHaveBeenCalled();
+  expect(input).toHaveFocus();
+  expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Clear selection" })).not.toBeInTheDocument();
+});

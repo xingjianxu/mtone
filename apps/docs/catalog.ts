@@ -2961,7 +2961,7 @@ export default function Demo() {
       },
       { name: "mode", type: '"single" | "multiple"', default: '"single"', description: "选择模式；单选为 string | null，多选为 string[] 且默认可搜索。" },
       { name: "searchable / searchPlaceholder", type: "boolean / string", description: "仅单选使用。启用后在下拉面板内提供本地搜索；可设置搜索框占位符。" },
-      { name: "clearable", type: "boolean", default: "false", description: "提供清除按钮；单选清除为 null，多选保留已选禁用项。" },
+      { name: "clearable", type: "boolean", default: "false", description: "有可清除的选中值时，桌面悬停或键盘聚焦清除按钮会在箭头原位显示 ×；无悬停的触屏可直接点 ×。清除不打开下拉；单选变为 null，多选保留已选禁用项。" },
       { name: "emptyContent", type: "ReactNode", description: "替换空列表或搜索无结果的默认提示。" },
       { name: "required / form", type: "boolean / string", description: "原生必填校验、可选外部表单 ID；多选通过重复 name 提交已选值。" },
       {
