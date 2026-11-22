@@ -95,6 +95,7 @@ const ciUnits = [
   "tests/targeted-ci.test.mjs",
 ];
 const appUnits = [
+  "tests/component-layout.test.tsx",
   "tests/docs-categories.test.tsx",
   "tests/secondary-demo-registry.test.tsx",
   "tests/llms.test.ts",
@@ -307,7 +308,13 @@ function runPlan(plan) {
       "webkit",
     ]);
     for (const path of plan.browser) {
-      run(process.execPath, [path], { ...process.env, BROWSER: "chromium" });
+      run(process.execPath, [path], {
+        ...process.env,
+        BROWSER: "chromium",
+        ...(path === "tests/docs-search.browser.mjs" && plan.docsBuild
+          ? { MTONE_DOCS_PREBUILT: "1" }
+          : {}),
+      });
     }
   }
   // Prose-only plans cannot change reference inputs and use no dependencies.

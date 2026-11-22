@@ -1,17 +1,44 @@
-import { createServer } from "vite";
+import { execSync } from "node:child_process";
+import { access } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { preview } from "vite";
 import { chromium, firefox, webkit } from "@playwright/test";
 import assert from "node:assert/strict";
-const server = await createServer({ root: "apps/docs", server: { host: "127.0.0.1", port: 5197, strictPort: true }, logLevel: "error" });
-await server.listen();
+
+// Browser navigation should use the shipped app, not Vite's cold optimizer
+// (which can reload the page while assertions are inspecting its DOM).
+const repoRoot = fileURLToPath(new URL("../", import.meta.url));
+const docsDist = fileURLToPath(new URL("../dist/docs/", import.meta.url));
+if (process.env.MTONE_DOCS_PREBUILT !== "1") {
+  execSync("npm run build:docs", { cwd: repoRoot, stdio: "inherit" });
+}
+for (const file of ["index.html", "showcase.html"]) {
+  await access(new URL(`../dist/docs/${file}`, import.meta.url)).catch((error) => {
+    throw new Error(`Missing built docs file ${file}; run npm run build:docs before using MTONE_DOCS_PREBUILT=1.`, { cause: error });
+  });
+}
+const base = "http://127.0.0.1:5197/mtone/";
+const server = await preview({
+  root: repoRoot,
+  configFile: false,
+  base: "/mtone/",
+  build: { outDir: docsDist },
+  preview: { host: "127.0.0.1", port: 5197, strictPort: true },
+  logLevel: "error",
+});
 let browser;
 try {
   const engine = process.env.BROWSER || "chromium";
   browser = await ({ chromium, firefox, webkit })[engine].launch({ headless: true, executablePath: process.env.CHROMIUM_PATH });
   const page = await browser.newPage();
+  const sidebar = page.locator(".docs-sidebar");
+  const goToStart = async () => {
+    await page.goto(`${base}#/start`);
+    await sidebar.locator('a[href="#/start"][aria-current="page"]').waitFor({ state: "attached" });
+  };
   for (const width of [1280, 768, 360, 320]) {
     await page.setViewportSize({ width, height: 740 });
-    await page.goto("http://127.0.0.1:5197/#/start");
-    const sidebar = page.locator(".docs-sidebar");
+    await goToStart();
     const toggle = page.locator(".mobile-menu");
     const mobile = await toggle.isVisible();
     if (mobile) await toggle.click();
@@ -38,7 +65,7 @@ try {
         assert.equal(await toggle.getAttribute("aria-expanded"), "false");
         await toggle.click();
         await popupGroup.getByRole("link", { name: "Menu", exact: true, current: "page" }).waitFor();
-        await page.goto("http://127.0.0.1:5197/#/start");
+        await goToStart();
         await toggle.click();
       }
     }
@@ -81,7 +108,7 @@ try {
       await page.keyboard.press("Enter");
       await page.waitForURL("**/#/theme");
       await sidebar.locator('a[href="#/theme"][aria-current="page"]').waitFor();
-      await page.goto("http://127.0.0.1:5197/#/start");
+      await goToStart();
     }
     if (mobile) {
       await sidebar.getByRole("link", { name: "主题与样式", exact: true }).click();
@@ -112,7 +139,7 @@ try {
     await input.press("Escape");
     await page.getByRole("dialog").waitFor({ state: "detached" });
     await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "搜索组件");
-    await page.goto("http://127.0.0.1:5197/#/components/Input");
+    await page.goto(`${base}#/components/Input`);
     const editor = page.locator(".example-stage input:not([disabled])").first();
     await editor.focus();
     await page.keyboard.press("Control+k");

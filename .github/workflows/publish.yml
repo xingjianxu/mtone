@@ -67,7 +67,7 @@ jobs:
       - name: Docs search browser regressions
         run: |
           for browser in chromium firefox webkit; do
-            BROWSER=$browser node tests/docs-search.browser.mjs
+            MTONE_DOCS_PREBUILT=1 BROWSER=$browser node tests/docs-search.browser.mjs || exit 1
           done
       - name: Component detail browser regressions
         run: |
