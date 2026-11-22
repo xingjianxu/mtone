@@ -12,6 +12,19 @@ import { Select } from "@bixlab/mtone";
 const roles = <Select mode="multiple" label="Roles" defaultValue={["read"]} options={[{ value: "read", label: "Read" }]} />;
 ```
 
+## Searchable selection popover
+
+When your installed mtone includes popup search, replace `Popover.SearchableSelect` with `Select searchable="popup"`; no compatibility alias is provided. Rename `items` to `options`, `title` to `popupTitle`, and `width` to `popupWidth`; remove Popover-specific `align` or `side` settings. Preserve the trigger and selected state, and use `renderOption(option)` for icons or other non-interactive option content. The selection value is `string | null`. Use `searchable={true}` if you prefer typing directly in the Select field.
+
+```tsx
+import { Select } from "@bixlab/mtone";
+
+const repositoryPicker = (
+  <Select searchable="popup" trigger="Switch repository" popupTitle="Repositories"
+    options={[{ value: "mtone", label: "mtone" }]} defaultValue="mtone" />
+);
+```
+
 # Upgrade notes for 0.10.x
 
 This release consolidates overlapping components and removes the old names without compatibility aliases.

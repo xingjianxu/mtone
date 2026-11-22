@@ -4,8 +4,8 @@ import SelectTags from "./inline-demos/select-tags";
 import SelectTagsSource from "./inline-demos/select-tags.tsx?raw";
 import SelectSearchable from "./inline-demos/select-searchable";
 import SelectSearchableSource from "./inline-demos/select-searchable.tsx?raw";
-import PopoverSearchableSelect from "./inline-demos/popover-select";
-import PopoverSearchableSelectSource from "./inline-demos/popover-select.tsx?raw";
+import SelectPopupSearch from "./inline-demos/select-popup-search";
+import SelectPopupSearchSource from "./inline-demos/select-popup-search.tsx?raw";
 import PopoverControlled from "./inline-demos/popover-controlled";
 import PopoverControlledSource from "./inline-demos/popover-controlled.tsx?raw";
 import PopoverCard from "./inline-demos/popover-card";
@@ -279,6 +279,13 @@ export const inlineDocSections: Readonly<
       source: source(SelectSearchableSource),
     },
     {
+      id: "popup-search",
+      title: "浮层搜索与自定义选项",
+      note: "按钮打开浮层并聚焦顶部搜索框。方向键浏览，按 Enter 或点击选项确认，Esc 关闭并回到触发器。图标只改变选项的展示，已归档仓库不可选。",
+      Demo: SelectPopupSearch,
+      source: source(SelectPopupSearchSource),
+    },
+    {
       id: "multiple",
       title: "多选模式",
       Demo: Example6_0,
@@ -415,13 +422,6 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example19_0,
       source: source(Example19_0Raw),
-    },
-    {
-      id: "searchable-select",
-      title: "可搜索单选",
-      note: "搜索框固定在选项列表上方。方向键浏览，Enter 确认，Esc 关闭；也可直接点击一项。",
-      Demo: PopoverSearchableSelect,
-      source: source(PopoverSearchableSelectSource),
     },
     {
       id: "controlled",

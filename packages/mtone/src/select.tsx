@@ -3,7 +3,8 @@ import React from "react";
 import { Check, ChevronDown, X } from "lucide-react";
 import { Select as BSelect } from "@base-ui/react/select";
 import { Combobox } from "@base-ui/react/combobox";
-import { MtoneScope, cn, useMtone } from "./basic";
+import { Button, MtoneScope, cn, useMtone } from "./basic";
+import { Input } from "./input";
 import { useFieldsetDisabled } from "./fieldset-context";
 import type { OpenProps, Option } from "./interactive";
 
@@ -17,6 +18,8 @@ export interface SelectOptionGroup {
 }
 interface SelectCommonProps extends OpenProps {
   options: readonly (SelectOption | SelectOptionGroup)[];
+  /** Overrides option row content, not its selected display or search text. */
+  renderOption?: (option: SelectOption) => React.ReactNode;
   placeholder?: string;
   clearable?: boolean;
   emptyContent?: React.ReactNode;
@@ -33,13 +36,21 @@ interface SelectCommonProps extends OpenProps {
   "aria-busy"?: boolean;
   onBlur?: React.FocusEventHandler<HTMLElement>;
 }
-export interface SelectSingleProps extends SelectCommonProps {
+interface SelectSingleBaseProps extends SelectCommonProps {
   mode?: "single";
-  searchable?: boolean;
   searchPlaceholder?: string;
   value?: string | null;
   defaultValue?: string | null;
   onValueChange?: (value: string | null) => void;
+}
+export interface SelectSingleProps extends SelectSingleBaseProps {
+  searchable?: boolean;
+}
+export interface SelectPopupSearchProps extends SelectSingleBaseProps {
+  searchable: "popup";
+  trigger?: React.ReactElement | string;
+  popupWidth?: number | string;
+  popupTitle?: React.ReactNode;
 }
 export interface SelectMultipleProps extends SelectCommonProps {
   mode: "multiple";
@@ -50,7 +61,7 @@ export interface SelectMultipleProps extends SelectCommonProps {
 export interface SelectTagsProps extends Omit<SelectMultipleProps, "mode"> {
   mode: "tags";
 }
-export type SelectProps = SelectSingleProps | SelectMultipleProps | SelectTagsProps;
+export type SelectProps = SelectSingleProps | SelectPopupSearchProps | SelectMultipleProps | SelectTagsProps;
 
 /** @deprecated Use SelectMultipleProps and Select with mode="multiple". */
 export type MultiSelectProps = Omit<SelectMultipleProps, "mode">;
@@ -138,13 +149,14 @@ function useSelectPopup({ open, defaultOpen, onOpenChange }: OpenProps, disabled
   };
 }
 
-function ClearSelection({ locale, focus, clear }: {
+function ClearSelection({ locale, focus, clear, className = "mt-select-clear" }: {
   locale: string;
   focus: () => void;
   clear: () => void;
+  className?: string;
 }) {
   return (
-    <button type="button" className="mt-select-clear"
+    <button type="button" className={className}
       aria-label={locale === "zh" ? "清除选择" : "Clear selection"}
       onMouseDown={(event) => event.preventDefault()}
       onClick={() => { focus(); clear(); }}>
@@ -154,7 +166,7 @@ function ClearSelection({ locale, focus, clear }: {
 }
 
 const marker = <Check size={16} strokeWidth={1.5} aria-hidden="true" />;
-function SelectSingle({ options, clearable, emptyContent,
+function SelectSingle({ options, clearable, emptyContent, renderOption,
   placeholder, className, name, form, label, id, onBlur, required,
   "aria-invalid": invalid, "aria-busy": busy,
   "aria-describedby": describedBy, "aria-labelledby": labelledBy, ...props
@@ -183,9 +195,10 @@ function SelectSingle({ options, clearable, emptyContent,
   );
   const withClear = (trigger: React.ReactElement) => clearable
     ? <span className="mt-select-clearable">{trigger}{clear}</span> : trigger;
-  const renderOption = (option: SelectOption) => (
-    <BSelect.Item className="mt-option" key={option.value} value={option.value} disabled={option.disabled}>
-      <BSelect.ItemText>{option.label}</BSelect.ItemText>
+  const renderItem = (option: SelectOption) => (
+    <BSelect.Item className="mt-option" key={option.value} value={option.value} disabled={option.disabled}
+      label={renderOption ? optionText(option, option.value) : undefined}>
+      <BSelect.ItemText>{renderOption ? renderOption(option) : option.label}</BSelect.ItemText>
       <BSelect.ItemIndicator className="mt-select-item-indicator" aria-hidden="true">{marker}</BSelect.ItemIndicator>
     </BSelect.Item>
   );
@@ -193,7 +206,10 @@ function SelectSingle({ options, clearable, emptyContent,
     <BSelect.Root<string> items={optionData.items} {...rootProps}>
       {withClear(
         <BSelect.Trigger {...triggerProps} onBlur={onBlur}>
-          <BSelect.Value className="mt-select-value" placeholder={prompt} />
+          <BSelect.Value className="mt-select-value" placeholder={prompt}>
+            {renderOption && selection.value !== null
+              ? optionData.byValue.get(selection.value)?.label ?? selection.value : undefined}
+          </BSelect.Value>
           <BSelect.Icon className="mt-select-icon"><ChevronDown size={16} aria-hidden="true" /></BSelect.Icon>
         </BSelect.Trigger>,
       )}
@@ -206,9 +222,9 @@ function SelectSingle({ options, clearable, emptyContent,
                 {optionData.sections.map((section, index) => section.grouped ? (
                   <BSelect.Group key={index}>
                     <BSelect.GroupLabel className="mt-select-group-label">{section.label}</BSelect.GroupLabel>
-                    {section.items.map(renderOption)}
+                    {section.items.map(renderItem)}
                   </BSelect.Group>
-                ) : <React.Fragment key={index}>{section.items.map(renderOption)}</React.Fragment>)}
+                ) : <React.Fragment key={index}>{section.items.map(renderItem)}</React.Fragment>)}
               </BSelect.List>
             </BSelect.Popup>
           </BSelect.Positioner>
@@ -218,7 +234,7 @@ function SelectSingle({ options, clearable, emptyContent,
   );
 }
 
-function SelectSearchable({ options, searchPlaceholder, clearable, emptyContent,
+function SelectSearchable({ options, searchPlaceholder, clearable, emptyContent, renderOption,
   placeholder, className, name, form, label, id, onBlur, required,
   "aria-invalid": invalid, "aria-busy": busy,
   "aria-describedby": describedBy, "aria-labelledby": labelledBy, ...props
@@ -334,54 +350,171 @@ function SelectSearchable({ options, searchPlaceholder, clearable, emptyContent,
         </span>
       </Combobox.InputGroup>
       <ComboboxPopup data={data} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
-        popupRef={popupRef} label={label} searchable />
+        popupRef={popupRef} label={label} searchable renderOption={renderOption} />
+    </Combobox.Root>
+  );
+}
+
+function SelectPopupSearch({ options, renderOption, trigger, popupWidth = 320, popupTitle, searchPlaceholder,
+  clearable, emptyContent, placeholder, className, name, form, label, id, onBlur, required,
+  "aria-invalid": invalid, "aria-busy": busy, "aria-describedby": describedBy, "aria-labelledby": labelledBy,
+  ...props
+}: SelectPopupSearchProps) {
+  const { locale } = useMtone();
+  const disabled = useFieldsetDisabled(props.disabled);
+  const popup = useSelectPopup(props, disabled);
+  const [draft, setDraft] = React.useState("");
+  const search = React.useRef<HTMLInputElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const popupRef = React.useRef<HTMLDivElement>(null);
+  const surface = React.useRef<HTMLSpanElement>(null);
+  const composingRef = React.useRef(false);
+  const headingId = React.useId();
+  const reset = React.useCallback(() => {
+    popup.reset();
+    setDraft("");
+  }, [popup.reset]);
+  const selection = useSelection({ ...props, form }, null, reset);
+  const data = useOptions(options);
+  const searchName = locale === "zh" ? "搜索选项" : "Search options";
+  const prompt = placeholder ?? (locale === "zh" ? "请选择" : "Select…");
+  const title = popupTitle ?? (label ?? (locale === "zh" ? "选择选项" : "Choose an option"));
+  const selectedLabel = selection.value === null ? prompt : data.byValue.get(selection.value)?.label ?? selection.value;
+  const renderTrigger = typeof trigger === "string" ? <Button preset="dropdown">{trigger}</Button> : trigger;
+  const clear = clearable && !disabled && selection.value !== null && (
+    <ClearSelection locale={locale} focus={() => triggerRef.current?.focus()}
+      clear={() => selection.change(null)}
+      className={renderTrigger ? "mt-select-popup-custom-clear" : undefined} />
+  );
+  const handleBlur = (event: React.FocusEvent<HTMLElement>) => {
+    if (surface.current?.contains(event.relatedTarget) || popupRef.current?.contains(event.relatedTarget)) return;
+    onBlur?.(event);
+  };
+  React.useEffect(() => {
+    if (!popup.open) {
+      composingRef.current = false;
+      setDraft("");
+    }
+  }, [popup.open]);
+
+  return (
+    <Combobox.Root<string> items={data.comboItems} inputValue={draft}
+      itemToStringLabel={(value) => optionText(data.byValue.get(value), value)} autoHighlight
+      value={selection.value} inputRef={selection.inputRef} name={name} form={form} disabled={disabled}
+      required={required && selection.value !== ""}
+      open={popup.open}
+      onOpenChange={popup.change}
+      onInputValueChange={(next, details) => {
+        if (details.reason === "input-change") setDraft(next);
+      }}
+      onValueChange={(next, details) => {
+        if (composingRef.current || next === null || data.byValue.get(next)?.disabled) {
+          details.cancel();
+          return;
+        }
+        if (next !== selection.value) selection.change(next);
+      }}>
+      <span ref={surface} onBlur={handleBlur}
+        className={cn(renderTrigger ? "mt-select-popup-trigger-wrap" : clearable ? "mt-select-clearable" : undefined)}>
+        <Combobox.Trigger render={renderTrigger} ref={triggerRef} id={id} role="button"
+          aria-label={label} aria-invalid={invalid} aria-busy={busy}
+          aria-describedby={describedBy} aria-labelledby={labelledBy} aria-required={undefined}
+          className={cn(!renderTrigger && "mt-select", className)}>
+          {!renderTrigger && <>
+            <span className="mt-select-value">{selectedLabel}</span>
+            <Combobox.Icon className="mt-select-icon"><ChevronDown size={16} aria-hidden="true" /></Combobox.Icon>
+          </>}
+        </Combobox.Trigger>
+        {clear}
+      </span>
+      <ComboboxPopup data={data} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
+        popupRef={popupRef} label={label} renderOption={renderOption}
+        searchPanel={{ width: popupWidth, titleId: headingId, initialFocus: search, content: <>
+          <h2 id={headingId} className="mt-popup-title">{title}</h2>
+          <Combobox.Input ref={search} aria-label={searchName} autoComplete="off"
+            placeholder={searchPlaceholder ?? searchName}
+            render={<Input.Search />}
+            onBlur={handleBlur}
+            onCompositionStart={() => { composingRef.current = true; }}
+            onCompositionEnd={() => { composingRef.current = false; }}
+            onKeyDown={(event) => {
+              const composing = composingRef.current || event.nativeEvent.isComposing;
+              if ((event.key === "Enter" || event.key === "Escape") && (composing || event.nativeEvent.keyCode === 229)) {
+                event.preventBaseUIHandler();
+                if (!composing) event.preventDefault();
+              } else if (event.key === "Enter") {
+                event.preventDefault();
+              }
+            }} />
+        </> }} />
     </Combobox.Root>
   );
 }
 
 type OptionData = ReturnType<typeof useOptions>;
 type ComboGroup = { items: string[]; section: OptionSection; index: number };
-function ComboboxPopup({ data, empty, popupRef, label, searchable, createOption }: {
+function ComboboxPopup({ data, empty, popupRef, label, searchable, renderOption, searchPanel, createOption }: {
   data: OptionData;
   empty: React.ReactNode;
   popupRef?: React.Ref<HTMLDivElement>;
   label?: string;
   searchable?: boolean;
+  renderOption?: SelectCommonProps["renderOption"];
+  searchPanel?: {
+    content: React.ReactNode;
+    width: number | string;
+    titleId: string;
+    initialFocus: React.RefObject<HTMLInputElement | null>;
+  };
   createOption?: { value: string; label: string };
 }) {
   const item = (value: string) => {
     const option = data.byValue.get(value);
+    const row = option && renderOption ? renderOption(option)
+      : option?.label ?? (value === createOption?.value ? createOption.label : value);
+    const indicator = <Combobox.ItemIndicator className="mt-select-item-indicator" aria-hidden="true">{marker}</Combobox.ItemIndicator>;
     return (
       <Combobox.Item className="mt-option" key={value} value={value} disabled={option?.disabled}>
-        <span className="mt-select-option-label">{option?.label ?? (value === createOption?.value ? createOption.label : value)}</span>
-        <Combobox.ItemIndicator className="mt-select-item-indicator" aria-hidden="true">{marker}</Combobox.ItemIndicator>
+        {searchPanel && <span className="mt-select-popup-check-slot" aria-hidden="true">{indicator}</span>}
+        <span className="mt-select-option-label">{row}</span>
+        {!searchPanel && indicator}
       </Combobox.Item>
     );
   };
+  const width = searchPanel?.width;
+  const list = (
+    <>
+      <Combobox.Empty className="mt-combobox-empty">{empty}</Combobox.Empty>
+      <Combobox.List className={searchPanel ? "mt-select-popup-search-list" : undefined} aria-label={label}>
+        {(entry: string | ComboGroup) => {
+          if (typeof entry === "string") return item(entry);
+          if (!entry.section.grouped) {
+            return (
+              <Combobox.Group key={entry.index} items={entry.items} role="presentation">
+                <Combobox.Collection>{item}</Combobox.Collection>
+              </Combobox.Group>
+            );
+          }
+          return (
+            <Combobox.Group key={entry.index} items={entry.items}>
+              <Combobox.GroupLabel className="mt-select-group-label">{entry.section.label}</Combobox.GroupLabel>
+              <Combobox.Collection>{item}</Combobox.Collection>
+            </Combobox.Group>
+          );
+        }}
+      </Combobox.List>
+    </>
+  );
   return (
     <Combobox.Portal>
       <MtoneScope>
-        <Combobox.Positioner className="mt-positioner" sideOffset={4}>
-          <Combobox.Popup ref={popupRef} className={cn("mt-popup", searchable && "mt-select-inline-popup")}>
-            <Combobox.Empty className="mt-combobox-empty">{empty}</Combobox.Empty>
-            <Combobox.List aria-label={label}>
-              {(entry: string | ComboGroup) => {
-                if (typeof entry === "string") return item(entry);
-                if (!entry.section.grouped) {
-                  return (
-                    <Combobox.Group key={entry.index} items={entry.items} role="presentation">
-                      <Combobox.Collection>{item}</Combobox.Collection>
-                    </Combobox.Group>
-                  );
-                }
-                return (
-                  <Combobox.Group key={entry.index} items={entry.items}>
-                    <Combobox.GroupLabel className="mt-select-group-label">{entry.section.label}</Combobox.GroupLabel>
-                    <Combobox.Collection>{item}</Combobox.Collection>
-                  </Combobox.Group>
-                );
-              }}
-            </Combobox.List>
+        <Combobox.Positioner className="mt-positioner" sideOffset={4} align={searchPanel ? "start" : undefined}>
+          <Combobox.Popup ref={popupRef}
+            className={cn("mt-popup", searchable && "mt-select-inline-popup", searchPanel && "mt-select-popup-search")}
+            aria-labelledby={searchPanel?.titleId}
+            initialFocus={searchPanel?.initialFocus}
+            style={width === undefined ? undefined : { "--mt-select-popup-search-width": typeof width === "number" ? `${width}px` : width } as React.CSSProperties}>
+            {searchPanel ? <>{searchPanel.content}<div className="mt-select-popup-search-body">{list}</div></> : list}
           </Combobox.Popup>
         </Combobox.Positioner>
       </MtoneScope>
@@ -389,7 +522,7 @@ function ComboboxPopup({ data, empty, popupRef, label, searchable, createOption 
   );
 }
 
-function SelectMultiple({ mode, options, clearable, emptyContent, placeholder, className, name, form, label, id, onBlur,
+function SelectMultiple({ mode, options, clearable, emptyContent, renderOption, placeholder, className, name, form, label, id, onBlur,
   required, "aria-invalid": invalid, "aria-busy": busy,
   "aria-describedby": describedBy, "aria-labelledby": labelledBy, ...props
 }: SelectMultipleProps | SelectTagsProps) {
@@ -509,7 +642,7 @@ function SelectMultiple({ mode, options, clearable, emptyContent, placeholder, c
           </Combobox.Trigger>
         </span>
       </Combobox.Chips>
-      <ComboboxPopup data={optionData} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
+      <ComboboxPopup data={optionData} renderOption={renderOption} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
         createOption={createValue === undefined ? undefined : {
           value: createValue, label: locale === "zh" ? `创建“${createValue}”` : `Create “${createValue}”`,
         }} />
@@ -519,6 +652,7 @@ function SelectMultiple({ mode, options, clearable, emptyContent, placeholder, c
 
 export function Select(props: SelectProps) {
   if (props.mode === "multiple" || props.mode === "tags") return <SelectMultiple {...props} />;
+  if (props.searchable === "popup") return <SelectPopupSearch {...props} />;
   return props.searchable ? <SelectSearchable {...props} /> : <SelectSingle {...props} />;
 }
 Select.formValueType = (props: { mode?: unknown }) => props.mode === "multiple" || props.mode === "tags" ? "array" : "select-single";

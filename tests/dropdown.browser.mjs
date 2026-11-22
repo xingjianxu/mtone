@@ -96,11 +96,19 @@ try{for(const [engineName,engine] of [['chromium',chromium],['firefox',firefox],
   assert(measurements.scroll>measurements.client && measurements.panelScroll<=measurements.panelClient+1,
     `${engineName} only the list scrolls: ${JSON.stringify(measurements)}`);
   assert(searchBox.y+searchBox.height<measurements.top && panelBox.width===320);
+  // Shared Combobox navigation may announce a disabled option without activating it.
+  const disabledOption=list.getByRole('option',{name:'Repository 1',exact:true});
+  await expect(disabledOption).toHaveAttribute('aria-disabled','true');
   await search.press('ArrowDown');
-  const option2=list.getByRole('option',{name:'Repository 2',exact:true});
-  await expect(search).toHaveAttribute('aria-activedescendant',await option2.getAttribute('id'));
+  await expect(search).toHaveAttribute('aria-activedescendant',await disabledOption.getAttribute('id'));
+  await search.press('Enter');
+  await expect(picker).toBeVisible();
+  await expect(list.getByRole('option',{name:'Repository 0',exact:true,selected:true})).toBeVisible();
+  const enabledOption=list.getByRole('option',{name:'Repository 2',exact:true});
+  await search.press('ArrowDown');
+  await expect(search).toHaveAttribute('aria-activedescendant',await enabledOption.getAttribute('id'));
   for(let i=0;i<15;i++) await search.press('ArrowDown');
-  assert(await list.evaluate(el=>el.scrollTop>0));
+  await expect.poll(()=>list.evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
   assert.equal((await search.boundingBox()).y,searchBox.y,'keyboard scrolling keeps search fixed');
   await search.fill('19');
   await expect(list.getByRole('option')).toHaveCount(1);
