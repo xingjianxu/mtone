@@ -1,6 +1,6 @@
-# Upgrade notes for 0.11.0
+# Upgrade notes for 0.11.1
 
-Use these changes when upgrading from 0.10.3 to 0.11.0.
+Use these changes when upgrading from 0.10.3 to 0.11.1.
 
 ## Select multiple mode
 

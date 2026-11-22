@@ -3072,7 +3072,7 @@ export default function Demo() {
     importNames: ["Select"],
     code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Select mode="multiple" label="分类" options={[{value:"design",label:"设计"}]} defaultValue={["design"]} />;\n}',
     props: [{ name: "MultiSelectProps", type: 'Omit<SelectMultipleProps, "mode">', description: "仍可导入 MultiSelect 与 MultiSelectProps；行为等同 Select 的 multiple 模式。" }],
-    notes: ['迁移时用 Select 替换组件名并加 mode="multiple"；现有的 string[] 值、回调、表单名称与受控开关保持不变。'],
+    notes: ['迁移时用 Select 替换组件名并加 mode="multiple"；现有的 string[] 值、回调、表单名称与受控开关保持不变。 默认单行外框高度为 32px（含边框），多行标签可以换行并撑高控件。'],
   },
   {
     name: "Slider",

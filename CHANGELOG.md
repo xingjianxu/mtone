@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.11.0
+## 0.11.1
+
+The v0.11.0 GitHub tag did not reach npm. This release includes the full update from 0.10.3.
 
 ### Breaking changes
 - Replace `Popover.SearchableSelect` with `Select searchable="popup"` and use `renderOption` for custom option content. No compatibility alias is provided. Existing inline Select search and ordinary Popover and Popover.Menu behavior are unchanged. See the [upgrade notes](docs/MIGRATION.md#searchable-selection-popover).
@@ -12,6 +14,7 @@
 - Unified Select for single, multiple, and tags modes, including inline single search and a separate searchable popup. `MultiSelect` remains a deprecated compatibility export.
 
 ### Fixed and documented
+- Document the deprecated MultiSelect compatibility export and its 32px baseline while demonstrating migration to Select.
 - Align the Select clear icon and avoid a duplicate focus border in inline search.
 - Serve lazy syntax highlighting for all Shiki languages from the app's own build, without a third-party runtime CDN.
 - Add independent Toolbar and Table composition examples, and use a single frame for the joined Toolbar and Table surfaces.

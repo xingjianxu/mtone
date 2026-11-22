@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.11.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.11.1. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 
@@ -1405,7 +1405,7 @@ export default function Demo() {
 - [MultiSelect](https://xingjianxu.github.io/mtone/#/components/MultiSelect): 已弃用的兼容入口；新代码请用 Select mode="multiple"。
 - Import: Select from @bixlab/mtone
 - MultiSelectProps: Omit<SelectMultipleProps, "mode">. 仍可导入 MultiSelect 与 MultiSelectProps；行为等同 Select 的 multiple 模式。
-- 迁移时用 Select 替换组件名并加 mode="multiple"；现有的 string[] 值、回调、表单名称与受控开关保持不变。
+- 迁移时用 Select 替换组件名并加 mode="multiple"；现有的 string[] 值、回调、表单名称与受控开关保持不变。 默认单行外框高度为 32px（含边框），多行标签可以换行并撑高控件。
 
 ```tsx
 import { Select } from "@bixlab/mtone";

@@ -15,7 +15,14 @@ describe("documentation", () => {
       componentDocs.length,
     );
     for (const doc of componentDocs) {
-      expect(doc.code).toContain(doc.name);
+      if (doc.name === "MultiSelect") {
+        // Its compatibility page intentionally demonstrates the recommended replacement.
+        expect(doc.importNames).toEqual(["Select"]);
+        expect(doc.code).toContain('import { Select } from "@bixlab/mtone"');
+        expect(doc.code).toContain('<Select mode="multiple"');
+      } else {
+        expect(doc.code).toContain(doc.name);
+      }
       expect(doc.description.length).toBeGreaterThan(4);
     }
   });
