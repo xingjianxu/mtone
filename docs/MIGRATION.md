@@ -1,6 +1,6 @@
-# Changes on master after 0.10.3
+# Upgrade notes for 0.11.0
 
-These changes are not in 0.10.3. Use the guidance for your installed version.
+Use these changes when upgrading from 0.10.3 to 0.11.0.
 
 ## Select multiple mode
 

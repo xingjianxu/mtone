@@ -145,6 +145,9 @@ jobs:
       - run: node tests/typography-code.browser.mjs
       - run: node tests/global-notice.browser.mjs
       - run: node tests/global-notice-docs.browser.mjs
+      - run: node tests/select-popup-docs.browser.mjs
+      - run: node tests/toolbar.browser.mjs
+      - run: node tests/floating-window.browser.mjs
       - name: Assert tracked files unchanged
         run: git diff --exit-code HEAD --
       - run: npm pack -w @bixlab/mtone --dry-run

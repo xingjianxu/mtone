@@ -1,9 +1,20 @@
 # Changelog
 
-## Unreleased
+## 0.11.0
 
 ### Breaking changes
 - Replace `Popover.SearchableSelect` with `Select searchable="popup"` and use `renderOption` for custom option content. No compatibility alias is provided. Existing inline Select search and ordinary Popover and Popover.Menu behavior are unchanged. See the [upgrade notes](docs/MIGRATION.md#searchable-selection-popover).
+
+### Added
+- Standalone `Toolbar` with white and gray surfaces, logical start/end slots, and container-aware wrapping. DataList reuses its layout while keeping its existing customization slot.
+- Nonmodal `FloatingWindow` with dragging, lower-right resizing, and a floating minimize/restore control that preserves draft state.
+- Optional top Tabs for Sidebar; the header, tabs and footer stay in place while the active navigation panel scrolls.
+- Unified Select for single, multiple, and tags modes, including inline single search and a separate searchable popup. `MultiSelect` remains a deprecated compatibility export.
+
+### Fixed and documented
+- Align the Select clear icon and avoid a duplicate focus border in inline search.
+- Serve lazy syntax highlighting for all Shiki languages from the app's own build, without a third-party runtime CDN.
+- Add independent Toolbar and Table composition examples, and use a single frame for the joined Toolbar and Table surfaces.
 
 ## 0.10.3
 
