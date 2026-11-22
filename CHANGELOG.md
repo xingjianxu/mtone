@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.10.2
+## 0.10.3
 
-The 0.10.0 and 0.10.1 tags did not reach npm. This version contains the complete update from 0.9.0.
+The earlier 0.10.x tags did not reach npm. This version contains the complete update from 0.9.0.
 
 ### Breaking changes
 - Use `Popover.Menu` for a triggered menu. `Menu` renders menu content on its own; `ContextMenu` and `Menubar` reuse that content without giving up their trigger behavior.

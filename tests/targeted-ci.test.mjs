@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makePlan, planFromGit } from "../scripts/check-targeted-changes.mjs";
+import { browserRuns, makePlan, planFromGit } from "../scripts/check-targeted-changes.mjs";
 import { execFileSync } from "node:child_process";
 import {
   copyFileSync,
@@ -65,6 +65,20 @@ describe("Targeted CI selection", () => {
     expect(plan.unit).toContain("tests/docs-categories.test.tsx");
     expect(plan.browser).toContain("tests/docs-search.browser.mjs");
     expect(plan.unit).not.toContain("tests/tree.test.tsx");
+  });
+
+  it("runs only the directly changed docs search fixture on all release engines", () => {
+    const docsSearch = "tests/docs-search.browser.mjs";
+    const tree = "tests/tree.browser.mjs";
+    expect(browserRuns(makePlan([docsSearch, tree], tests))).toEqual([
+      { path: docsSearch, browser: "chromium" },
+      { path: docsSearch, browser: "firefox" },
+      { path: docsSearch, browser: "webkit" },
+      { path: tree, browser: "chromium" },
+    ]);
+    expect(browserRuns(makePlan(["apps/docs/docs-app.tsx"], tests))).toEqual([
+      { path: docsSearch, browser: "chromium" },
+    ]);
   });
 
   it.each(["apps/docs/catalog.ts", "apps/docs/docs-app.tsx"])(

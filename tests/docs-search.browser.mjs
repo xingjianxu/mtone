@@ -233,11 +233,14 @@ try {
           ];
         }),
       }));
-      assert.deepEqual(spacing, {
-        start: "0px",
-        end: "0px",
-        dividers: [[12, 12], [12, 12]],
-      }, "docs styles leave each divider centered without extra outer section space");
+      assert.deepEqual([spacing.start, spacing.end], ["0px", "0px"],
+        "docs styles leave no extra outer section space");
+      // Subtracting fractional DOMRect coordinates can introduce float noise.
+      const tolerance = 0.05;
+      for (const [index, [before, after]] of spacing.dividers.entries()) {
+        assert(Math.abs(before - 12) <= tolerance && Math.abs(after - 12) <= tolerance,
+          `divider ${index + 1} must have 12px on each side; measured ${before}px before, ${after}px after`);
+      }
       const geometry = await deploy.evaluate(node => {
         const parent = node.getBoundingClientRect();
         const title = node.querySelector("h3").getBoundingClientRect();

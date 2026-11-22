@@ -5,6 +5,8 @@ import { pathToFileURL } from "node:url";
 const exactSha = /^[0-9a-f]{40}$/;
 const unitPattern = /^tests\/[a-z0-9-]+\.test\.[cm]?[jt]sx?$/;
 const browserPattern = /^tests\/[a-z0-9-]+\.browser\.mjs$/;
+const docsSearchBrowser = "tests/docs-search.browser.mjs";
+const releaseBrowsers = ["chromium", "firefox", "webkit"];
 const stem = (path) => path.toLowerCase().split("/").at(-1).split(".")[0];
 const testName = (path) =>
   path
@@ -199,7 +201,7 @@ export function makePlan(changes, testFiles) {
           path,
         )
       )
-        add(["tests/docs-search.browser.mjs"]);
+        add([docsSearchBrowser]);
       if (/^apps\/docs\/.*(?:css|layout|showcase)/.test(path))
         add([
           "tests/component-layout.browser.mjs",
@@ -278,6 +280,15 @@ export function planFromGit({ cwd = process.cwd(), base, head }) {
   return makePlan(paths, tests);
 }
 
+export function browserRuns(plan) {
+  return plan.browser.flatMap((path) => {
+    const browsers = path === docsSearchBrowser && plan.changes.includes(path)
+      ? releaseBrowsers
+      : ["chromium"];
+    return browsers.map((browser) => ({ path, browser }));
+  });
+}
+
 function runPlan(plan) {
   const run = (file, args, env = process.env) =>
     execFileSync(file, args, {
@@ -295,23 +306,21 @@ function runPlan(plan) {
   }
   if (plan.packageSmoke) run("npm", ["run", "test:package"]);
   if (plan.browser.length) {
-    // Some existing fixture runners require all engines internally. Run only
-    // the selected fixtures; those accepting BROWSER use one Chromium run here.
+    // Some fixture runners already require all engines internally. A direct edit
+    // to the docs search fixture also gets the release workflow's engine coverage.
     run("npm", [
       "exec",
       "--",
       "playwright",
       "install",
       "--with-deps",
-      "chromium",
-      "firefox",
-      "webkit",
+      ...releaseBrowsers,
     ]);
-    for (const path of plan.browser) {
+    for (const { path, browser } of browserRuns(plan)) {
       run(process.execPath, [path], {
         ...process.env,
-        BROWSER: "chromium",
-        ...(path === "tests/docs-search.browser.mjs" && plan.docsBuild
+        BROWSER: browser,
+        ...(path === docsSearchBrowser && plan.docsBuild
           ? { MTONE_DOCS_PREBUILT: "1" }
           : {}),
       });
