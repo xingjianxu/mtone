@@ -1,5 +1,5 @@
 import React from "react";
-import { MultiSelect } from "../../../packages/mtone/src";
+import { Select } from "../../../packages/mtone/src";
 
 const options = [
   { value: "design", label: "产品设计" },
@@ -9,6 +9,6 @@ const options = [
 
 export default function Demo() {
   return (
-    <MultiSelect label="文档分类" options={options} placeholder="选择分类" />
+    <Select mode="multiple" label="文档分类" options={options} placeholder="选择分类" />
   );
 }

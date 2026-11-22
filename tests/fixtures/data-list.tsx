@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Button, MtoneProvider } from "../../packages/mtone/src";
+import { Button, MtoneProvider, Popover } from "../../packages/mtone/src";
 import { DataList, type DataListKey } from "../../packages/mtone/src/data-list";
 import "../../packages/mtone/dist/styles.css";
 const items = [
@@ -16,7 +16,7 @@ function Fixture() {
   const [remotePage, setRemotePage] = useState(1);
   const [remoteQuery, setRemoteQuery] = useState("");
   return (
-    <MtoneProvider locale="en">
+    <MtoneProvider locale="en" theme="system">
       <main style={{ maxWidth: 760, margin: "0 auto", padding: 12 }}>
         <section data-testid="local">
           <h1>Local list</h1>
@@ -39,7 +39,13 @@ function Fixture() {
               match: (item, query) =>
                 item.name.toLowerCase().includes(query.toLowerCase()),
             }}
-            filters={<Button>Filter records</Button>}
+            filters={
+              <Popover
+                trigger={<Button>Filter records</Button>}
+                title="Filter options"
+                content={<Button>Active records</Button>}
+              />
+            }
             toolbar={<Button>Create record</Button>}
             pagination={{ pageSize: 2 }}
             selection={{

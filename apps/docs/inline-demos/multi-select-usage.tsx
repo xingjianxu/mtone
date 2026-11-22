@@ -17,7 +17,7 @@ export default function Demo() {
 
   return (
     <div style={stackStyle}>
-      <M.MultiSelect
+      <M.Select mode="multiple" clearable
         label="文档标签"
         options={options}
         value={multi}

@@ -273,50 +273,66 @@ export function DataList<T>({
     if (selected.size) changeSelection([]);
   };
 
+  const hasFilters =
+    filters != null && typeof filters !== "boolean" && filters !== "";
+  const hasToolbar =
+    toolbar != null && typeof toolbar !== "boolean" && toolbar !== "";
+  const hasControls = search || hasFilters || hasToolbar;
+
   return (
     <section {...props} className={cn("mt-data-list", className)}>
-      {(search || filters != null || toolbar != null) && (
+      {(selection || hasControls) && (
         <div className="mt-data-list-toolbar">
-          {search && (
-            <Input.Search
-              aria-label={search.label ?? (zh ? "搜索列表" : "Search list")}
-              placeholder={search.placeholder ?? (zh ? "搜索…" : "Search…")}
-              value={query}
-              onChange={(event) => changeQuery(event.currentTarget.value)}
-              allowClear
-            />
+          {selection && (
+            <div className="mt-data-list-selection">
+              <Checkbox
+                label={zh ? "选择当前可见项" : "Select visible items"}
+                checked={all}
+                indeterminate={picked > 0 && !all}
+                disabled={!enabledKeys.length}
+                onCheckedChange={(checked) =>
+                  changeSelection(updateKeys(selected, enabledKeys, checked))
+                }
+              />
+              <span className="mt-data-list-count" aria-live="polite">
+                {zh
+                  ? `已选择 ${selected.size} 项`
+                  : `${selected.size} selected`}
+              </span>
+              {selected.size > 0 && (
+                <div className="mt-data-list-actions">
+                  {renderBatchActions?.({
+                    selectedKeys: [...selected],
+                    clearSelection,
+                  })}
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    onClick={clearSelection}
+                  >
+                    {zh ? "清除选择" : "Clear selection"}
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
-          {filters != null && (
-            <div className="mt-data-list-filters">{filters}</div>
-          )}
-          {toolbar != null && (
-            <div className="mt-data-list-toolbar-end">{toolbar}</div>
-          )}
-        </div>
-      )}
-      {selection && (
-        <div className="mt-data-list-selection">
-          <Checkbox
-            label={zh ? "选择当前可见项" : "Select visible items"}
-            checked={all}
-            indeterminate={picked > 0 && !all}
-            disabled={!enabledKeys.length}
-            onCheckedChange={(checked) =>
-              changeSelection(updateKeys(selected, enabledKeys, checked))
-            }
-          />
-          <span className="mt-data-list-count" aria-live="polite">
-            {zh ? `已选择 ${selected.size} 项` : `${selected.size} selected`}
-          </span>
-          {selected.size > 0 && (
-            <div className="mt-data-list-actions">
-              {renderBatchActions?.({
-                selectedKeys: [...selected],
-                clearSelection,
-              })}
-              <Button variant="ghost" type="button" onClick={clearSelection}>
-                {zh ? "清除选择" : "Clear selection"}
-              </Button>
+          {hasControls && (
+            <div className="mt-data-list-controls">
+              {search && (
+                <Input.Search
+                  aria-label={search.label ?? (zh ? "搜索列表" : "Search list")}
+                  placeholder={search.placeholder ?? (zh ? "搜索…" : "Search…")}
+                  value={query}
+                  onChange={(event) => changeQuery(event.currentTarget.value)}
+                  allowClear
+                />
+              )}
+              {hasFilters && (
+                <div className="mt-data-list-filters">{filters}</div>
+              )}
+              {hasToolbar && (
+                <div className="mt-data-list-toolbar-end">{toolbar}</div>
+              )}
             </div>
           )}
         </div>

@@ -2931,9 +2931,9 @@ export default function Demo() {
   },
   {
     name: "Select",
-    description: "带浮层列表的单选控件。",
+    description: "带浮层列表的单选和多选表单控件，支持搜索、分组与清除。",
     importNames: ["Select"],
-    code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Select label="分类" defaultValue="design" options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />\n  );\n}',
+    code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const options = [{value:"design",label:"设计"},{value:"code",label:"开发"}];\n  return (\n    <>\n      <Select label="分类" searchable clearable defaultValue="design" options={options} />\n      <Select mode="multiple" label="标签" clearable defaultValue={["design"]} options={options} />\n    </>\n  );\n}',
     props: [
       {
         name: "label",
@@ -2955,11 +2955,16 @@ export default function Demo() {
         type: "string",
         description: "附加样式类。",
       },
+      { name: "mode", type: '"single" | "multiple"', default: '"single"', description: "选择模式；单选为 string | null，多选为 string[] 且默认可搜索。" },
+      { name: "searchable / searchPlaceholder", type: "boolean / string", description: "仅单选使用。启用后在下拉面板内提供本地搜索；可设置搜索框占位符。" },
+      { name: "clearable", type: "boolean", default: "false", description: "提供清除按钮；单选清除为 null，多选保留已选禁用项。" },
+      { name: "emptyContent", type: "ReactNode", description: "替换空列表或搜索无结果的默认提示。" },
+      { name: "required / form", type: "boolean / string", description: "原生必填校验、可选外部表单 ID；多选通过重复 name 提交已选值。" },
       {
         name: "options",
-        type: "Option[]",
+        type: "readonly (SelectOption | SelectOptionGroup)[]",
         description:
-          "必填；每项含 value、label，可设置 disabled。value 必须唯一。",
+          "必填。选项包含唯一字符串 value、可渲染 label、可选 disabled 和 searchText；分组为 { label, options }，可与未分组选项混用。",
       },
       {
         name: "placeholder",
@@ -2968,17 +2973,17 @@ export default function Demo() {
       },
       {
         name: "value",
-        type: "string | null",
+        type: "string | null / string[]",
         description: "受控值；提供后需在回调中更新。",
       },
       {
         name: "defaultValue",
-        type: "string | null",
+        type: "string | null / string[]",
         description: "非受控初始值。",
       },
       {
         name: "onValueChange",
-        type: "(value: string | null) => void",
+        type: "((value: string | null) => void) / ((value: string[]) => void)",
         description: "值变化回调。",
       },
       {
@@ -2998,6 +3003,10 @@ export default function Demo() {
       },
     ],
     notes: [
+      "保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择。",
+      "默认值和受控值按 mode 区分。空字符串可以作为显式选项值，原生和 Form.Item 的必填检查都将其视为已选；未选择单项用 null，多选未选择用 []。Form.Item 随 mode 集成。",
+      '原 MultiSelect 保留为兼容入口，新代码使用 Select mode="multiple"。多选标签可换行；已选的禁用标签不由用户删除。',
+
       "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框高度为 32px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "支持键盘选择、禁用选项和焦点恢复。", "选中项使用垂直居中的 16px Lucide Check 细线对号（1.5px 描边），无需新增属性配置。"],
   },
   {
@@ -3029,74 +3038,11 @@ export default function Demo() {
   },
   {
     name: "MultiSelect",
-    description: "支持搜索与移除标签的多选控件。",
-    importNames: ["MultiSelect"],
-    code: 'import { MultiSelect } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MultiSelect label="分类" defaultValue={["design"]} options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />\n  );\n}',
-    props: [
-      {
-        name: "label",
-        type: "string",
-        description: "提供可访问名称。",
-      },
-      {
-        name: "disabled",
-        type: "boolean",
-        description: "禁用交互。",
-      },
-      {
-        name: "name",
-        type: "string",
-        description: "表单字段名称。",
-      },
-      {
-        name: "className",
-        type: "string",
-        description: "附加样式类。",
-      },
-      {
-        name: "options",
-        type: "Option[]",
-        description:
-          "必填；每项含 value、label，可设置 disabled。value 必须唯一。",
-      },
-      {
-        name: "placeholder",
-        type: "string",
-        description: "未选择时的提示。",
-      },
-      {
-        name: "value",
-        type: "string[]",
-        description: "受控值；提供后需在回调中更新。",
-      },
-      {
-        name: "defaultValue",
-        type: "string[]",
-        description: "非受控初始值。",
-      },
-      {
-        name: "onValueChange",
-        type: "(value: string[]) => void",
-        description: "值变化回调。",
-      },
-      {
-        name: "open",
-        type: "boolean",
-        description: "受控开关。",
-      },
-      {
-        name: "defaultOpen",
-        type: "boolean",
-        description: "非受控初始开关。",
-      },
-      {
-        name: "onOpenChange",
-        type: "(open: boolean) => void",
-        description: "开关变化回调。",
-      },
-    ],
-    notes: [
-      "同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。","默认单行外框最小高度为 32px（含边框）；多个标签换行时自动增高，不强制裁剪为 32px；可用 className 定制。", "输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。", "MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。"],
+    description: '已弃用的兼容入口；新代码请用 Select mode="multiple"。',
+    importNames: ["Select"],
+    code: 'import { Select } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Select mode="multiple" label="分类" options={[{value:"design",label:"设计"}]} defaultValue={["design"]} />;\n}',
+    props: [{ name: "MultiSelectProps", type: 'Omit<SelectMultipleProps, "mode">', description: "仍可导入 MultiSelect 与 MultiSelectProps；行为等同 Select 的 multiple 模式。" }],
+    notes: ['迁移时用 Select 替换组件名并加 mode="multiple"；现有的 string[] 值、回调、表单名称与受控开关保持不变。'],
   },
   {
     name: "Slider",
@@ -4816,6 +4762,7 @@ export default function Demo() {
     ],
     notes: [
       "DataList 用于行内容由应用渲染的数据管理页。仅需基础列表、分组吸顶或虚拟滚动时，使用 List。",
+      "统一边框包围工具栏、行和分页。工具栏起始侧显示选择和批量操作，末端显示搜索、筛选和自定义控件；窄容器中自动换行，无控件时不显示空工具栏。",
       "本地搜索与筛选先于分页。输入搜索词会请求回到第 1 页；本地结果缩小时限制页码范围。",
       "远程模式不会过滤或再次切分 items。应用提供当前页记录、总数、加载及错误状态，管理请求取消；外部筛选变化时由应用重置页码。",
       "目前不提供卡片网格、内联编辑或虚拟滚动。过滤和翻页后若需批量修改，应按键操作，不以当前页的条目数组为准。",

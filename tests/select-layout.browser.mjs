@@ -1,5 +1,5 @@
 import { createServer } from "vite";
-import { chromium } from "@playwright/test";
+import { chromium, expect } from "@playwright/test";
 import assert from "node:assert/strict";
 const server = await createServer({
   root: process.cwd(),
@@ -45,7 +45,42 @@ try {
         };
       }),
     );
-    console.log(JSON.stringify(results));
+    await page.setViewportSize({ width: 390, height: 550 });
+  await page.goto("http://127.0.0.1:5187/tests/fixtures/select-layout.html?unified");
+  const form = page.getByRole("form", { name: "Select example" });
+  const field = form.getByRole("combobox", { name: "Project", exact: true });
+  const selectionValue = (name) => form.evaluate((node, name) => new FormData(node).getAll(name), name);
+  await field.press("Enter");
+  const popup = page.getByRole("dialog", { name: "Project" });
+  const search = popup.getByRole("combobox", { name: "Search options" });
+  await expect(search).toBeFocused();
+  const options = popup.getByRole("listbox");
+  assert(await options.evaluate((node) => node.scrollHeight > node.clientHeight));
+  const inputBox = await search.boundingBox(), panelBox = await popup.boundingBox();
+  assert(panelBox.x >= -1 && panelBox.x + panelBox.width <= 391 && inputBox.y >= panelBox.y);
+  await search.fill("missing");
+  await expect(popup.getByRole("status")).toHaveText("No results");
+  assert.deepEqual(await selectionValue("project"), ["repo-0"]);
+  await search.fill("fallback");
+  await expect(popup.getByRole("option", { name: "Default project" })).toBeVisible();
+  await search.press("Enter");
+  await expect(popup).toHaveCount(0);
+  await expect(field).toBeFocused();
+  assert.deepEqual(await selectionValue("project"), [""]);
+  assert(await form.evaluate((node) => node.checkValidity()));
+  await form.getByRole("button", { name: "Clear selection" }).first().click();
+  assert.equal(await form.evaluate((node) => node.checkValidity()), false);
+
+  const multiselect = form.getByRole("combobox", { name: "Projects", exact: true });
+  await multiselect.press("Backspace");
+  assert.deepEqual(await selectionValue("projects"), ["", "locked"]);
+  await multiselect.press("Escape");
+  await form.getByRole("button", { name: "Clear selection" }).click();
+  assert.deepEqual(await selectionValue("projects"), ["locked"]);
+  await form.getByRole("button", { name: "Reset selection" }).click();
+  await expect(field).toHaveText("Repository 0");
+  assert.deepEqual(await selectionValue("projects"), ["", "locked"]);
+  console.log(JSON.stringify(results));
     assert.equal(
       results.length,
       14,

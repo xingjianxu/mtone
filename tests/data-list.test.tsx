@@ -31,6 +31,56 @@ const labels = () =>
     .map((row) => row.textContent);
 
 describe("DataList", () => {
+  it("keeps selection and optional controls in a single header before the list", async () => {
+    const user = userEvent.setup();
+    render(
+      english(
+        <DataList
+          {...props}
+          aria-label="Records"
+          selection={{}}
+          search={{}}
+          filters={<button>Filters</button>}
+          toolbar={<button>New record</button>}
+          renderBatchActions={() => <button>Process selected</button>}
+        />,
+      ),
+    );
+    const frame = screen.getByRole("region", { name: "Records" });
+    const header = frame.querySelector<HTMLElement>(
+      ":scope > .mt-data-list-toolbar",
+    )!;
+    const selection = within(header).getByRole("checkbox", {
+      name: "Select visible items",
+    });
+    const search = within(header).getByRole("textbox", { name: "Search list" });
+    await user.tab();
+    expect(selection).toHaveFocus();
+    await user.tab();
+    expect(search).toHaveFocus();
+    expect(
+      within(header).getByRole("button", { name: "Filters" }),
+    ).toBeVisible();
+    expect(
+      within(header).getByRole("button", { name: "New record" }),
+    ).toBeVisible();
+    await user.click(selection);
+    expect(within(header).getByText("4 selected")).toBeVisible();
+    expect(
+      within(header).getByRole("button", { name: "Process selected" }),
+    ).toBeVisible();
+    expect(frame.children[1]).toBe(list());
+  });
+
+  it("does not render an empty header when there are no controls", () => {
+    render(
+      english(<DataList {...props} aria-label="Records" filters={false} />),
+    );
+    expect(
+      screen.getByRole("region", { name: "Records" }).firstElementChild,
+    ).toBe(list());
+  });
+
   it("filters and searches before pagination, resetting to page one once per actual page change", async () => {
     const user = userEvent.setup();
     const onPageChange = vi.fn();

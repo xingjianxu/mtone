@@ -1,3 +1,5 @@
+import SelectSearchable from "./inline-demos/select-searchable";
+import SelectSearchableSource from "./inline-demos/select-searchable.tsx?raw";
 import PopoverSearchableSelect from "./inline-demos/popover-select";
 import PopoverSearchableSelectSource from "./inline-demos/popover-select.tsx?raw";
 import PopoverControlled from "./inline-demos/popover-controlled";
@@ -256,6 +258,18 @@ export const inlineDocSections: Readonly<
       Demo: SelectExtra,
       source: source(SelectExtraRaw),
     },
+    {
+      id: "searchable",
+      title: "搜索、分组与清空",
+      Demo: SelectSearchable,
+      source: source(SelectSearchableSource),
+    },
+    {
+      id: "multiple",
+      title: "多选模式",
+      Demo: Example6_0,
+      source: source(Example6_0Raw),
+    },
   ],
   TagSelect: [
     { id: "usage", title: "基础用法", Demo: TagChoice, source: source(TagChoiceRaw) },
@@ -265,6 +279,8 @@ export const inlineDocSections: Readonly<
     {
       id: "usage",
       title: "基础用法",
+      note: "MultiSelect 保留为兼容入口，新代码使用 Select 的 multiple 模式。",
+      relatedLink: { href: "#/components/Select?section=multiple", label: "Select 多选模式" },
       Demo: Example6_0,
       source: source(Example6_0Raw),
     },

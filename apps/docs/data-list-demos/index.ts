@@ -1,4 +1,6 @@
 import type { DocSection } from "../doc-section";
+import IssueListDemo from "./issues";
+import issueSource from "./issues.tsx?raw";
 import LocalDataListDemo from "./local";
 import localSource from "./local.tsx?raw";
 import RemoteDataListDemo from "./remote";
@@ -11,6 +13,13 @@ const packageSource = (source: string) =>
   );
 
 export const dataListDocSections = [
+  {
+    id: "issue-list",
+    title: "事项列表样式",
+    note: "全选与已选数量位于工具栏起始侧，状态筛选和视图切换位于末端。窄容器中控件会自动换行。",
+    Demo: IssueListDemo,
+    source: packageSource(issueSource),
+  },
   {
     id: "local-data",
     title: "本地列表",

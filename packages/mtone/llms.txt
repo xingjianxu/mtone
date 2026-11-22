@@ -1301,20 +1301,28 @@ export default function Demo() {
 
 ### Select
 
-- [Select](https://xingjianxu.github.io/mtone/#/components/Select): 带浮层列表的单选控件。
+- [Select](https://xingjianxu.github.io/mtone/#/components/Select): 带浮层列表的单选和多选表单控件，支持搜索、分组与清除。
 - Import: Select from @bixlab/mtone
 - label: string. 提供可访问名称。
 - disabled: boolean. 禁用交互。
 - name: string. 表单字段名称。
 - className: string. 附加样式类。
-- options: Option[]. 必填；每项含 value、label，可设置 disabled。value 必须唯一。
+- mode: "single" | "multiple" (default: "single"). 选择模式；单选为 string | null，多选为 string[] 且默认可搜索。
+- searchable / searchPlaceholder: boolean / string. 仅单选使用。启用后在下拉面板内提供本地搜索；可设置搜索框占位符。
+- clearable: boolean (default: false). 提供清除按钮；单选清除为 null，多选保留已选禁用项。
+- emptyContent: ReactNode. 替换空列表或搜索无结果的默认提示。
+- required / form: boolean / string. 原生必填校验、可选外部表单 ID；多选通过重复 name 提交已选值。
+- options: readonly (SelectOption | SelectOptionGroup)[]. 必填。选项包含唯一字符串 value、可渲染 label、可选 disabled 和 searchText；分组为 { label, options }，可与未分组选项混用。
 - placeholder: string. 未选择时的提示。
-- value: string | null. 受控值；提供后需在回调中更新。
-- defaultValue: string | null. 非受控初始值。
-- onValueChange: (value: string | null) => void. 值变化回调。
+- value: string | null / string[]. 受控值；提供后需在回调中更新。
+- defaultValue: string | null / string[]. 非受控初始值。
+- onValueChange: ((value: string | null) => void) / ((value: string[]) => void). 值变化回调。
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
+- 保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择。
+- 默认值和受控值按 mode 区分。空字符串可以作为显式选项值，原生和 Form.Item 的必填检查都将其视为已选；未选择单项用 null，多选未选择用 []。Form.Item 随 mode 集成。
+- 原 MultiSelect 保留为兼容入口，新代码使用 Select mode="multiple"。多选标签可换行；已选的禁用标签不由用户删除。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 默认单行外框高度为 32px（含边框）；长选中标签在行内省略。可用 className 覆盖尺寸。
 - 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
@@ -1326,8 +1334,12 @@ import { Select } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
+  const options = [{value:"design",label:"设计"},{value:"code",label:"开发"}];
   return (
-    <Select label="分类" defaultValue="design" options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />
+    <>
+      <Select label="分类" searchable clearable defaultValue="design" options={options} />
+      <Select mode="multiple" label="标签" clearable defaultValue={["design"]} options={options} />
+    </>
   );
 }
 ```
@@ -1362,33 +1374,17 @@ export default function Demo() {
 
 ### MultiSelect
 
-- [MultiSelect](https://xingjianxu.github.io/mtone/#/components/MultiSelect): 支持搜索与移除标签的多选控件。
-- Import: MultiSelect from @bixlab/mtone
-- label: string. 提供可访问名称。
-- disabled: boolean. 禁用交互。
-- name: string. 表单字段名称。
-- className: string. 附加样式类。
-- options: Option[]. 必填；每项含 value、label，可设置 disabled。value 必须唯一。
-- placeholder: string. 未选择时的提示。
-- value: string[]. 受控值；提供后需在回调中更新。
-- defaultValue: string[]. 非受控初始值。
-- onValueChange: (value: string[]) => void. 值变化回调。
-- open: boolean. 受控开关。
-- defaultOpen: boolean. 非受控初始开关。
-- onOpenChange: (open: boolean) => void. 开关变化回调。
-- 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
-- 默认单行外框最小高度为 32px（含边框）；多个标签换行时自动增高，不强制裁剪为 32px；可用 className 定制。
-- 输入表面聚焦时只将现有边框改为 #93B4DC，不加粗、不加外圈；错误与禁用状态保留，强制颜色模式使用系统焦点提示。
-- MultiSelect 建议使用纯文本 label，以确保搜索与标签显示正确。
+- [MultiSelect](https://xingjianxu.github.io/mtone/#/components/MultiSelect): 已弃用的兼容入口；新代码请用 Select mode="multiple"。
+- Import: Select from @bixlab/mtone
+- MultiSelectProps: Omit<SelectMultipleProps, "mode">. 仍可导入 MultiSelect 与 MultiSelectProps；行为等同 Select 的 multiple 模式。
+- 迁移时用 Select 替换组件名并加 mode="multiple"；现有的 string[] 值、回调、表单名称与受控开关保持不变。
 
 ```tsx
-import { MultiSelect } from "@bixlab/mtone";
+import { Select } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
-  return (
-    <MultiSelect label="分类" defaultValue={["design"]} options={[{value:"design",label:"设计"},{value:"code",label:"开发"}]} />
-  );
+  return <Select mode="multiple" label="分类" options={[{value:"design",label:"设计"}]} defaultValue={["design"]} />;
 }
 ```
 
@@ -2279,6 +2275,7 @@ export default function Demo() {
 - loading / empty: boolean / ReactNode. 加载状态与空内容；请求、错误和记录更新由应用处理。
 - 原生属性: HTMLAttributes<HTMLElement>. 转发 section 根元素属性，例如 aria-label、className、style；行由 renderItem 提供。
 - DataList 用于行内容由应用渲染的数据管理页。仅需基础列表、分组吸顶或虚拟滚动时，使用 List。
+- 统一边框包围工具栏、行和分页。工具栏起始侧显示选择和批量操作，末端显示搜索、筛选和自定义控件；窄容器中自动换行，无控件时不显示空工具栏。
 - 本地搜索与筛选先于分页。输入搜索词会请求回到第 1 页；本地结果缩小时限制页码范围。
 - 远程模式不会过滤或再次切分 items。应用提供当前页记录、总数、加载及错误状态，管理请求取消；外部筛选变化时由应用重置页码。
 - 目前不提供卡片网格、内联编辑或虚拟滚动。过滤和翻页后若需批量修改，应按键操作，不以当前页的条目数组为准。
