@@ -154,7 +154,7 @@ function ClearSelection({ locale, focus, clear }: {
 }
 
 const marker = <Check size={16} strokeWidth={1.5} aria-hidden="true" />;
-function SelectSingle({ options, searchable = false, searchPlaceholder, clearable, emptyContent,
+function SelectSingle({ options, clearable, emptyContent,
   placeholder, className, name, form, label, id, onBlur, required,
   "aria-invalid": invalid, "aria-busy": busy,
   "aria-describedby": describedBy, "aria-labelledby": labelledBy, ...props
@@ -165,13 +165,8 @@ function SelectSingle({ options, searchable = false, searchPlaceholder, clearabl
   const selection = useSelection({ ...props, form }, null, popup.reset);
   const optionData = useOptions(options);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
-  const popupRef = React.useRef<HTMLDivElement>(null);
   const empty = emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results");
   const prompt = placeholder ?? (locale === "zh" ? "请选择" : "Select…");
-  const searchName = locale === "zh" ? "搜索选项" : "Search options";
-  const fallbackLabel = (v: string) => optionText(optionData.byValue.get(v), v);
-  const selectedLabel = selection.value === null
-    ? prompt : optionData.byValue.get(selection.value)?.label ?? selection.value;
   const rootProps = {
     value: selection.value, onValueChange: selection.change, inputRef: selection.inputRef,
     open: popup.open, onOpenChange: popup.change, disabled, name, form,
@@ -188,28 +183,6 @@ function SelectSingle({ options, searchable = false, searchPlaceholder, clearabl
   );
   const withClear = (trigger: React.ReactElement) => clearable
     ? <span className="mt-select-clearable">{trigger}{clear}</span> : trigger;
-  if (searchable) {
-    return (
-      <Combobox.Root<string> items={optionData.comboItems} itemToStringLabel={fallbackLabel}
-        autoHighlight {...rootProps}>
-        {withClear(
-          <Combobox.Trigger {...triggerProps} onBlur={(event) => {
-            if (!popupRef.current?.contains(event.relatedTarget)) onBlur?.(event);
-          }}>
-            <span className="mt-select-value">{selectedLabel}</span>
-            <Combobox.Icon className="mt-select-icon"><ChevronDown size={16} aria-hidden="true" /></Combobox.Icon>
-          </Combobox.Trigger>,
-        )}
-        <ComboboxPopup data={optionData} empty={empty} popupRef={popupRef} label={label ?? searchName}>
-          <Combobox.Input className="mt-select-search" aria-label={searchName}
-            placeholder={searchPlaceholder ?? searchName}
-            onBlur={(event) => {
-              if (event.relatedTarget !== triggerRef.current && !popupRef.current?.contains(event.relatedTarget)) onBlur?.(event);
-            }} />
-        </ComboboxPopup>
-      </Combobox.Root>
-    );
-  }
   const renderOption = (option: SelectOption) => (
     <BSelect.Item className="mt-option" key={option.value} value={option.value} disabled={option.disabled}>
       <BSelect.ItemText>{option.label}</BSelect.ItemText>
@@ -245,14 +218,133 @@ function SelectSingle({ options, searchable = false, searchPlaceholder, clearabl
   );
 }
 
+function SelectSearchable({ options, searchPlaceholder, clearable, emptyContent,
+  placeholder, className, name, form, label, id, onBlur, required,
+  "aria-invalid": invalid, "aria-busy": busy,
+  "aria-describedby": describedBy, "aria-labelledby": labelledBy, ...props
+}: SelectSingleProps) {
+  const { locale } = useMtone();
+  const disabled = useFieldsetDisabled(props.disabled);
+  const popup = useSelectPopup(props, disabled);
+  const [draft, setDraft] = React.useState("");
+  const composingRef = React.useRef(false);
+  const input = React.useRef<HTMLInputElement>(null);
+  const surface = React.useRef<HTMLDivElement>(null);
+  const popupRef = React.useRef<HTMLDivElement>(null);
+  const richLabelId = React.useId();
+  const reset = React.useCallback(() => { popup.reset(); setDraft(""); }, [popup.reset]);
+  const selection = useSelection({ ...props, form }, null, reset);
+  const data = useOptions(options);
+  const selected = selection.value === null ? undefined : data.byValue.get(selection.value);
+  const selectedLabel = selected?.label ?? selection.value;
+  const plainLabel = typeof selectedLabel === "string" || typeof selectedLabel === "number";
+  const valueText = selection.value === null ? "" : plainLabel ? String(selectedLabel) : optionText(selected, selection.value);
+  const showRichLabel = !popup.open && selectedLabel != null && !plainLabel;
+  // The editable value cannot contain markup. Give assistive technology the
+  // rendered selected label as well as any caller-provided description.
+  const description = showRichLabel
+    ? (describedBy ? `${describedBy} ${richLabelId}` : richLabelId) : describedBy;
+  const searchPrompt = searchPlaceholder ?? (locale === "zh" ? "搜索选项" : "Search options");
+  const prompt = selection.value !== null && !valueText ? undefined
+    : placeholder ?? (locale === "zh" ? "请选择" : "Select…");
+
+  React.useEffect(() => {
+    if (!popup.open) setDraft("");
+  }, [popup.open]);
+  React.useLayoutEffect(() => {
+    // On cancel/commit, keep focus on the same field and let the next keystroke
+    // start a new query instead of appending to the restored display value.
+    if (!popup.open && input.current === input.current?.ownerDocument.activeElement) input.current?.select();
+  }, [popup.open, valueText]);
+
+  return (
+    <Combobox.Root<string> items={data.comboItems}
+      itemToStringLabel={(value) => optionText(data.byValue.get(value), value)}
+      autoHighlight inputValue={popup.open ? draft : valueText}
+      filter={popup.open ? undefined : null}
+      value={selection.value} inputRef={selection.inputRef} name={name} form={form} disabled={disabled}
+      required={required && selection.value !== ""}
+      onInputValueChange={(next, details) => {
+        if (details.reason !== "input-change") return;
+        setDraft(next);
+        // Base UI opens on nonblank typing. A keyboard deletion of the
+        // closed label also starts editing, without clearing its selection.
+        if (!popup.open && !next.trim()) popup.change(true);
+      }}
+      onValueChange={(next, details) => {
+        // Base UI can clear the selection on empty inline text or a closed
+        // Escape. A search draft must not replace the committed form value.
+        if (composingRef.current || (next === null && details.reason !== "clear-press") ||
+          (next !== null && data.byValue.get(next)?.disabled)) {
+          details.cancel();
+          return;
+        }
+        selection.change(next);
+        setDraft("");
+      }}
+      open={popup.open} onOpenChange={(open) => {
+        if (!open) setDraft("");
+        popup.change(open);
+      }}>
+      <Combobox.InputGroup ref={surface} aria-invalid={invalid}
+        className={cn("mt-select mt-select-inline-search", clearable && "mt-select-clearable", className)}
+        onBlur={(event) => {
+          if (surface.current?.contains(event.relatedTarget) || popupRef.current?.contains(event.relatedTarget)) return;
+          composingRef.current = false;
+          setDraft("");
+          onBlur?.(event);
+        }}>
+        <span className="mt-select-inline-value">
+          <Combobox.Input ref={input} id={id}
+            aria-label={label} aria-invalid={invalid} aria-busy={busy}
+            aria-describedby={description} aria-labelledby={labelledBy} aria-required={required || undefined}
+            className="mt-select-inline-input" data-rich-label={showRichLabel || undefined}
+            placeholder={popup.open ? searchPrompt : prompt}
+            onFocus={(event) => { if (!popup.open) event.currentTarget.select(); }}
+            onCompositionStart={() => { composingRef.current = true; }}
+            onCompositionEnd={() => { composingRef.current = false; }}
+            onKeyDown={(event) => {
+              const composing = composingRef.current || event.nativeEvent.isComposing;
+              if ((event.key === "Enter" || event.key === "Escape") && (composing || event.nativeEvent.keyCode === 229)) {
+                event.preventBaseUIHandler();
+                if (!composing) event.preventDefault();
+                return;
+              }
+              if (event.key === "Enter") {
+                event.preventDefault();
+                if (!popup.open) {
+                  event.preventBaseUIHandler();
+                  popup.change(true);
+                }
+              }
+            }} />
+          {showRichLabel && <span id={richLabelId} className="mt-select-value mt-select-rich-label" aria-hidden="true">{selectedLabel}</span>}
+        </span>
+        <Combobox.Trigger className="mt-select-icon mt-select-inline-trigger" tabIndex={-1}
+          aria-label={locale === "zh" ? "展开选项" : "Show options"}>
+          <ChevronDown size={16} aria-hidden="true" />
+        </Combobox.Trigger>
+        {clearable && !disabled && selection.value !== null && (
+          <Combobox.Clear className="mt-select-clear" tabIndex={popup.open ? -1 : 0}
+            aria-label={locale === "zh" ? "清除选择" : "Clear selection"}>
+            <X size={14} aria-hidden="true" />
+          </Combobox.Clear>
+        )}
+      </Combobox.InputGroup>
+      <ComboboxPopup data={data} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
+        popupRef={popupRef} label={label} searchable />
+    </Combobox.Root>
+  );
+}
+
 type OptionData = ReturnType<typeof useOptions>;
 type ComboGroup = { items: string[]; section: OptionSection; index: number };
-function ComboboxPopup({ data, empty, popupRef, label, children, createOption }: {
+function ComboboxPopup({ data, empty, popupRef, label, searchable, createOption }: {
   data: OptionData;
   empty: React.ReactNode;
   popupRef?: React.Ref<HTMLDivElement>;
   label?: string;
-  children?: React.ReactNode;
+  searchable?: boolean;
   createOption?: { value: string; label: string };
 }) {
   const item = (value: string) => {
@@ -268,10 +360,9 @@ function ComboboxPopup({ data, empty, popupRef, label, children, createOption }:
     <Combobox.Portal>
       <MtoneScope>
         <Combobox.Positioner className="mt-positioner" sideOffset={4}>
-          <Combobox.Popup ref={popupRef} aria-label={label} className={cn("mt-popup", children != null && "mt-select-search-popup")}>
-            {children}
+          <Combobox.Popup ref={popupRef} className={cn("mt-popup", searchable && "mt-select-inline-popup")}>
             <Combobox.Empty className="mt-combobox-empty">{empty}</Combobox.Empty>
-            <Combobox.List className={children != null ? "mt-select-search-list" : undefined}>
+            <Combobox.List aria-label={label}>
               {(entry: string | ComboGroup) => {
                 if (typeof entry === "string") return item(entry);
                 if (!entry.section.grouped) {
@@ -425,7 +516,8 @@ function SelectMultiple({ mode, options, clearable, emptyContent, placeholder, c
 }
 
 export function Select(props: SelectProps) {
-  return props.mode === "multiple" || props.mode === "tags" ? <SelectMultiple {...props} /> : <SelectSingle {...props} />;
+  if (props.mode === "multiple" || props.mode === "tags") return <SelectMultiple {...props} />;
+  return props.searchable ? <SelectSearchable {...props} /> : <SelectSingle {...props} />;
 }
 Select.formValueType = (props: { mode?: unknown }) => props.mode === "multiple" || props.mode === "tags" ? "array" : "select-single";
 

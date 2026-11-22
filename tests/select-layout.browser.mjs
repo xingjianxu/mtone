@@ -199,24 +199,59 @@ try {
   const form = page.getByRole("form", { name: "Select example" });
   const field = form.getByRole("combobox", { name: "Project", exact: true });
   const selectionValue = (name) => form.evaluate((node, name) => new FormData(node).getAll(name), name);
+  const options = page.getByRole("listbox", { name: "Project", exact: true });
+  const scroller = page.locator(".mt-select-inline-popup");
+  const outsideSelect = form.getByRole("button", { name: "Outside select", includeHidden: true });
+  await form.evaluate((node) => node.addEventListener("submit", (event) => {
+    event.preventDefault();
+    node.dataset.submitted = "true";
+  }));
+  await expect(field).toHaveValue("Repository 0");
+  await expect(field).toHaveAttribute("placeholder", "Choose project");
   await field.press("Enter");
-  const popup = page.getByRole("dialog", { name: "Project" });
-  const search = popup.getByRole("combobox", { name: "Search options" });
-  await expect(search).toBeFocused();
-  const options = popup.getByRole("listbox");
-  assert(await options.evaluate((node) => node.scrollHeight > node.clientHeight));
-  const inputBox = await search.boundingBox(), panelBox = await popup.boundingBox();
-  assert(panelBox.x >= -1 && panelBox.x + panelBox.width <= 391 && inputBox.y >= panelBox.y);
-  await search.fill("missing");
-  await expect(popup.getByRole("status")).toHaveText("No results");
-  assert.deepEqual(await selectionValue("project"), ["repo-0"]);
-  await search.fill("fallback");
-  await expect(popup.getByRole("option", { name: "Default project" })).toBeVisible();
-  await search.press("Enter");
-  await expect(popup).toHaveCount(0);
+  await expect(options).toBeVisible();
   await expect(field).toBeFocused();
+  await expect(field).toHaveValue("");
+  await expect(field).toHaveAttribute("placeholder", "Search projects");
+  await expect(scroller.locator("input")).toHaveCount(0);
+  assert(await scroller.evaluate((node) => node.scrollHeight > node.clientHeight));
+  const inputBox = await field.boundingBox(), panelBox = await scroller.boundingBox();
+  assert(panelBox.x >= -1 && panelBox.x + panelBox.width <= 391);
+  assert(inputBox.y + inputBox.height <= panelBox.y + 1 || panelBox.y + panelBox.height <= inputBox.y + 1,
+    "The inline field must not overlap or live inside the options panel");
+
+  await field.fill("missing");
+  await expect(scroller.getByRole("status")).toHaveText("No results");
+  assert.deepEqual(await selectionValue("project"), ["repo-0"]);
+  await field.press("Enter");
+  await expect(options).toBeHidden();
+  await expect(field).toHaveValue("Repository 0");
+  assert.equal(await form.getAttribute("data-submitted"), null);
+
+  await field.click();
+  await field.fill("Repository 2");
+  await page.keyboard.press("Escape");
+  await expect(options).toBeHidden();
+  await expect(field).toBeFocused();
+  await expect(field).toHaveValue("Repository 0");
+  await field.pressSequentially("Repository 3");
+  await expect(options.getByRole("option", { name: "Repository 3", exact: true })).toBeVisible();
+  await outsideSelect.click();
+  await expect(options).toBeHidden();
+  await expect(field).toHaveValue("Repository 0");
+  assert.deepEqual(await selectionValue("project"), ["repo-0"]);
+
+  await field.press("ArrowDown");
+  await expect(options).toBeVisible();
+  await field.fill("fallback");
+  await expect(options.getByRole("option", { name: "Default project" })).toBeVisible();
+  await field.press("Enter");
+  await expect(options).toBeHidden();
+  await expect(field).toBeFocused();
+  await expect(form.locator(".mt-select-rich-label")).toHaveText("Default project");
   assert.deepEqual(await selectionValue("project"), [""]);
   assert(await form.evaluate((node) => node.checkValidity()));
+  assert.equal(await form.getAttribute("data-submitted"), null);
   await field.hover();
   await form.getByRole("button", { name: "Clear selection" }).first().click();
   assert.equal(await form.evaluate((node) => node.checkValidity()), false);
@@ -229,7 +264,7 @@ try {
   await form.getByRole("button", { name: "Clear selection" }).click();
   assert.deepEqual(await selectionValue("projects"), ["locked"]);
   await form.getByRole("button", { name: "Reset selection" }).click();
-  await expect(field).toHaveText("Repository 0");
+  await expect(field).toHaveValue("Repository 0");
   assert.deepEqual(await selectionValue("projects"), ["", "locked"]);
   const slotURL = "http://127.0.0.1:5187/tests/fixtures/select-layout.html?clearSlot";
   const slotParts = (host, id) => {

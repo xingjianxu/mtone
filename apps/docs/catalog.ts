@@ -2960,7 +2960,7 @@ export default function Demo() {
         description: "附加样式类。",
       },
       { name: "mode", type: '"single" | "multiple" | "tags"', default: '"single"', description: "单选值为 string | null，多选与标签模式均为可搜索的 string[]；只有 tags 可以创建自定义值。" },
-      { name: "searchable / searchPlaceholder", type: "boolean / string", description: "仅单选使用。启用后在下拉面板内提供本地搜索；可设置搜索框占位符。" },
+      { name: "searchable / searchPlaceholder", type: "boolean / string", description: "仅单选使用。启用后直接在选择框内输入；编辑时用 searchPlaceholder，收起未选时用 placeholder。下拉仅显示匹配选项。" },
       { name: "clearable", type: "boolean", default: "false", description: "有可清除的选中值时，桌面悬停或键盘聚焦清除按钮会在箭头原位显示 ×；无悬停的触屏可直接点 ×。清除不打开下拉；单选变为 null，多选与标签模式保留已选禁用项。" },
       { name: "emptyContent", type: "ReactNode", description: "替换空列表或搜索无结果的默认提示。" },
       { name: "required / form", type: "boolean / string", description: "原生必填校验、可选外部表单 ID；多选与标签模式通过重复 name 提交已选值。" },
@@ -3007,7 +3007,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择。",
+      "保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择；按 Enter 选中高亮选项或点击才提交，Esc、失焦或外部点击撤销搜索。",
       "默认值和受控值按 mode 区分。空字符串可以作为显式选项值，原生和 Form.Item 的必填检查都将其视为已选；未选择单项用 null，多选未选择用 []。Form.Item 随 mode 集成。",
       '标签模式（SelectTagsProps）通过 Enter 或点击“创建”添加去掉首尾空白的输入。已有选项的精确 value 或纯文本标签不另建，包括禁用选项；重复输入不会添加。失焦或输入法确认不创建，不按逗号等分隔符拆分批量输入。仅更新已选值数组，不修改 options。外部传入而不在 options 中的已选值显示原字符串。',
       '原 MultiSelect 保留为兼容入口，新代码使用 Select mode="multiple"。多选标签可换行；已选的禁用标签不由用户删除。',

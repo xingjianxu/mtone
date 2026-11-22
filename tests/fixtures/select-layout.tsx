@@ -17,9 +17,12 @@ function UnifiedFixture() {
   return (
     <MtoneProvider locale="en">
       <form aria-label="Select example" style={{ display: "grid", justifyItems: "start", gap: 12, padding: 12 }}>
-        <Select label="Project" searchable clearable required name="project" options={pickerOptions} defaultValue="repo-0" />
+        <Select label="Project" searchable clearable required name="project" options={pickerOptions} defaultValue="repo-0"
+          placeholder="Choose project" searchPlaceholder="Search projects" />
         <Select mode="multiple" label="Projects" clearable name="projects" options={pickerOptions} defaultValue={["", "locked"]} />
         <button type="reset">Reset selection</button>
+        <button type="button">Outside select</button>
+        <button type="submit">Submit selection</button>
       </form>
     </MtoneProvider>
   );

@@ -35,37 +35,121 @@ test("unifies multiple mode without stringifying rich labels or removing disable
   expect(screen.getByText("Default workspace")).toBeVisible();
 });
 
-test("searchable single renders named groups and rich options, clears, and preserves committed form values", async () => {
+test("searchable single uses the only combobox in its surface and keeps grouped rich choices and native values", async () => {
   const user = userEvent.setup();
   const changed = vi.fn();
   const { container } = render(<MtoneProvider locale="en"><form>
     <Select searchable clearable label="Project" name="project" options={grouped}
+      placeholder="Choose a project" searchPlaceholder="Find projects"
       required defaultValue="desk" onValueChange={changed} />
   </form></MtoneProvider>);
-  const trigger = screen.getByRole("combobox", { name: "Project" });
+  const search = screen.getByRole("combobox", { name: "Project" });
   const form = container.querySelector("form")!;
-  await user.click(trigger);
-  const search = await screen.findByRole("combobox", { name: "Search options" });
+  expect(search).toBeInstanceOf(HTMLInputElement);
+  expect(search).toHaveValue("Help desk");
+  expect(search).toHaveAttribute("placeholder", "Choose a project");
+  await user.click(search);
+  expect(search).toHaveFocus();
+  expect(search).toHaveValue("");
+  expect(search).toHaveAttribute("placeholder", "Find projects");
+  expect(screen.getAllByRole("combobox")).toEqual([search]);
   expect(screen.getByRole("group", { name: "Systems" })).toBeVisible();
   expect(screen.getByRole("group", { name: "Services" })).toBeVisible();
   await user.type(search, "missing");
   expect(screen.getByRole("status")).toHaveTextContent("No results");
   expect(new FormData(form).get("project")).toBe("desk");
+  expect(changed).not.toHaveBeenCalled();
   await user.clear(search);
   await user.type(search, "fallback");
   expect(screen.queryByRole("group", { name: "Services" })).not.toBeInTheDocument();
   const option = screen.getByRole("option", { name: "Default workspace" });
   expect(within(option).getByText("Default workspace").tagName).toBe("STRONG");
   await user.click(option);
-  expect(changed).toHaveBeenLastCalledWith("");
-  expect(within(trigger).getByText("Default workspace").tagName).toBe("STRONG");
+  expect(changed).toHaveBeenCalledExactlyOnceWith("");
+  expect(container.querySelector(".mt-select strong")).toHaveTextContent("Default workspace");
+  expect(search).toHaveAccessibleDescription("Default workspace");
+  expect(search).toHaveFocus();
   expect(new FormData(form).get("project")).toBe("");
   expect(form.checkValidity()).toBe(true);
   await user.click(screen.getByRole("button", { name: "Clear selection" }));
   expect(changed).toHaveBeenLastCalledWith(null);
+  expect(search).toHaveFocus();
+  expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   expect(form.checkValidity()).toBe(false);
   await act(async () => form.reset());
-  expect(trigger).toHaveTextContent("Help desk");
+  expect(search).toHaveValue("Help desk");
+});
+
+test("searchable single drops a draft on Escape, outside press and blur without changing committed state", async () => {
+  const user = userEvent.setup();
+  const onChange = vi.fn();
+  render(<MtoneProvider locale="en">
+    <Select searchable label="Workspace" options={grouped} value="unknown-id" onValueChange={onChange} />
+    <button type="button">Outside</button>
+  </MtoneProvider>);
+  const field = screen.getByRole("combobox", { name: "Workspace" });
+  const outside = screen.getByRole("button", { name: "Outside" });
+  expect(field).toHaveValue("unknown-id");
+  field.focus();
+  await user.keyboard("{Backspace}");
+  expect(screen.getByRole("listbox")).toBeVisible();
+  expect(field).toHaveValue("");
+  expect(onChange).not.toHaveBeenCalled();
+  await user.keyboard("{Escape}");
+  expect(field).toHaveValue("unknown-id");
+  await user.keyboard("vault");
+  expect(await screen.findByRole("option", { name: "Vault" })).toBeVisible();
+  await user.keyboard("{Escape}");
+  expect(field).toHaveValue("unknown-id");
+  expect(field).toHaveFocus();
+  expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  await user.type(field, "new");
+  await user.click(outside);
+  expect(field).toHaveValue("unknown-id");
+  expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  await user.click(field);
+  await user.type(field, "query");
+  await user.tab();
+  expect(outside).toHaveFocus();
+  expect(field).toHaveValue("unknown-id");
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test("searchable single never implicitly submits a form on Enter and respects IME confirmation", async () => {
+  const user = userEvent.setup();
+  const submit = vi.fn((event: React.FormEvent) => event.preventDefault());
+  const changed = vi.fn();
+  render(<MtoneProvider locale="en"><form onSubmit={submit}>
+    <Select searchable label="Workspace" options={[{ value: "im", label: "内蒙古" }, { value: "disabled", label: "Restricted", disabled: true }]}
+      onValueChange={changed} />
+    <button type="submit">Submit</button>
+  </form></MtoneProvider>);
+  const field = screen.getByRole("combobox", { name: "Workspace" });
+  await user.tab();
+  expect(field).toHaveFocus();
+  await user.keyboard("{Enter}");
+  expect(screen.getByRole("listbox")).toBeVisible();
+  await user.type(field, "not found");
+  await user.keyboard("{Enter}");
+  expect(submit).not.toHaveBeenCalled();
+  expect(changed).not.toHaveBeenCalled();
+  await user.click(field);
+  await user.type(field, "Restricted{Enter}");
+  expect(changed).not.toHaveBeenCalled();
+  await user.keyboard("{Escape}");
+  await user.click(field);
+  fireEvent.compositionStart(field);
+  fireEvent.input(field, { target: { value: "内蒙古" }, inputType: "insertCompositionText", isComposing: true });
+  fireEvent.keyDown(field, { key: "Enter", isComposing: true, keyCode: 229 });
+  expect(changed).not.toHaveBeenCalled();
+  fireEvent.compositionEnd(field, { data: "内蒙古" });
+  expect(await screen.findByRole("option", { name: "内蒙古" })).toBeVisible();
+  fireEvent.keyDown(field, { key: "Enter", keyCode: 229 });
+  expect(changed).not.toHaveBeenCalled();
+  await user.keyboard("{Enter}");
+  expect(changed).toHaveBeenCalledExactlyOnceWith("im");
+  expect(field).toHaveValue("内蒙古");
+  expect(submit).not.toHaveBeenCalled();
 });
 
 test("Form.Item normalizes empty unified multiple and single values by component mode", async () => {
@@ -75,7 +159,7 @@ test("Form.Item normalizes empty unified multiple and single values by component
   function Example() {
     [form] = Form.useForm();
     return <Form form={form} onFinish={finish}>
-      <Form.Item name="single" label="Single"><Select clearable options={grouped} /></Form.Item>
+      <Form.Item name="single" label="Single"><Select searchable clearable options={grouped} /></Form.Item>
       <Form.Item name="multiple" label="Multiple"><Select mode="multiple" clearable options={grouped} /></Form.Item>
       <button type="submit">Submit</button>
     </Form>;

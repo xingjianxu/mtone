@@ -16,7 +16,7 @@ export default function Demo() {
   return (
     <div style={{ display: "grid", justifyItems: "start", gap: 8 }}>
       <Select label="选择资料" options={options} searchable clearable
-        searchPlaceholder="按资料名称搜索" emptyContent="没有找到相关资料"
+        placeholder="请选择资料" searchPlaceholder="在选择框内搜索" emptyContent="没有找到相关资料"
         value={selected} onValueChange={setSelected} />
       <Text muted>已选：{selected ?? "无"}</Text>
     </div>
