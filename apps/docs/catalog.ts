@@ -11,7 +11,7 @@ export type PropDoc = {
  */
 const taxonomy = {
   "布局容器": [
-    "AdminLayout", "PageLayout", "Splitter", "Affix", "Divider",
+    "AdminLayout", "PageLayout", "SectionGroup", "Splitter", "Affix", "Divider",
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
@@ -3334,6 +3334,25 @@ export default function Demo() {
       "收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。",
       "受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。",
       "不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。",
+      "版本、部署和包信息等非导航内容，可使用 SectionGroup 分区；示例使用不收起的 Sidebar，不影响导航图标窄栏。",
+    ],
+  },
+  {
+    name: "SectionGroup",
+    description: "用标题、右侧操作和分隔线组织任意内容。",
+    importNames: ["SectionGroup", "Tag"],
+    code: 'import { SectionGroup, Tag } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <SectionGroup>\n      <SectionGroup.Section title="版本发布" actions={<Tag>8</Tag>}>mtone 0.9.0</SectionGroup.Section>\n      <SectionGroup.Section title="部署">文档站已上线</SectionGroup.Section>\n    </SectionGroup>\n  );\n}',
+    props: [
+      { name: "dividers", type: "boolean", default: "true", description: "在各区块之间绘制分隔线。不在首尾画线；关闭后保留间距。" },
+      { name: "children", type: "ReactNode", description: "将 SectionGroup.Section 作为直接子项。" },
+      { name: "Section.title", type: "ReactNode", description: "区块标题，作为该区块的可访问名称。" },
+      { name: "Section.actions", type: "ReactNode", description: "标题行末端的独立操作，可放图标、按钮或多个控件。" },
+      { name: "Section.headingLevel", type: "2 | 3 | 4 | 5 | 6", default: "3", description: "根据页面结构选择原生标题级别。" },
+      { name: "Section.children", type: "ReactNode", description: "正文区域，可放任意组件。" },
+    ],
+    notes: [
+      "SectionGroup 是内容布局，不处理导航选中或折叠。导航菜单继续使用 NavGroup。",
+      "用 hidden 属性或条件渲染隐藏区块，分隔线会随之调整。支持 className、style 等原生属性；图标按钮请提供 aria-label。参见 Sidebar 页的「内容分区」示例。",
     ],
   },
   {

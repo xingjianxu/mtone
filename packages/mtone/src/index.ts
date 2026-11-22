@@ -8,6 +8,7 @@ export * from "./data";
 export * from "./admin-layout";
 export * from "./global-notice";
 export * from "./page-layout";
+export * from "./section-group";
 
 export * from "./spotlight";
 

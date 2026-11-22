@@ -37,6 +37,10 @@ import Example9_0 from "./inline-demos/date-picker-usage";
 import Example9_0Raw from "./inline-demos/date-picker-usage.tsx?raw";
 import Example10_0 from "./inline-demos/sidebar-usage";
 import Example10_0Raw from "./inline-demos/sidebar-usage.tsx?raw";
+import SectionGroupUsage from "./inline-demos/section-group-usage";
+import SectionGroupUsageRaw from "./inline-demos/section-group-usage.tsx?raw";
+import SidebarSectionGroup from "./inline-demos/sidebar-section-group";
+import SidebarSectionGroupRaw from "./inline-demos/sidebar-section-group.tsx?raw";
 import Example11_0 from "./inline-demos/nav-group-usage";
 import Example11_0Raw from "./inline-demos/nav-group-usage.tsx?raw";
 import Example12_0 from "./inline-demos/nav-item-usage";
@@ -299,6 +303,20 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example10_0,
       source: source(Example10_0Raw),
+    },
+    {
+      id: "section-group",
+      title: "内容分区",
+      Demo: SidebarSectionGroup,
+      source: source(SidebarSectionGroupRaw),
+    },
+  ],
+  SectionGroup: [
+    {
+      id: "usage",
+      title: "基础用法",
+      Demo: SectionGroupUsage,
+      source: source(SectionGroupUsageRaw),
     },
   ],
   NavGroup: [

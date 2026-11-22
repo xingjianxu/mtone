@@ -949,3 +949,40 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 @import "./transfer.css";
 
 @import "./tree-select.css";
+
+.mt-section-group,
+.mt-section-group-section {
+  min-inline-size: 0;
+}
+.mt-section-group > .mt-section-group-section:not([hidden]) ~ .mt-section-group-section:not([hidden]) {
+  margin-block-start: 12px;
+  padding-block-start: 12px;
+}
+.mt-section-group:not([data-no-dividers]) > .mt-section-group-section:not([hidden]) ~ .mt-section-group-section:not([hidden]) {
+  border-block-start: 1px solid var(--mt-border, #e9e9e7);
+}
+.mt-section-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.mt-section-group-title {
+  margin: 0;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.mt-section-group-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+.mt-section-group-content:not(:empty) {
+  margin-block-start: 8px;
+}

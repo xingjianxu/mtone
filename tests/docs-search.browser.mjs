@@ -207,7 +207,39 @@ try {
   } finally {
     await direct.close();
   }
-  console.log("Docs navigation, initial sidebar alignment and Spotlight desktop/mobile checks passed");
+  // Verify the shipped Sidebar composition (including its real computed CSS).
+  const sectionsPage = await browser.newPage({ viewport: { width: 320, height: 700 } });
+  try {
+    await sectionsPage.goto(`${base}#/components/Sidebar?section=section-group`);
+    const demo = sectionsPage.getByRole("complementary", { name: "项目概览" });
+    await demo.waitFor();
+    const deploy = demo.getByRole("region", { name: "部署" });
+    const action = deploy.getByRole("button", { name: "检查部署状态" });
+    for (const colorScheme of ["light", "dark"]) {
+      await sectionsPage.emulateMedia({ colorScheme });
+      assert.deepEqual(await demo.getByRole("region").evaluateAll(nodes => nodes.map(node =>
+        getComputedStyle(node).borderBlockStartWidth
+      )), ["0px", "1px", "1px"]);
+      const geometry = await deploy.evaluate(node => {
+        const parent = node.getBoundingClientRect();
+        const title = node.querySelector("h3").getBoundingClientRect();
+        const button = node.querySelector("button").getBoundingClientRect();
+        return {
+          gap: button.left - title.right,
+          rightOffset: parent.right - button.right,
+          inViewport: parent.left >= 0 && parent.right <= window.innerWidth,
+        };
+      });
+      assert(geometry.inViewport && geometry.gap >= 8 && Math.abs(geometry.rightOffset) <= 1,
+        "heading and action do not overlap in the narrow Sidebar");
+    }
+    await action.focus();
+    await sectionsPage.keyboard.press("Enter");
+    assert.equal((await deploy.getByRole("status").textContent()).trim(), "已检查，站点正常");
+  } finally {
+    await sectionsPage.close();
+  }
+  console.log("Docs navigation, Sidebar sections and Spotlight desktop/mobile checks passed");
 } finally {
   await browser?.close();
   await server.close();

@@ -1493,6 +1493,7 @@ export default function Demo() {
 - 收起时悬停或键盘聚焦显示提示，Escape 可关闭提示。复杂 children 请提供 aria-label 作为提示文字。
 - 受控用法：const [collapsed, setCollapsed] = useState(false); <Sidebar collapsible collapsed={collapsed} onCollapsedChange={setCollapsed}>…</Sidebar>。
 - 不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。
+- 版本、部署和包信息等非导航内容，可使用 SectionGroup 分区；示例使用不收起的 Sidebar，不影响导航图标窄栏。
 
 ```tsx
 import { Sidebar, NavItem } from "@bixlab/mtone";
@@ -1501,6 +1502,33 @@ import "@bixlab/mtone/styles.css";
 export default function Demo() {
   return (
     <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>
+  );
+}
+```
+
+### SectionGroup
+
+- [SectionGroup](https://xingjianxu.github.io/mtone/#/components/SectionGroup): 用标题、右侧操作和分隔线组织任意内容。
+- Import: SectionGroup, Tag from @bixlab/mtone
+- dividers: boolean (default: true). 在各区块之间绘制分隔线。不在首尾画线；关闭后保留间距。
+- children: ReactNode. 将 SectionGroup.Section 作为直接子项。
+- Section.title: ReactNode. 区块标题，作为该区块的可访问名称。
+- Section.actions: ReactNode. 标题行末端的独立操作，可放图标、按钮或多个控件。
+- Section.headingLevel: 2 | 3 | 4 | 5 | 6 (default: 3). 根据页面结构选择原生标题级别。
+- Section.children: ReactNode. 正文区域，可放任意组件。
+- SectionGroup 是内容布局，不处理导航选中或折叠。导航菜单继续使用 NavGroup。
+- 用 hidden 属性或条件渲染隐藏区块，分隔线会随之调整。支持 className、style 等原生属性；图标按钮请提供 aria-label。参见 Sidebar 页的「内容分区」示例。
+
+```tsx
+import { SectionGroup, Tag } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <SectionGroup>
+      <SectionGroup.Section title="版本发布" actions={<Tag>8</Tag>}>mtone 0.9.0</SectionGroup.Section>
+      <SectionGroup.Section title="部署">文档站已上线</SectionGroup.Section>
+    </SectionGroup>
   );
 }
 ```
