@@ -2192,6 +2192,7 @@ export default function Demo() {
 - children: ReactNode. 未传 items 时保留原 ul/ListItem 内容模式。
 - items / getKey: readonly T[] / (item: T, index: number) => React.Key. 数据源与唯一稳定键；未提供 getKey 时使用原始索引，排序或增删时应提供稳定键。
 - renderItem: (item: T, index: number) => ReactNode. 渲染条目内容，不要返回 li 或 ListItem；外层 li 由 List 创建。未提供时将数据转换为字符串。
+- onReorder: (fromIndex: number, toIndex: number) => void. 非虚拟数据模式的可选受控排序回调。移动整行并实时预览插入位置；有效放下时报告两个原始数组索引，调用方更新 items；分组交错的数组需保留组的位置和顺序。拖出、按 Esc 或取消不会提交。
 - groupBy / renderGroup: (item: T) => React.Key / (key: React.Key, items: readonly T[]) => ReactNode. 相同键的数据合并为一组，按组首次出现顺序展示；index 保持原始数据索引。默认组标题为键字符串。
 - stickyGroups: boolean (default: false). 组标题在滚动容器顶部吸顶；适用于普通和虚拟列表。
 - height / contentWidth: number / CSSProperties["minWidth"]. 滚动视口高度和内容最小宽度；内容更宽时横向滚动。非正或非有限 height 回退 240px。
@@ -2204,7 +2205,8 @@ export default function Demo() {
 - 原生属性: HTMLAttributes<HTMLUListElement>. 支持 className、style、aria-label、tabIndex 和 onScroll 等。
 - List 的数据渲染仍使用 ul/li；renderItem 仅返回条目内容。ListItem 和 DocumentList 既有用法保持不变。
 - 虚拟列表通过估算未挂载行和测量可见行支持不等高内容；跳到尚未测量的位置是估算定位，滚动过程中总高度可能修正。需要精确定位时使用固定高度或关闭虚拟滚动。
-- List 不内置网络请求、分页、选择或排序库。加载与排序由外部受控数据组合；数据模式可在 renderItem 的起始位置放置 List.SortHandle（接受 span 拖放事件）。拖动仍只从手柄开始，原生预览显示整行；保留上移和下移按钮供键盘操作。
+- List 不内置网络请求、分页或选择。可在 renderItem 起始位置放置 List.SortHandle，以鼠标沿列表方向拖动；设定 onReorder 后，只能在同组内相邻的可排序行之间移动，无手柄或禁用手柄的行会阻止越过。仍请提供上移、下移等键盘操作；不支持触屏拖动。
+- 实时排序尊重系统的减少动态效果设置。手柄 onDragStart 先运行，可用 preventDefault() 取消；活动拖动由 List 根接收，List 的 onDragOver 和 onDrop 也可阻止组件接手。不传 onReorder 时，手柄只提供整行原生拖放预览，应用可继续用原生事件控制排序。
 - 自定义内容的按钮、链接与拖放可访问性由调用方负责；可为滚动容器设置 aria-label 和 tabIndex。
 
 ```tsx

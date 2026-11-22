@@ -1,5 +1,7 @@
 import React, {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
@@ -41,6 +43,8 @@ export interface ListProps<T = unknown> extends Omit<
   getKey?: (item: T, index: number) => React.Key;
   /** Render row content, not a li/ListItem. The List owns the row element. */
   renderItem?: (item: T, index: number) => React.ReactNode;
+  /** Opt into live vertical drag sorting of nonvirtual data rows with a List.SortHandle. */
+  onReorder?: (fromIndex: number, toIndex: number) => void;
   groupBy?: (item: T) => React.Key;
   renderGroup?: (key: React.Key, items: readonly T[]) => React.ReactNode;
   stickyGroups?: boolean;
@@ -100,12 +104,288 @@ function MeasuredRow({
   );
 }
 
+const ListSortStart = createContext<
+  React.DragEventHandler<HTMLSpanElement> | undefined
+>(undefined);
+const enabledGrip =
+  '.mt-list-sort-handle:not([aria-disabled="true"], [data-disabled])';
+const ownsGrip = (row: Element) =>
+  [...row.querySelectorAll(enabledGrip)].some(
+    (grip) => grip.closest("li") === row,
+  );
+type SortRow = {
+  row: HTMLElement;
+  index: number;
+  item: unknown;
+  top: number;
+  bottom: number;
+};
+type SortPreview = {
+  root: HTMLUListElement;
+  lane: SortRow[];
+  source: SortRow;
+  originY: number;
+  target: SortRow | undefined;
+  cleanup: () => void;
+};
+
+function useListSortPreview(
+  list: React.RefObject<HTMLUListElement | null>,
+  data: readonly unknown[],
+  onReorder: ListProps["onReorder"],
+) {
+  const active = useRef<SortPreview | null>(null);
+  const paintGap = (drag: SortPreview, target?: SortRow) => {
+    if (drag.target === target) return;
+    drag.target = target;
+    const from = drag.lane.indexOf(drag.source);
+    const to = target ? drag.lane.indexOf(target) : from;
+    // Include any row spacing in the size of the gap left behind.
+    const downward = to > from;
+    const spacing = downward
+      ? (drag.lane[from + 1]?.top ?? drag.source.bottom) - drag.source.bottom
+      : drag.source.top - (drag.lane[from - 1]?.bottom ?? drag.source.top);
+    const shift =
+      (drag.source.bottom - drag.source.top + spacing) * (downward ? -1 : 1);
+    drag.lane.forEach(({ row }, index) => {
+      if (
+        downward ? index > from && index <= to : index >= to && index < from
+      ) {
+        row.style.setProperty("--_mt-list-sort-y", `${shift}px`);
+      } else if (index !== from) {
+        row.style.removeProperty("--_mt-list-sort-y");
+      }
+    });
+  };
+  const reset = (drag: SortPreview) => {
+    drag.source.row.removeAttribute("data-list-sort-moving");
+    drag.source.row.style.removeProperty("--_mt-list-sort-y");
+    paintGap(drag);
+  };
+  const stop = useCallback(() => {
+    const drag = active.current;
+    if (!drag) return;
+    active.current = null;
+    drag.cleanup();
+    drag.root.removeAttribute("data-list-sort-active");
+    drag.source.row.removeAttribute("data-list-sort-moving");
+    drag.lane.forEach(({ row }) =>
+      row.style.removeProperty("--_mt-list-sort-y"),
+    );
+  }, []);
+  useEffect(() => stop, [onReorder !== undefined, stop]);
+
+  const start: React.DragEventHandler<HTMLSpanElement> = (event) => {
+    const root = list.current;
+    const row = event.currentTarget.closest<HTMLElement>(
+      "li[data-list-sort-index]",
+    );
+    if (!root || row?.parentElement !== root) return;
+    if (
+      !event.currentTarget.matches(enabledGrip) ||
+      event.currentTarget.closest("li") !== row
+    ) {
+      event.preventDefault();
+      return;
+    }
+    // A heading or a row with no enabled handle bounds this sorting lane.
+    const valid = (item: Element | null): item is HTMLElement =>
+      item instanceof HTMLElement &&
+      item.hasAttribute("data-list-sort-index") &&
+      ownsGrip(item);
+    const before: HTMLElement[] = [];
+    const after: HTMLElement[] = [];
+    for (
+      let item = row.previousElementSibling;
+      valid(item);
+      item = item.previousElementSibling
+    )
+      before.push(item);
+    for (
+      let item = row.nextElementSibling;
+      valid(item);
+      item = item.nextElementSibling
+    )
+      after.push(item);
+    if (!before.length && !after.length) {
+      event.preventDefault();
+      return;
+    }
+    stop();
+    const origin = root.getBoundingClientRect().top - root.scrollTop;
+    const lane = [...before.reverse(), row, ...after].map((item) => {
+      const { top, bottom } = item.getBoundingClientRect();
+      const index = Number(item.dataset.listSortIndex);
+      return {
+        row: item,
+        index,
+        item: data[index],
+        top: top - origin,
+        bottom: bottom - origin,
+      };
+    });
+    const source = lane[before.length];
+    const doc = root.ownerDocument;
+    const handle = event.currentTarget;
+    const image = doc.createElement("canvas");
+    image.width = image.height = 1;
+    image.style.cssText = "position:fixed;left:0;top:0;pointer-events:none";
+    doc.body.append(image);
+    // Keep native drag/drop, but paint the actual themed row, not a second ghost.
+    event.dataTransfer.setDragImage(image, 0, 0);
+    if (!event.dataTransfer.types.length)
+      event.dataTransfer.setData("application/x-mtone-list-sort", "1");
+    event.dataTransfer.effectAllowed = "move";
+
+    const owned = (target: EventTarget | null) =>
+      target instanceof Element && target.closest("ul.mt-list") === root;
+    const outside = (next: DragEvent) => {
+      if (active.current === drag && !owned(next.target)) reset(drag);
+    };
+    const leaveDocument = (next: DragEvent) => {
+      const view = doc.defaultView;
+      if (
+        !next.relatedTarget &&
+        view &&
+        (next.clientX <= 0 ||
+          next.clientX >= view.innerWidth ||
+          next.clientY <= 0 ||
+          next.clientY >= view.innerHeight)
+      )
+        reset(drag);
+    };
+    // Trusted events can run microtasks between capture and React's bubble.
+    const afterDrop = () =>
+      setTimeout(() => {
+        if (active.current === drag) stop();
+      }, 0);
+    const finish = (next: DragEvent) => {
+      if (next.target === handle) stop();
+    };
+    const escape = (next: KeyboardEvent) => {
+      if (next.key === "Escape") stop();
+    };
+    const drag: SortPreview = {
+      root,
+      lane,
+      source,
+      originY: event.clientY - origin,
+      target: undefined,
+      cleanup: () => {
+        image.remove();
+        doc.removeEventListener("dragover", outside, true);
+        doc.removeEventListener("dragleave", leaveDocument, true);
+        doc.removeEventListener("dragend", finish, true);
+        doc.removeEventListener("drop", afterDrop, true);
+        doc.removeEventListener("keydown", escape, true);
+      },
+    };
+    active.current = drag;
+    doc.addEventListener("dragover", outside, true);
+    doc.addEventListener("dragleave", leaveDocument, true);
+    doc.addEventListener("dragend", finish, true);
+    doc.addEventListener("drop", afterDrop, true);
+    doc.addEventListener("keydown", escape, true);
+    const native = event.nativeEvent;
+    setTimeout(() => {
+      if (active.current === drag && native.defaultPrevented) stop();
+    }, 0);
+  };
+  const project = (
+    event: React.DragEvent<HTMLUListElement>,
+    drag: SortPreview,
+  ) => {
+    if (
+      !(event.target instanceof Element) ||
+      event.target.closest("ul.mt-list") !== drag.root
+    )
+      return;
+    const box = drag.root.getBoundingClientRect();
+    const y = event.clientY - box.top + drag.root.scrollTop;
+    if (
+      event.clientX < box.left ||
+      event.clientX >= box.right ||
+      event.clientY < box.top ||
+      event.clientY >= box.bottom ||
+      // Never land on group headings or on unsortable rows.
+      y < drag.lane[0].top ||
+      y >= drag.lane[drag.lane.length - 1].bottom
+    )
+      return;
+    const from = drag.lane.indexOf(drag.source);
+    let target = drag.source;
+    for (let i = 0; i < drag.lane.length; i++) {
+      const entry = drag.lane[i];
+      const middle = (entry.top + entry.bottom) / 2;
+      if (
+        (i < from && y < middle && target === drag.source) ||
+        (i > from && y > middle)
+      )
+        target = entry;
+    }
+    return { y, target };
+  };
+
+  return {
+    start: onReorder ? start : undefined,
+    over(event: React.DragEvent<HTMLUListElement>) {
+      const drag = active.current;
+      if (!drag) return;
+      const next = project(event, drag);
+      if (!next || event.defaultPrevented) {
+        reset(drag);
+        return;
+      }
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      // Once native dragging has begun, keep UL as the stable hit target.
+      // Otherwise translated rows can change the target on a stationary drop.
+      drag.root.setAttribute("data-list-sort-active", "");
+      drag.source.row.setAttribute("data-list-sort-moving", "");
+      drag.source.row.style.setProperty(
+        "--_mt-list-sort-y",
+        `${next.y - drag.originY}px`,
+      );
+      paintGap(drag, next.target);
+    },
+    drop(event: React.DragEvent<HTMLUListElement>) {
+      const drag = active.current;
+      if (!drag) return;
+      const next = project(event, drag);
+      stop();
+      if (
+        event.defaultPrevented ||
+        !next ||
+        !drag.target ||
+        drag.target !== next.target
+      )
+        return;
+      // Cancel if a consumer changed data, group membership or controls mid-drag.
+      if (
+        drag.lane.some(
+          ({ row, index, item }, i) =>
+            row.parentElement !== drag.root ||
+            Number(row.dataset.listSortIndex) !== index ||
+            !Object.is(data[index], item) ||
+            (i > 0 && drag.lane[i - 1].row.nextElementSibling !== row) ||
+            !ownsGrip(row),
+        )
+      )
+        return;
+      event.preventDefault();
+      if (next.target !== drag.source)
+        onReorder?.(drag.source.index, next.target.index);
+    },
+  };
+}
+
 /** Compact native list, with optional grouped and windowed data rendering. */
 function ListRoot<T = unknown>({
   children,
   items,
   getKey,
   renderItem,
+  onReorder,
   groupBy,
   renderGroup,
   stickyGroups = false,
@@ -125,6 +405,8 @@ function ListRoot<T = unknown>({
   className,
   style,
   onScroll,
+  onDragOver,
+  onDrop,
   ...props
 }: ListProps<T>) {
   const element = useRef<HTMLUListElement>(null);
@@ -139,6 +421,7 @@ function ListRoot<T = unknown>({
   const viewport = height === undefined ? undefined : positive(height, 240);
   const windowed = dataMode && virtual && viewport !== undefined;
   virtualRef.current = windowed;
+  const sort = useListSortPreview(element, data, dataMode && !windowed ? onReorder : undefined);
   const rows = useMemo(() => {
     const itemRow = (item: T, index: number): Row<T> => {
       const key = getKey ? getKey(item, index) : index;
@@ -367,7 +650,7 @@ function ListRoot<T = unknown>({
     data.length,
     rows,
   ]);
-  return (
+  const list = (
     <ul
       {...props}
       ref={element}
@@ -385,6 +668,22 @@ function ListRoot<T = unknown>({
           ? { height: viewport, overflow: "auto" }
           : {}),
       }}
+      onDragOver={
+        sort.start
+          ? (event) => {
+              onDragOver?.(event);
+              sort.over(event);
+            }
+          : onDragOver
+      }
+      onDrop={
+        sort.start
+          ? (event) => {
+              onDrop?.(event);
+              sort.drop(event);
+            }
+          : onDrop
+      }
       onScroll={(event) => {
         setScrollTop(event.currentTarget.scrollTop);
         onScroll?.(event);
@@ -446,6 +745,7 @@ function ListRoot<T = unknown>({
                   !group && windowed ? positions[index] : undefined
                 }
                 data-list-key={!group ? String(row.key) : undefined}
+                data-list-sort-index={sort.start && !group ? row.index : undefined}
                 data-list-group={group ? String(row.key) : undefined}
                 className={cn(
                   group ? "mt-list-group" : "mt-list-row",
@@ -480,12 +780,19 @@ function ListRoot<T = unknown>({
       )}
     </ul>
   );
+  return <ListSortStart.Provider value={sort.start}>{list}</ListSortStart.Provider>;
 }
 /** Drag grip for a controlled sortable list. Supply keyboard reordering separately. */
 export type ListSortHandleProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children" | "draggable">;
 
 function ListSortHandle({ className, title = "拖动排序", onDragStart, ...props }: ListSortHandleProps) {
+  const start = useContext(ListSortStart);
   const handleDragStart: React.DragEventHandler<HTMLSpanElement> = (event) => {
+    if (start) {
+      onDragStart?.(event);
+      if (!event.defaultPrevented) start(event);
+      return;
+    }
     const row = event.currentTarget.closest("li.mt-list-row, li.mt-list-item");
     if (row && !event.defaultPrevented && event.dataTransfer?.setDragImage) {
       const bounds = row.getBoundingClientRect();

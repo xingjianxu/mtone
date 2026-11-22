@@ -7,6 +7,7 @@ import {
   Tag,
   type ListHandle,
 } from "../../packages/mtone/src";
+import ListSortingDemo from "./secondary-demos/list-sorting";
 const records = Array.from({ length: 10000 }, (_, id) => ({
   id,
   title: `记录 ${id + 1}`,
@@ -20,18 +21,7 @@ export function ListExample({ compact = false }: { compact?: boolean }) {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const [order, setOrder] = useState(["设计规范", "研究笔记", "项目归档"]);
-  const dragged = useRef<string | null>(null);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const move = (from: number, to: number) =>
-    setOrder((previous) => {
-      if (from < 0 || to < 0 || to >= previous.length || from === to)
-        return previous;
-      const next = [...previous];
-      const [item] = next.splice(from, 1);
-      next.splice(to, 0, item);
-      return next;
-    });
   if (compact)
     return (
       <List>
@@ -164,52 +154,7 @@ export function ListExample({ compact = false }: { compact?: boolean }) {
       />
       <small role="status">已加载 {count} 条</small>
       <h3>受控排序</h3>
-      <p>从条目左侧的六点手柄开始拖动，整行预览随鼠标移动；也可用上移、下移按钮。排序由外部状态维护。</p>
-      <List
-        aria-label="排序列表"
-        items={order}
-        getKey={(item) => item}
-        renderItem={(item, index) => (
-          <div
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={(event) => {
-              event.preventDefault();
-              if (dragged.current !== null)
-                move(order.indexOf(dragged.current), index);
-              dragged.current = null;
-            }}
-            style={{ display: "flex", alignItems: "center", gap: 8 }}
-          >
-            <List.SortHandle
-              onDragStart={(event) => {
-                dragged.current = item;
-                event.dataTransfer.effectAllowed = "move";
-                event.dataTransfer.setData("text/plain", item);
-              }}
-              onDragEnd={() => {
-                dragged.current = null;
-              }}
-            />
-            <span style={{ flex: 1 }}>{item}</span>
-            <Button
-              size="sm"
-              disabled={!index}
-              aria-label={`${item}上移`}
-              onClick={() => move(index, index - 1)}
-            >
-              上移
-            </Button>
-            <Button
-              size="sm"
-              disabled={index === order.length - 1}
-              aria-label={`${item}下移`}
-              onClick={() => move(index, index + 1)}
-            >
-              下移
-            </Button>
-          </div>
-        )}
-      />
+      <ListSortingDemo />
       <h3>空状态与加载状态</h3>
       <List items={[]} emptyContent="暂无记录" />
       <List items={[]} loading />

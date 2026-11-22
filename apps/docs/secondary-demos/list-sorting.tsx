@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button, List } from "../../../packages/mtone/src";
 export default function Demo() {
   const [order, setOrder] = useState(["设计规范", "研究笔记", "项目归档"]);
-  const dragged = useRef<string | null>(null);
   const move = (from: number, to: number) =>
     setOrder((previous) => {
       if (from < 0 || to < 0 || to >= previous.length || from === to)
@@ -14,32 +13,15 @@ export default function Demo() {
     });
   return (
     <div style={{ width: "100%", minWidth: 0 }}>
-      <p>从条目左侧的六点手柄开始拖动，整行预览随鼠标移动；也可用上移、下移按钮。排序由外部状态维护。</p>
+      <p>从条目起始侧的六点手柄拖动，整行沿列表移动，相邻条目会让出插入位置。松手才提交排序；也可用上移、下移按钮。</p>
       <List
         aria-label="排序列表"
         items={order}
         getKey={(item) => item}
+        onReorder={move}
         renderItem={(item, index) => (
-          <div
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={(event) => {
-              event.preventDefault();
-              if (dragged.current !== null)
-                move(order.indexOf(dragged.current), index);
-              dragged.current = null;
-            }}
-            style={{ display: "flex", alignItems: "center", gap: 8 }}
-          >
-            <List.SortHandle
-              onDragStart={(event) => {
-                dragged.current = item;
-                event.dataTransfer.effectAllowed = "move";
-                event.dataTransfer.setData("text/plain", item);
-              }}
-              onDragEnd={() => {
-                dragged.current = null;
-              }}
-            />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <List.SortHandle />
             <span style={{ flex: 1 }}>{item}</span>
             <Button
               size="sm"

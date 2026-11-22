@@ -466,6 +466,25 @@
 .mt-list-sort-handle:hover { background-color: var(--mt-hover, #efefed); }
 .mt-list-sort-handle:active { cursor: grabbing; }
 .mt-list-sort-handle svg { pointer-events: none; }
+.mt-list[data-list-sort-active] > [data-list-sort-index],
+.mt-list[data-list-sort-active] > [data-list-sort-index] * {
+  pointer-events: none;
+}
+.mt-list[data-list-sort-active] > [data-list-sort-index] {
+  translate: 0 var(--_mt-list-sort-y, 0px);
+  transition: translate 160ms ease-out;
+}
+.mt-list[data-list-sort-active] > [data-list-sort-moving] {
+  position: relative;
+  z-index: 2;
+  background: var(--mt-bg, #fff);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 14%);
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-list[data-list-sort-active] > [data-list-sort-index] { transition: none; }
+}
+
 /* Data lists keep the original children/ListItem presentation intact. */
 .mt-list-data { position: relative; isolation: isolate; }
 .mt-list-row { box-sizing: border-box; padding: 8px; border-bottom: 1px solid var(--mt-border, #e9e9e7); overflow-wrap: anywhere; }

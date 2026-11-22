@@ -364,3 +364,88 @@ it("uses the browser's own preview when a standalone sort grip has no List row",
   expect(setDragImage).not.toHaveBeenCalled();
   expect(onDragStart).toHaveBeenCalledOnce();
 });
+
+function startListDrag(list: HTMLElement, source: Element) {
+  const transfer = { types: [], setData: vi.fn(), setDragImage: vi.fn() };
+  const place = (node: Element, y: number) =>
+    vi
+      .spyOn(node, "getBoundingClientRect")
+      .mockReturnValue(new DOMRect(0, y, 200, 36));
+  const rows = Array.from(list.children);
+  rows.forEach((row, i) => place(row, i * 36));
+  vi.spyOn(list, "getBoundingClientRect").mockReturnValue(
+    new DOMRect(0, 0, 200, rows.length * 36),
+  );
+  const dispatch = (
+    type: "dragStart" | "dragOver" | "drop" | "dragEnd",
+    target: Element,
+    y: number,
+  ) => {
+    const event = createEvent[type](target, { dataTransfer: transfer });
+    Object.defineProperties(event, {
+      clientX: { value: 10 },
+      clientY: { value: y },
+    });
+    fireEvent(target, event);
+    return event;
+  };
+  dispatch("dragStart", source, rows.indexOf(source.closest("li")!) * 36 + 10);
+  return (target: Element, y: number) => {
+    dispatch("dragOver", target, y);
+    dispatch("drop", target, y);
+  };
+}
+
+it("only reorders a contiguous lane of enabled grips in the same group and reports original indices", () => {
+  const onReorder = vi.fn();
+  const values = ["A1", "B1", "A2", "A3", "A4", "B2"];
+  render(
+    <List
+      items={values}
+      getKey={(value) => value}
+      groupBy={(value) => value[0]}
+      onReorder={onReorder}
+      renderItem={(value) => (
+        <>
+          <List.SortHandle aria-disabled={value === "A3" || undefined} />
+          {value}
+        </>
+      )}
+    />,
+  );
+  const list = screen.getByRole("list");
+  const source = screen.getByText("A1").querySelector("[draggable]")!;
+  startListDrag(list, source)(list, 100);
+  expect(onReorder).toHaveBeenCalledExactlyOnceWith(0, 2);
+
+  for (const y of [120, 165, 238]) {
+    startListDrag(list, source)(list, y);
+  }
+  expect(onReorder).toHaveBeenCalledTimes(1);
+  expect(list).not.toHaveAttribute("data-list-sort-active");
+});
+
+it("cancels stale drag data even when the default index keys reuse the same DOM rows", () => {
+  const onReorder = vi.fn();
+  const view = (values: string[]) => (
+    <List
+      items={values}
+      onReorder={onReorder}
+      renderItem={(value) => (
+        <>
+          <List.SortHandle />
+          {value}
+        </>
+      )}
+    />
+  );
+  const { rerender } = render(view(["Alpha", "Bravo"]));
+  const list = screen.getByRole("list");
+  const source = screen.getByText("Alpha").querySelector("[draggable]")!;
+  const drop = startListDrag(list, source);
+  rerender(view(["Bravo", "Alpha"]));
+  expect(screen.getByText("Bravo").contains(source)).toBe(true);
+  drop(list, 67);
+  expect(onReorder).not.toHaveBeenCalled();
+  expect(list).not.toHaveAttribute("data-list-sort-active");
+});

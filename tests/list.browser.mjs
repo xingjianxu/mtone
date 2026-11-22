@@ -1,5 +1,5 @@
 import { createServer } from 'vite';
-import { chromium, firefox, webkit } from '@playwright/test';
+import { chromium, firefox, webkit, expect } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 const server=await createServer({root:'apps/docs',server:{host:'127.0.0.1',port:5223,strictPort:true},logLevel:'error'});
@@ -7,25 +7,6 @@ await server.listen();let browser;
 try {
  browser=await ({chromium,firefox,webkit}[process.env.BROWSER||'chromium']).launch({headless:true,executablePath:process.env.CHROMIUM_PATH});
  const page=await browser.newPage({viewport:{width:1280,height:900}});
- await page.addInitScript(() => {
-   const nativeSetDragImage = DataTransfer.prototype.setDragImage;
-   window.listDragImages = [];
-   let start;
-   document.addEventListener('dragstart', event => { start = event; }, true);
-   DataTransfer.prototype.setDragImage = function(element, x, y) {
-     const bounds = element.getBoundingClientRect();
-     window.listDragImages.push({
-       key: element.getAttribute('data-list-key'),
-       width: bounds.width,
-       text: element.textContent,
-       x, y,
-       expectedX: Math.round(start.clientX - bounds.left),
-       expectedY: Math.round(start.clientY - bounds.top),
-       trusted: start.isTrusted,
-     });
-     return nativeSetDragImage.call(this, element, x, y);
-   };
- });
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:5223/#/components/List');
  const virtual=page.getByRole('list',{name:'虚拟列表',exact:true});
@@ -109,26 +90,69 @@ try {
  assert(await rows.evaluateAll(items => items.every(item => !item.hasAttribute('draggable'))));
  assert.equal(await virtual.locator('[draggable]').count(), 0);
 
- // Drop outside the list without changing the order, then sort normally.
- const description = sorting.locator('xpath=preceding-sibling::p');
+ // Real pointer drags change visual geometry before committing data order.
+ const originalOrder = ['研究笔记', '设计规范', '项目归档'];
  const source = handles.first();
+ const sourceRow = sorting.locator('[data-list-key="研究笔记"]');
+ const neighbor = sorting.locator('[data-list-key="设计规范"]');
+ const last = sorting.locator('[data-list-key="项目归档"]');
+ const description = sorting.locator('xpath=preceding-sibling::p');
  await description.scrollIntoViewIfNeeded();
- await source.dragTo(description);
- assert.deepEqual(await order(), ['研究笔记', '设计规范', '项目归档']);
+ const begin = async () => {
+   const grip = await source.boundingBox();
+   const first = await sourceRow.boundingBox();
+   const middle = await neighbor.boundingBox();
+   const end = await last.boundingBox();
+   const x = grip.x + 6;
+   const y = grip.y + 10;
+   const overX = end.x + end.width / 2;
+   const overY = end.y + end.height * 0.75;
+   await page.mouse.move(x, y);
+   await page.mouse.down();
+   await page.mouse.move(x + 8, y + 8, {steps: 4});
+   await page.mouse.move(overX, overY, {steps: 8});
+   // Some engines dispatch dragover only after a second move into the target.
+   await page.mouse.move(overX + 1, overY);
+   return {first, middle, end, dy: overY - y};
+ };
+ const assertPreview = async ({first, middle, dy}) => {
+   await expect.poll(async () => Math.abs((await sourceRow.boundingBox()).y - first.y - dy),
+       {message:'the actual source row follows the pointer before drop'}).toBeLessThan(3);
+   const current = await sourceRow.boundingBox();
+   assert(Math.abs(current.x - first.x) < 1 && Math.abs(current.width - first.width) < 1,
+     'the moving row stays full width within the vertical lane');
+   await expect(sourceRow.getByText('研究笔记', {exact:true})).toBeVisible();
+   await expect(sourceRow.getByRole('button', {name:'研究笔记下移'})).toBeVisible();
+   await expect.poll(async () => Math.abs((await neighbor.boundingBox()).y - middle.y + first.height),
+       {message:'neighbor shifts one row into the vacated position'}).toBeLessThan(2);
+   assert.deepEqual(await order(), originalOrder, 'preview never mutates DOM order');
+ };
+ const first = await begin();
+ await assertPreview(first);
+ assert(await neighbor.evaluate(el => getComputedStyle(el).transitionDuration.split(',').some(t => parseFloat(t) > 0)),
+   'neighbor transition is enabled normally');
+ const outside = await description.boundingBox();
+ await page.mouse.move(outside.x + 20, outside.y + outside.height / 2, {steps: 5});
+ await page.mouse.move(outside.x + 21, outside.y + outside.height / 2);
+ await expect.poll(async () => Math.abs((await sourceRow.boundingBox()).y - first.first.y)).toBeLessThan(2);
+ await expect.poll(async () => Math.abs((await neighbor.boundingBox()).y - first.middle.y)).toBeLessThan(2);
+ await page.mouse.up();
+ assert.deepEqual(await order(), originalOrder, 'drop outside does not reorder');
 
- const target = rows.last().getByRole('button', { name: '项目归档上移' });
- await source.dragTo(target, { sourcePosition: { x: 6, y: 8 } });
- assert.deepEqual(await order(), ['设计规范', '项目归档', '研究笔记']);
- const previews=await page.evaluate(() => window.listDragImages);
- assert.equal(previews.length, 2, 'both real pointer drags choose a custom preview');
- for (const image of previews) {
-   assert.equal(image.key, '研究笔记', 'preview is the source row, not the handle or drop target');
-   assert(image.text.includes('研究笔记') && image.text.includes('下移') && image.width > 100,
-     'the native image includes the row content, not just the leading grip');
-   assert.equal(image.trusted, true);
-   assert.equal(image.x, image.expectedX, 'horizontal hotspot is relative to row');
-   assert.equal(image.y, image.expectedY, 'vertical hotspot is relative to row');
- }
+ await page.emulateMedia({reducedMotion:'reduce'});
+ const reduced = await begin();
+ await assertPreview(reduced);
+ assert(await neighbor.evaluate(el => getComputedStyle(el).transitionDuration.split(',').every(t => parseFloat(t) === 0)),
+   'reduced motion removes neighbor animation without removing the preview');
+ await page.keyboard.press('Escape');
+ await page.mouse.up();
+ assert.deepEqual(await order(), originalOrder, 'Escape does not reorder');
+ await expect.poll(async () => Math.abs((await sourceRow.boundingBox()).y - reduced.first.y)).toBeLessThan(2);
+
+ const good = await begin();
+ await assertPreview(good);
+ await page.mouse.up();
+ await expect.poll(order).toEqual(['设计规范', '项目归档', '研究笔记']);
  await page.setViewportSize({width:360,height:800});
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await mkdir('artifacts/list',{recursive:true});
