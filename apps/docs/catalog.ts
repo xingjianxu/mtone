@@ -37,7 +37,7 @@ const taxonomy = {
   "弹层与菜单": [
     "Popover", "Menu", "ContextMenu", "Menubar", "HoverCard",
     "Tooltip", "Spotlight", "Dialog", "ConfirmDialog", "Popconfirm",
-    "Drawer",
+    "Drawer", "FloatingWindow",
   ],
   "状态反馈": [
     "Alert", "GlobalNotice", "ToastProvider", "Status",
@@ -5491,6 +5491,29 @@ export default function Demo() {
     notes: [
       "支持 Esc 关闭、焦点管理与关闭后焦点恢复。",
       "Drawer 当前固定从右侧打开。",
+    ],
+  },
+  {
+    name: "FloatingWindow",
+    description: "可拖动、调整尺寸并最小化的非模态浮动窗口。",
+    importNames: ["FloatingWindow"],
+    code: 'import { Button, FloatingWindow } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <FloatingWindow title="任务速记" trigger={<Button>打开窗口</Button>} initialSize={{ width: 360, height: 235 }}><p>整理本周的任务。</p></FloatingWindow>;\n}',
+    props: [
+      { name: "title", type: "ReactNode", description: "窗口标题，用于对话框的可访问名称。" },
+      { name: "trigger", type: "ReactElement | string", description: "可选打开或恢复按钮；自定义组件需转发 ref 与触发属性。" },
+      { name: "open / defaultOpen / onOpenChange", type: "boolean / boolean / (open: boolean) => void", description: "受控显示状态、非受控初始状态和显示状态回调。" },
+      { name: "initialPosition", type: "{ left: number; top: number }", description: "窗口的初始视口坐标，单位 px；省略时居中。" },
+      { name: "initialSize", type: "{ width: number; height: number }", default: "440 × 320", description: "窗口的初始宽高，单位 px；拖动和缩放不要求受控。" },
+      { name: "minWidth / minHeight / maxWidth / maxHeight", type: "number", description: "可选尺寸限制，单位 px。默认最小 220 × 140；尺寸仍受视口约束。" },
+      { name: "draggable / resizable / minimizable", type: "boolean", default: "true", description: "分别启用标题栏拖动、右下角缩放和最小化。" },
+      { name: "minimizedIcon", type: "ReactNode", description: "可替换右下角恢复按钮的装饰图标。" },
+      { name: "zIndex", type: "number", default: "1150", description: "按应用布局需要覆盖窗口层叠顺序。" },
+      { name: "children", type: "ReactNode", description: "窗口正文；高度不足时可在窗口内滚动。" },
+    ],
+    notes: [
+      "窗口非模态，不显示遮罩，不锁定背景滚动或焦点，按 Esc 或点击外部都不关闭。需要阻止用户与背景交互时用 Dialog。",
+      "可用指针拖动标题栏或右下角手柄，也可聚焦“移动窗口”或“调整窗口大小”后用方向键调整，每步 8px，按住 Shift 为 24px。窗口位置和尺寸保持在当前视口内。",
+      "最小化后点击右下角图标恢复；过程保留窗口位置、尺寸和已挂载子组件的状态。关闭会卸载窗口正文，并将焦点还给可用触发器；不提供持久化或应用级窗口管理。",
     ],
   },
   {

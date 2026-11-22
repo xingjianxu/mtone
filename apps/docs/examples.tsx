@@ -679,6 +679,12 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
           {properties}
         </M.Drawer>
       );
+    case "FloatingWindow":
+      return (
+        <M.FloatingWindow title="项目备注" trigger={<M.Button>打开浮动窗口</M.Button>}>
+          <M.Text>记录项目待办和更新。</M.Text>
+        </M.FloatingWindow>
+      );
     case "ConfirmDialog":
       return (
         <div style={stackStyle}>

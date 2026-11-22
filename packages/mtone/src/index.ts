@@ -60,3 +60,4 @@ export * from "./ai-evidence";
 export * from "./check-card";
 
 export * from "./toolbar";
+export * from "./floating-window";

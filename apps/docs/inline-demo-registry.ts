@@ -6,6 +6,10 @@ import ToolbarPage from "./inline-demos/toolbar-page";
 import ToolbarPageSource from "./inline-demos/toolbar-page.tsx?raw";
 import ToolbarNarrow from "./inline-demos/toolbar-narrow";
 import ToolbarNarrowSource from "./inline-demos/toolbar-narrow.tsx?raw";
+import FloatingWindowGeometry from "./inline-demos/floating-window-geometry";
+import FloatingWindowGeometrySource from "./inline-demos/floating-window-geometry.tsx?raw";
+import FloatingWindowMinimize from "./inline-demos/floating-window-minimize";
+import FloatingWindowMinimizeSource from "./inline-demos/floating-window-minimize.tsx?raw";
 import SidebarTabsDemo from "./inline-demos/sidebar-tabs";
 import SidebarTabsDemoRaw from "./inline-demos/sidebar-tabs.tsx?raw";
 import SelectTags from "./inline-demos/select-tags";
@@ -580,6 +584,22 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example31_0,
       source: source(Example31_0Raw),
+    },
+  ],
+  FloatingWindow: [
+    {
+      id: "move-resize",
+      title: "拖动与缩放",
+      note: "打开窗口后，可拖动标题栏、拖动右下角缩放，也可聚焦相应控制后用方向键调整。窗口打开期间仍可点击背景的「添加待办」。",
+      Demo: FloatingWindowGeometry,
+      source: source(FloatingWindowGeometrySource),
+    },
+    {
+      id: "minimize",
+      title: "最小化与恢复",
+      note: "输入几字后最小化，再按右下角图标恢复：草稿、窗口位置和大小都保留。",
+      Demo: FloatingWindowMinimize,
+      source: source(FloatingWindowMinimizeSource),
     },
   ],
   ConfirmDialog: [

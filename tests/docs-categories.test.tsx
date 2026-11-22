@@ -34,7 +34,7 @@ const expected: Record<string, string[]> = {
   "弹层与菜单": [
     "Popover", "Menu", "ContextMenu", "Menubar", "HoverCard",
     "Tooltip", "Spotlight", "Dialog", "ConfirmDialog", "Popconfirm",
-    "Drawer",
+    "Drawer", "FloatingWindow",
   ],
   "状态反馈": [
     "Alert", "GlobalNotice", "ToastProvider", "Status",
