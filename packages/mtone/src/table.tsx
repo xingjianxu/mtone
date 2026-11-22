@@ -86,6 +86,144 @@ function useResponsive() {
   }, []);
   return width;
 }
+// Native tables proportionally stretch pixel widths when every other column
+// has a width. The relative equivalent is reserved first, so only data
+// columns absorb remaining space. The fixed header uses rc-table's measured
+// body widths, not the override.
+function useCompactSelectionWidth(
+  ref: React.RefObject<Reference | null>,
+  compactWidth: number | undefined,
+  virtual: boolean,
+  separateHeader: boolean,
+  empty: boolean,
+  maxContentScroll: boolean,
+  tableComponent: unknown,
+) {
+  const [virtualViewportWidth, setVirtualViewportWidth] = React.useState(0);
+  React.useLayoutEffect(() => {
+    if (compactWidth === undefined) return;
+    const root = ref.current?.nativeElement;
+    if (!root) return;
+    // Empty fixed holders fall back to the original, unmeasured colgroup.
+    const holders =
+      empty && separateHeader ? ", .mt-table-header, .mt-table-summary" : "";
+    const tables = virtual
+      ? []
+      : Array.from(
+          root.querySelectorAll<HTMLTableElement>(
+            `:scope > .mt-table-container > :is(.mt-table-body, .mt-table-content${holders}) > table`,
+          ),
+        );
+    if (!virtual && !tables.length) return;
+    const variable = "--_mt-table-selection-width-percent";
+    const attribute = "data-mtone-compact-selection";
+    const update = () => {
+      if (virtual) {
+        setVirtualViewportWidth(root.offsetWidth);
+        return;
+      }
+      for (const table of tables) {
+        const width = table.offsetWidth;
+        // An intrinsic max-content table already has no surplus to apportion
+        // once it exceeds its scroll viewport. Don't feed a percentage back
+        // into the layout calculation of that intrinsically sized table.
+        if (
+          maxContentScroll &&
+          width > (table.parentElement?.clientWidth ?? width) + 1
+        ) {
+          table.removeAttribute(attribute);
+          table.style.removeProperty(variable);
+          continue;
+        }
+        if (width > 0) {
+          const percentage = `${(compactWidth / width) * 100}%`;
+          if (table.style.getPropertyValue(variable) !== percentage) {
+            table.style.setProperty(variable, percentage);
+            table.setAttribute(attribute, "");
+          }
+        }
+      }
+    };
+    update();
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? undefined
+        : new ResizeObserver(update);
+    for (const target of virtual ? [root] : tables) observer?.observe(target);
+    return () => {
+      observer?.disconnect();
+      for (const table of tables) {
+        table.removeAttribute(attribute);
+        table.style.removeProperty(variable);
+      }
+    };
+  }, [
+    compactWidth,
+    empty,
+    maxContentScroll,
+    ref,
+    separateHeader,
+    tableComponent,
+    virtual,
+  ]);
+  return virtualViewportWidth;
+}
+
+// rc-table's virtual grid has its own allocator. When every column has a
+// width, give its surplus to data columns before rc-table scales all columns.
+function reserveVirtualSelectionWidth<T>(
+  columns: TableColumn<T>[],
+  selection: TableColumn<T>,
+  selectionWidth: number,
+  scrollWidth: number,
+  availableWidth: number,
+  expandable: TableProps<T>["expandable"],
+): TableColumn<T>[] {
+  const parseWidth = (width: TableColumn<T>["width"]) =>
+    typeof width === "number"
+      ? width
+      : width?.endsWith("%")
+        ? (scrollWidth * parseFloat(width)) / 100
+        : 0;
+  const expandWidth =
+    expandable?.expandedRowRender && expandable.showExpandColumn !== false
+      ? parseWidth(expandable.columnWidth)
+      : 0;
+  // An automatic expand/data column already takes the surplus itself.
+  if (
+    expandable?.expandedRowRender &&
+    expandable.showExpandColumn !== false &&
+    !expandWidth
+  )
+    return columns;
+  const widths = new Map<TableColumn<T>, number>();
+  let total = 0;
+  for (const column of flattenColumns(columns)) {
+    if (column === selection || column === EXPAND_COLUMN) continue;
+    const width = parseWidth(column.width);
+    if (!width || !Number.isFinite(width) || width < 0) return columns;
+    widths.set(column, width);
+    total += width;
+  }
+  const target =
+    Math.max(scrollWidth, availableWidth) - selectionWidth - expandWidth;
+  if (!widths.size || target <= total) return columns;
+  let remaining = target;
+  let count = widths.size;
+  const fit = (cols: TableColumn<T>[]): TableColumn<T>[] =>
+    cols.map((column) => {
+      if (column.children?.length)
+        return { ...column, children: fit(column.children) };
+      const width = widths.get(column);
+      if (!width) return column;
+      const next =
+        --count === 0 ? remaining : Math.floor((width / total) * target);
+      remaining -= next;
+      return { ...column, width: next };
+    });
+  return fit(columns);
+}
+
 function TableInner<T>(
   props: TableProps<T>,
   forwardedRef: React.ForwardedRef<Reference>,
@@ -581,13 +719,34 @@ function TableInner<T>(
           <span className="mt-table-expand-placeholder" />
         )),
   };
+  const virtualViewportWidth = useCompactSelectionWidth(
+    tableRef,
+    selection.compactWidth,
+    !!virtual,
+    scroll?.y != null || !!engineProps.sticky,
+    pageData.length === 0,
+    scroll?.x === "max-content",
+    components?.table,
+  );
+  const virtualScrollWidth = typeof scroll?.x === "number" ? scroll.x : 1000;
+  const engineColumns =
+    virtual && selection.column && selection.compactWidth !== undefined
+      ? reserveVirtualSelectionWidth(
+          renderedColumns,
+          selection.column,
+          selection.compactWidth,
+          virtualScrollWidth,
+          virtualViewportWidth,
+          resolvedExpandable,
+        )
+      : renderedColumns;
   const rcProps = {
     ...engineProps,
     ref: tableRef,
     prefixCls: "mt-table",
     className: cn("mt-table-engine", showLoading && "mt-table-is-loading"),
     data: pageData,
-    columns: renderedColumns as ColumnsType<T>,
+    columns: engineColumns as ColumnsType<T>,
     rowKey,
     scroll,
     expandable: resolvedExpandable,
@@ -650,7 +809,7 @@ function TableInner<T>(
           <VirtualEngine
             {...rcProps}
             scroll={{
-              x: typeof scroll?.x === "number" ? scroll.x : 1000,
+              x: virtualScrollWidth,
               y: typeof scroll?.y === "number" ? scroll.y : 400,
             }}
             listItemHeight={virtualItemHeight}

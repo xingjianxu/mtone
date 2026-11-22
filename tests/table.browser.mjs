@@ -16,14 +16,102 @@ try {
     ["firefox", firefox],
     ["webkit", webkit],
   ]) {
+    if (process.env.MTONE_TABLE_BROWSER && process.env.MTONE_TABLE_BROWSER !== name) continue;
     let browser, page;
     try {
-      browser = await engine.launch({ headless: true });
+      browser = await engine.launch({
+        headless: true,
+        executablePath: name === "chromium" ? process.env.CHROMIUM_PATH : undefined,
+      });
       page = await browser.newPage({ viewport: { width: 1100, height: 1000 } });
       page.setDefaultTimeout(10000);
       const errors = [];
       page.on("pageerror", (error) => errors.push(error.message));
       await page.goto("http://127.0.0.1:5197/tests/fixtures/table.html");
+      for (const [kind, width] of Object.entries({
+        default: 32,
+        radio: 32,
+        actions: 56,
+        fixed: 32,
+        empty: 32,
+        intrinsic: 32,
+        explicit: 88,
+        virtual: 32,
+      })) {
+        const selection = page.getByTestId(`column-width-${kind}`);
+        const tableCells = selection.locator(
+          "thead th.mt-table-selection-column, .mt-table-row .mt-table-selection-column",
+        );
+        await expect(tableCells.first()).toBeVisible();
+        await expect
+          .poll(
+            async () =>
+              tableCells.evaluateAll((cells) => {
+                const visible = cells.filter(
+                  (cell) => cell.getBoundingClientRect().width > 0,
+                );
+                return visible.map((cell) => cell.getBoundingClientRect().width);
+              }),
+            {
+              message: `${name}: ${kind} selection column should stay ${width}px on a wide table`,
+            },
+          )
+          .toEqual(expect.arrayContaining([expect.closeTo(width, 0)]));
+        const cells = await tableCells.evaluateAll((cells) =>
+          cells
+            .filter((cell) => cell.getBoundingClientRect().width > 0)
+            .map((cell) => {
+              const column = cell.getBoundingClientRect();
+              const buttons = [...cell.querySelectorAll("input, button")].map(
+                (control) => control.getBoundingClientRect(),
+              );
+              return {
+                width: column.width,
+                controlsFit: buttons.every(
+                  (control) =>
+                    control.left >= column.left + 4 &&
+                    control.right <= column.right - 4,
+                ),
+              };
+            }),
+        );
+        assert(
+          cells.length >= (kind === "empty" ? 1 : 2) &&
+            cells.every(
+              (cell) => Math.abs(cell.width - width) < 1 && cell.controlsFit,
+            ),
+          `${name}: ${kind} header/body match and selection controls fit ${JSON.stringify(cells)}`,
+        );
+      }
+      const resized = page.getByTestId("column-width-default");
+      const resizedHeader = resized.locator("thead .mt-table-selection-column");
+      for (const width of [600, 800]) {
+        await resized.evaluate((section, width) => {
+          section.style.width = `${width}px`;
+        }, width);
+        await expect
+          .poll(async () => (await resizedHeader.boundingBox()).width)
+          .toBeCloseTo(32, 0);
+      }
+      await resized.evaluate((section) => section.style.removeProperty("width"));
+      const fixedSelection = page.getByTestId("column-width-fixed");
+      const fixedSelectionCell = fixedSelection
+        .locator(".mt-table-body .mt-table-row .mt-table-selection-column")
+        .first();
+      const fixedLeft = (await fixedSelectionCell.boundingBox()).x;
+      await fixedSelection.locator(".mt-table-body").evaluate((el) => {
+        el.scrollLeft = 150;
+      });
+      await expect
+        .poll(() =>
+          fixedSelection.locator(".mt-table-header").evaluate((el) => el.scrollLeft),
+        )
+        .toBeGreaterThan(100);
+      assert(
+        Math.abs((await fixedSelectionCell.boundingBox()).x - fixedLeft) < 1,
+        name +
+          ": the compact fixed selection column remains sticky while the body scrolls",
+      );
       const fixed = page.getByTestId("fixed");
       await expect(fixed.getByText("Person 0", { exact: true })).toBeVisible();
       const body = fixed.locator(".mt-table-body");

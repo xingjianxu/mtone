@@ -348,6 +348,12 @@
 .mt-table .mt-table-selection-column {
   padding-inline: 12px;
 }
+.mt-table .mt-table-selection-column-compact {
+  padding-inline: 7px;
+}
+.mt-table table[data-mtone-compact-selection] > colgroup > .mt-table-compact-selection-col {
+  width: var(--_mt-table-selection-width-percent) !important;
+}
 /* Reserve the command slot in both header and body, so checkbox centers align. */
 .mt-table-selection-controls-with-actions {
   position: relative;
