@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import { Table, Button, Tag, Text } from "../../../packages/mtone/src";
-import type { TableColumn, TableRef } from "../../../packages/mtone/src";
+import { DataTable, Button, Tag, Text } from "../../../packages/mtone/src";
+import type { DataTableColumn, DataTableRef } from "../../../packages/mtone/src";
 
 type Row = {
   key: number;
@@ -15,7 +15,7 @@ const initial: Row[] = Array.from({ length: 18 }, (_, i) => ({
   category: ["设计", "研究", "阅读"][i % 3],
   score: 60 + ((i * 7) % 40),
 }));
-const basic: TableColumn<Row>[] = [
+const basic: DataTableColumn<Row>[] = [
   { key: "title", title: "标题", dataIndex: "title", width: 240 },
   { key: "category", title: "分类", dataIndex: "category", width: 140 },
   { key: "score", title: "完成度", dataIndex: "score", width: 120 },
@@ -27,7 +27,7 @@ const toolbar: React.CSSProperties = {
   alignItems: "center",
 };
 export default function Demo() {
-  const ref = useRef<TableRef>(null);
+  const ref = useRef<DataTableRef>(null);
   const large = Array.from({ length: 2000 }, (_, i) => ({
     ...initial[i % initial.length],
     key: i + 1,
@@ -44,7 +44,7 @@ export default function Demo() {
         </Button>
         <Tag>2000 行</Tag>
       </div>
-      <Table
+      <DataTable
         ref={ref}
         virtual
         dataSource={large}

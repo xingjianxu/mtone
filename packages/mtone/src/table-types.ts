@@ -5,76 +5,76 @@ import type {
   ExpandableConfig,
   Reference,
 } from "@rc-component/table";
-export type TableRef = Reference;
-export type SortOrder = "ascend" | "descend" | null;
-export type TableFilterValue = React.Key | boolean;
-export type TableFilters = Record<string, TableFilterValue[] | null>;
-export type TableState = {
+export type DataTableRef = Reference;
+export type DataTableSortOrder = "ascend" | "descend" | null;
+export type DataTableFilterValue = React.Key | boolean;
+export type DataTableFilters = Record<string, DataTableFilterValue[] | null>;
+export type DataTableState = {
   sort?: { key: string; direction: "asc" | "desc" } | null;
   filters: Record<string, string>;
   page: number;
   pageSize: number;
 };
-export type TableFilterItem = {
+export type DataTableFilterItem = {
   text: React.ReactNode;
-  value: TableFilterValue;
-  children?: TableFilterItem[];
+  value: DataTableFilterValue;
+  children?: DataTableFilterItem[];
 };
-export type TableFilterDropdownProps = {
+export type DataTableFilterDropdownProps = {
   prefixCls: string;
-  selectedKeys: TableFilterValue[];
-  setSelectedKeys: (keys: TableFilterValue[]) => void;
+  selectedKeys: DataTableFilterValue[];
+  setSelectedKeys: (keys: DataTableFilterValue[]) => void;
   confirm: (options?: { closeDropdown?: boolean }) => void;
   clearFilters: (options?: {
     confirm?: boolean;
     closeDropdown?: boolean;
   }) => void;
   close: () => void;
-  filters?: TableFilterItem[];
+  filters?: DataTableFilterItem[];
   visible: boolean;
 };
-export type TableSortResult<T> = {
-  column?: TableColumn<T>;
-  order?: SortOrder;
-  field?: TableColumn<T>["dataIndex"];
+export type DataTableSortResult<T> = {
+  column?: DataTableColumn<T>;
+  order?: DataTableSortOrder;
+  field?: DataTableColumn<T>["dataIndex"];
   columnKey?: React.Key;
 };
-export type TableColumnTitleProps<T> = {
-  sortColumns: { column: TableColumn<T>; order: SortOrder }[];
-  filters: TableFilters;
+export type DataTableColumnTitleProps<T> = {
+  sortColumns: { column: DataTableColumn<T>; order: DataTableSortOrder }[];
+  filters: DataTableFilters;
 };
-export type TableColumn<T> = Omit<RcColumn<T>, "title" | "dataIndex"> & {
+export type DataTableColumn<T> = Omit<RcColumn<T>, "title" | "dataIndex"> & {
   dataIndex?: keyof T | string | number | (string | number)[];
   title?:
-    React.ReactNode | ((props: TableColumnTitleProps<T>) => React.ReactNode);
-  children?: TableColumn<T>[];
+    React.ReactNode | ((props: DataTableColumnTitleProps<T>) => React.ReactNode);
+  children?: DataTableColumn<T>[];
   sortable?: boolean;
   filterable?: boolean;
   sorter?:
     | boolean
-    | ((a: T, b: T, order?: SortOrder) => number)
+    | ((a: T, b: T, order?: DataTableSortOrder) => number)
     | {
-        compare?: (a: T, b: T, order?: SortOrder) => number;
+        compare?: (a: T, b: T, order?: DataTableSortOrder) => number;
         multiple?: number;
       };
-  sortOrder?: SortOrder;
-  defaultSortOrder?: SortOrder;
-  sortDirections?: Exclude<SortOrder, null>[];
-  sortIcon?: (props: { sortOrder: SortOrder }) => React.ReactNode;
+  sortOrder?: DataTableSortOrder;
+  defaultSortOrder?: DataTableSortOrder;
+  sortDirections?: Exclude<DataTableSortOrder, null>[];
+  sortIcon?: (props: { sortOrder: DataTableSortOrder }) => React.ReactNode;
   showSorterTooltip?:
     | boolean
     | { title?: React.ReactNode; target?: "full-header" | "sorter-icon" };
-  filters?: TableFilterItem[];
-  filteredValue?: TableFilterValue[] | null;
-  defaultFilteredValue?: TableFilterValue[] | null;
+  filters?: DataTableFilterItem[];
+  filteredValue?: DataTableFilterValue[] | null;
+  defaultFilteredValue?: DataTableFilterValue[] | null;
   filtered?: boolean;
   filterMultiple?: boolean;
   filterMode?: "menu" | "tree";
-  filterSearch?: boolean | ((input: string, item: TableFilterItem) => boolean);
+  filterSearch?: boolean | ((input: string, item: DataTableFilterItem) => boolean);
   filterResetToDefaultFilteredValue?: boolean;
   filterOnClose?: boolean;
   filterDropdown?:
-    React.ReactNode | ((props: TableFilterDropdownProps) => React.ReactNode);
+    React.ReactNode | ((props: DataTableFilterDropdownProps) => React.ReactNode);
   filterIcon?: React.ReactNode | ((filtered: boolean) => React.ReactNode);
   filterDropdownProps?: {
     open?: boolean;
@@ -82,20 +82,20 @@ export type TableColumn<T> = Omit<RcColumn<T>, "title" | "dataIndex"> & {
     className?: string;
     style?: React.CSSProperties;
   };
-  onFilter?: (value: TableFilterValue, record: T) => boolean;
+  onFilter?: (value: DataTableFilterValue, record: T) => boolean;
   responsive?: ("xs" | "sm" | "md" | "lg" | "xl" | "xxl")[];
 };
-export type TableColumnsType<T> = TableColumn<T>[];
-export type TableSelectionType =
+export type DataTableColumnsType<T> = DataTableColumn<T>[];
+export type DataTableSelectionType =
   "all" | "none" | "invert" | "single" | "multiple";
-export type TableRowSelection<T> = {
+export type DataTableRowSelection<T> = {
   type?: "checkbox" | "radio";
   selectedRowKeys?: React.Key[];
   defaultSelectedRowKeys?: React.Key[];
   onChange?: (
     keys: React.Key[],
     rows: T[],
-    info: { type: TableSelectionType },
+    info: { type: DataTableSelectionType },
   ) => void;
   onSelect?: (record: T, selected: boolean, rows: T[], event: Event) => void;
   onSelectAll?: (selected: boolean, rows: T[], changeRows: T[]) => void;
@@ -140,7 +140,7 @@ export type TableRowSelection<T> = {
           }
       )[];
 };
-export type TablePagination = {
+export type DataTablePagination = {
   page?: number;
   current?: number;
   defaultCurrent?: number;
@@ -183,7 +183,7 @@ export type TablePagination = {
   className?: string;
   style?: React.CSSProperties;
 };
-export type TableLocale = {
+export type DataTableLocale = {
   emptyText?: React.ReactNode;
   filterTitle?: string;
   filterConfirm?: string;
@@ -205,15 +205,15 @@ export type TableLocale = {
 };
 type RcSemantics = NonNullable<RcTableProps["classNames"]>;
 type RcStyles = NonNullable<RcTableProps["styles"]>;
-export type TableClassNames = RcSemantics & {
+export type DataTableClassNames = RcSemantics & {
   root?: string;
   pagination?: string;
 };
-export type TableStyles = RcStyles & {
+export type DataTableStyles = RcStyles & {
   root?: React.CSSProperties;
   pagination?: React.CSSProperties;
 };
-export type TableProps<T> = Omit<
+export type DataTableProps<T> = Omit<
   RcTableProps<T>,
   | "data"
   | "columns"
@@ -226,9 +226,9 @@ export type TableProps<T> = Omit<
 > & {
   data?: T[];
   dataSource?: T[];
-  columns?: TableColumn<T>[];
+  columns?: DataTableColumn<T>[];
   children?: React.ReactNode;
-  column?: Partial<TableColumn<T>>;
+  column?: Partial<DataTableColumn<T>>;
   manual?: boolean;
   loading?:
     | boolean
@@ -238,26 +238,26 @@ export type TableProps<T> = Omit<
         delay?: number;
         indicator?: React.ReactNode;
       };
-  onChange?: (state: TableState) => void;
+  onChange?: (state: DataTableState) => void;
   onTableChange?: (
-    pagination: TablePagination,
-    filters: TableFilters,
-    sorter: TableSortResult<T> | TableSortResult<T>[],
+    pagination: DataTablePagination,
+    filters: DataTableFilters,
+    sorter: DataTableSortResult<T> | DataTableSortResult<T>[],
     extra: { currentDataSource: T[]; action: "paginate" | "sort" | "filter" },
   ) => void;
-  sort?: TableState["sort"];
+  sort?: DataTableState["sort"];
   filters?: Record<string, string>;
   selectable?: boolean;
   selectedKeys?: React.Key[];
   onSelectionChange?: (keys: React.Key[]) => void;
-  rowSelection?: TableRowSelection<T>;
-  pagination?: false | TablePagination;
+  rowSelection?: DataTableRowSelection<T>;
+  pagination?: false | DataTablePagination;
   empty?: React.ReactNode;
-  locale?: TableLocale;
+  locale?: DataTableLocale;
   size?: "small" | "middle" | "medium" | "large";
   bordered?: boolean;
-  sortDirections?: Exclude<SortOrder, null>[];
-  showSorterTooltip?: TableColumn<T>["showSorterTooltip"];
+  sortDirections?: Exclude<DataTableSortOrder, null>[];
+  showSorterTooltip?: DataTableColumn<T>["showSorterTooltip"];
   getPopupContainer?: (trigger: HTMLElement) => HTMLElement;
   scroll?: NonNullable<RcTableProps<T>["scroll"]> & {
     scrollToFirstRowOnChange?: boolean;
@@ -265,7 +265,7 @@ export type TableProps<T> = Omit<
   virtual?: boolean;
   virtualItemHeight?: number;
   classNames?:
-    TableClassNames | ((info: { props: TableProps<T> }) => TableClassNames);
-  styles?: TableStyles | ((info: { props: TableProps<T> }) => TableStyles);
+    DataTableClassNames | ((info: { props: DataTableProps<T> }) => DataTableClassNames);
+  styles?: DataTableStyles | ((info: { props: DataTableProps<T> }) => DataTableStyles);
 };
-export type TableExpandableConfig<T> = ExpandableConfig<T>;
+export type DataTableExpandableConfig<T> = ExpandableConfig<T>;

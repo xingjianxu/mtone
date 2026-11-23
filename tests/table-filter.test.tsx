@@ -6,8 +6,8 @@ import {
   TableFilter,
   type TableFilterProps,
 } from "../packages/mtone/src/table-filter";
-import type { TableColumn } from "../packages/mtone/src/table-types";
-const column: TableColumn<{ status: string }> = {
+import type { DataTableColumn } from "../packages/mtone/src/table-types";
+const column: DataTableColumn<{ status: string }> = {
   key: "status",
   title: "Status",
   filters: [

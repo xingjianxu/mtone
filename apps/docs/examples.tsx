@@ -31,7 +31,8 @@ import { PopconfirmExample } from "./popconfirm-example";
 import { RateExample } from "./rate-example";
 import { CalendarExample } from "./calendar-example";
 import { MentionsExample } from "./mentions-example";
-import { TableExample } from "./table-example";
+import TableNative from "./inline-demos/table-native";
+import { DataTableExample } from "./table-example";
 import { SplitterExample } from "./splitter-example";
 import { CardExample } from "./card-example";
 import { FormExample, FormItemExample } from "./form-example";
@@ -583,7 +584,9 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     case "Table":
-      return <TableExample compact={compact} />;
+      return <TableNative compact={compact} />;
+    case "DataTable":
+      return <DataTableExample compact={compact} />;
     case "Tag": {
       return (
         <div style={rowStyle}>

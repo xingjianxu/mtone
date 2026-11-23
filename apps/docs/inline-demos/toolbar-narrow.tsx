@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Download, Plus } from "lucide-react";
-import { Button, Input, Popover, Status, Table, Toolbar } from "../../../packages/mtone/src";
+import { Button, Input, Popover, Status, DataTable, Toolbar } from "../../../packages/mtone/src";
 
 const initialRows = [
   { id: 1, name: "组件文档整理", status: "进行中" },
@@ -31,7 +31,7 @@ export default function Demo() {
           }}>新建</Button>
         </>}
       />
-      <Table style={{ border: 0, borderRadius: 0 }} rowKey="id" rowSelection={{}} pagination={false} dataSource={shown}
+      <DataTable style={{ border: 0, borderRadius: 0 }} rowKey="id" rowSelection={{}} pagination={false} dataSource={shown}
         columns={[
           { title: "项目名称", dataIndex: "name" },
           { title: "状态", dataIndex: "status", render: (value: string) => <Status tone={value === "进行中" ? "blue" : "green"}>{value}</Status> },

@@ -4,7 +4,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import * as M from "../packages/mtone/src";
 import { componentDocs } from "../apps/docs/catalog";
 import { ComponentExample } from "../apps/docs/examples";
-import { parseRoute, searchDocs } from "../apps/docs/docs-app";
+import { docSections, parseRoute, searchDocs } from "../apps/docs/docs-app";
 describe("documentation", () => {
   it("covers every component export without counting hooks as components", () => {
     const names = Object.keys(M).filter(
@@ -31,6 +31,23 @@ describe("documentation", () => {
     expect(parseRoute("#/apps")).toEqual({ kind: "showcase" });
     expect(parseRoute("#/garbage").kind).toBe("not-found");
     expect(parseRoute("").kind).toBe("gallery");
+  });
+  it("documents native Table and data-driven DataTable on separate routes", () => {
+    expect(parseRoute("#/components/Table")).toEqual({ kind: "component", name: "Table" });
+    expect(parseRoute("#/components/DataTable?section=sorting")).toEqual({
+      kind: "component", name: "DataTable", section: "sorting",
+    });
+    const native = docSections.Table.find(({ id }) => id === "basic");
+    expect(native?.source).toContain("<thead>");
+    expect(native?.source).not.toMatch(/dataSource=|columns=/);
+    expect(docSections.Table.map(({ id }) => id)).not.toContain("sort-filter");
+    expect(docSections.DataTable.map(({ id }) => id)).toContain("sort-filter");
+    expect(docSections.DataTable.find(({ id }) => id === "toolbar")?.source).toContain("<DataTable");
+
+    const Demo = native!.Demo!;
+    render(<Demo />);
+    expect(screen.getByRole("table", { name: "本周项目" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "项目" })).toHaveAttribute("scope", "col");
   });
   it("searches names and Chinese descriptions", () => {
     expect(searchDocs("button").some((d) => d.name === "Button")).toBe(true);

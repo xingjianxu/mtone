@@ -40,7 +40,7 @@ export function Pagination({
   );
 }
 export { Table } from "./table";
-export type { TableColumn, TableState, TableProps } from "./table-types";
+export type { DataTableColumn, DataTableState, DataTableProps } from "./table-types";
 
 export { Tree } from "./tree";
 export type { TreeProps, TreeItem, TreeKey, TreeNode, TreeRef, TreeNodeInfo, TreeCheckedKeys, TreeDropInfo } from "./tree";

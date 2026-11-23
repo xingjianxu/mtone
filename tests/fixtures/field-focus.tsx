@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Input, Select, NumberInput, DatePicker, Table, Checkbox, Button, MtoneProvider } from "../../packages/mtone/src";
+import { Input, Select, NumberInput, DatePicker, DataTable, Checkbox, Button, MtoneProvider } from "../../packages/mtone/src";
 const options=[{value:"one",label:"One"},{value:"two",label:"Two"}];
 const fields=[
  ["Input",<Input aria-label="Input" />],
@@ -10,7 +10,7 @@ const fields=[
  ["Multiple Select",<Select mode="multiple" label="Multiple Select" options={options} defaultValue={["one"]} />],
  ["NumberInput",<NumberInput label="NumberInput" defaultValue={2} />],
  ["DatePicker",<DatePicker label="DatePicker" />],
- ["Table",<Table columns={[{key:"title",title:"Title",filterable:true}]} data={[{id:"one",title:"One"}]} rowKey="id" />],
+ ["DataTable",<DataTable columns={[{key:"title",title:"Title",filterable:true}]} data={[{id:"one",title:"One"}]} rowKey="id" />],
 ] as const;
 import "../../packages/mtone/dist/styles.css";
 createRoot(document.getElementById("root")!).render(<MtoneProvider locale="en"><div style={{width:300,padding:20,display:"grid",gap:20}}>

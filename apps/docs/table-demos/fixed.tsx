@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Table, Button } from "../../../packages/mtone/src";
-import type { TableColumn } from "../../../packages/mtone/src";
+import { DataTable, Button } from "../../../packages/mtone/src";
+import type { DataTableColumn } from "../../../packages/mtone/src";
 
 type Row = {
   key: number;
@@ -15,7 +15,7 @@ const initial: Row[] = Array.from({ length: 18 }, (_, i) => ({
   category: ["设计", "研究", "阅读"][i % 3],
   score: 60 + ((i * 7) % 40),
 }));
-const basic: TableColumn<Row>[] = [
+const basic: DataTableColumn<Row>[] = [
   { key: "title", title: "标题", dataIndex: "title", width: 240 },
   { key: "category", title: "分类", dataIndex: "category", width: 140 },
   { key: "score", title: "完成度", dataIndex: "score", width: 120 },
@@ -24,7 +24,7 @@ export default function Demo() {
   const [notice, setNotice] = useState("");
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <Table
+      <DataTable
         dataSource={initial}
         bordered
         scroll={{ x: 1000, y: 280 }}

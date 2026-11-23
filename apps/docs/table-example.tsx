@@ -1,35 +1,35 @@
 /// <reference types="vite/client" />
 import ToolbarTable from "./inline-demos/toolbar-table";
 import toolbarTableSource from "./inline-demos/toolbar-table.tsx?raw";
-import TableExample0 from "./table-demos/basic";
+import DataTableExample0 from "./table-demos/basic";
 import tableSource0 from "./table-demos/basic.tsx?raw";
-import TableExample1 from "./table-demos/selection";
+import DataTableExample1 from "./table-demos/selection";
 import tableSource1 from "./table-demos/selection.tsx?raw";
-import TableExample2 from "./table-demos/selection-menu";
+import DataTableExample2 from "./table-demos/selection-menu";
 import tableSource2 from "./table-demos/selection-menu.tsx?raw";
-import TableExample3 from "./table-demos/radio";
+import DataTableExample3 from "./table-demos/radio";
 import tableSource3 from "./table-demos/radio.tsx?raw";
-import TableExample4 from "./table-demos/sorting";
+import DataTableExample4 from "./table-demos/sorting";
 import tableSource4 from "./table-demos/sorting.tsx?raw";
-import TableExample5 from "./table-demos/filters";
+import DataTableExample5 from "./table-demos/filters";
 import tableSource5 from "./table-demos/filters.tsx?raw";
-import TableExample6 from "./table-demos/pagination";
+import DataTableExample6 from "./table-demos/pagination";
 import tableSource6 from "./table-demos/pagination.tsx?raw";
-import TableExample7 from "./table-demos/tree";
+import DataTableExample7 from "./table-demos/tree";
 import tableSource7 from "./table-demos/tree.tsx?raw";
-import TableExample8 from "./table-demos/expand";
+import DataTableExample8 from "./table-demos/expand";
 import tableSource8 from "./table-demos/expand.tsx?raw";
-import TableExample9 from "./table-demos/fixed";
+import DataTableExample9 from "./table-demos/fixed";
 import tableSource9 from "./table-demos/fixed.tsx?raw";
-import TableExample10 from "./table-demos/summary";
+import DataTableExample10 from "./table-demos/summary";
 import tableSource10 from "./table-demos/summary.tsx?raw";
-import TableExample11 from "./table-demos/virtual";
+import DataTableExample11 from "./table-demos/virtual";
 import tableSource11 from "./table-demos/virtual.tsx?raw";
-import TableExample12 from "./table-demos/edit";
+import DataTableExample12 from "./table-demos/edit";
 import tableSource12 from "./table-demos/edit.tsx?raw";
 import React, { useRef, useState } from "react";
-import { Table, Button, Tag, Text } from "../../packages/mtone/src";
-import type { TableColumn, TableRef } from "../../packages/mtone/src";
+import { DataTable, Button, Tag, Text } from "../../packages/mtone/src";
+import type { DataTableColumn, DataTableRef } from "../../packages/mtone/src";
 
 type Row = {
   key: number;
@@ -44,7 +44,7 @@ const initial: Row[] = Array.from({ length: 18 }, (_, i) => ({
   category: ["设计", "研究", "阅读"][i % 3],
   score: 60 + ((i * 7) % 40),
 }));
-const basic: TableColumn<Row>[] = [
+const basic: DataTableColumn<Row>[] = [
   { key: "title", title: "标题", dataIndex: "title", width: 240 },
   { key: "category", title: "分类", dataIndex: "category", width: 140 },
   { key: "score", title: "完成度", dataIndex: "score", width: 120 },
@@ -64,7 +64,7 @@ const modes = [
   "编辑与拖拽",
 ] as const;
 /** Demonstrations use local data only. Editing and drag sorting are application compositions. */
-export function TableExample({ compact = false }: { compact?: boolean }) {
+export function DataTableExample({ compact = false }: { compact?: boolean }) {
   const [mode, setMode] = useState<(typeof modes)[number]>(modes[0]);
   return (
     <div style={{ width: "100%", minWidth: 0, display: "grid", gap: 12 }}>
@@ -167,7 +167,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
   ]);
   const dragRow = useRef<number | null>(null);
   const dragColumn = useRef<string | null>(null);
-  const ref = useRef<TableRef>(null);
+  const ref = useRef<DataTableRef>(null);
   const move = (key: number, target: number) =>
     setRows((previous) => {
       const from = previous.findIndex((r) => r.key === key),
@@ -180,7 +180,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
     });
   let demo: React.ReactNode;
   if (mode === "筛选与分页") {
-    const columns: TableColumn<Row>[] = [
+    const columns: DataTableColumn<Row>[] = [
       {
         ...basic[0],
         sorter: {
@@ -250,7 +250,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
           <Button onClick={() => setSelected([])}>清除选择</Button>
           <Text muted>已选择 {selected.length} 行</Text>
         </div>
-        <Table
+        <DataTable
           dataSource={rows}
           columns={columns}
           rowSelection={{
@@ -283,7 +283,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
     );
   } else if (mode === "固定与分组") {
     demo = (
-      <Table
+      <DataTable
         dataSource={rows}
         bordered
         scroll={{ x: 1000, y: 280 }}
@@ -341,7 +341,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
     ];
     demo = (
       <>
-        <Table
+        <DataTable
           dataSource={tree}
           columns={basic}
           rowSelection={{ checkStrictly: false }}
@@ -350,13 +350,13 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
         <Text muted>
           上表：树形层级与父子关联选择。下表：展开详情中嵌套表格。
         </Text>
-        <Table
+        <DataTable
           dataSource={rows.slice(0, 3)}
           columns={basic}
           expandable={{
             showExpandAll: true,
             expandedRowRender: (row) => (
-              <Table
+              <DataTable
                 dataSource={[{ ...row, title: `${row.title} · 子记录` }]}
                 columns={basic}
                 size="small"
@@ -369,7 +369,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
     );
   } else if (mode === "合并与汇总") {
     demo = (
-      <Table
+      <DataTable
         dataSource={rows.slice(0, 4)}
         bordered
         columns={[
@@ -383,16 +383,16 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
           basic[2],
         ]}
         summary={(data) => (
-          <Table.Summary>
-            <Table.Summary.Row>
-              <Table.Summary.Cell index={0} colSpan={2}>
+          <DataTable.Summary>
+            <DataTable.Summary.Row>
+              <DataTable.Summary.Cell index={0} colSpan={2}>
                 当前数据合计
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={2}>
+              </DataTable.Summary.Cell>
+              <DataTable.Summary.Cell index={2}>
                 {data.reduce((sum, row) => sum + row.score, 0)}
-              </Table.Summary.Cell>
-            </Table.Summary.Row>
-          </Table.Summary>
+              </DataTable.Summary.Cell>
+            </DataTable.Summary.Row>
+          </DataTable.Summary>
         )}
       />
     );
@@ -413,7 +413,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
           </Button>
           <Tag>2000 行</Tag>
         </div>
-        <Table
+        <DataTable
           ref={ref}
           virtual
           dataSource={large}
@@ -427,7 +427,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
       </>
     );
   } else {
-    const editableColumns: TableColumn<Row>[] = columnOrder.map((key) => ({
+    const editableColumns: DataTableColumn<Row>[] = columnOrder.map((key) => ({
       ...basic.find((c) => c.key === key)!,
       onHeaderCell: () => ({
         draggable: true,
@@ -595,7 +595,7 @@ function TableDemo({ mode }: { mode: (typeof modes)[number] }) {
             重置
           </Button>
         </div>
-        <Table
+        <DataTable
           dataSource={rows.slice(0, 5)}
           columns={editableColumns}
           onRow={(row) => ({
@@ -641,17 +641,17 @@ function displayTableSource(source: string) {
   return source.replaceAll("../../../packages/mtone/src", "@bixlab/mtone");
 }
 
-export const tableDocSections = [
+export const dataTableDocSections = [
   {
     id: "basic",
     title: "基础用法",
-    Demo: TableExample0,
+    Demo: DataTableExample0,
     source: displayTableSource(tableSource0),
   },
   {
     id: "toolbar",
     title: "工具栏与表格",
-    note: "Toolbar 与 Table 同级放置，搜索、状态筛选和导出由应用控制，不需要给 Table 添加属性。",
+    note: "Toolbar 与 DataTable 同级放置，搜索、状态筛选和导出由应用控制，不需要给 DataTable 添加属性。",
     Demo: ToolbarTable,
     source: displayTableSource(toolbarTableSource),
   },
@@ -662,19 +662,19 @@ export const tableDocSections = [
       {
         id: "selection",
         title: "复选",
-        Demo: TableExample1,
+        Demo: DataTableExample1,
         source: displayTableSource(tableSource1),
       },
       {
         id: "selection-menu",
         title: "表头选择菜单",
-        Demo: TableExample2,
+        Demo: DataTableExample2,
         source: displayTableSource(tableSource2),
       },
       {
         id: "radio",
         title: "单选",
-        Demo: TableExample3,
+        Demo: DataTableExample3,
         source: displayTableSource(tableSource3),
       },
     ],
@@ -686,13 +686,13 @@ export const tableDocSections = [
       {
         id: "sorting",
         title: "多列排序",
-        Demo: TableExample4,
+        Demo: DataTableExample4,
         source: displayTableSource(tableSource4),
       },
       {
         id: "filters",
         title: "自定义与树形筛选",
-        Demo: TableExample5,
+        Demo: DataTableExample5,
         source: displayTableSource(tableSource5),
       },
     ],
@@ -700,7 +700,7 @@ export const tableDocSections = [
   {
     id: "pagination",
     title: "分页",
-    Demo: TableExample6,
+    Demo: DataTableExample6,
     source: displayTableSource(tableSource6),
   },
   {
@@ -710,13 +710,13 @@ export const tableDocSections = [
       {
         id: "tree",
         title: "树形与关联选择",
-        Demo: TableExample7,
+        Demo: DataTableExample7,
         source: displayTableSource(tableSource7),
       },
       {
         id: "expand",
         title: "展开详情",
-        Demo: TableExample8,
+        Demo: DataTableExample8,
         source: displayTableSource(tableSource8),
       },
     ],
@@ -724,25 +724,25 @@ export const tableDocSections = [
   {
     id: "fixed",
     title: "滚动与固定",
-    Demo: TableExample9,
+    Demo: DataTableExample9,
     source: displayTableSource(tableSource9),
   },
   {
     id: "summary",
     title: "合并与汇总",
-    Demo: TableExample10,
+    Demo: DataTableExample10,
     source: displayTableSource(tableSource10),
   },
   {
     id: "virtual",
     title: "虚拟列表",
-    Demo: TableExample11,
+    Demo: DataTableExample11,
     source: displayTableSource(tableSource11),
   },
   {
     id: "edit",
     title: "编辑与拖拽",
-    Demo: TableExample12,
+    Demo: DataTableExample12,
     source: displayTableSource(tableSource12),
   },
 ];

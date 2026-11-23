@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
-import { Table, MtoneProvider } from "../packages/mtone/src";
+import { DataTable, MtoneProvider } from "../packages/mtone/src";
 const render = (node: React.ReactNode) =>
   rtlRender(<MtoneProvider locale="en">{node}</MtoneProvider>);
 const rows = [
@@ -17,7 +17,7 @@ const rows = [
 ];
 test("modern dataSource nested fields, groups and hidden columns", () => {
   render(
-    <Table
+    <DataTable
       dataSource={[{ key: 1, profile: { name: "Ann" } }]}
       columns={[
         {
@@ -36,7 +36,7 @@ test("modern sorting calls distinct callback while preserving legacy state callb
   const old = vi.fn(),
     modern = vi.fn();
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       onChange={old}
       onTableChange={modern}
@@ -61,7 +61,7 @@ test("modern sorting calls distinct callback while preserving legacy state callb
 test("pagination defaults, size changer and remote data preserve table state", async () => {
   const change = vi.fn();
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       pagination={{
         defaultPageSize: 1,
@@ -87,7 +87,7 @@ test("pagination defaults, size changer and remote data preserve table state", a
 });
 test("expandable rows with expand-all, summary, title and footer", () => {
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[{ title: "Name", dataIndex: "name" }]}
       title={() => "Report"}
@@ -97,11 +97,11 @@ test("expandable rows with expand-all, summary, title and footer", () => {
         showExpandAll: true,
       }}
       summary={() => (
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0} colSpan={2}>
+        <DataTable.Summary.Row>
+          <DataTable.Summary.Cell index={0} colSpan={2}>
             Summary
-          </Table.Summary.Cell>
-        </Table.Summary.Row>
+          </DataTable.Summary.Cell>
+        </DataTable.Summary.Row>
       )}
     />,
   );
@@ -113,7 +113,7 @@ test("expandable rows with expand-all, summary, title and footer", () => {
 test("row/cell event overrides, merged cells and semantic styling", () => {
   const click = vi.fn();
   const { container } = render(
-    <Table
+    <DataTable
       dataSource={rows}
       bordered
       classNames={{ root: "custom-root", body: { row: "custom-row" } }}
@@ -134,11 +134,11 @@ test("row/cell event overrides, merged cells and semantic styling", () => {
 });
 test("JSX Column and ColumnGroup support", () => {
   render(
-    <Table dataSource={rows}>
-      <Table.ColumnGroup title="People">
-        <Table.Column title="Name" dataIndex="name" />
-      </Table.ColumnGroup>
-    </Table>,
+    <DataTable dataSource={rows}>
+      <DataTable.ColumnGroup title="People">
+        <DataTable.Column title="Name" dataIndex="name" />
+      </DataTable.ColumnGroup>
+    </DataTable>,
   );
   expect(screen.getByText("People")).toBeTruthy();
   expect(screen.getByText("Ann")).toBeTruthy();
@@ -146,7 +146,7 @@ test("JSX Column and ColumnGroup support", () => {
 test("imperative ref exposes native element and scrollTo", () => {
   const ref = React.createRef<any>();
   render(
-    <Table
+    <DataTable
       ref={ref}
       dataSource={rows}
       columns={[{ title: "Name", dataIndex: "name" }]}
@@ -167,14 +167,14 @@ test("controlled sort and filters emit requests without changing rows until pare
     },
   ];
   const { rerender } = render(
-    <Table dataSource={rows} columns={cols} onTableChange={onTableChange} />,
+    <DataTable dataSource={rows} columns={cols} onTableChange={onTableChange} />,
   );
   fireEvent.click(screen.getByRole("button", { name: /Age/ }));
   expect(screen.getAllByRole("cell")[0].textContent).toBe("20");
   expect(onTableChange.mock.calls[0][2].order).toBe("ascend");
   rerender(
     <MtoneProvider locale="en">
-      <Table
+      <DataTable
         dataSource={rows}
         columns={[{ ...cols[0], sortOrder: "ascend" }]}
       />
@@ -184,14 +184,14 @@ test("controlled sort and filters emit requests without changing rows until pare
 });
 test("selection and expansion markers preserve requested order", () => {
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       rowSelection={{}}
       expandable={{ expandedRowRender: (r) => r.name + " details" }}
       columns={[
         { title: "Name", dataIndex: "name" },
-        Table.EXPAND_COLUMN,
-        Table.SELECTION_COLUMN,
+        DataTable.EXPAND_COLUMN,
+        DataTable.SELECTION_COLUMN,
       ]}
     />,
   );
@@ -201,7 +201,7 @@ test("selection and expansion markers preserve requested order", () => {
 });
 test("nested tree expansions and child selection remain reachable", () => {
   render(
-    <Table
+    <DataTable
       dataSource={[
         {
           key: "parent",
@@ -223,7 +223,7 @@ test("nested tree expansions and child selection remain reachable", () => {
 });
 test("loading delay, hide single page and page placement", async () => {
   const { rerender } = render(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[{ title: "Name", dataIndex: "name" }]}
       loading={{ spinning: true, delay: 5, tip: "Fetching" }}
@@ -234,7 +234,7 @@ test("loading delay, hide single page and page placement", async () => {
   expect(await screen.findByRole("status")).toHaveTextContent("Fetching");
   rerender(
     <MtoneProvider locale="en">
-      <Table
+      <DataTable
         dataSource={rows}
         columns={[{ title: "Name", dataIndex: "name" }]}
         loading={false}
@@ -252,7 +252,7 @@ test("virtual table mounts bounded rows and imperative scroll is available", () 
   }));
   const ref = React.createRef<any>();
   const { container } = render(
-    <Table
+    <DataTable
       ref={ref}
       virtual
       scroll={{ x: 600, y: 200 }}
@@ -267,11 +267,11 @@ test("virtual table mounts bounded rows and imperative scroll is available", () 
 });
 test("anonymous sortable column after selection marker uses the same key throughout pipeline", () => {
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       rowSelection={{}}
       columns={[
-        Table.SELECTION_COLUMN,
+        DataTable.SELECTION_COLUMN,
         {
           title: "Computed",
           render: (_, r) => r.age,
@@ -286,7 +286,7 @@ test("anonymous sortable column after selection marker uses the same key through
 test("filter callback reports total for the newly filtered data", () => {
   const fn = vi.fn();
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       onTableChange={fn}
       columns={[
@@ -303,7 +303,7 @@ test("filter callback reports total for the newly filtered data", () => {
 });
 test("hidden columns remain available for controlled sorting without rendering", () => {
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[
         { title: "Name", dataIndex: "name" },
@@ -323,7 +323,7 @@ test("hidden columns remain available for controlled sorting without rendering",
 });
 test("custom pagination content retains navigation behavior", () => {
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[{ title: "Name", dataIndex: "name" }]}
       pagination={{
@@ -339,18 +339,18 @@ test("custom pagination content retains navigation behavior", () => {
 test("JSX explicit keys are not rewritten in sort state and callbacks", () => {
   const fn = vi.fn();
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       onTableChange={fn}
       sort={{ key: "age", direction: "asc" }}
     >
-      <Table.Column
+      <DataTable.Column
         key="age"
         title="Age"
         dataIndex="age"
         sorter={(a: (typeof rows)[0], b: (typeof rows)[0]) => a.age - b.age}
       />
-    </Table>,
+    </DataTable>,
   );
   expect(screen.getAllByRole("cell")[0]).toHaveTextContent("10");
   fireEvent.click(screen.getByRole("button", { name: /Age/ }));
@@ -358,7 +358,7 @@ test("JSX explicit keys are not rewritten in sort state and callbacks", () => {
 });
 test("groups with all children hidden do not leave empty header columns", () => {
   render(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[
         {
@@ -374,7 +374,7 @@ test("groups with all children hidden do not leave empty header columns", () => 
 });
 test("sorter tooltip targets only the icon and accepts rich content", () => {
   const { container } = render(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[
         {
@@ -395,10 +395,10 @@ test("sorter tooltip targets only the icon and accepts rich content", () => {
     "aria-describedby",
   );
 });
-test('legacy expandable expandIcon remains usable alongside expand-all default icon',()=>{render(<Table dataSource={rows} columns={[{title:'Name',dataIndex:'name'}]} expandable={{showExpandAll:true,expandedRowRender:r=>r.name+' detail',expandIcon:({record,onExpand})=><button onClick={e=>onExpand(record,e)}>Custom expand {record.name}</button>}}/>);fireEvent.click(screen.getByRole('button',{name:'Custom expand Bob'}));expect(screen.getByText('Bob detail')).toBeTruthy();expect(screen.getByRole('button',{name:'Expand all rows'})).toBeTruthy()});
+test('legacy expandable expandIcon remains usable alongside expand-all default icon',()=>{render(<DataTable dataSource={rows} columns={[{title:'Name',dataIndex:'name'}]} expandable={{showExpandAll:true,expandedRowRender:r=>r.name+' detail',expandIcon:({record,onExpand})=><button onClick={e=>onExpand(record,e)}>Custom expand {record.name}</button>}}/>);fireEvent.click(screen.getByRole('button',{name:'Custom expand Bob'}));expect(screen.getByText('Bob detail')).toBeTruthy();expect(screen.getByRole('button',{name:'Expand all rows'})).toBeTruthy()});
 
 test("tree expand controls default to the first data column, not the selection column", () => {
-  const { container } = render(<Table
+  const { container } = render(<DataTable
     dataSource={[{ key: 1, name: "Parent", children: [{ key: 2, name: "Child" }] }]}
     columns={[{ title: "Group", children: [{ title: "Name", dataIndex: "name" }] }]}
     rowSelection={{ checkStrictly: false }}
@@ -413,9 +413,9 @@ test("tree expand controls default to the first data column, not the selection c
 test("tree expand position honors explicit overrides and tables without selection", () => {
   const data = [{ key: 1, name: "Parent", age: 20, children: [{ key: 2, name: "Child", age: 10 }] }];
   const columns = [{ title: "Name", dataIndex: "name" }, { title: "Age", dataIndex: "age" }];
-  const { rerender } = render(<Table dataSource={data} columns={columns} />);
+  const { rerender } = render(<DataTable dataSource={data} columns={columns} />);
   expect(screen.getByRole('button', { name: 'Expand row' }).closest('td')?.textContent).toBe('Parent');
-  rerender(<MtoneProvider locale="en"><Table dataSource={data} columns={columns} rowSelection={{}}
+  rerender(<MtoneProvider locale="en"><DataTable dataSource={data} columns={columns} rowSelection={{}}
     expandable={{ expandIconColumnIndex: 2 }} /></MtoneProvider>);
   expect(screen.getByRole('button', { name: 'Expand row' }).closest('td')?.textContent).toBe('20');
 });
@@ -425,7 +425,7 @@ test("page size Select preserves controlled values and numeric callbacks", async
     onShowSizeChange = vi.fn(),
     onTableChange = vi.fn();
   const { rerender } = render(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[{ dataIndex: "name" }]}
       pagination={{
@@ -453,7 +453,7 @@ test("page size Select preserves controlled values and numeric callbacks", async
   expect(screen.queryByText("Bob")).toBeNull();
   rerender(
     <MtoneProvider locale="en">
-      <Table
+      <DataTable
         dataSource={rows}
         columns={[{ dataIndex: "name" }]}
         pagination={{ current: 1, pageSize: 2, showSizeChanger: true }}
@@ -468,7 +468,7 @@ test("page size Select localizes, disables and hides with pagination settings", 
   const onChange = vi.fn();
   const { rerender } = rtlRender(
     <MtoneProvider locale="zh">
-      <Table
+      <DataTable
         dataSource={rows}
         columns={[{ dataIndex: "name" }]}
         pagination={{
@@ -487,7 +487,7 @@ test("page size Select localizes, disables and hides with pagination settings", 
   expect(screen.queryByRole("listbox")).toBeNull();
   expect(onChange).not.toHaveBeenCalled();
   rerender(
-    <Table
+    <DataTable
       dataSource={rows}
       columns={[]}
       pagination={{ showSizeChanger: false }}

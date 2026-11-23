@@ -1,8 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Table, Button, MtoneProvider } from "../../packages/mtone/src";
-import type { TableColumn, TableRef } from "../../packages/mtone/src";
-import { TableExample } from "../../apps/docs/table-example";
+import { DataTable, Button, MtoneProvider } from "../../packages/mtone/src";
+import type { DataTableColumn, DataTableRef } from "../../packages/mtone/src";
+import { DataTableExample } from "../../apps/docs/table-example";
 import "../../packages/mtone/dist/styles.css";
 type Row = {
   key: number;
@@ -17,7 +17,7 @@ const rows: Row[] = Array.from({ length: 24 }, (_, i) => ({
   city: i % 2 ? "Paris" : "London",
   age: 20 + i,
 }));
-const columns: TableColumn<Row>[] = [
+const columns: DataTableColumn<Row>[] = [
   { key: "name", title: "Name", dataIndex: "name", width: 180 },
   { key: "city", title: "City", dataIndex: "city", width: 180 },
   { key: "age", title: "Age", dataIndex: "age", width: 100 },
@@ -26,7 +26,7 @@ function Demo() {
   const [selection, setSelection] = React.useState<React.Key[]>([]),
     [treeSelection, setTreeSelection] = React.useState<React.Key[]>([]),
     [radio, setRadio] = React.useState(false);
-  const virtual = React.useRef<TableRef>(null);
+  const virtual = React.useRef<DataTableRef>(null);
   return (
     <MtoneProvider locale="en">
       <main
@@ -41,7 +41,7 @@ function Demo() {
       >
         <section data-testid="fixed">
           <h2>Fixed columns, header and summary</h2>
-          <Table
+          <DataTable
             dataSource={rows}
             bordered
             scroll={{ x: 1100, y: 230 }}
@@ -58,14 +58,14 @@ function Demo() {
               },
             ]}
             summary={(data) => (
-              <Table.Summary fixed>
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} colSpan={3}>
+              <DataTable.Summary fixed>
+                <DataTable.Summary.Row>
+                  <DataTable.Summary.Cell index={0}>Total</DataTable.Summary.Cell>
+                  <DataTable.Summary.Cell index={1} colSpan={3}>
                     {data.length} records
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-              </Table.Summary>
+                  </DataTable.Summary.Cell>
+                </DataTable.Summary.Row>
+              </DataTable.Summary>
             )}
           />
         </section>
@@ -83,7 +83,7 @@ function Demo() {
           ] as const
         ).map((kind) => (
           <section data-testid={`column-width-${kind}`} key={kind}>
-            <Table
+            <DataTable
               dataSource={kind === "empty" ? [] : rows.slice(0, 3)}
               bordered
               columns={
@@ -136,7 +136,7 @@ function Demo() {
           </Button>
           <Button>Outside filter</Button>
           <output aria-label="Selected keys">{selection.join(",")}</output>
-          <Table
+          <DataTable
             dataSource={rows}
             rowSelection={{
               selectedRowKeys: selection,
@@ -172,7 +172,7 @@ function Demo() {
           <output aria-label="Tree selected keys">
             {treeSelection.join(",")}
           </output>
-          <Table
+          <DataTable
             dataSource={[
               {
                 ...rows[0],
@@ -191,7 +191,7 @@ function Demo() {
         {(["small", "middle", "large"] as const).flatMap(size =>
           ([false, true] as const).map(rtl => (
             <section key={`${size}-${rtl}`} data-testid={`tree-align-${size}-${rtl}`} dir={rtl ? "rtl" : "ltr"}>
-              <Table
+              <DataTable
                 direction={rtl ? "rtl" : "ltr"}
                 size={size}
                 dataSource={[{ ...rows[0], name: "Parent", children: [{ ...rows[1], name: "Child one" }] }, rows[2]]}
@@ -205,7 +205,7 @@ function Demo() {
         )}
         <section data-testid="expanded">
           <h2>Expansion</h2>
-          <Table
+          <DataTable
             dataSource={rows.slice(0, 3)}
             columns={columns}
             expandable={{
@@ -217,7 +217,7 @@ function Demo() {
         </section>
         <section data-testid="merged">
           <h2>Grouped headers and merged cells</h2>
-          <Table
+          <DataTable
             dataSource={rows.slice(0, 4)}
             bordered
             columns={[
@@ -228,16 +228,16 @@ function Demo() {
               { title: "Details", children: [columns[1], columns[2]] },
             ]}
             summary={(data) => (
-              <Table.Summary>
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0} colSpan={2}>
+              <DataTable.Summary>
+                <DataTable.Summary.Row>
+                  <DataTable.Summary.Cell index={0} colSpan={2}>
                     Combined total
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={2}>
+                  </DataTable.Summary.Cell>
+                  <DataTable.Summary.Cell index={2}>
                     {data.reduce((s, r) => s + r.age, 0)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-              </Table.Summary>
+                  </DataTable.Summary.Cell>
+                </DataTable.Summary.Row>
+              </DataTable.Summary>
             )}
           />
         </section>
@@ -249,7 +249,7 @@ function Demo() {
           <Button onClick={() => virtual.current?.scrollTo({ top: 0 })}>
             Virtual top
           </Button>
-          <Table
+          <DataTable
             ref={virtual}
             virtual
             dataSource={Array.from({ length: 1000 }, (_, i) => ({
@@ -263,7 +263,7 @@ function Demo() {
         </section>
         <section data-testid="responsive">
           <h2>Responsive</h2>
-          <Table
+          <DataTable
             dataSource={rows.slice(0, 2)}
             columns={[
               columns[0],
@@ -287,7 +287,7 @@ function Demo() {
               "--mt-primary": "#ededed",
             }}
           >
-            <Table
+            <DataTable
               dataSource={rows.slice(0, 3)}
               columns={columns}
               rowSelection={{}}
@@ -300,7 +300,7 @@ function Demo() {
               key={align + direction}
               data-testid={"selection-" + align + "-" + direction}
             >
-              <Table
+              <DataTable
                 dataSource={rows.slice(0, 3)}
                 columns={columns}
                 direction={direction}
@@ -313,7 +313,7 @@ function Demo() {
         )}
         <section data-testid="composition">
           <h2>Editing and drag demos</h2>
-          <TableExample />
+          <DataTableExample />
         </section>
       </main>
     </MtoneProvider>

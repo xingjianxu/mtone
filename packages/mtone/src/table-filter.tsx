@@ -3,25 +3,25 @@ import { Popover } from "@base-ui/react/popover";
 import { Filter, ChevronRight } from "lucide-react";
 import { Button, cn, MtoneScope } from "./basic";
 import type {
-  TableColumn,
-  TableFilterDropdownProps,
-  TableFilterItem,
-  TableFilterValue,
-  TableLocale,
+  DataTableColumn,
+  DataTableFilterDropdownProps,
+  DataTableFilterItem,
+  DataTableFilterValue,
+  DataTableLocale,
 } from "./table-types";
 
 export type TableFilterProps<T> = {
-  column: TableColumn<T>;
+  column: DataTableColumn<T>;
   columnKey: string;
-  value: TableFilterValue[] | null;
-  onChange: (values: TableFilterValue[] | null) => void;
+  value: DataTableFilterValue[] | null;
+  onChange: (values: DataTableFilterValue[] | null) => void;
   zh: boolean;
-  locale?: TableLocale;
+  locale?: DataTableLocale;
   getPopupContainer?: (trigger: HTMLElement) => HTMLElement;
 };
 const sameValues = (
-  a: readonly TableFilterValue[],
-  b: readonly TableFilterValue[],
+  a: readonly DataTableFilterValue[],
+  b: readonly DataTableFilterValue[],
 ) => a.length === b.length && a.every((value, index) => value === b[index]);
 function plainText(node: React.ReactNode): string {
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -30,7 +30,7 @@ function plainText(node: React.ReactNode): string {
     return plainText(node.props.children);
   return "";
 }
-function itemValues(item: TableFilterItem): TableFilterValue[] {
+function itemValues(item: DataTableFilterItem): DataTableFilterValue[] {
   return [item.value, ...(item.children ?? []).flatMap(itemValues)];
 }
 function MixedCheckbox({
@@ -62,15 +62,15 @@ export function TableFilter<T>({
 }: TableFilterProps<T>) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const open = column.filterDropdownProps?.open ?? internalOpen;
-  const [draft, setDraftState] = React.useState<TableFilterValue[]>(
+  const [draft, setDraftState] = React.useState<DataTableFilterValue[]>(
     value ?? [],
   );
   const draftRef = React.useRef(draft);
-  const committed = React.useRef<TableFilterValue[]>(value ?? []);
+  const committed = React.useRef<DataTableFilterValue[]>(value ?? []);
   const previousValue = React.useRef(value);
   const previousOpen = React.useRef(false);
   const [search, setSearch] = React.useState("");
-  const [collapsed, setCollapsed] = React.useState<Set<TableFilterValue>>(
+  const [collapsed, setCollapsed] = React.useState<Set<DataTableFilterValue>>(
     new Set(),
   );
   const trigger = React.useRef<HTMLButtonElement | null>(null);
@@ -85,7 +85,7 @@ export function TableFilter<T>({
   const filterLabel = `${locale?.filterTitle ?? (zh ? "筛选" : "Filter")} ${title}`;
   const multiple = column.filterMultiple !== false;
   const isTree = column.filterMode === "tree";
-  const setDraft = React.useCallback((keys: TableFilterValue[]) => {
+  const setDraft = React.useCallback((keys: DataTableFilterValue[]) => {
     draftRef.current = keys;
     setDraftState(keys);
   }, []);
@@ -105,7 +105,7 @@ export function TableFilter<T>({
     else setPortalContainer(undefined);
   }, [getPopupContainer, open]);
 
-  const commit = (keys: TableFilterValue[], force = false) => {
+  const commit = (keys: DataTableFilterValue[], force = false) => {
     if (force || !sameValues(committed.current, keys)) {
       committed.current = [...keys];
       onChange(keys.length ? [...keys] : null);
@@ -122,11 +122,11 @@ export function TableFilter<T>({
     setInternalOpen(next);
     column.filterDropdownProps?.onOpenChange?.(next);
   };
-  const confirm: TableFilterDropdownProps["confirm"] = (options) => {
+  const confirm: DataTableFilterDropdownProps["confirm"] = (options) => {
     commit(draftRef.current, true);
     if (options?.closeDropdown !== false) changeOpen(false, false);
   };
-  const clearFilters: TableFilterDropdownProps["clearFilters"] = (options) => {
+  const clearFilters: DataTableFilterDropdownProps["clearFilters"] = (options) => {
     const next = column.filterResetToDefaultFilteredValue
       ? (column.defaultFilteredValue ?? [])
       : [];
@@ -134,7 +134,7 @@ export function TableFilter<T>({
     if (options?.confirm !== false) commit(next, true);
     if (options?.closeDropdown) changeOpen(false, false);
   };
-  const toggle = (item: TableFilterItem) => {
+  const toggle = (item: DataTableFilterItem) => {
     if (!multiple) {
       setDraft([item.value]);
       return;
@@ -147,7 +147,7 @@ export function TableFilter<T>({
         : [...draftRef.current, ...values],
     );
     if (isTree) {
-      const reconcile = (items: TableFilterItem[]) =>
+      const reconcile = (items: DataTableFilterItem[]) =>
         items.forEach((node) => {
           if (!node.children?.length) return;
           reconcile(node.children);
@@ -163,21 +163,21 @@ export function TableFilter<T>({
     }
     setDraft([...next]);
   };
-  const matches = (item: TableFilterItem) =>
+  const matches = (item: DataTableFilterItem) =>
     !search ||
     (typeof column.filterSearch === "function"
       ? column.filterSearch(search, item)
       : plainText(item.text)
           .toLocaleLowerCase()
           .includes(search.toLocaleLowerCase()));
-  const visibleItems = (items: TableFilterItem[]): TableFilterItem[] =>
+  const visibleItems = (items: DataTableFilterItem[]): DataTableFilterItem[] =>
     items.flatMap((item) => {
       const children = item.children ? visibleItems(item.children) : undefined;
       return matches(item) || children?.length ? [{ ...item, children }] : [];
     });
   const originalItems = React.useMemo(() => {
-    const map = new Map<TableFilterValue, TableFilterItem>();
-    const visit = (items: TableFilterItem[]) =>
+    const map = new Map<DataTableFilterValue, DataTableFilterItem>();
+    const visit = (items: DataTableFilterItem[]) =>
       items.forEach((item) => {
         map.set(item.value, item);
         if (item.children) visit(item.children);
@@ -187,7 +187,7 @@ export function TableFilter<T>({
   }, [column.filters]);
   const items = visibleItems(column.filters ?? []);
   const renderItems = (
-    entries: TableFilterItem[],
+    entries: DataTableFilterItem[],
     depth = 0,
   ): React.ReactNode =>
     entries.map((item, index) => {
@@ -268,7 +268,7 @@ export function TableFilter<T>({
       : (column.filterIcon ?? (
           <Filter size={13} strokeWidth={1.5} aria-hidden="true" />
         ));
-  const customProps: TableFilterDropdownProps = {
+  const customProps: DataTableFilterDropdownProps = {
     prefixCls: "mt-table-filter",
     selectedKeys: draft,
     setSelectedKeys: setDraft,

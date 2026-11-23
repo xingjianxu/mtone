@@ -27,7 +27,7 @@ const expected: Record<string, string[]> = {
   ],
   "数据展示": [
     "Card", "CardGroup", "List", "ListItem", "DataList",
-    "DocumentList", "DocumentCard", "Table", "Tree",
+    "DocumentList", "DocumentCard", "Table", "DataTable", "Tree",
     "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
     "Avatar", "AvatarGroup", "Tag", "Calendar", "Timeline",
   ],

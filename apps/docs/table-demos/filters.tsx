@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Tag } from "../../../packages/mtone/src";
-import type { TableColumn } from "../../../packages/mtone/src";
+import { DataTable, Button, Tag } from "../../../packages/mtone/src";
+import type { DataTableColumn } from "../../../packages/mtone/src";
 
 type Row = {
   key: number;
@@ -15,7 +15,7 @@ const initial: Row[] = Array.from({ length: 18 }, (_, i) => ({
   category: ["设计", "研究", "阅读"][i % 3],
   score: 60 + ((i * 7) % 40),
 }));
-const basic: TableColumn<Row>[] = [
+const basic: DataTableColumn<Row>[] = [
   { key: "title", title: "标题", dataIndex: "title", width: 240 },
   { key: "category", title: "分类", dataIndex: "category", width: 140 },
   { key: "score", title: "完成度", dataIndex: "score", width: 120 },
@@ -28,7 +28,7 @@ const toolbar: React.CSSProperties = {
 };
 export default function Demo() {
   const [notice, setNotice] = useState("");
-  const columns: TableColumn<Row>[] = [
+  const columns: DataTableColumn<Row>[] = [
     {
       ...basic[0],
       filterDropdown: ({
@@ -79,7 +79,7 @@ export default function Demo() {
   ];
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <Table
+      <DataTable
         dataSource={initial.slice(0, 6)}
         columns={columns}
         onTableChange={(_, filters, _sorter, extra) =>

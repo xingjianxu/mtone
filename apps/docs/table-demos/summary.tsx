@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import { Table } from "../../../packages/mtone/src";
-import type { TableColumn } from "../../../packages/mtone/src";
+import { DataTable } from "../../../packages/mtone/src";
+import type { DataTableColumn } from "../../../packages/mtone/src";
 
 type Row = {
   key: number;
@@ -15,14 +15,14 @@ const initial: Row[] = Array.from({ length: 18 }, (_, i) => ({
   category: ["设计", "研究", "阅读"][i % 3],
   score: 60 + ((i * 7) % 40),
 }));
-const basic: TableColumn<Row>[] = [
+const basic: DataTableColumn<Row>[] = [
   { key: "title", title: "标题", dataIndex: "title", width: 240 },
   { key: "category", title: "分类", dataIndex: "category", width: 140 },
   { key: "score", title: "完成度", dataIndex: "score", width: 120 },
 ];
 export default function Demo() {
   return (
-    <Table
+    <DataTable
       dataSource={initial.slice(0, 4)}
       bordered
       columns={[
@@ -36,16 +36,16 @@ export default function Demo() {
         basic[2],
       ]}
       summary={(data) => (
-        <Table.Summary>
-          <Table.Summary.Row>
-            <Table.Summary.Cell index={0} colSpan={2}>
+        <DataTable.Summary>
+          <DataTable.Summary.Row>
+            <DataTable.Summary.Cell index={0} colSpan={2}>
               当前数据合计
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={2}>
+            </DataTable.Summary.Cell>
+            <DataTable.Summary.Cell index={2}>
               {data.reduce((sum, row) => sum + row.score, 0)}
-            </Table.Summary.Cell>
-          </Table.Summary.Row>
-        </Table.Summary>
+            </DataTable.Summary.Cell>
+          </DataTable.Summary.Row>
+        </DataTable.Summary>
       )}
     />
   );

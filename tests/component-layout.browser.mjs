@@ -15,8 +15,8 @@ try {
   });
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 800 });
-    await page.goto(`http://127.0.0.1:${port}/#/components/Table`);
-    await page.getByRole("heading", { level: 1, name: "Table", exact: true }).waitFor();
+    await page.goto(`http://127.0.0.1:${port}/#/components/DataTable`);
+    await page.getByRole("heading", { level: 1, name: "DataTable", exact: true }).waitFor();
     const disclosure = page.locator(".component-outline .mt-toc-disclosure");
     const openOutline = async () => {
       if (width < 1111) {
@@ -50,7 +50,7 @@ try {
     await codeToggle.press("Enter");
     await codeBlock.waitFor();
     const code = await codeBlock.locator("code").textContent();
-    assert(code.includes("@bixlab/mtone") && code.includes("Table"));
+    assert(code.includes("@bixlab/mtone") && code.includes("DataTable"));
     await codeBlock.locator(".mt-code-token").first().waitFor();
     assert.equal(await codeBlock.locator("code").textContent(), code);
     const copy = source.getByRole("button", { name: "复制代码" });
@@ -84,6 +84,25 @@ try {
     await page.waitForFunction(() => document.activeElement?.id === "input-search");
     assert.equal(await page.getByRole("heading", { level: 1, name: "Input", exact: true }).count(), 1);
   }
+  await page.setViewportSize({ width: 1440, height: 800 });
+  await page.goto("http://127.0.0.1:" + port + "/#/components/Table?section=basic");
+  await page.getByRole("heading", { level: 1, name: "Table", exact: true }).waitFor();
+  const nativeTable = page.locator("table.mt-native-table").first();
+  await nativeTable.getByRole("columnheader").first().waitFor();
+  assert(await nativeTable.locator("tbody > tr > td").count());
+  assert.equal(await page.locator(".mt-table-wrap").count(), 0);
+  const preview = page.locator(".component-demo-card").filter({has: nativeTable});
+  const body = nativeTable.locator("tbody");
+  const cellBackground = (row) => body.locator("tr").nth(row).locator("td").evaluate((cell) => getComputedStyle(cell).backgroundColor);
+  const baseline = await cellBackground(0);
+  await preview.getByRole("checkbox", {name: "网格边框"}).click();
+  assert.equal(await nativeTable.evaluate((table) => getComputedStyle(table).borderTopWidth), "1px");
+  await preview.getByRole("checkbox", {name: "隔行底色"}).click();
+  assert.notEqual(await cellBackground(1), baseline);
+  await preview.getByRole("checkbox", {name: "悬停高亮"}).click();
+  await body.locator("tr").first().locator("td").hover();
+  assert.notEqual(await cellBackground(0), baseline);
+
   console.log("Component docs: desktop/mobile outline, deep links, keyboard code disclosure, exact clipboard source and Input section links passed");
 } finally {
   await browser?.close();

@@ -7,8 +7,8 @@ import type { DocSection } from "../apps/docs/doc-section";
 import { componentDocs } from "../apps/docs/catalog";
 import { typographySectionId } from "../apps/docs/typography-navigation";
 test("accepts directly linked demo and API anchors", () => {
-  expect(parseRoute("#/components/Table?section=row-selection")).toEqual(
-    { kind: "component", name: "Table", section: "row-selection" }
+  expect(parseRoute("#/components/DataTable?section=row-selection")).toEqual(
+    { kind: "component", name: "DataTable", section: "row-selection" }
   );
 });
 

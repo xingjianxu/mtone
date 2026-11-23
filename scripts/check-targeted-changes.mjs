@@ -36,6 +36,7 @@ const aliases = {
   "calendar-model": ["calendar"],
   "confirm-transaction": ["interactive", "popconfirm", "avatar-popconfirm", "modal-layout"],
   data: ["list", "data-list", "table-advanced"],
+  "data-table": ["table"],
   "fieldset-context": ["fieldset", "form"],
   "floating-owner": ["hover-card-portals", "dropdown", "menu", "select-layout"],
   "form-store": ["form"],

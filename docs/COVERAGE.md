@@ -10,7 +10,7 @@ Reference groups 01–09, 11–12 are implemented. Group10 block editor was expl
 | Navigation      | Sidebar, NavItem, NavGroup, Tree, Breadcrumb, Tabs, Pagination |
 | Menus           | Menu, ContextMenu, Popover, Tooltip                                        |
 | Documents       | List, ListItem, DocumentList, DocumentCard, Card, Text, Divider                    |
-| Table           | Table                                                                              |
+| Tables          | Table (native display), DataTable (data-driven behavior)                           |
 | Status          | Tag (including filter variant), Status, Avatar, AvatarGroup, Progress, PropertyList, PropertyItem |
 | Dialogs         | Dialog, ConfirmDialog, Drawer                                                       |
 | Feedback        | Alert, ToastProvider, useToast, Empty, Skeleton, Spinner, Upload    |

@@ -123,7 +123,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 ## Navigation
 
 - [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): single-page frame with a required `title`, optional `headingLevel` (default 1), `icon`, `subtitle`, `actions`, `description`, `extra`, `tabs`, and body children. Pass a complete `Tabs` instance to render its own panels after the header, or omit `tabs` to leave no tab row. PageLayout does not manage navigation or tab state; it can sit inside `AdminLayout.Content`. Compose a page-local `Sidebar` through the optional `sidebar` slot. `sidebarPosition="left"` (default) or `"right"` picks a physical side; `headerSpan="full"` (default) spans both columns with the header and tabs; `"header"` spans both columns with the header only, leaving tabs and body in the main column; `"main"` keeps the header and tabs in the main column. The header includes the title, icon, subtitle, actions, description and extra content. `maxWidth` constrains both columns. At an available width of 640px or more the sidebar defaults to 240px (override with `--mt-page-layout-sidebar-width`, up to half the layout width); below that it stacks before or after the main column in reading order. No sidebar leaves the single-column markup unchanged.
-- [Toolbar](https://xingjianxu.github.io/mtone/#/components/Toolbar) is a standalone layout for consumer controls, with optional `search`, `start`, and `end` ReactNode slots. `background="white"` (default) and `"gray"` pick theme-aware surfaces. It responds to its container: the search can take a full first row, while actions wrap and remain aligned to the logical end. Set an accessible name to get a labeled group; native Tab order stays search, start, end. Pass div props and a div ref, and use slots instead of `children`. Toolbar owns neither query nor actions and does not require Table, List, DataList or PageLayout.
+- [Toolbar](https://xingjianxu.github.io/mtone/#/components/Toolbar) is a standalone layout for consumer controls, with optional `search`, `start`, and `end` ReactNode slots. `background="white"` (default) and `"gray"` pick theme-aware surfaces. It responds to its container: the search can take a full first row, while actions wrap and remain aligned to the logical end. Set an accessible name to get a labeled group; native Tab order stays search, start, end. Pass div props and a div ref, and use slots instead of `children`. Toolbar owns neither query nor actions and does not require Table, DataTable, List, DataList or PageLayout.
 - AdminLayout: application shell; compose `AdminLayout.Sider`, `AdminLayout.Header`, `AdminLayout.Content`, and optional `AdminLayout.Footer`. The root `notice?: ReactNode` slot spans the shell above the sidebar and main column; keep the shell mounted for cross-route notices. This replaces `Layout` starting with 0.6.0, without a compatibility alias.
 - [Sidebar](https://xingjianxu.github.io/mtone/#/components/Sidebar?section=tabs) accepts optional `tabs: SidebarTabsOptions`: a readonly `items` list (unique `value`, renderable `label` and `content`, optional `disabled` and `icon`), plus `label` and `value` / `defaultValue` / `onValueChange`. Nonempty items replace ordinary children; otherwise Sidebar behaves as before. A compact 32px line tab uses a blue underline while NavItem keeps its neutral active background. In a bounded-height sidebar only the active panel's navigation scrolls, leaving identity, tabs and footer in place. Collapsing hides the tab strip and preserves active icon navigation; expanding restores the selected tab. Visited panels stay mounted. Tabs are local, not a routing API: use your own links or navigation state within each panel. `AdminLayout.Sider` forwards `tabs`; pass a `Sidebar` instance through `PageLayout.sidebar` if the navigation is page-local.
 - Sidebar, NavGroup(label), NavItem(active, icon, optional href and actions): layout and navigation. NavItem is a button by default; an href renders a native anchor with corresponding props and ref. Native anchor navigation is unchanged. Pass one or more `{ content, visibility? }` descriptors for independent trailing actions. Visibility can be `always` (default), `hover` (also keyboard focus or touch-only), or `active`. The collapsed icon rail hides actions; the full rows in a submenu popup retain them.
@@ -321,16 +321,30 @@ See [Progress examples and full API](https://xingjianxu.github.io/mtone/#/compon
 
 ## Table
 
+[Table](https://xingjianxu.github.io/mtone/#/components/Table) is a styled native `<table>` with no wrapper. Supply semantic children such as `caption`, `thead`, `tbody`, `tfoot`, `tr`, `th`, and `td`. `TableProps` extends native table attributes, and its ref is an `HTMLTableElement`. Three independent flags default to `false`: `bordered` adds the frame and cell grid, `striped` alternates the body row background, and `highlightOnHover` highlights a body row under the pointer. Default styling keeps subtle row dividers.
+
+```tsx
+<Table striped>
+  <caption>本周项目</caption>
+  <thead><tr><th scope="col">项目</th><th scope="col">进度</th></tr></thead>
+  <tbody><tr><th scope="row">组件文档整理</th><td>进行中</td></tr></tbody>
+</Table>
+```
+
+Table does not accept a data source or column configuration and does not implement sorting, filtering, selection, or pagination. Use [DataTable](https://xingjianxu.github.io/mtone/#/components/DataTable) for those behaviors.
+
+## DataTable
+
 ### Version scope
 
-This section describes the Table API introduced in **0.3.0**. Version 0.2.0 contains only the legacy API below. The [live documentation](https://xingjianxu.github.io/mtone/#/components/Table) follows `master` and may be newer than npm; check the declarations bundled with your installed version.
+Current source exposes the advanced data-driven table as `DataTable`. Its features were previously exported as `Table` (the advanced API dates to 0.3.0 under that name). The [live documentation](https://xingjianxu.github.io/mtone/#/components/DataTable) follows `master` and may be newer than npm. Check your installed declarations and the [migration notes](MIGRATION.md#split-native-table-and-datatable) before changing imports.
 
-For external search, filtering or export, compose a standalone [Toolbar above the Table](https://xingjianxu.github.io/mtone/#/components/Table?section=toolbar). Keep the query, filters and actions in the application; neither component requires the other.
+For external search, filtering or export, compose a standalone [Toolbar above the DataTable](https://xingjianxu.github.io/mtone/#/components/DataTable?section=toolbar). Keep the query, filters and actions in the application; neither component requires the other.
 
 ### Basic usage (legacy API retained)
 
 ```tsx
-<Table
+<DataTable
   data={rows}
   rowKey="id"
   selectable
@@ -353,21 +367,21 @@ For external search, filtering or export, compose a standalone [Toolbar above th
 />
 ```
 
-### Current Table API
+### DataTable API
 
-- **Data and columns:** use `dataSource` (takes precedence) or legacy `data`, and `columns` or `Table.Column` / `Table.ColumnGroup` children. `rowKey` defaults to `"key"`; provide stable, unique string or number keys. Columns support nested `dataIndex` paths, grouped `children`, `render`, width/alignment, `hidden`, `responsive`, `ellipsis`, `fixed`, `onCell`, `onHeaderCell` and `shouldCellUpdate`. `column` supplies shared column defaults. Use `onCell` to supply `rowSpan` / `colSpan` for merged cells.
+- **Data and columns:** use `dataSource` (takes precedence) or legacy `data`, and `columns` or `DataTable.Column` / `DataTable.ColumnGroup` children. `rowKey` defaults to `"key"`; provide stable, unique string or number keys. Columns support nested `dataIndex` paths, grouped `children`, `render`, width/alignment, `hidden`, `responsive`, `ellipsis`, `fixed`, `onCell`, `onHeaderCell` and `shouldCellUpdate`. `column` supplies shared column defaults. Use `onCell` to supply `rowSpan` / `colSpan` for merged cells.
 - **Sorting:** legacy `sortable` retains its simple behavior. `sorter` accepts a comparator or `{ compare, multiple }` for prioritized multi-column sorting. `sorter={true}` reports sorting intent rather than applying a local comparator. Use `sortOrder` / `defaultSortOrder` (`"ascend"`, `"descend"`, or `null`), `sortDirections`, `sortIcon` and `showSorterTooltip` for configuration.
 - **Filtering:** legacy `filterable` provides case-insensitive text containment. Modern column `filters` and `onFilter` support menu/tree options, search, multiple selection, controlled `filteredValue`, defaults and reset behavior. `filterDropdown` can render a custom panel using `selectedKeys`, `setSelectedKeys`, `confirm`, `clearFilters` and `close`.
 - **Selection:** legacy `selectable`, `selectedKeys` and `onSelectionChange` remain supported. `rowSelection` adds checkbox/radio selection, controlled/default keys, disabled rows, `checkStrictly={false}` tree association, `preserveSelectedRowKeys`, custom cells, callbacks and bulk actions. The default selection track stays compact on wide tables (32px for a standard checkbox or radio, 56px with the batch-action menu). Set `rowSelection.columnWidth` for wider custom headers or cells. Bulk actions use mtone's `Popover.Menu`, not a value-holding Select. The application remains responsible for deciding when retained keys should be removed.
 - **Pagination and remote data:** pagination is disabled by default. `pagination` supports controlled `page`/`current`, defaults, page size choices, quick jumping, totals, placement and callbacks. `manual` delegates sorting, filtering and paging to the application and does not reprocess supplied rows; supply the server total and controlled page.
-- **Tree and expansion:** `expandable` configures tree children, controlled/default expanded keys, detail rows, custom icons and expansion callbacks. Render another Table in expanded content for nested tables.
-- **Layout:** `scroll`, `sticky`, fixed columns, grouped headers, `size`, `bordered`, `showHeader`, `tableLayout`, row properties and custom `components` support richer layouts. `title`, `footer` and `summary` receive the current data; use `Table.Summary.Row` and `Table.Summary.Cell` for summary rows.
-- **Virtualization:** enable `virtual`, preferably with numeric `scroll.x` and `scroll.y`. Defaults are a 1000×400 virtual viewport and `virtualItemHeight={38}`. The ref exposes `nativeElement` and `scrollTo` for row/index/offset positioning. Use `<Table.Summary fixed>` for summary rows with virtual scrolling; non-fixed summaries are not rendered by the virtual body. Validate complex combinations and custom body components in the target application.
+- **Tree and expansion:** `expandable` configures tree children, controlled/default expanded keys, detail rows, custom icons and expansion callbacks. Render another DataTable in expanded content for nested tables.
+- **Layout:** `scroll`, `sticky`, fixed columns, grouped headers, `size`, `bordered`, `showHeader`, `tableLayout`, row properties and custom `components` support richer layouts. `title`, `footer` and `summary` receive the current data; use `DataTable.Summary.Row` and `DataTable.Summary.Cell` for summary rows.
+- **Virtualization:** enable `virtual`, preferably with numeric `scroll.x` and `scroll.y`. Defaults are a 1000×400 virtual viewport and `virtualItemHeight={38}`. The ref exposes `nativeElement` and `scrollTo` for row/index/offset positioning. Use `<DataTable.Summary fixed>` for summary rows with virtual scrolling; non-fixed summaries are not rendered by the virtual body. Validate complex combinations and custom body components in the target application.
 - **Presentation:** `loading` accepts a boolean or `{ spinning?, tip?, delay?, indicator? }`. Use `empty`, `locale`, `classNames` and `styles` for empty-state content, text and semantic styling.
 
 ### Events and compatibility
 
-The legacy `onChange(state)` remains unchanged: it receives `{ sort, filters, page, pageSize }`, with legacy sort directions `"asc"` / `"desc"`. Explicit `sort={null}` clears the controlled legacy sort. Use the new `onTableChange(pagination, filters, sorter, extra)` for modern array-valued filters, single/multiple sorter results and `extra.action` (`"paginate"`, `"sort"`, `"filter"`). Do not assign a four-argument handler to the legacy single-argument `onChange` prop.
+The legacy `onChange(state)` remains unchanged: it receives `{ sort, filters, page, pageSize }`, with legacy sort directions `"asc"` / `"desc"`. Explicit `sort={null}` clears the controlled legacy sort. Use `onTableChange(pagination, filters, sorter, extra)` for modern array-valued filters, single/multiple sorter results and `extra.action` (`"paginate"`, `"sort"`, `"filter"`). Do not assign a four-argument handler to the legacy single-argument `onChange` prop.
 
 `filterDropdownProps` supports only `open`, `onOpenChange`, `className` and `style`; sorter tooltip options support `title` and `target`; loading supports the fields listed above. Other popup, tooltip or loading-indicator props are not forwarded. Editing and row/column dragging are application compositions demonstrated in the live documentation, not automatic persistence or a spreadsheet engine. Column-width resizing is not built in. Exact current types are in `packages/mtone/src/table-types.ts` and the built declarations; use your installed package's declarations for a released version.
 

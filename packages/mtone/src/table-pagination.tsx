@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button, cn } from "./basic";
 import { Select } from "./interactive";
 import { PaginationControls } from "./pagination-controls";
-import type { TablePagination } from "./table-types";
+import type { DataTablePagination } from "./table-types";
 export function TablePaginationBar({
   config,
   total,
@@ -14,7 +14,7 @@ export function TablePaginationBar({
   className,
   style,
 }: {
-  config: TablePagination;
+  config: DataTablePagination;
   total: number;
   current: number;
   pageSize: number;

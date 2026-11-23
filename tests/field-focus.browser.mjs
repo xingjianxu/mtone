@@ -4,12 +4,12 @@ import assert from "node:assert/strict";
 const server=await createServer({root:process.cwd(),server:{host:"127.0.0.1",port:5195,strictPort:true},logLevel:"error"});await server.listen();let browser;
 try {browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:500,height:1600}});
 await page.goto("http://127.0.0.1:5195/tests/fixtures/field-focus.html");
-const specs=[['Input','.mt-input',1],['SearchInput','.mt-search',1],['Textarea','.mt-input',1],['Select','.mt-select',1],['Multiple Select','.mt-select-multiple',1],['NumberInput','.mt-number-group',1],['DatePicker','.mt-input',1],['Table','.mt-table-filter',1]];
+const specs=[['Input','.mt-input',1],['SearchInput','.mt-search',1],['Textarea','.mt-input',1],['Select','.mt-select',1],['Multiple Select','.mt-select-multiple',1],['NumberInput','.mt-number-group',1],['DatePicker','.mt-input',1],['DataTable','.mt-table-filter',1]];
 const measure=el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();return {size:[r.width,r.height],border:[s.borderTopWidth,s.borderRightWidth,s.borderBottomWidth,s.borderLeftWidth],padding:[s.paddingTop,s.paddingRight,s.paddingBottom,s.paddingLeft],color:s.borderTopColor,outline:s.outlineStyle};};
 for(const [name,selector] of specs){
  await page.goto('http://127.0.0.1:5195/tests/fixtures/field-focus.html');
  const section=page.locator(`[data-test-field="${name}"]`),surface=section.locator(selector),before=section.getByRole('button',{name:`Before ${name}`,exact:true});
- const target=name==='Table'?section.getByRole('textbox'):section.getByLabel(name,{exact:true});
+ const target=name==='DataTable'?section.getByRole('textbox'):section.getByLabel(name,{exact:true});
  await before.scrollIntoViewIfNeeded();await before.click();const normal=await surface.evaluate(measure);
  // Keyboard entry covers the first child for compound fields (chip/stepper).
  await page.keyboard.press('Tab');const keyboard=await surface.evaluate(measure);

@@ -27,6 +27,9 @@ const tests = [
   "tests/page-layout.test.tsx",
   "tests/secondary-demo-registry.test.tsx",
   "tests/targeted-ci.test.mjs",
+  "tests/table.test.tsx",
+  "tests/table-advanced.test.tsx",
+  "tests/table.browser.mjs",
   "tests/typography-languages.test.ts",
   "tests/typography-code.browser.mjs",
   "tests/tree-model.test.ts",
@@ -104,6 +107,14 @@ describe("Targeted CI selection", () => {
       expect(makePlan([path], tests).unit).toContain("tests/component-layout.test.tsx");
     },
   );
+
+  it("runs the existing advanced table suite when DataTable changes", () => {
+    const plan = makePlan(["packages/mtone/src/data-table.tsx"], tests);
+    expect(plan.unmatched).toEqual([]);
+    expect(plan.unit).toContain("tests/table-advanced.test.tsx");
+    expect(plan.browser).toContain("tests/table.browser.mjs");
+    expect(plan.packageSmoke).toBe(true);
+  });
 
   it("maps navigation and fixtures to their actual component/browser tests, not unrelated checks", () => {
     const plan = makePlan(

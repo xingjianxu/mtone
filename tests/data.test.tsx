@@ -8,19 +8,19 @@ import {
 } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import {
-  Table,
   Tree,
   DatePicker,
   Upload,
   Pagination,
 } from "../packages/mtone/src/data";
+import { DataTable } from "../packages/mtone/src/data-table";
 import { MtoneProvider } from "../packages/mtone/src/basic";
 afterEach(cleanup);
 const en = (x: React.ReactNode) =>
   render(<MtoneProvider locale="en">{x}</MtoneProvider>);
 test("table sorts filters selects and paginates locally", () => {
   en(
-    <Table
+    <DataTable
       data={[
         { id: "b", name: "Beta" },
         { id: "a", name: "Alpha" },
@@ -53,7 +53,7 @@ test("table sorts filters selects and paginates locally", () => {
 test("manual table reports sorting without reordering supplied rows", () => {
   const change = vi.fn();
   en(
-    <Table
+    <DataTable
       manual
       onChange={change}
       data={[
@@ -152,7 +152,7 @@ test("pagination disables boundary controls", () => {
 test("table preserves numeric row keys in selection", () => {
   const change = vi.fn();
   const { rerender } = en(
-    <Table
+    <DataTable
       data={[{ id: 1, name: "One" }]}
       rowKey="id"
       columns={[{ key: "name", title: "Name" }]}
@@ -168,7 +168,7 @@ test("table preserves numeric row keys in selection", () => {
   expect(change).toHaveBeenLastCalledWith([]);
   rerender(
     <MtoneProvider locale="en">
-      <Table
+      <DataTable
         data={[{ id: 1, name: "One" }]}
         rowKey="id"
         columns={[{ key: "name", title: "Name" }]}
@@ -190,7 +190,7 @@ test("explicit null clears a previously controlled table sort", () => {
     { key: "name", title: "Name", dataIndex: "name" as const, sortable: true },
   ];
   const { rerender } = en(
-    <Table
+    <DataTable
       data={data}
       rowKey="id"
       columns={columns}
@@ -200,7 +200,7 @@ test("explicit null clears a previously controlled table sort", () => {
   fireEvent.click(screen.getByRole("button", { name: "Name" }));
   rerender(
     <MtoneProvider locale="en">
-      <Table data={data} rowKey="id" columns={columns} sort={null} />
+      <DataTable data={data} rowKey="id" columns={columns} sort={null} />
     </MtoneProvider>,
   );
   expect(screen.getAllByRole("row")[1].textContent).toContain("Beta");
@@ -228,7 +228,7 @@ test("invalid upload cannot retry after locale changes", () => {
 });
 test("loading table preserves headers and announces loading", () => {
   en(
-    <Table
+    <DataTable
       loading
       data={[]}
       rowKey="id"

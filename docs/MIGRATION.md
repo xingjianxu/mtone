@@ -1,3 +1,22 @@
+# Changes on master after 0.12.0
+
+These changes are not in 0.12.0. Use the documentation for your installed release.
+
+## Split native Table and DataTable
+
+The old advanced `Table` is now named `DataTable`, with no compatibility alias for that old meaning of `Table`. When you use `dataSource` or legacy `data`, `columns`, row selection, pagination, virtualization, or any other advanced prop, switch the import and JSX to `DataTable`. Replace advanced types such as `TableProps<T>`, `TableColumn<T>`, and `TableRef` with `DataTableProps<T>`, `DataTableColumn<T>`, and `DataTableRef`; `SortOrder` becomes `DataTableSortOrder`. Use `DataTable.Column`, `DataTable.ColumnGroup`, `DataTable.Summary`, and constants such as `DataTable.EXPAND_COLUMN` and `DataTable.SELECTION_COLUMN`. Existing behavior, advanced CSS selectors and callback prop names such as `onTableChange` are unchanged.
+
+```tsx
+import { DataTable, type DataTableColumn } from "@bixlab/mtone";
+
+const columns: DataTableColumn<{ id: string; name: string }>[] = [
+  { title: "项目", dataIndex: "name" },
+];
+const projects = <DataTable rowKey="id" columns={columns} dataSource={[{ id: "p1", name: "组件文档整理" }]} />;
+```
+
+The new `Table` is for native JSX cells, not data-driven props. Its `TableProps` are non-generic native table props plus `bordered`, `striped`, and `highlightOnHover`. See the separate [Table](https://xingjianxu.github.io/mtone/#/components/Table) and [DataTable](https://xingjianxu.github.io/mtone/#/components/DataTable) examples.
+
 # Upgrade notes for 0.12.0
 
 Start with the Select migration when upgrading from 0.11.1 to 0.12.0. The later sections also cover earlier releases.

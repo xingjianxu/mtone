@@ -18,7 +18,7 @@ import { standaloneTypographySections, focusTypographySection, isTypographySecti
 import { componentSectionHref, focusDocSection, type DocSection, type OutlineEntry } from "./doc-section";
 import { inputDocSections } from "./input-demos";
 import { buttonDocSections } from "./button-demos";
-import { tableDocSections } from "./table-example";
+import { dataTableDocSections } from "./table-example";
 import { dataListDocSections } from "./data-list-demos";
 import { secondaryDocSections } from "./secondary-demo-registry";
 import { inlineDocSections } from "./inline-demo-registry";
@@ -97,7 +97,7 @@ export const docSections: Record<string, readonly DocSection[]> = {
   ...aiDocSections,
   Input: inputDocSections,
   Button: buttonDocSections,
-  Table: tableDocSections,
+  DataTable: dataTableDocSections,
   DataList: dataListDocSections,
 };
 

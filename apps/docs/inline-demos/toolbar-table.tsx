@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Download, Plus } from "lucide-react";
-import { Button, Input, Popover, Status, Table, Toolbar } from "../../../packages/mtone/src";
+import { Button, Input, Popover, Status, DataTable, Toolbar } from "../../../packages/mtone/src";
 
 const initialProjects = [
   { id: 1, name: "组件文档整理", owner: "林杉", status: "进行中", updated: "11月22日" },
@@ -44,7 +44,7 @@ export default function Demo() {
           <Button variant="solid" leftSection={<Plus size={16} aria-hidden="true" />} onClick={addProject}>新建</Button>
         </>}
       />
-      <Table
+      <DataTable
         style={{ border: 0, borderRadius: 0 }}
         rowKey="id"
         rowSelection={{}}

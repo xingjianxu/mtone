@@ -3,10 +3,10 @@ import { ChevronDown } from "lucide-react";
 import { INTERNAL_COL_DEFINE } from "@rc-component/table";
 import { Popover } from "./interactive";
 import type {
-  TableColumn,
-  TableLocale,
-  TableRowSelection,
-  TableSelectionType,
+  DataTableColumn,
+  DataTableLocale,
+  DataTableRowSelection,
+  DataTableSelectionType,
 } from "./table-types";
 
 type Options<T> = {
@@ -14,12 +14,12 @@ type Options<T> = {
   pageData: T[];
   getRowKey: (row: T) => React.Key;
   childrenColumnName: string;
-  rowSelection?: TableRowSelection<T>;
+  rowSelection?: DataTableRowSelection<T>;
   selectedKeys?: React.Key[];
   selectable?: boolean;
   onSelectionChange?: (keys: React.Key[]) => void;
   zh: boolean;
-  locale?: TableLocale;
+  locale?: DataTableLocale;
 };
 type Node<T> = {
   key: React.Key;
@@ -42,7 +42,7 @@ export function useTableSelection<T>({
   zh,
   locale = {},
 }: Options<T>): {
-  column: TableColumn<T> | null;
+  column: DataTableColumn<T> | null;
   compactWidth?: number;
   selectedKeys: React.Key[];
 } {
@@ -152,7 +152,7 @@ export function useTableSelection<T>({
     keys
       .map((key) => map.get(key)?.row ?? recordCache.current.get(key))
       .filter((row): row is T => row !== undefined);
-  const apply = (next: Set<React.Key>, type: TableSelectionType) => {
+  const apply = (next: Set<React.Key>, type: DataTableSelectionType) => {
     const result = [...conduct(next).checked].filter(
       (key) => preserve || map.has(key),
     );

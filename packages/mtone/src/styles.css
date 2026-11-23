@@ -42,7 +42,8 @@
 .mt-card,
 .mt-tag,
 .mt-list,
-.mt-table-wrap {
+.mt-table-wrap,
+.mt-native-table {
   font-family:
     Inter,
     -apple-system,

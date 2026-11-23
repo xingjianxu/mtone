@@ -1,3 +1,5 @@
+import TableNative from "./inline-demos/table-native";
+import TableNativeSource from "./inline-demos/table-native.tsx?raw";
 import ToolbarStandalone from "./inline-demos/toolbar-standalone";
 import ToolbarStandaloneSource from "./inline-demos/toolbar-standalone.tsx?raw";
 import ToolbarTable from "./inline-demos/toolbar-table";
@@ -345,6 +347,15 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example9_0,
       source: source(Example9_0Raw),
+    },
+  ],
+  Table: [
+    {
+      id: "basic",
+      title: "原生表格",
+      note: "直接编写 caption、thead、tbody、tr、th 和 td。需要排序、分页或选择时，使用 DataTable。",
+      Demo: TableNative,
+      source: source(TableNativeSource),
     },
   ],
   Toolbar: [

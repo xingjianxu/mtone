@@ -100,7 +100,7 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Form, Card, CardGroup, Splitter, Table, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
+import { MtoneProvider, MtoneScope, Input, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Form, Card, CardGroup, Splitter, Table, DataTable, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Dropdown'));
@@ -162,13 +162,19 @@ assert(renderToStaticMarkup(createElement(Mentions, {defaultValue:'Hi @alice', o
 assert.deepEqual(getMentions('@alice'), [{prefix:'@',value:'alice'}]);
 assert(CardGroup.Item);
 assert.match(renderToStaticMarkup(createElement(CardGroup, {columns:{xs:1,md:3},divided:true},createElement(CardGroup.Item,{span:2},createElement(Card,{collapsible:true,defaultCollapsed:true},"Mounted")))), /aria-expanded="false"/);
-assert(Card.Meta && Card.Grid && Splitter.Panel && Table.Column && Table.ColumnGroup && Table.Summary);
+assert(Card.Meta && Card.Grid && Splitter.Panel && DataTable.Column && DataTable.ColumnGroup && DataTable.Summary);
+const nativeTable = renderToStaticMarkup(createElement(Table, {striped: true},
+  createElement('caption', null, 'Native release table'),
+  createElement('tbody', null, createElement('tr', null, createElement('td', {colSpan: 2}, 'Merged cell')))));
+assert.match(nativeTable, /^<table[^>]*>/);
+assert(nativeTable.includes('<caption>Native release table</caption>') && nativeTable.includes('<td colSpan="2">Merged cell</td>'));
+assert(!Object.hasOwn(Table, 'Summary'));
 for (const virtual of [false, true]) {
-  const tableHtml = renderToStaticMarkup(createElement(Table, {
+  const tableHtml = renderToStaticMarkup(createElement(DataTable, {
     dataSource: [{key:1, name:'release-row'}],
     columns: [{key:'name',dataIndex:'name',title:'Name'}],
     virtual, scroll: {x:500,y:200},
-    summary: () => createElement(Table.Summary, {fixed: true}, createElement(Table.Summary.Row, null, createElement(Table.Summary.Cell, {index:0}, 'Summary'))),
+    summary: () => createElement(DataTable.Summary, {fixed: true}, createElement(DataTable.Summary.Row, null, createElement(DataTable.Summary.Cell, {index:0}, 'Summary'))),
   }));
   assert(tableHtml.includes('release-row'));
   assert(tableHtml.includes('Summary'), 'Summary should render for virtual=' + virtual);
@@ -185,7 +191,7 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, type PopoverMenuProps, Typography, Text, Title, Paragraph, Link, Menu, type MenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, ToastProvider, useToast, Form, Input, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
+    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, type PopoverMenuProps, Typography, Text, Title, Paragraph, Link, Menu, type MenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, ToastProvider, useToast, Form, Input, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableProps, DataTable, type DataTableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
 // @ts-expect-error The former component and its props are no longer exported.
 import { Layout, type LayoutProps } from '@bixlab/mtone';
 // @ts-expect-error There is no old standalone Dropdown alias or type.
@@ -286,8 +292,13 @@ export const autoCompleteDemo = <AutoComplete options={[{value:"a"}]} onChange={
 const mentionsRef = createRef<MentionsRef>();
 export const mentionDemo = <Mentions ref={mentionsRef} prefix={["@","#"]} options={[{value:"alice"}]} onChange={value=>value.toUpperCase()} onSelect={(option,prefix)=>console.log(option.value,prefix)} autoSize={{minRows:2,maxRows:5}} />;
 mentionsRef.current?.focus();
-const tableRef = createRef<TableRef>();
-export const tableDemo = <Table<{key:number;name:string}> ref={tableRef} dataSource={[{key:1,name:'Release'}]} columns={[{key:'name',dataIndex:'name',title:'Name',sorter:(a,b)=>a.name.localeCompare(b.name)}]} rowSelection={{onChange:(keys,rows)=>rows.map(row=>row.name)}} pagination={{pageSize:10}} onTableChange={(page,filters,sorter,extra)=>console.log(extra.action)} />;
+const nativeTableRef = createRef<HTMLTableElement>();
+const nativeTableProps: TableProps = {bordered:true, striped:true, highlightOnHover:true, 'aria-label':'Native table'};
+export const simpleTableDemo = <Table {...nativeTableProps} ref={nativeTableRef}><tbody><tr><td colSpan={2}>Merged</td></tr></tbody></Table>;
+// @ts-expect-error Basic Table accepts native markup, not the data-driven API.
+export const invalidTable = <Table columns={[]} dataSource={[]}/>;
+const tableRef = createRef<DataTableRef>();
+export const tableDemo = <DataTable<{key:number;name:string}> ref={tableRef} dataSource={[{key:1,name:'Release'}]} columns={[{key:'name',dataIndex:'name',title:'Name',sorter:(a,b)=>a.name.localeCompare(b.name)}]} rowSelection={{onChange:(keys,rows)=>rows.map(row=>row.name)}} pagination={{pageSize:10}} onTableChange={(page,filters,sorter,extra)=>console.log(extra.action)} />;
 tableRef.current?.scrollTo({index:0});
 export const action = () => useToast().success({title:'Saved', body:'Ready', position:'top-right'});
 `,

@@ -4,8 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
 import { useTableSelection } from "../packages/mtone/src/table-selection";
 import type {
-  TableRowSelection,
-  TableLocale,
+  DataTableRowSelection,
+  DataTableLocale,
 } from "../packages/mtone/src/table-types";
 type Row = { id: number; disabled?: boolean; children?: Row[] };
 const data: Row[] = [{ id: 1 }, { id: 2, disabled: true }, { id: 3 }];
@@ -19,10 +19,10 @@ function Harness({
 }: {
   rows?: Row[];
   page?: Row[];
-  selection?: TableRowSelection<Row>;
+  selection?: DataTableRowSelection<Row>;
   selectedKeys?: React.Key[];
   legacyChange?: (keys: React.Key[]) => void;
-  locale?: TableLocale;
+  locale?: DataTableLocale;
 }) {
   const result = useTableSelection({
     data: rows,

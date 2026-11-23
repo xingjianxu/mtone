@@ -10,7 +10,7 @@ This is the rendered outer **border-box**, including borders, rather than a chil
 | Input, Input.Search, DatePicker input | 32px |
 | Single Select, TreeSelect, Cascader and AutoComplete trigger/input | 32px |
 | NumberInput complete group | 32px |
-| Table column filter input | 32px |
+| DataTable column filter input | 32px |
 | Select chips/input container (`mode="multiple"` or `"tags"`) | minimum 32px |
 | Tag with `variant="filter"` | 32px |
 | TagSelect option, expansion trigger and collapsed viewport | 32px |

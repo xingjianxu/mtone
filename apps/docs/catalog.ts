@@ -30,7 +30,7 @@ const taxonomy = {
   ],
   "数据展示": [
     "Card", "CardGroup", "List", "ListItem", "DataList",
-    "DocumentList", "DocumentCard", "Table", "Tree",
+    "DocumentList", "DocumentCard", "Table", "DataTable", "Tree",
     "PropertyList", "PropertyItem", "Image", "ImageGroup", "ImagePreview",
     "Avatar", "AvatarGroup", "Tag", "Calendar", "Timeline",
   ],
@@ -881,7 +881,7 @@ export default function Demo() {
     }
   ],
   "notes": [
-    "支持受控和非受控，未内置 Tree/Table 适配器，可通过 renderList 自行连接。",
+    "支持受控和非受控，未内置 Tree/DataTable 适配器，可通过 renderList 自行连接。",
     "key 必须唯一且稳定。items 应包含两侧完整记录；未知 targetKeys 保留以支持外部数据更新。",
     "搜索和分页不会清除隐藏选择，移动按钮移动该侧所有选中可用项，不仅当前页。分页全选仅当前页；不提供反选菜单或虚拟化。",
     "键盘使用原生/本库复选框 Tab 与空格，操作按钮 Enter/空格；不使用伪 listbox 组合键。",
@@ -2212,7 +2212,7 @@ export default function Demo() {
     ],
     notes: [
       "响应自己的容器宽度，而不是只看视口。start 和 end 使用逻辑方向，RTL 自动镜像。",
-      "只负责布局；不执行搜索、过滤、数据更新或快捷键，也不接管 Tab 顺序。表格、列表、普通页面的状态由应用各自管理，不要求与 DataList 或 Table 绑定。",
+      "只负责布局；不执行搜索、过滤、数据更新或快捷键，也不接管 Tab 顺序。表格、列表、普通页面的状态由应用各自管理，不要求与 DataList、Table 或 DataTable 绑定。",
     ],
   },
   {
@@ -4868,10 +4868,26 @@ export default function Demo() {
   },
   {
     name: "Table",
+    description: "使用原生 HTML 表格结构的基础展示表格。",
+    importNames: ["Table"],
+    code: 'import { Table } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Table striped>\n      <caption>本周项目</caption>\n      <thead><tr><th scope="col">项目</th><th scope="col">进度</th></tr></thead>\n      <tbody><tr><th scope="row">组件文档整理</th><td>进行中</td></tr></tbody>\n    </Table>\n  );\n}',
+    props: [
+      { name: "bordered", type: "boolean", default: "false", description: "显示外框与单元格网格线；不开启时仍保留轻量行分隔线。" },
+      { name: "striped", type: "boolean", default: "false", description: "为 tbody 的行添加隔行底色。" },
+      { name: "highlightOnHover", type: "boolean", default: "false", description: "指针悬停于正文行时高亮该行。" },
+      { name: "原生属性 / ref", type: "TableProps / HTMLTableElement", description: "支持原生 table 属性和 ref，根元素就是 table。用 caption、thead、tbody、tfoot、tr、th、td 描述结构。" },
+    ],
+    notes: [
+      "保持浏览器原生表格语义；需要时用 caption 或 aria-label 命名，并在 th 上指定 scope。组件不内置排序、过滤、分页和选择。",
+      "需要列配置、数据源、选择、筛选、分页、展开或虚拟滚动时，请使用 DataTable。",
+    ],
+  },
+  {
+    name: "DataTable",
     description:
       "保留 mtone 紧凑风格的数据表格，支持高级排序筛选、选择、展开、固定布局与虚拟滚动。",
-    importNames: ["Table"],
-    code: 'import { Table } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Table dataSource={[{key:1,title:"设计规范",score:90},{key:2,title:"研究笔记",score:75}]} columns={[{key:"title",title:"标题",dataIndex:"title"},{key:"score",title:"完成度",dataIndex:"score",sorter:(a,b)=>a.score-b.score}]} rowSelection={{}} pagination={{defaultPageSize:10}} />;\n}',
+    importNames: ["DataTable"],
+    code: 'import { DataTable } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <DataTable dataSource={[{key:1,title:"设计规范",score:90},{key:2,title:"研究笔记",score:75}]} columns={[{key:"title",title:"标题",dataIndex:"title"},{key:"score",title:"完成度",dataIndex:"score",sorter:(a,b)=>a.score-b.score}]} rowSelection={{}} pagination={{defaultPageSize:10}} />;\n}',
     props: [
       {
         name: "data / dataSource",
@@ -4881,9 +4897,9 @@ export default function Demo() {
       },
       {
         name: "columns / children",
-        type: "TableColumn<T>[] / ReactNode",
+        type: "DataTableColumn<T>[] / ReactNode",
         description:
-          "列定义或 Table.Column / Table.ColumnGroup JSX。列支持嵌套 dataIndex、children 分组、render、width/minWidth、align、hidden、responsive、ellipsis、fixed、rowScope、shouldCellUpdate 和 onCell/onHeaderCell。",
+          "列定义或 DataTable.Column / DataTable.ColumnGroup JSX。列支持嵌套 dataIndex、children 分组、render、width/minWidth、align、hidden、responsive、ellipsis、fixed、rowScope、shouldCellUpdate 和 onCell/onHeaderCell。",
       },
       {
         name: "rowKey",
@@ -4893,7 +4909,7 @@ export default function Demo() {
       },
       {
         name: "column",
-        type: "Partial<TableColumn<T>>",
+        type: "Partial<DataTableColumn<T>>",
         description: "所有列的共享默认配置，单列配置优先。",
       },
       {
@@ -4916,31 +4932,31 @@ export default function Demo() {
       },
       {
         name: "columns[].filters / onFilter",
-        type: "TableFilterItem[] / (value, record) => boolean",
+        type: "DataTableFilterItem[] / (value, record) => boolean",
         description:
           "菜单或树形筛选项及本地匹配逻辑。支持 filterSearch、filterMultiple、filteredValue、defaultFilteredValue、filterResetToDefaultFilteredValue、filterOnClose。",
       },
       {
         name: "columns[].filterDropdown",
-        type: "ReactNode | (props: TableFilterDropdownProps) => ReactNode",
+        type: "ReactNode | (props: DataTableFilterDropdownProps) => ReactNode",
         description:
           "自定义筛选面板，使用 selectedKeys、setSelectedKeys、confirm、clearFilters、close 管理草稿；filterDropdownProps 支持 open/onOpenChange/className/style。",
       },
       {
         name: "rowSelection",
-        type: "TableRowSelection<T>",
+        type: "DataTableRowSelection<T>",
         description:
           "checkbox/radio、受控/默认选择、禁选、树关联、跨页保留、自定义选择菜单与渲染、选择回调；checkStrictly=false 开启父子关联。表头批量操作使用 Popover.Menu，而非保存字段值的 Select；支持重复执行命令、键盘导航与 Escape 关闭。标准 checkbox 和 radio 列默认保持约 32px；有批量操作菜单时为约 56px，表头和各行对齐。更宽的自定义表头或单元格可用 columnWidth 指定宽度。",
       },
       {
         name: "expandable",
-        type: "TableExpandableConfig<T>",
+        type: "DataTableExpandableConfig<T>",
         description:
-          "树字段、默认/受控展开键、expandedRowRender、展开图标、行点击展开、showExpandAll、forceRender、展开回调。详情中可嵌套 Table。树形展开箭头默认置于首个可见数据列，选择列保持表头与各行复选框对齐；子节点默认每层缩进 15px，可用 indentSize 调整；expandIconColumnIndex 可覆盖箭头位置。",
+          "树字段、默认/受控展开键、expandedRowRender、展开图标、行点击展开、showExpandAll、forceRender、展开回调。详情中可嵌套 DataTable。树形展开箭头默认置于首个可见数据列，选择列保持表头与各行复选框对齐；子节点默认每层缩进 15px，可用 indentSize 调整；expandIconColumnIndex 可覆盖箭头位置。",
       },
       {
         name: "pagination",
-        type: "false | TablePagination",
+        type: "false | DataTablePagination",
         description:
           "支持 page/current、默认页、页容量、total、showSizeChanger、showQuickJumper、hideOnSinglePage、simple、disabled、showTotal、itemRender、placement/position 和变化回调。每页条数选择器使用本库 Select，支持键盘选择、Escape 取消与禁用状态，切换条数后回到第一页。",
         default: "false",
@@ -4962,11 +4978,11 @@ export default function Demo() {
         name: "title / footer / summary",
         type: "(currentData: T[]) => ReactNode",
         description:
-          "顶部、底部和汇总内容。Table.Summary、Row、Cell 可组成汇总表格；virtual 模式需设置 Table.Summary fixed。",
+          "顶部、底部和汇总内容。DataTable.Summary、Row、Cell 可组成汇总表格；virtual 模式需设置 DataTable.Summary fixed。",
       },
       {
         name: "components / onRow / onHeaderRow",
-        type: "TableComponents / function / function",
+        type: 'DataTableProps<T>["components"] / function / function',
         description:
           "替换表格结构或配置行属性。编辑、拖拽、额外工具提示属于应用组合，不是自动持久化功能。",
       },
@@ -4984,13 +5000,13 @@ export default function Demo() {
       },
       {
         name: "empty / locale",
-        type: "ReactNode / TableLocale",
+        type: "ReactNode / DataTableLocale",
         description:
           "自定义空态与筛选、排序、展开和选择文字（含 selectRow、selectionAll、selectionActions）；默认跟随 MtoneProvider 语言。",
       },
       {
         name: "classNames / styles",
-        type: "TableClassNames | function / TableStyles | function",
+        type: "DataTableClassNames | function / DataTableStyles | function",
         description:
           "支持 root、section、title、footer、content、pagination，以及 body/header 下的 wrapper、row、cell；className/style 配置外层。",
       },
@@ -5001,7 +5017,7 @@ export default function Demo() {
       },
       {
         name: "ref",
-        type: "TableRef",
+        type: "DataTableRef",
         description:
           "nativeElement 与 scrollTo({key?, index?, top?, offset?, align?})。虚拟模式不支持 center 对齐。",
       },
@@ -5020,7 +5036,7 @@ export default function Demo() {
       },
       {
         name: "onChange",
-        type: "(state: TableState) => void",
+        type: "(state: DataTableState) => void",
         description:
           "保留旧单参数回调。state 包含 sort、文本 filters、page、pageSize；高级筛选请用 onTableChange。",
       },
@@ -5037,9 +5053,9 @@ export default function Demo() {
       },
     ],
     notes: [
-      "需要搜索、筛选或导出时，可在 Table 上方放置独立的 Toolbar。示例的交互由应用控制，不增加 Table 属性。",
+      "需要搜索、筛选或导出时，可在 DataTable 上方放置独立的 Toolbar。示例的交互由应用控制，不增加 DataTable 属性。",
       "旧 onChange(state)、pagination=false 默认值和文本筛选继续保留；高级事件使用 onTableChange。",
-      "Table.EXPAND_COLUMN / Table.SELECTION_COLUMN 控制特殊列顺序；Table.SELECTION_ALL / SELECTION_INVERT / SELECTION_NONE 可用于选择菜单。",
+      "DataTable.EXPAND_COLUMN / DataTable.SELECTION_COLUMN 控制特殊列顺序；DataTable.SELECTION_ALL / SELECTION_INVERT / SELECTION_NONE 可用于选择菜单。",
       "列 onCell 返回 rowSpan/colSpan 可合并单元格，0 隐藏被合并的单元格；固定列需要合理宽度和足够的横向滚动空间。",
       "菜单筛选需提供 onFilter 才执行本地匹配；旧 filterable 为不区分大小写的文本包含匹配。多列 sorter.multiple 值较大者优先。",
       "编辑单元格、整行编辑、行列拖拽和自定义提示通过 render/onCell/onRow/onHeaderCell/components 组合；示例使用本地状态，不包含网络请求、自动保存、校验框架或拖拽库。列宽调整不是内置能力。",

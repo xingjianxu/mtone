@@ -1,28 +1,28 @@
-import type { TableColumn, TableFilters, SortOrder } from "./table-types";
-export type SortState = { key: string; order: Exclude<SortOrder, null> };
-export const getColumnKey = <T>(c: TableColumn<T>, index: number): string =>
+import type { DataTableColumn, DataTableFilters, DataTableSortOrder } from "./table-types";
+export type SortState = { key: string; order: Exclude<DataTableSortOrder, null> };
+export const getColumnKey = <T>(c: DataTableColumn<T>, index: number): string =>
   String(
     c.key ??
       (Array.isArray(c.dataIndex) ? c.dataIndex.join(".") : c.dataIndex) ??
       index,
   );
-export const getValue = <T>(row: T, c: TableColumn<T>): unknown => {
+export const getValue = <T>(row: T, c: DataTableColumn<T>): unknown => {
   const path = c.dataIndex ?? c.key;
   return (Array.isArray(path) ? path : [path]).reduce<any>(
     (v, k) => v?.[k as any],
     row,
   );
 };
-export function flattenColumns<T>(columns: TableColumn<T>[]): TableColumn<T>[] {
+export function flattenColumns<T>(columns: DataTableColumn<T>[]): DataTableColumn<T>[] {
   return columns.flatMap((c) =>
     c.children ? flattenColumns(c.children) : [c],
   );
 }
 export function processTableData<T>(
   data: T[],
-  columns: TableColumn<T>[],
+  columns: DataTableColumn<T>[],
   sorts: SortState[],
-  filters: TableFilters,
+  filters: DataTableFilters,
   textFilters: Record<string, string>,
   manual: boolean,
   childrenName = "children",
