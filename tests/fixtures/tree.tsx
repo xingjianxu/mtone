@@ -4,6 +4,8 @@ import {
   Tree,
   MtoneProvider,
   Button,
+  NavGroup,
+  NavItem,
   type TreeItem,
   type TreeRef,
 } from "../../packages/mtone/src";
@@ -31,6 +33,8 @@ function App() {
         <Tree
           label="Checked"
           items={basic}
+          multiple
+          defaultSelectedKeys={["a", "b"]}
           checkable
           defaultExpandAll
           showLine
@@ -67,6 +71,9 @@ function App() {
           ref={ref}
           label="Virtual"
           height={150}
+          itemHeight={34}
+          multiple
+          defaultSelectedKeys={["900", "901"]}
           items={Array.from({ length: 1000 }, (_, i) => ({
             id: String(i),
             label: `Node ${i}`,
@@ -76,6 +83,10 @@ function App() {
           label="Long"
           items={[{ id: "long", label: "LongLabel".repeat(80) }]}
         />
+        <NavGroup label="Navigation spacing">
+          <NavItem href="#alpha">Navigation Alpha</NavItem>
+          <NavItem href="#beta">Navigation Beta</NavItem>
+        </NavGroup>
       </main>
     </MtoneProvider>
   );

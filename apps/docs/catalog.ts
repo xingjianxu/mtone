@@ -3692,7 +3692,7 @@ export default function Demo() {
         name: "height / itemHeight / virtual",
         type: "number / number / boolean",
         description:
-          "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px；virtual=false 保留滚动容器但渲染全部节点。",
+          "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px，不含与 NavGroup 一致的 3px 行间距；virtual=false 保留滚动容器但渲染全部节点。",
         default: "— / 30 / true",
       },
       {

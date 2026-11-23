@@ -1703,7 +1703,7 @@ export default function Demo() {
 - loadData: (node: TreeItem) => Promise<unknown>. 展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。
 - loadedKeys / defaultLoadedKeys: TreeKey[]. 受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。
 - onLoad / onLoadError: (keys, { node }) => void / (error, node) => void. 加载成功或失败回调。失败显示错误提示并允许通过展开控件重试。
-- height / itemHeight / virtual: number / number / boolean (default: — / 30 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px；virtual=false 保留滚动容器但渲染全部节点。
+- height / itemHeight / virtual: number / number / boolean (default: — / 30 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px，不含与 NavGroup 一致的 3px 行间距；virtual=false 保留滚动容器但渲染全部节点。
 - draggable: boolean | (node: TreeItem) => boolean (default: false). 启用 HTML 原生拖放，可按节点决定是否允许拖动。
 - allowDrop: ({ dragNode, dropNode, dropPosition }) => boolean. 可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。
 - onDrop: (info: TreeDropInfo) => void. info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap。应用按结果更新数据，组件不自动移动节点。

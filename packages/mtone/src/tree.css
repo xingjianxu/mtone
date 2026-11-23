@@ -8,6 +8,9 @@
   min-width: 0;
   gap: 6px;
 }
+.mt-tree > .mt-tree-item + .mt-tree-item {
+  margin-block-start: var(--_mt-tree-row-gap);
+}
 .mt-tree-toggle {
   width: 16px;
   height: 20px;
@@ -80,7 +83,7 @@
 .mt-tree-guide {
   pointer-events: none;
   position: absolute;
-  top: 0;
+  top: calc(-1 * var(--_mt-tree-row-gap));
   bottom: 0;
   width: 20px;
   border-inline-start: 1px solid var(--mt-border, #ddd);
@@ -90,7 +93,9 @@
   position: absolute;
   inset-inline-start: 0;
   width: 14px;
-  top: 50%;
+  /* Keep the branch on the row center after extending the trunk through
+   * the preceding gap. */
+  top: calc(50% + var(--_mt-tree-row-gap) / 2);
   border-top: 1px solid var(--mt-border, #ddd);
 }
 .mt-tree-guide-last {

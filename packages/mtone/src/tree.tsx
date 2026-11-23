@@ -20,6 +20,11 @@ import {
   toggleTreeCheck,
   expandTreeParents,
 } from "./tree-model";
+
+// Match the spacing of adjacent NavGroup rows without changing the height of
+// the interactive row. Keep the CSS and virtual scroll stride in sync.
+const TREE_ROW_GAP = 3;
+
 export type { TreeItem, TreeKey, TreeNode } from "./tree-types";
 export type TreeCheckedKeys =
   TreeKey[] | { checked: TreeKey[]; halfChecked: TreeKey[] };
@@ -295,6 +300,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     Number.isFinite(itemHeight) && itemHeight > 0
       ? Math.max(24, itemHeight)
       : 30;
+  const rowStride = rowHeight + TREE_ROW_GAP;
   const viewport =
     typeof height === "number" && Number.isFinite(height) && height > 0
       ? height
@@ -303,11 +309,11 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
   const start = isVirtual
     ? Math.max(
         0,
-        Math.min(visible.length - 1, Math.floor(scrollTop / rowHeight) - 3),
+        Math.min(visible.length - 1, Math.floor(scrollTop / rowStride) - 3),
       )
     : 0;
   const end = isVirtual
-    ? Math.min(visible.length, start + Math.ceil(viewport! / rowHeight) + 7)
+    ? Math.min(visible.length, start + Math.ceil(viewport! / rowStride) + 7)
     : visible.length;
   const selectedAnchor = React.useRef<TreeKey | undefined>(undefined);
   const pendingFocus = React.useRef<TreeKey | undefined>(undefined);
@@ -390,7 +396,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     const el = root.current;
     if (!el || i < 0) return;
     if (isVirtual) {
-      const top = i * rowHeight,
+      const top = i * rowStride,
         bottom = top + rowHeight,
         view = viewport!;
       let next = el.scrollTop;
@@ -583,15 +589,16 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
       )}
       style={{
         ...style,
+        "--_mt-tree-row-gap": `${TREE_ROW_GAP}px`,
         ...(viewport ? { height: viewport, overflow: "auto" } : {}),
-      }}
+      } as React.CSSProperties}
       onScroll={(e) => {
         setScrollTop(e.currentTarget.scrollTop);
         onScroll?.(e);
       }}
       onKeyDown={onKeyDown}
     >
-      {isVirtual && <div aria-hidden style={{ height: start * rowHeight }} />}
+      {isVirtual && <div aria-hidden style={{ height: start * rowStride }} />}
       {visible
         .slice(start, end)
         .map(({ item: node, level, parent, posInSet, setSize }) => {
@@ -919,7 +926,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
       {isVirtual && (
         <div
           aria-hidden
-          style={{ height: Math.max(0, visible.length - end) * rowHeight }}
+          style={{ height: (visible.length - end) * rowStride }}
         />
       )}
     </div>
