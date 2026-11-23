@@ -91,8 +91,23 @@ try {
       split.body.bottom < split.side.y, JSON.stringify(split));
     await sidebarStage.getByRole("tab", { name: "交付记录" }).click();
     await expect(sidebarStage.getByRole("tabpanel", { name: "交付记录" })).toContainText("最近交付");
+
+    const adminStage = page.locator(".component-demo-stage").filter({
+      has: page.getByRole("heading", { name: "项目资料", exact: true, level: 3 }),
+    });
+    const content = adminStage.locator(".mt-layout-content");
+    const control = adminStage.getByRole("button", { name: "长内容" });
+    await expect(content.getByText("本周尚无新记录。")).toBeVisible();
+    const overflow = () => content.evaluate((element) => element.scrollHeight - element.clientHeight);
+    assert(await overflow() <= 1);
+    await control.click();
+    await expect(control).toHaveAttribute("aria-pressed", "true");
+    assert(await overflow() > 1);
+    await control.click();
+    await expect(content.getByText("本周尚无新记录。")).toBeVisible();
+    assert(await overflow() <= 1);
   }
-  console.log("PageLayout docs: centered and sidebar demos fit desktop/mobile; sidebar controls and tabs work");
+  console.log("PageLayout docs: centered and sidebar demos fit desktop/mobile; sidebar, tabs and AdminLayout content toggle work");
 } finally {
   await browser?.close();
   await server?.close();

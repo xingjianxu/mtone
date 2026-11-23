@@ -85,7 +85,35 @@ function SidebarFixture() {
   );
 }
 
+function AdminContentFixture() {
+  const query = new URLSearchParams(window.location.search);
+  const mode = query.get("admin-content");
+  const sidebar = !query.has("no-sidebar");
+  const layout = (
+    <PageLayout
+      data-testid="fill-page"
+      title="Project overview"
+      tabs={<Tabs items={[{ value: "today", label: "Today", content: "Daily activity" }]} />}
+      sidebar={sidebar ? <Sidebar aria-label="Departments">Design</Sidebar> : undefined}
+      maxWidth={840}
+    >
+      <div style={mode === "long" ? { minHeight: 680 } : undefined}>Project tasks</div>
+    </PageLayout>
+  );
+  if (mode === "standalone") return <div style={{ height: 430 }}>{layout}</div>;
+  return (
+    <AdminLayout fullHeight style={{ height: 430, "--mt-layout-header-height": "64px" } as React.CSSProperties}>
+      <AdminLayout.Header>Workspace</AdminLayout.Header>
+      <AdminLayout.Content data-testid="admin-content" style={{ padding: "12px 18px 20px" }}>
+        {mode === "multiple" ? <><p>Another block</p>{layout}</> :
+          mode === "wrapped" ? <div>{layout}</div> : layout}
+      </AdminLayout.Content>
+      {!query.has("no-footer") && <AdminLayout.Footer>Workspace footer</AdminLayout.Footer>}
+    </AdminLayout>
+  );
+}
+
 const query = new URLSearchParams(window.location.search);
 createRoot(document.getElementById("root")!).render(
-  query.has("sidebar") ? <SidebarFixture /> : query.has("max-width") ? <MaxWidthFixture /> : <Fixture />,
+  query.has("admin-content") ? <AdminContentFixture /> : query.has("sidebar") ? <SidebarFixture /> : query.has("max-width") ? <MaxWidthFixture /> : <Fixture />,
 );

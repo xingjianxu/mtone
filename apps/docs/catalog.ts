@@ -2194,6 +2194,7 @@ export default function Demo() {
     ],
     notes: [
       "maxWidth 同时约束页头、标签页、侧栏和正文，不影响外层 AdminLayout 的侧栏或顶栏。",
+      "当 PageLayout 是有可用高度的 AdminLayout.Content 中唯一的直接子元素时，默认至少撑满主内容区的内边距以内；宽屏的页面侧栏同步延伸到底部。长页仍由 AdminLayout.Content 滚动。独立使用、有额外包裹或与其他区块一起使用时，按内容高度布局。",
       "PageLayout 本身的可用宽度达到 640px 时左右分栏；侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 和 header 模式的页头始终在最上方。",
       "只负责单页布局，不管理侧栏折叠、独立滚动、标签状态、路由或应用导航。",
     ],

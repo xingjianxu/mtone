@@ -151,6 +151,52 @@ try {
       }
     }
   }
+  for (const [width, mode, options] of [
+    [1200, "short", ""], [1200, "short", "&no-sidebar&no-footer"],
+    [375, "short", ""], [1200, "long", ""],
+    [1200, "multiple", ""], [1200, "wrapped", ""], [1200, "standalone", ""],
+  ]) {
+    await page.setViewportSize({ width, height: 700 });
+    await page.goto(`http://127.0.0.1:5284/tests/fixtures/page-layout.html?admin-content=${mode}${options}`);
+    const root = page.getByTestId("fill-page");
+    await expect(root.getByText("Project tasks")).toBeVisible();
+    const result = await root.evaluate((layout) => {
+      const content = layout.closest(".mt-layout-content");
+      const rootBox = layout.getBoundingClientRect();
+      const host = content || layout.parentElement;
+      const style = getComputedStyle(host);
+      const available = host.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      const sidebar = layout.querySelector(".mt-sidebar");
+      const header = layout.querySelector(".mt-page-layout-header").getBoundingClientRect();
+      const tabs = layout.querySelector(".mt-page-layout-tabs").getBoundingClientRect();
+      if (content) content.scrollTop = 100;
+      return {
+        available, pageHeight: rootBox.height,
+        sideBottom: sidebar?.getBoundingClientRect().bottom,
+        pageBottom: layout.getBoundingClientRect().bottom,
+        tabGap: tabs.top - header.bottom,
+        hostOverflow: host.scrollHeight - host.clientHeight,
+        hostScroll: host.scrollTop,
+        ownOverflow: getComputedStyle(layout).overflowY,
+        documentScroll: window.scrollY,
+      };
+    });
+    const context = JSON.stringify({ width, mode, options, result });
+    assert.equal(result.tabGap, 16, context);
+    assert.equal(result.ownOverflow, "visible", context);
+    assert.equal(result.documentScroll, 0, context);
+    if (mode === "short") {
+      assert(Math.abs(result.pageHeight - result.available) < 1, context);
+      assert(result.hostOverflow <= 1, context);
+      if (width >= 640 && result.sideBottom !== undefined) {
+        assert(Math.abs(result.sideBottom - result.pageBottom) < 1, context);
+      }
+    } else if (mode === "long") {
+      assert(result.pageHeight > result.available && result.hostScroll > 0, context);
+    } else {
+      assert(result.pageHeight < result.available, context);
+    }
+  }
   assert.deepEqual(errors, []);
   console.log("PageLayout responsive geometry, dark theme, and live actions/tabs passed");
 } finally {

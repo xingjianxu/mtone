@@ -10,6 +10,17 @@
   max-inline-size: var(--mt-page-layout-max-width);
   margin-inline: auto;
 }
+/* The application shell already sizes and scrolls Content. Only a dedicated
+ * page uses its available block size; nested pages keep their natural height. */
+:where(.mt-layout > .mt-layout-content) > .mt-page-layout:only-child {
+  box-sizing: border-box;
+  min-block-size: 100%;
+  display: flex;
+  flex-direction: column;
+}
+:where(.mt-layout > .mt-layout-content) > .mt-page-layout:only-child > .mt-page-layout-columns {
+  flex: 1 0 auto;
+}
 .mt-page-layout-with-sidebar {
   container: mt-page-layout / inline-size;
 }
@@ -43,6 +54,16 @@
   }
   .mt-page-layout-sidebar {
     flex: 0 0 min(var(--mt-page-layout-sidebar-width, 240px), 50%);
+  }
+  :where(.mt-layout > .mt-layout-content) > .mt-page-layout:only-child
+    > .mt-page-layout-columns > .mt-page-layout-sidebar {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+  :where(.mt-layout > .mt-layout-content) > .mt-page-layout:only-child
+    > .mt-page-layout-columns > .mt-page-layout-sidebar > .mt-sidebar {
+    flex: 1 0 auto;
   }
 }
 .mt-page-layout-header {
