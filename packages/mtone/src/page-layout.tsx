@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Sidebar, type SidebarProps } from "./navigation";
+import { SidebarResize, type SidebarResizeOptions } from "./sidebar-resize";
 
 const pageLayoutWidths = { sm: 720, md: 960, lg: 1200 } as const;
 
@@ -15,6 +17,7 @@ export interface PageLayoutProps
   sidebar?: React.ReactNode;
   /** Physical side of the main column when there is room. */
   sidebarPosition?: "left" | "right";
+  sidebarResize?: boolean | SidebarResizeOptions;
   /** Span both columns with the header and tabs ("full"), only the header
    * ("header"), or keep both in the main column ("main"). */
   headerSpan?: "full" | "header" | "main";
@@ -34,7 +37,7 @@ function hasContent(node: React.ReactNode): boolean {
 
 export function PageLayout({
   title, subtitle, icon, actions, description, extra, tabs, children,
-  sidebar, sidebarPosition = "left", headerSpan = "full",
+  sidebar, sidebarPosition = "left", sidebarResize, headerSpan = "full",
   headingLevel = 1, maxWidth, className, style, ...rootProps
 }: PageLayoutProps) {
   const Heading = `h${headingLevel}` as const;
@@ -74,7 +77,14 @@ export function PageLayout({
   );
   const tabsSlot = hasContent(tabs) && <div className="mt-page-layout-tabs">{tabs}</div>;
   const body = hasContent(children) && <div className="mt-page-layout-body">{children}</div>;
-  const sidebarSlot = showSidebar && <div className="mt-page-layout-sidebar">{sidebar}</div>;
+  const sidebarSlot = (content: React.ReactNode) => <div className="mt-page-layout-sidebar">{content}</div>;
+  const main = (
+    <div className="mt-page-layout-main">
+      {headerSpan === "main" && header}
+      {headerSpan !== "full" && tabsSlot}
+      {body}
+    </div>
+  );
 
   return (
     <div {...rootProps} className={rootClassName} style={rootStyle}>
@@ -82,13 +92,17 @@ export function PageLayout({
       {(!showSidebar || headerSpan === "full") && tabsSlot}
       {showSidebar ? (
         <div className="mt-page-layout-columns">
-          {sidebarPosition === "left" && sidebarSlot}
-          <div className="mt-page-layout-main">
-            {headerSpan === "main" && header}
-            {headerSpan !== "full" && tabsSlot}
-            {body}
-          </div>
-          {sidebarPosition === "right" && sidebarSlot}
+          {sidebarResize ? (
+            <SidebarResize layout="page" options={sidebarResize} sidebar={sidebar}
+              collapsibleSidebar={React.isValidElement<SidebarProps>(sidebar) && sidebar.type === Sidebar ? sidebar : undefined}
+              wrapSidebar={sidebarSlot} position={sidebarPosition === "left" ? "before" : "after"}>
+              {main}
+            </SidebarResize>
+          ) : <>
+            {sidebarPosition === "left" && sidebarSlot(sidebar)}
+            {main}
+            {sidebarPosition === "right" && sidebarSlot(sidebar)}
+          </>}
         </div>
       ) : body}
     </div>

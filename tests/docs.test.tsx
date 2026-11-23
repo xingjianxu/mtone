@@ -69,6 +69,18 @@ describe("documentation", () => {
     expect(panel).toContainElement(screen.getByRole("tree", { name: "文档目录" }));
     expect(screen.getByRole("treeitem", { name: "快速开始", selected: true })).toBeVisible();
   });
+  it("publishes separate examples for all three sidebar resize compositions", () => {
+    for (const [name, id, fragment] of [
+      ["Sidebar", "resize", "<Splitter.Panel"],
+      ["AdminLayout", "sidebar-resize", "sidebarResize="],
+      ["PageLayout", "sidebar-resize", "sidebarResize="],
+    ]) {
+      expect(parseRoute(`#/components/${name}?section=${id}`)).toEqual({ kind: "component", name, section: id });
+      const demo = docSections[name].find((item) => item.id === id);
+      expect(demo?.source).toContain('from "@bixlab/mtone"');
+      expect(demo?.source).toContain(fragment);
+    }
+  });
   it("shows explicit framed Toolbar composition in DataTable and DataList demos", () => {
     const table = docSections.DataTable.find(({ id }) => id === "toolbar")?.source;
     expect(table).toContain("toolbar={");

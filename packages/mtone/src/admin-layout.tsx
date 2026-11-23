@@ -1,10 +1,14 @@
 import * as React from "react";
 import { cn } from "./basic";
 import { Sidebar, type SidebarProps } from "./navigation";
+import { SidebarResize, type SidebarResizeOptions } from "./sidebar-resize";
+
+export type { SidebarResizeOptions } from "./sidebar-resize";
 
 export type AdminLayoutProps = React.HTMLAttributes<HTMLDivElement> & {
   hasSider?: boolean;
   fullHeight?: boolean;
+  sidebarResize?: boolean | SidebarResizeOptions;
   /** Optional banner above the sidebar and main area, outside their scroll regions. */
   notice?: React.ReactNode;
 };
@@ -141,28 +145,53 @@ function containsSider(children: React.ReactNode): boolean {
           ))),
   );
 }
+function collectLayoutChildren(children: React.ReactNode, path = ""): React.ReactNode[] {
+  return React.Children.toArray(children).flatMap((child, i) => {
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) return [child];
+    const key = `${path}/${child.key ?? i}`;
+    return child.type === React.Fragment
+      ? collectLayoutChildren(child.props.children, key)
+      : [React.cloneElement(child, { key })];
+  });
+}
 function AdminLayoutRoot({
   hasSider,
   fullHeight = false,
+  sidebarResize,
   className,
   children,
   notice,
   ...props
 }: AdminLayoutProps) {
   const showNotice = notice != null && typeof notice !== "boolean" && notice !== "";
+  const detectedSider = hasSider ?? containsSider(children);
+  const parts = sidebarResize && detectedSider ? collectLayoutChildren(children) : [];
+  const siders = parts.filter((child): child is React.ReactElement<AdminLayoutSiderProps> =>
+    React.isValidElement(child) && child.type === AdminLayoutSider);
+  const sider = siders.length === 1 ? siders[0] : undefined;
+  const resize = sidebarResize && sider;
   return (
     <div
       {...props}
       className={cn(
         "mt-layout",
-        (hasSider ?? containsSider(children)) && "mt-layout-has-sider",
+        detectedSider && "mt-layout-has-sider",
+        resize && "mt-layout-sidebar-resizable",
         fullHeight && "mt-layout-full-height",
         showNotice && "mt-layout-with-notice",
         className,
       )}
     >
       {showNotice && <div className="mt-layout-notice">{notice}</div>}
-      {children}
+      {resize ? (
+        <SidebarResize layout="admin" options={sidebarResize}
+          sidebar={sider} collapsibleSidebar={sider}
+          position={parts.indexOf(sider) === 0 ? "before" : "after"}
+          defaultWidth={Number.isFinite(sider.props.width) ? Math.max(40, sider.props.width!) : undefined}
+          collapsedWidth={Number.isFinite(sider.props.collapsedWidth) ? Math.max(40, sider.props.collapsedWidth!) : undefined}>
+          {parts.filter((child) => child !== sider)}
+        </SidebarResize>
+      ) : children}
     </div>
   );
 }

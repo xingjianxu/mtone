@@ -71,6 +71,8 @@ import SectionGroupUsage from "./inline-demos/section-group-usage";
 import SectionGroupUsageRaw from "./inline-demos/section-group-usage.tsx?raw";
 import SidebarSectionGroup from "./inline-demos/sidebar-section-group";
 import SidebarSectionGroupRaw from "./inline-demos/sidebar-section-group.tsx?raw";
+import SidebarResizeDemo from "./inline-demos/sidebar-resize";
+import SidebarResizeDemoRaw from "./inline-demos/sidebar-resize.tsx?raw";
 import Example11_0 from "./inline-demos/nav-group-usage";
 import Example11_0Raw from "./inline-demos/nav-group-usage.tsx?raw";
 import Example12_0 from "./inline-demos/nav-item-usage";
@@ -414,6 +416,13 @@ export const inlineDocSections: Readonly<
       title: "内容分区",
       Demo: SidebarSectionGroup,
       source: source(SidebarSectionGroupRaw),
+    },
+    {
+      id: "resize",
+      title: "与 Splitter 组合调宽",
+      note: "独立 Sidebar 不新增调宽属性。把它放进 Splitter.Panel，用分隔线或方向键调宽。",
+      Demo: SidebarResizeDemo,
+      source: source(SidebarResizeDemoRaw),
     },
   ],
   SectionGroup: [

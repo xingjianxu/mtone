@@ -2187,6 +2187,7 @@ export default function Demo() {
       { name: "tabs", type: "ReactNode", description: "可选，可传入完整 Tabs。省略时不占空间。" },
       { name: "sidebar", type: "ReactNode", description: "页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。" },
       { name: "sidebarPosition", type: '"left" | "right"', default: '"left"', description: "侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。" },
+      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。" },
       { name: "headerSpan", type: '"full" | "header" | "main"', default: '"full"', description: "full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。" },
       { name: "maxWidth", type: '"sm" | "md" | "lg" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
       { name: "children", type: "ReactNode", description: "正文。" },
@@ -2195,7 +2196,7 @@ export default function Demo() {
     notes: [
       "maxWidth 同时约束页头、标签页、侧栏和正文，不影响外层 AdminLayout 的侧栏或顶栏。",
       "当 PageLayout 是有可用高度的 AdminLayout.Content 中唯一的直接子元素时，默认至少撑满主内容区的内边距以内；宽屏的页面侧栏同步延伸到底部。长页仍由 AdminLayout.Content 滚动。独立使用、有额外包裹或与其他区块一起使用时，按内容高度布局。",
-      "PageLayout 本身的可用宽度达到 640px 时左右分栏；侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 和 header 模式的页头始终在最上方。",
+      "PageLayout 本身的可用宽度达到 640px 时左右分栏；未启用拖拽时侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 和 header 模式的页头始终在最上方。",
       "只负责单页布局，不管理侧栏折叠、独立滚动、标签状态、路由或应用导航。",
     ],
   },
@@ -2242,6 +2243,12 @@ export default function Demo() {
         default: "false",
         description:
           "占满视口高度（100dvh）；嵌入页面时可改用 style.height 指定有限高度。",
+      },
+      {
+        name: "AdminLayout.sidebarResize",
+        type: "boolean | SidebarResizeOptions",
+        default: "false",
+        description: "对一个直接的 AdminLayout.Sider（可放在 Fragment 中）启用 Splitter 调宽。默认初始宽度继承 Sider.width；可传 defaultWidth / minWidth / maxWidth（像素，下限 160、上限 480）。折叠和窄容器隐藏手柄，不影响通知或断点规则。",
       },
       {
         name: "AdminLayout.Sider.tabs",
@@ -3321,6 +3328,7 @@ export default function Demo() {
       "不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。",
       "版本、部署和包信息等非导航内容，可使用 SectionGroup 分区；示例使用不收起的 Sidebar，不影响导航图标窄栏。",
       "文档目录可把 Tree 直接放进 Sidebar；见 Tree 的「侧栏文档树」示例，当前文档和异步子节点由应用维护。",
+      "独立侧栏调宽时把 Sidebar 放入 Splitter.Panel；Sidebar 本身不管理拖拽宽度。AdminLayout 与 PageLayout 则可选择启用 sidebarResize。",
     ],
   },
   {

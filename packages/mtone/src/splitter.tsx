@@ -714,11 +714,11 @@ function SplitterRoot(props: SplitterProps) {
                 className="mt-splitter-separator"
                 data-boundary={i}
                 disableDoubleClick
-                aria-description={
-                  locale === "zh"
+                aria-description={collapsible || panels[i + 1].props.collapsible
+                  ? locale === "zh"
                     ? "双击、触屏双击或按 Enter 循环收起相邻面板与恢复初始比例"
                     : "Double-click, double-tap, or press Enter to cycle adjacent panel collapse and initial proportions"
-                }
+                  : undefined}
                 disabled={
                   disabled ||
                   !resizable ||

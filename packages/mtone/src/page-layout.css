@@ -133,3 +133,43 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* PageLayout positions the panes physically even under RTL. Splitter receives
+ * the same physical axis for pointer/keyboard resizing; content keeps its own direction. */
+.mt-sidebar-resize-page > .mt-splitter {
+  direction: ltr;
+}
+.mt-page-layout-columns > .mt-sidebar-resize-page {
+  display: flex;
+  align-self: stretch;
+}
+.mt-sidebar-resize-page:dir(rtl) > .mt-splitter > [data-sidebar-resize-pane]
+  > .mt-splitter-panel > .mt-splitter-content {
+  direction: rtl;
+}
+.mt-sidebar-resize-page > .mt-splitter > [data-sidebar-resize-pane] > .mt-splitter-panel {
+  overflow: visible !important;
+}
+.mt-sidebar-resize-page[data-compact] > .mt-splitter {
+  flex-direction: column !important;
+  gap: 16px;
+}
+.mt-sidebar-resize-page[data-compact] > .mt-splitter > [data-sidebar-resize-pane] {
+  flex: 0 0 auto !important;
+}
+@container mt-page-layout (width >= 640px) {
+  :where(.mt-layout > .mt-layout-content) > .mt-page-layout:only-child
+    > .mt-page-layout-columns > .mt-sidebar-resize-page
+    > .mt-splitter > [data-sidebar-resize-pane="sidebar"] > .mt-splitter-panel
+    > .mt-splitter-content > .mt-page-layout-sidebar {
+    min-block-size: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  :where(.mt-layout > .mt-layout-content) > .mt-page-layout:only-child
+    > .mt-page-layout-columns > .mt-sidebar-resize-page
+    > .mt-splitter > [data-sidebar-resize-pane="sidebar"] > .mt-splitter-panel
+    > .mt-splitter-content > .mt-page-layout-sidebar > .mt-sidebar {
+    flex: 1 0 auto;
+  }
+}

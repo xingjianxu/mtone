@@ -9,6 +9,8 @@ import PageLayoutComposed from "./secondary-demos/page-layout-composed";
 import PageLayoutComposedSource from "./secondary-demos/page-layout-composed.tsx?raw";
 import PageLayoutSidebar from "./secondary-demos/page-layout-sidebar";
 import PageLayoutSidebarSource from "./secondary-demos/page-layout-sidebar.tsx?raw";
+import PageLayoutSidebarResize from "./secondary-demos/page-layout-sidebar-resize";
+import PageLayoutSidebarResizeSource from "./secondary-demos/page-layout-sidebar-resize.tsx?raw";
 import PageLayoutAdmin from "./secondary-demos/page-layout-admin";
 import PageLayoutAdminSource from "./secondary-demos/page-layout-admin.tsx?raw";
 import CheckCardUsage from "./secondary-demos/check-card-usage";
@@ -64,6 +66,8 @@ import Card2 from "./secondary-demos/card-inner";
 import Card2Source from "./secondary-demos/card-inner.tsx?raw";
 import AdminLayoutNotice from "./secondary-demos/admin-layout-notice";
 import AdminLayoutNoticeSource from "./secondary-demos/admin-layout-notice.tsx?raw";
+import AdminLayoutSidebarResize from "./secondary-demos/admin-layout-sidebar-resize";
+import AdminLayoutSidebarResizeSource from "./secondary-demos/admin-layout-sidebar-resize.tsx?raw";
 import GlobalNoticeUsage from "./secondary-demos/global-notice-usage";
 import GlobalNoticeUsageSource from "./secondary-demos/global-notice-usage.tsx?raw";
 import AdminLayout0 from "./secondary-demos/admin-layout-usage";
@@ -401,6 +405,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
     { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },
     { id: "actions-and-tabs", title: "居中限宽、操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
     { id: "sidebar", title: "页面侧栏与页头跨度", Demo: PageLayoutSidebar, source: source(PageLayoutSidebarSource) },
+    { id: "sidebar-resize", title: "拖拽调整页面侧栏", Demo: PageLayoutSidebarResize, source: source(PageLayoutSidebarResizeSource) },
     { id: "admin-layout", title: "撑满应用主内容区", Demo: PageLayoutAdmin, source: source(PageLayoutAdminSource) },
   ],
   AdminLayout: [
@@ -417,6 +422,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       Demo: AdminLayoutNotice,
       source: source(AdminLayoutNoticeSource),
     },
+    { id: "sidebar-resize", title: "拖拽调整应用侧栏", Demo: AdminLayoutSidebarResize, source: source(AdminLayoutSidebarResizeSource) },
   ],
   GlobalNotice: [
     {

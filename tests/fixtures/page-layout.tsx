@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { AdminLayout, Button, PageLayout, Sidebar, Tabs } from "../../packages/mtone/src";
+import { AdminLayout, Button, PageLayout, Sidebar, Splitter, Tabs } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 
 function Fixture() {
@@ -95,6 +95,7 @@ function AdminContentFixture() {
       title="Project overview"
       tabs={<Tabs items={[{ value: "today", label: "Today", content: "Daily activity" }]} />}
       sidebar={sidebar ? <Sidebar aria-label="Departments">Design</Sidebar> : undefined}
+      sidebarResize={query.has("resize")}
       maxWidth={840}
     >
       <div style={mode === "long" ? { minHeight: 680 } : undefined}>Project tasks</div>
@@ -113,7 +114,40 @@ function AdminContentFixture() {
   );
 }
 
+function ResizableFixture() {
+  const resize = { defaultWidth: 220, minWidth: 170, maxWidth: 340 };
+  return (
+    <div style={{ maxWidth: 900, display: "grid", gap: 20 }}>
+      <AdminLayout aria-label="Resizable admin" data-testid="resizable-admin" sidebarResize={resize} fullHeight
+        style={{ height: 245 }} notice={<p>Admin notice</p>}>
+        <AdminLayout.Sider collapsible breakpoint={620} aria-label="Admin navigation" logo="Workspace">
+          <input aria-label="Sidebar draft" />
+        </AdminLayout.Sider>
+        <AdminLayout>
+          <AdminLayout.Header>Workspace header</AdminLayout.Header>
+          <AdminLayout.Content><input aria-label="Main draft" /></AdminLayout.Content>
+        </AdminLayout>
+      </AdminLayout>
+      {(["left", "right"] as const).map((position) => (
+        <PageLayout key={position} dir={position === "right" ? "rtl" : "ltr"}
+          data-testid={`resizable-page-${position}`} title={`Page ${position}`}
+          sidebarResize={resize} sidebarPosition={position} headerSpan={position === "right" ? "main" : "full"}
+          tabs={<button>Page tab</button>}
+          sidebar={<Sidebar collapsible aria-label={`Page ${position} navigation`}><button>Filter</button></Sidebar>}>
+          <input aria-label={`Page ${position} draft`} />
+        </PageLayout>
+      ))}
+      <div data-testid="standalone-sidebar" style={{ height: 140 }}>
+        <Splitter>
+          <Splitter.Panel defaultSize={220} min={170} max={340}><Sidebar aria-label="Standalone navigation">Menu</Sidebar></Splitter.Panel>
+          <Splitter.Panel><p>Standalone content</p></Splitter.Panel>
+        </Splitter>
+      </div>
+    </div>
+  );
+}
+
 const query = new URLSearchParams(window.location.search);
 createRoot(document.getElementById("root")!).render(
-  query.has("admin-content") ? <AdminContentFixture /> : query.has("sidebar") ? <SidebarFixture /> : query.has("max-width") ? <MaxWidthFixture /> : <Fixture />,
+  query.has("resizable") ? <ResizableFixture /> : query.has("admin-content") ? <AdminContentFixture /> : query.has("sidebar") ? <SidebarFixture /> : query.has("max-width") ? <MaxWidthFixture /> : <Fixture />,
 );

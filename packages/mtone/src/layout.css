@@ -250,3 +250,63 @@
 .mt-layout-sider[data-collapsed="true"] .mt-sidebar-footer .mt-sidebar-toggle {
   margin: 0;
 }
+
+/* Resizable layouts keep the same two mounted panes while an existing rail is
+ * collapsed or PageLayout switches to its stacked, narrow presentation. */
+.mt-layout-sidebar-resizable {
+  flex-direction: column;
+}
+.mt-layout-sidebar-resizable.mt-layout-with-notice {
+  grid-template-columns: minmax(0, 1fr);
+}
+.mt-sidebar-resize {
+  flex: 1 1 auto;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+.mt-sidebar-resize > .mt-splitter > [data-sidebar-resize-pane] > .mt-splitter-panel {
+  background: transparent;
+}
+.mt-sidebar-resize[data-compact] > .mt-splitter > .mt-splitter-separator,
+.mt-sidebar-resize[data-sidebar-collapsed] > .mt-splitter > .mt-splitter-separator {
+  display: none;
+}
+.mt-sidebar-resize[data-sidebar-collapsed] > .mt-splitter > [data-sidebar-resize-pane="sidebar"] {
+  flex: 0 0 var(--_mt-sidebar-resize-collapsed) !important;
+}
+.mt-sidebar-resize[data-sidebar-collapsed] > .mt-splitter > [data-sidebar-resize-pane="main"] {
+  flex: 1 1 0 !important;
+}
+.mt-sidebar-resize-admin {
+  display: flex;
+  flex-direction: column;
+}
+.mt-sidebar-resize-admin > .mt-splitter {
+  flex: 1 1 auto;
+}
+.mt-sidebar-resize-admin > .mt-splitter > [data-sidebar-resize-pane] > .mt-splitter-panel {
+  overflow: hidden !important;
+}
+.mt-sidebar-resize-admin > .mt-splitter > [data-sidebar-resize-pane="sidebar"]
+  > .mt-splitter-panel > .mt-splitter-content > .mt-layout-sider {
+  inline-size: 100%;
+  block-size: 100%;
+}
+.mt-sidebar-resize-admin > .mt-splitter > [data-sidebar-resize-pane="main"]
+  > .mt-splitter-panel > .mt-splitter-content {
+  display: flex;
+  flex-direction: column;
+}
+.mt-sidebar-resize-admin > .mt-splitter > [data-sidebar-resize-pane="main"]
+  > .mt-splitter-panel > .mt-splitter-content > .mt-layout {
+  overflow: hidden;
+}
+.mt-sidebar-resize-admin[data-compact]:not([data-sidebar-collapsed])
+  > .mt-splitter > [data-sidebar-resize-pane="sidebar"] {
+  flex: 0 0 min(var(--_mt-sidebar-resize-initial), 75%) !important;
+}
+.mt-sidebar-resize-admin[data-compact]:not([data-sidebar-collapsed])
+  > .mt-splitter > [data-sidebar-resize-pane="main"] {
+  flex: 1 1 0 !important;
+}

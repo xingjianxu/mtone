@@ -41,6 +41,15 @@ const tests = [
 ];
 
 describe("Targeted CI selection", () => {
+  it("checks both layouts and Splitter when the shared sidebar resize integration changes", () => {
+    const layoutTests = [
+      "tests/admin-layout.test.tsx", "tests/page-layout.test.tsx",
+      "tests/page-layout.browser.mjs", "tests/splitter.test.tsx", "tests/splitter.browser.mjs",
+    ];
+    const plan = makePlan(["packages/mtone/src/sidebar-resize.tsx"], layoutTests);
+    expect(plan.unmatched).toEqual([]);
+    expect([...plan.unit, ...plan.browser].sort()).toEqual(layoutTests.sort());
+  });
   it("keeps ordinary prose outside npm, unit and browser checks", () => {
     const plan = makePlan(["README.md", "docs/CONTRIBUTING-CI.md"], tests);
     expect(plan).toMatchObject({

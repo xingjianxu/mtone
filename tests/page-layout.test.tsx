@@ -3,6 +3,22 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import * as Mtone from "../packages/mtone/src";
 
+test("sidebar drag resizing is opt-in and uses a Splitter without replacing the layout landmarks", () => {
+  const { AdminLayout, PageLayout, Sidebar } = Mtone;
+  const { rerender } = render(<PageLayout title="Page" sidebar={<Sidebar aria-label="Page navigation">Filters</Sidebar>}>Content</PageLayout>);
+  expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+  rerender(<PageLayout title="Page" sidebarResize sidebar={<Sidebar aria-label="Page navigation">Filters</Sidebar>}>Content</PageLayout>);
+  expect(screen.getByRole("separator")).toBeInTheDocument();
+  expect(screen.getByRole("complementary", { name: "Page navigation" })).toHaveTextContent("Filters");
+  rerender(<AdminLayout sidebarResize notice={<p>Notice</p>}>
+    <AdminLayout.Sider aria-label="App navigation">Menu</AdminLayout.Sider>
+    <AdminLayout><AdminLayout.Header>App</AdminLayout.Header><AdminLayout.Content>Screen</AdminLayout.Content></AdminLayout>
+  </AdminLayout>);
+  expect(screen.getByRole("separator")).toBeInTheDocument();
+  expect(screen.getByRole("main")).toHaveTextContent("Screen");
+  expect(screen.getByText("Notice").closest(".mt-splitter")).toBeNull();
+});
+
 test("renders only the heading and content when optional slots are omitted", () => {
   const { PageLayout } = Mtone;
   const { container } = render(<PageLayout title="Inventory">Rows</PageLayout>);

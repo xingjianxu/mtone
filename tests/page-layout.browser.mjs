@@ -153,6 +153,7 @@ try {
   }
   for (const [width, mode, options] of [
     [1200, "short", ""], [1200, "short", "&no-sidebar&no-footer"],
+    [1200, "short", "&resize"], [375, "short", "&resize"],
     [375, "short", ""], [1200, "long", ""],
     [1200, "multiple", ""], [1200, "wrapped", ""], [1200, "standalone", ""],
   ]) {
@@ -197,6 +198,82 @@ try {
       assert(result.pageHeight < result.available, context);
     }
   }
+  await page.setViewportSize({ width: 1000, height: 720 });
+  await page.goto("http://127.0.0.1:5284/tests/fixtures/page-layout.html?resizable");
+  const widthOf = async (selector) => (await selector.boundingBox()).width;
+  const closeTo = async (selector, desired) =>
+    expect.poll(async () => Math.abs(await widthOf(selector) - desired)).toBeLessThan(1);
+  const drag = async (handle, delta) => {
+    await handle.scrollIntoViewIfNeeded();
+    const box = await handle.boundingBox();
+    const x = box.x + box.width / 2, y = box.y + Math.min(25, box.height / 2);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + delta, y, { steps: 8 });
+    await page.mouse.up();
+  };
+  const admin = page.getByTestId("resizable-admin");
+  const adminNavigation = admin.getByRole("complementary", { name: "Admin navigation" });
+  const adminHandle = admin.getByRole("separator");
+  await closeTo(adminNavigation, 220);
+  assert(await admin.getByText("Admin notice").evaluate((node) => !node.closest(".mt-splitter")));
+  await admin.getByRole("textbox", { name: "Sidebar draft" }).fill("Sidebar retained");
+  await admin.getByRole("textbox", { name: "Main draft" }).fill("Main retained");
+  await drag(adminHandle, 75);
+  const expandedAdmin = await widthOf(adminNavigation);
+  assert(expandedAdmin > 280 && expandedAdmin < 305, `Admin sidebar pointer width ${expandedAdmin}`);
+  await admin.getByRole("button", { name: "收起侧边栏" }).click();
+  await expect(adminHandle).toBeHidden();
+  await closeTo(adminNavigation, 52);
+  await admin.getByRole("button", { name: "展开侧边栏" }).click();
+  await expect(adminHandle).toBeVisible();
+  await closeTo(adminNavigation, expandedAdmin);
+  await expect(admin.getByRole("textbox", { name: "Sidebar draft" })).toHaveValue("Sidebar retained");
+  await expect(admin.getByRole("textbox", { name: "Main draft" })).toHaveValue("Main retained");
+  await adminHandle.press("End");
+  await closeTo(adminNavigation, 340);
+  await adminHandle.press("Home");
+  await closeTo(adminNavigation, 170);
+
+  const left = page.getByTestId("resizable-page-left");
+  const right = page.getByTestId("resizable-page-right");
+  const leftNavigation = left.getByRole("complementary");
+  const rightNavigation = right.getByRole("complementary");
+  const rightBody = right.getByRole("textbox", { name: "Page right draft" });
+  await closeTo(leftNavigation, 220);
+  await closeTo(rightNavigation, 220);
+  assert((await rightNavigation.boundingBox()).x > (await rightBody.boundingBox()).x, "RTL preserves the PageLayout physical right side");
+  assert.equal(await rightBody.evaluate((node) => getComputedStyle(node).direction), "rtl");
+  await drag(right.getByRole("separator"), -60);
+  const expandedRight = await widthOf(rightNavigation);
+  assert(expandedRight > 265 && expandedRight < 290, `Right sidebar pointer width ${expandedRight}`);
+  await right.getByRole("button", { name: "收起侧边栏" }).click();
+  await expect(right.getByRole("separator")).toBeHidden();
+  await closeTo(rightNavigation, 52);
+  await right.getByRole("button", { name: "展开侧边栏" }).click();
+  await closeTo(rightNavigation, expandedRight);
+
+  const standalone = page.getByTestId("standalone-sidebar");
+  await closeTo(standalone.getByRole("complementary"), 220);
+  await drag(standalone.getByRole("separator"), 48);
+  assert(await widthOf(standalone.getByRole("complementary")) > 255, "standalone Sidebar works in an explicit Splitter.Panel");
+
+  await page.setViewportSize({ width: 390, height: 720 });
+  await expect(adminHandle).toBeHidden();
+  await closeTo(adminNavigation, 52);
+  for (const [root, nav, position] of [[left, leftNavigation, "left"], [right, rightNavigation, "right"]]) {
+    await expect(root.getByRole("separator")).toBeHidden();
+    const side = await nav.boundingBox();
+    const main = await root.getByRole("textbox").boundingBox();
+    assert(position === "left" ? side.y + side.height <= main.y : main.y + main.height <= side.y,
+      `${position} sidebar keeps its existing mobile stack order`);
+  }
+  assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), "no horizontal overflow on mobile");
+  await page.setViewportSize({ width: 1000, height: 720 });
+  await expect(adminHandle).toBeVisible();
+  await closeTo(adminNavigation, 170);
+  await expect(right.getByRole("separator")).toBeVisible();
+  await closeTo(rightNavigation, expandedRight);
   assert.deepEqual(errors, []);
   console.log("PageLayout responsive geometry, dark theme, and live actions/tabs passed");
 } finally {
