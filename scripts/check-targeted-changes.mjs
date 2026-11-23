@@ -69,6 +69,7 @@ const aliases = {
   ],
   "pagination-controls": ["pagination", "table"],
   popconfirm: ["avatar-popconfirm"],
+  shortcuts: ["spotlight", "docs-search"],
   "splitter-utils": ["splitter"],
   "table-filter": ["table"],
   "table-model": ["table"],

@@ -765,6 +765,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
         </div>
       );
     }
+    case "ShortcutsProvider":
+      return <M.Text>在应用中注册快捷键，按场景切换作用域。</M.Text>;
     case "MtoneProvider":
       return (
         <div style={stackStyle}>

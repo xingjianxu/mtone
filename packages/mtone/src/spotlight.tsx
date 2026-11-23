@@ -3,6 +3,7 @@ import React from "react";
 import { Input, useMtone } from "./basic";
 import { useFieldsetDisabled } from "./fieldset-context";
 import { Dialog } from "./interactive";
+import { isShortcutInEditable, useHasShortcutsProvider, useShortcutBinding } from "./shortcuts";
 
 export interface SpotlightAction {
   /** Unique within this Spotlight. */
@@ -45,6 +46,7 @@ export function Spotlight({ actions, trigger, open, defaultOpen = false, onOpenC
   closeOnSelect = true, resetQueryOnClose = true, className }: SpotlightProps) {
   const { locale } = useMtone();
   const disabled = useFieldsetDisabled();
+  const managedShortcuts = useHasShortcutsProvider();
   const zh = locale === "zh";
   const [localOpen, setLocalOpen] = React.useState(defaultOpen);
   const [localQuery, setLocalQuery] = React.useState(defaultQuery);
@@ -63,8 +65,23 @@ export function Spotlight({ actions, trigger, open, defaultOpen = false, onOpenC
     onOpenChange?.(next);
     if (!next && resetQueryOnClose) changeQuery("");
   };
+  const bindings = React.useMemo(() => {
+    if (!managedShortcuts || !shortcut || (shortcut !== "+" && shortcut.includes("+"))) return false;
+    const key = shortcut === "+" ? "Plus" : shortcut === " " ? "Space" : shortcut;
+    return [`Ctrl+${key}`, `Meta+${key}`, `Ctrl+Meta+${key}`];
+  }, [managedShortcuts, shortcut]);
+  useShortcutBinding(bindings, () => changeOpen(!shown), {
+    allowInInputs: true,
+    // The palette's own search input can toggle it closed. Do not claim a
+    // different editor's chord before the registry can consider other bindings.
+    acceptsEvent: (event) =>
+      typeof shortcut === "string" && event.key.toLowerCase() === shortcut.toLowerCase() &&
+      (enableInInputs ||
+        (input.current != null && event.composedPath().includes(input.current)) ||
+        !isShortcutInEditable(event)),
+  });
   React.useEffect(() => {
-    if (!shortcut) return;
+    if (managedShortcuts || !shortcut) return;
     const listener = (event: KeyboardEvent) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
       if (event.defaultPrevented || event.repeat || event.isComposing || event.altKey || event.shiftKey || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== shortcut.toLowerCase()) return;

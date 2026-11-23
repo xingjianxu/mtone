@@ -369,6 +369,10 @@ function Theme() {
   );
 }
 export function DocsApp() {
+  return <M.ShortcutsProvider><DocsBody /></M.ShortcutsProvider>;
+}
+
+function DocsBody() {
   const preference = useThemePreference();
   const [route, setRoute] = useState(() => parseRoute(window.location.hash));
   const [query, setQuery] = useState("");

@@ -17,6 +17,9 @@ const tests = [
   "tests/component-layout.test.tsx",
   "tests/docs-categories.test.tsx",
   "tests/docs-search.browser.mjs",
+  "tests/docs-search.test.tsx",
+  "tests/shortcuts.test.tsx",
+  "tests/spotlight.browser.mjs",
   "tests/docs-regression-proof.test.mjs",
   "tests/input-family.test.tsx",
   "tests/llms.test.ts",
@@ -107,6 +110,13 @@ describe("Targeted CI selection", () => {
       expect(makePlan([path], tests).unit).toContain("tests/component-layout.test.tsx");
     },
   );
+
+  it("checks both keyboard shortcut integrations when the registry changes", () => {
+    const plan = makePlan(["packages/mtone/src/shortcuts.tsx"], tests);
+    expect(plan.unit).toContain("tests/shortcuts.test.tsx");
+    expect(plan.unit).toContain("tests/docs-search.test.tsx");
+    expect(plan.browser).toEqual(["tests/docs-search.browser.mjs", "tests/spotlight.browser.mjs"]);
+  });
 
   it("runs the existing advanced table suite when DataTable changes", () => {
     const plan = makePlan(["packages/mtone/src/data-table.tsx"], tests);

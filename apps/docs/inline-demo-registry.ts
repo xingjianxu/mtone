@@ -1,3 +1,5 @@
+import ShortcutsUsage from "./inline-demos/shortcuts-usage";
+import ShortcutsUsageSource from "./inline-demos/shortcuts-usage.tsx?raw";
 import TableNative from "./inline-demos/table-native";
 import TableNativeSource from "./inline-demos/table-native.tsx?raw";
 import ToolbarStandalone from "./inline-demos/toolbar-standalone";
@@ -664,6 +666,14 @@ export const inlineDocSections: Readonly<
       title: "拖拽上传",
       Demo: UploadDragAndDrop,
       source: source(UploadDragAndDropRaw),
+    },
+  ],
+  ShortcutsProvider: [
+    {
+      id: "usage",
+      title: "注册快捷键与作用域",
+      Demo: ShortcutsUsage,
+      source: source(ShortcutsUsageSource),
     },
   ],
   MtoneProvider: [

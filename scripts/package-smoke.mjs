@@ -100,9 +100,16 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Form, Card, CardGroup, Splitter, Table, DataTable, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
+import { MtoneProvider, MtoneScope, Input, ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Form, Card, CardGroup, Splitter, Table, DataTable, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
+assert.equal(formatShortcut('Mod+K', 'other'), 'Ctrl+K');
+const ShortcutConsumer = () => {
+  useShortcut('Mod+K', () => {});
+  return createElement('button', null, 'Shortcut SSR');
+};
+assert.match(renderToStaticMarkup(createElement(ShortcutsProvider, null,
+  createElement(ShortcutScope, { priority: 1 }, createElement(ShortcutConsumer)))), /Shortcut SSR/);
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'Dropdown'));
 for (const name of ['Toast', 'DirectoryTree', 'AiChainOfThought', 'Modal', 'DropdownMenu', 'Mention', 'SearchInput', 'Textarea', 'FormField', 'MultiSelect']) {
   assert(!Object.hasOwn(await import('@bixlab/mtone'), name), 'Removed export: ' + name);
@@ -191,7 +198,7 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, type PopoverMenuProps, Typography, Text, Title, Paragraph, Link, Menu, type MenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, ToastProvider, useToast, Form, Input, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableProps, DataTable, type DataTableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
+    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, type PopoverMenuProps, Typography, Text, Title, Paragraph, Link, Menu, type MenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, ToastProvider, useToast, Form, Input, ShortcutsProvider, ShortcutScope, useShortcut, type ShortcutOptions, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableProps, DataTable, type DataTableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
 // @ts-expect-error The former component and its props are no longer exported.
 import { Layout, type LayoutProps } from '@bixlab/mtone';
 // @ts-expect-error There is no old standalone Dropdown alias or type.
@@ -300,6 +307,12 @@ export const invalidTable = <Table columns={[]} dataSource={[]}/>;
 const tableRef = createRef<DataTableRef>();
 export const tableDemo = <DataTable<{key:number;name:string}> ref={tableRef} dataSource={[{key:1,name:'Release'}]} columns={[{key:'name',dataIndex:'name',title:'Name',sorter:(a,b)=>a.name.localeCompare(b.name)}]} rowSelection={{onChange:(keys,rows)=>rows.map(row=>row.name)}} pagination={{pageSize:10}} onTableChange={(page,filters,sorter,extra)=>console.log(extra.action)} />;
 tableRef.current?.scrollTo({index:0});
+function ShortcutTypeDemo() {
+  const options: ShortcutOptions = {enabled:true, allowInInputs:false, preventDefault:true};
+  useShortcut(['Mod+K', 'Ctrl+Shift+P'], event => { const key: string = event.key; console.log(key); }, options);
+  return null;
+}
+export const shortcutsDemo = <ShortcutsProvider><ShortcutScope active priority={1}><ShortcutTypeDemo/></ShortcutScope></ShortcutsProvider>;
 export const action = () => useToast().success({title:'Saved', body:'Ready', position:'top-right'});
 `,
   );

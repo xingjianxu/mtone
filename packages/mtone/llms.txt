@@ -848,7 +848,7 @@ export default function Demo() {
 - onOpenChange: (open: boolean) => void. 请求打开或关闭时调用。
 - query / defaultQuery: string (default: ""（defaultQuery）). 受控搜索内容或非受控初始查询。
 - onQueryChange: (query: string) => void. 查询变化或关闭时请求重置查询。
-- shortcut: string | false (default: "k"). 配合 Ctrl 或 Meta 的 KeyboardEvent.key 值；false 禁用。不是快捷键表达式解析器，不传 "mod+k"。
+- shortcut: string | false (default: "k"). 配合 Ctrl 或 Meta 的单个 KeyboardEvent.key 值，false 禁用。在 ShortcutsProvider 内共享监听；在 Provider 外保留独立监听。不要传 "Mod+K"。
 - enableInInputs: boolean (default: false). 是否允许快捷键在外部输入和可编辑内容中触发；面板自己的搜索框始终允许切换。
 - title: string (default: 快捷操作 / Command palette). 面板标题，默认按 Provider locale 选择。
 - placeholder: string (default: 搜索操作或页面… / Search actions or pages…). 搜索输入提示，同时用于输入可访问名称。
@@ -862,7 +862,7 @@ export default function Demo() {
 - action.onSelect: () => void. 动作选择回调；与 id、label 一起定义在 actions 中。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 这是 mtone 自己的组件 API，不是 Mantine Spotlight API 的兼容实现；不提供全局 singleton、spotlight.open() 或命令注册中心。每个实例独立管理状态。
-- 默认 Ctrl/Cmd+K 切换面板；默认不拦截 input、textarea、select 和可编辑内容中的按键，忽略组合输入、重复按键及 Alt/Shift 组合。文档演示使用 shortcut={false}，避免 Gallery 多实例争抢快捷键。应用中建议只挂载一个启用相同全局快捷键的实例。
+- 默认 Ctrl/Cmd+K 切换面板；默认不拦截 input、textarea、select 和可编辑内容中的按键，忽略组合输入、重复按键及 Alt/Shift 组合。同一应用的 Spotlight 可加入 ShortcutsProvider 并随 ShortcutScope 的启用状态和优先级切换。需要自定义组合时，用 shortcut={false}、受控 open/onOpenChange 和 useShortcut。文档演示禁用内建键，避免 Gallery 的多个实例争抢。
 - 默认搜索 label、description 和 keywords，不区分大小写，并去除查询首尾空白；group 不参与默认搜索。filter 接收未经裁剪的原始查询。
 - 动作按传入顺序保留，连续相同 group 合并为一组；相同分组若不连续，会出现多个同名组。每个 action.id 必须在实例中唯一。limit 在过滤之后应用，禁用项也计入数量。
 - 方向键上下循环选择可用项，Home/End 到首尾，Enter 执行，Esc 关闭。禁用项显示但不会执行。焦点保持在搜索框，关闭与焦点恢复由 Dialog 处理。
@@ -1842,7 +1842,7 @@ export default function Demo() {
 - 可以把 Menu 作为普通 Popover 自定义内容的一部分；选中菜单项不会替应用关闭外层 Popover，需要时在 onSelect 中更新外层的受控 open。
 - 同组相邻菜单或选项行之间保留 3px 间距；首项、分组标题和分隔线不额外增加间距。
 - 同一菜单面板任意项渲染左侧图标时，所有项保留 16px 图标列和 8px 间距；全部为空则移除该列。渲染 null 的图标不计入。支持分组、分隔线、多级子菜单及空 children 叶子项。
-- 快捷键文字仅作提示，不注册全局快捷键；条目 key 在同级内唯一。子菜单可用鼠标、方向键与 Escape 操作；内联菜单始终可用，不需要先打开。
+- 快捷键文字仅作提示，不注册全局快捷键；可用 formatShortcut 生成平台标签，并在 ShortcutsProvider 内用 useShortcut 显式绑定同一操作。条目 key 在同级内唯一。子菜单可用鼠标、方向键与 Escape 操作；内联菜单始终可用，不需要先打开。
 - 复选项支持 checked/defaultChecked、onCheckedChange；在浮层中默认不关闭，可显式设置 closeOnClick。单选组用 value/defaultValue、onValueChange，值对应子项 key；两类选项用各自的回调，不触发外层 onSelect。
 
 ```tsx
@@ -2958,6 +2958,45 @@ export default function Demo() {
   return (
     <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope theme="dark"><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>
   );
+}
+```
+
+### ShortcutsProvider
+
+- [ShortcutsProvider](https://xingjianxu.github.io/mtone/#/components/ShortcutsProvider): 按需注册全局键盘快捷键：用 useShortcut 绑定操作、ShortcutScope 控制作用域、formatShortcut 生成平台标签。
+- Import: ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut from @bixlab/mtone
+- ShortcutsProvider.children: ReactNode. 包裹需要注册快捷键的应用树；推荐每个应用使用一个根 Provider。嵌套 Provider 复用同一个监听。
+- ShortcutScope.children: ReactNode. 定义快捷键的作用域，可嵌套；仅影响作用域内注册的动作。
+- ShortcutScope.active: boolean (default: true). 设为 false 时暂停此作用域及其后代的快捷键。
+- ShortcutScope.priority: number (default: 0). 多个有效作用域匹配同一快捷键时，优先级较高者优先；同级优先最深的作用域。
+- useShortcut(shortcut, callback, options?): (shortcut: string | readonly string[] | false, callback: (event: KeyboardEvent) => void, options?: ShortcutOptions) => void. 在 Provider 内显式注册。字符串数组表示任选一组按键，不是按键序列；false 禁用。
+- options.enabled: boolean (default: true). 控制当前快捷键是否启用。
+- options.allowInInputs: boolean (default: false). 默认跳过 input、textarea、select 和可编辑内容；设为 true 才在其中响应。
+- options.preventDefault: boolean (default: true). 命中后阻止浏览器的默认动作；设为 false 时保留默认动作。
+- formatShortcut(shortcut, platform?): (shortcut: string, platform?: 'mac' | 'other') => string. 生成平台对应的显示文字，不注册事件。可指定平台给 SSR 或测试使用。
+- Mod+K 在苹果平台匹配 Meta+K，其他平台匹配 Ctrl+K。也可明确写 Ctrl、Meta、Alt、Shift；用 + 分隔同时按下的键，不支持多步序列。
+- 默认忽略输入法组合和长按产生的重复事件。Provider 外的 useShortcut 不注册监听；应用只应显式绑定确有用途的快捷键，并保留等价的可点击操作。
+- 同一作用域重复注册同一组合时，开发环境会提示；同一个 Provider 的注册表每次按键至多调用一个匹配动作。
+- Menu 条目的 shortcut 只显示标签。把 formatShortcut 的结果赋给 shortcut，再用 useShortcut 为同一操作显式注册，菜单本身不会重复绑定。
+- Spotlight 加入 Provider 的监听，但继续接受 shortcut="k" 或 false；不要把 useShortcut 的组合表达式直接传给 Spotlight。
+
+```tsx
+import { Button, ShortcutsProvider, useShortcut, formatShortcut } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+const shortcut = "Shift+F2";
+
+function Search({ onOpen }: { onOpen: () => void }) {
+  useShortcut(shortcut, onOpen);
+  return (
+    <Button onClick={onOpen} rightSection={<kbd>{formatShortcut(shortcut)}</kbd>}>
+      打开搜索
+    </Button>
+  );
+}
+
+export default function Demo() {
+  return <ShortcutsProvider><Search onOpen={() => console.log("打开搜索")} /></ShortcutsProvider>;
 }
 ```
 

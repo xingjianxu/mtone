@@ -49,7 +49,7 @@ const expected: Record<string, string[]> = {
     "AiTestResults",
   ],
   "全局配置": [
-    "MtoneProvider", "MtoneScope",
+    "MtoneProvider", "MtoneScope", "ShortcutsProvider",
   ],
 };
 const categories = Object.keys(expected);

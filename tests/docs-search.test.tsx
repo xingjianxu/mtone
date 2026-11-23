@@ -50,3 +50,18 @@ test("opening search closes mobile navigation and Escape closes the palette", as
   fireEvent.keyDown(input, { key: "Escape" });
   await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
 });
+
+test("the docs search keeps one stable keyboard registration across rerenders", () => {
+  const add = vi.spyOn(document, "addEventListener");
+  try {
+    const { rerender, unmount } = render(<DocsApp />);
+    const documentKeyListeners = () => add.mock.calls.filter(([type]) => type === "keydown").length;
+    const mounted = documentKeyListeners();
+    expect(mounted).toBeGreaterThan(0);
+    rerender(<DocsApp />);
+    expect(documentKeyListeners()).toBe(mounted);
+    unmount();
+  } finally {
+    add.mockRestore();
+  }
+});

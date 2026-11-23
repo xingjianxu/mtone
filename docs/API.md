@@ -136,7 +136,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 
 ## Menus and overlays
 
-- `Menu` renders commands inline without a trigger or outer popup. Provide grouped or nested `items`, an accessible `label`, optional `className`, and `onSelect(key)` for ordinary leaf commands. The same item schema is shared with the hosted menus.
+- `Menu` renders commands inline without a trigger or outer popup. Provide grouped or nested `items`, an accessible `label`, optional `className`, and `onSelect(key)` for ordinary leaf commands. The same item schema is shared with the hosted menus. An item’s `shortcut` is a display label only; use [keyboard shortcuts](#keyboard-shortcuts) to bind the action.
 - `Popover.Menu` (type `PopoverMenuProps`) hosts an action menu with a string or React element `trigger`, `items`, optional `label` and `onSelect(key)`, `width`, `align`, and `open` / `defaultOpen` / `onOpenChange`. It keeps menu semantics, keyboard navigation, nested menus and focus return, without wrapping the menu in a dialog. A string trigger uses the content-width dropdown Button preset. `triggerMode="click" | "hover"` defaults to click; desktop mouse hover can cross the trigger gap and enter submenus without stealing keyboard focus, while click, keyboard and touch still work. Replace prior `<Menu trigger=…>` usage with `<Popover.Menu trigger=…>`. See [trigger mode examples](https://xingjianxu.github.io/mtone/#/components/Popover?section=trigger-mode).
 - `ContextMenu` uses the same item schema and open contract, with children as the right-click area. `Menubar` coordinates multiple action menus.
 - `Popover` remains a nonmodal popup for arbitrary `content`, with a `trigger` and optional title, side, alignment, width and open state. Set `unstyled` only if the content supplies its own visual shell: it removes the Popover background, border, shadow and padding without changing positioning, keyboard behavior or open/close state. Compose a standalone `Menu` in its content when needed; the caller can close the outer Popover from the menu's `onSelect` by controlling `open`.
@@ -148,6 +148,43 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - ToastProvider: wraps application, timeout and limit. `useToast().add({title,description})` creates a dismissible toast. Place inside MtoneProvider.
 
 Triggers use Base UI's `render` composition. Custom trigger components must forward ref and DOM props; standard mtone Button does this.
+
+## Keyboard shortcuts
+
+Wrap the application subtree with `ShortcutsProvider`. Register actions in its
+descendants using `useShortcut(shortcut, callback, options?)`. The callback
+receives the native `KeyboardEvent`. A string binds one chord, an array binds
+alternatives, and `false` disables the binding. Without the provider,
+`useShortcut` is a no-op. The provider does not assign keyboard shortcuts to
+ordinary components, and it does not replace `MtoneProvider`. Prefer one root
+provider per application. Nested providers share the same listener.
+
+- Join simultaneous keys with `+`. `Mod+K` is Meta+K on Apple platforms and
+  Ctrl+K elsewhere. Use explicit `Ctrl`, `Meta`, `Alt`, or `Shift` when needed.
+  Key names follow `KeyboardEvent.key` and match without case; the modifiers
+  must match exactly. Use `Plus` for the literal plus key. Multi-step sequences
+  are not supported.
+- `enabled` defaults to true; `allowInInputs` defaults to false and skips native
+  inputs, textareas, selects and editable content. IME composition and repeat
+  events are always ignored. `preventDefault` defaults to true for a handled
+  chord.
+- `ShortcutScope` groups registrations, without adding a DOM element. Set
+  `active={false}` to disable the scope and descendants. For conflicts, higher
+  `priority` wins (default 0), then deeper scopes. Register one action per
+  chord per scope: duplicates produce a development warning and a key event
+  calls at most one shortcut callback in the registry.
+- `formatShortcut(chord, platform?)` returns display text, not a binding
+  (e.g. `⌘K` or `Ctrl+K`). Pass `"mac"` or `"other"` for deterministic
+  server-rendered labels. Use it for a menu item’s `shortcut` and share the
+  actual action with `useShortcut` and the menu’s selection handler. Keep the
+  clickable action available without the keyboard chord.
+- `Spotlight` keeps its own `shortcut="k"` (Ctrl or Meta + K), a single key name
+  override, and `false` to disable it. Outside the provider the existing
+  standalone listener is retained; inside it registers in the shared
+  listener and respects `ShortcutScope`. For an arbitrary chord, disable the
+  built-in shortcut and control `open` from `useShortcut` with `onOpenChange`.
+
+[Interactive keyboard shortcuts example](https://xingjianxu.github.io/mtone/#/components/ShortcutsProvider?section=usage)
 
 ## Content and status
 

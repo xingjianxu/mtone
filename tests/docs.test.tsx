@@ -1,14 +1,20 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import * as M from "../packages/mtone/src";
 import { componentDocs } from "../apps/docs/catalog";
 import { ComponentExample } from "../apps/docs/examples";
 import { docSections, parseRoute, searchDocs } from "../apps/docs/docs-app";
+// The shortcut utilities, including the scope wrapper, share their provider guide.
+const nonStandaloneExports = [
+  "cn", "useMtone", "useToast", "getMentions",
+  "ShortcutScope", "useShortcut", "formatShortcut",
+];
+
 describe("documentation", () => {
   it("covers every component export without counting hooks as components", () => {
     const names = Object.keys(M).filter(
-      (k) => !["cn", "useMtone", "useToast", "getMentions"].includes(k),
+      (k) => !nonStandaloneExports.includes(k),
     );
     expect(componentDocs.map((d) => d.name).sort()).toEqual(names.sort());
     expect(new Set(componentDocs.map((d) => d.name)).size).toBe(
@@ -49,13 +55,43 @@ describe("documentation", () => {
     expect(screen.getByRole("table", { name: "本周项目" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "项目" })).toHaveAttribute("scope", "col");
   });
+  it("documents keyboard-shortcut utilities together and demos switching active scopes", () => {
+    const route = "#/components/ShortcutsProvider?section=usage";
+    expect(parseRoute(route)).toEqual({ kind: "component", name: "ShortcutsProvider", section: "usage" });
+    const doc = componentDocs.find(({ name }) => name === "ShortcutsProvider");
+    expect(doc?.importNames).toEqual(["ShortcutsProvider", "ShortcutScope", "useShortcut", "formatShortcut"]);
+    for (const tool of doc!.importNames) {
+      expect(searchDocs(tool)).toContain(doc);
+    }
+
+    const usage = docSections.ShortcutsProvider.find(({ id }) => id === "usage");
+    expect(usage?.source).toContain("<ShortcutScope");
+    const Demo = usage!.Demo!;
+    render(<Demo />);
+    const shortcut = { key: "F2", shiftKey: true };
+    fireEvent.keyDown(document, shortcut);
+    expect(screen.getByRole("status")).toHaveTextContent("尚未保存");
+
+    fireEvent.click(screen.getByRole("button", { name: "演示快捷键" }));
+    fireEvent.keyDown(screen.getByRole("textbox", { name: "草稿名称" }), shortcut);
+    expect(screen.getByRole("status")).toHaveTextContent("尚未保存");
+
+    fireEvent.keyDown(document, shortcut);
+    expect(screen.getByRole("status")).toHaveTextContent("已保存草稿");
+    fireEvent.click(screen.getByRole("button", { name: "编辑器作用域" }));
+    fireEvent.keyDown(document, shortcut);
+    expect(screen.getByRole("status")).toHaveTextContent("已保存工作区");
+
+    fireEvent.click(screen.getByRole("button", { name: /保存草稿/ }));
+    expect(screen.getByRole("status")).toHaveTextContent("已保存草稿");
+  });
   it("searches names and Chinese descriptions", () => {
     expect(searchDocs("button").some((d) => d.name === "Button")).toBe(true);
     expect(searchDocs("zzzzzz")).toEqual([]);
     expect(searchDocs("")).toHaveLength(componentDocs.length);
   });
   it.each(
-    Object.keys(M).filter((k) => !["cn", "useMtone", "useToast", "getMentions"].includes(k)),
+    Object.keys(M).filter((k) => !nonStandaloneExports.includes(k)),
   )("renders %s example", (name) => {
     render(
       <M.MtoneProvider>

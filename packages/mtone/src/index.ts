@@ -62,3 +62,6 @@ export * from "./check-card";
 
 export * from "./toolbar";
 export * from "./floating-window";
+
+export { ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut } from "./shortcuts";
+export type { ShortcutsProviderProps, ShortcutScopeProps, ShortcutOptions } from "./shortcuts";
