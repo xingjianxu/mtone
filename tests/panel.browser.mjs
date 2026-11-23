@@ -94,6 +94,69 @@ try {
   await workbench.getByRole("button", { name: "收起面板" }).click();
   await expect(workbench.getByRole("button", { name: "展开面板" })).toBeVisible();
   await expect(workbench.getByRole("tablist")).toBeVisible();
+  const placementDemo = page.getByTestId("placement");
+  const placement = placementDemo.locator(".mt-ide-panel");
+  const demoBar = placement.locator(".mt-tab-bar");
+  await placementDemo.getByRole("tab", { name: "终端" }).click();
+  const demoCommand = placementDemo.getByRole("textbox", { name: "面板命令" });
+  await demoCommand.fill("ls");
+  const directions = [
+    ["标签在顶部", "top"],
+    ["标签在底部", "bottom"],
+    ["标签在左侧", "left"],
+    ["标签在右侧", "right"],
+  ];
+  for (const [label, direction] of directions) {
+    await placementDemo.getByRole("button", { name: label }).click();
+    await expect(placement).toHaveAttribute("data-panel-tab-placement", direction);
+    await expect(demoCommand).toHaveValue("ls");
+    const side = direction === "left" || direction === "right";
+    const bar = await demoBar.boundingBox();
+    const content = await placementDemo.getByRole("tabpanel").boundingBox();
+    if (direction === "top") assert(bar.y + bar.height <= content.y + 1);
+    if (direction === "bottom") assert(bar.y >= content.y + content.height - 1);
+    if (direction === "left") assert(bar.x + bar.width <= content.x + 1);
+    if (direction === "right") assert(bar.x >= content.x + content.width - 1);
+    if (side) {
+      assert.equal(bar.width, 44);
+      await expect(placementDemo.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical");
+      await expect(placementDemo.getByRole("tab", { name: "终端" })).toHaveAttribute("title", "终端");
+      await expect(placementDemo.getByRole("tab", { name: "终端" }).locator(".mt-tab-label")).toHaveCSS("clip-path", "inset(50%)");
+      await expect(placementDemo.getByRole("tab", { name: "终端" })).toHaveAttribute("aria-selected", "true");
+    }
+    await placementDemo.getByRole("button", { name: "收起面板" }).click();
+    await expect(placementDemo.getByRole("tabpanel")).toHaveCount(0);
+    await expect(placementDemo.getByRole("button", { name: "工作区信息" })).toBeVisible();
+    const toggle = placementDemo.getByRole("button", { name: "展开面板" });
+    await expect(toggle).toBeVisible();
+    assert(Math.abs((await placement.boundingBox())[side ? "width" : "height"] - (side ? 44 : 34)) < 1);
+    if (side) assert(Math.abs((await demoBar.boundingBox()).x - bar.x) < 1, "Collapsed rail stays on the selected physical edge");
+    await toggle.press("Enter");
+    await expect(demoCommand).toHaveValue("ls");
+  }
+
+  const rtl = page.getByTestId("rtl-rail");
+  const rtlBar = rtl.locator(".mt-tab-bar");
+  const consoleTab = rtl.getByRole("tab", { name: "Console" });
+  const settingsTab = rtl.getByRole("tab", { name: "Settings" });
+  await expect(consoleTab).toHaveAttribute("title", "Console");
+  await expect(settingsTab.locator(".mt-tab-label")).toHaveCSS("clip-path", "none");
+  assert((await rtlBar.boundingBox()).x > (await rtl.getByRole("tabpanel").boundingBox()).x, "RTL right remains physically right");
+  await consoleTab.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(settingsTab).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(rtl.getByRole("tabpanel", { name: "Settings" })).toHaveText("Settings content");
+  await expect(settingsTab).toHaveAttribute("aria-selected", "true");
+  const selectedPaint = await settingsTab.evaluate(button => {
+    const probe = document.createElement("span");
+    button.append(probe);
+    probe.style.background = "var(--mt-select-surface)";
+    const sameThemePaint = getComputedStyle(button).backgroundColor === getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return sameThemePaint;
+  });
+  assert(selectedPaint, "The rail's selected tab uses the active theme token");
   assert.deepEqual(errors, []);
   console.log("Panel SSR companion browser: compact and dark header, focus recovery, four docks, keyboard resize and restore passed");
 } finally {

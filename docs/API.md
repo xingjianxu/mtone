@@ -250,11 +250,17 @@ Use `Panel` for IDE-style work areas. Pass `items` (tab value, label, content, o
 icon and disabled flag), `label` to name the tab strip, and `actions` for header
 controls. `value` / `defaultValue` and `collapsed` / `defaultCollapsed` allow
 controlled or independent tab selection and disclosure. A collapsed Panel keeps
-the header and all visited content mounted but hides the tab bodies.
+the tab bar and all visited content mounted but hides the tab bodies.
 
 Use Splitter to dock on any edge: vertical orientation for top/bottom and horizontal
-for left/right. Keep the header at the top. The [IDE example](https://xingjianxu.github.io/mtone/#/components/Panel?section=ide)
+for left/right. Docking does not set the internal tab position. The [IDE example](https://xingjianxu.github.io/mtone/#/components/Panel?section=ide)
 retains enough space for the side header when collapsed and restores the previous pane size on expansion.
+
+Set `tabPlacement` to `"top"` (default), `"bottom"`, `"left"`, or `"right"`.
+Side values are physical even in RTL; use Up/Down to move between their tabs.
+With a plain text label and icon, the rail shows the icon and retains the
+accessible name and native title. Tabs without icons keep a visible text label.
+The collapse and action controls move with the tab bar regardless of placement.
 
 ## HoverMarquee
 

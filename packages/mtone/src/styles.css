@@ -28,7 +28,6 @@
 @import "./toast.css";
 @import "./layout.css";
 @import "./page-layout.css";
-@import "./panel.css";
 @import "./interactive.css";
 @import "./data.css";
 @import "./data-list.css";
@@ -949,6 +948,7 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 @import "./tree.css";
 
 @import "./tabs.css";
+@import "./panel.css";
 
 @import "./cascader.css";
 

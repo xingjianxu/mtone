@@ -58,7 +58,14 @@ export interface TabsProps extends Omit<
 }
 
 /** Internal: let Panel hide its tab bodies without destroying visited content. */
-export const TabsCollapsedContext = React.createContext(false);
+const defaultPanelSettings = { collapsed: false, sideRail: false };
+export const TabsPanelContext = React.createContext(defaultPanelSettings);
+
+/** Plain labels can be represented by an icon with an accessible name and a tooltip. */
+export function tabHint(label: React.ReactNode): string | undefined {
+  if (typeof label === "string") return label.trim() || undefined;
+  return typeof label === "number" ? String(label) : undefined;
+}
 
 export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   {
@@ -92,7 +99,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   ref,
 ) {
   const { locale } = useMtone();
-  const panelsCollapsed = React.useContext(TabsCollapsedContext);
+  const { collapsed: panelsCollapsed, sideRail } = React.useContext(TabsPanelContext);
   const zh = locale === "zh";
   const inheritedDirection = useDirection();
   const direction =
@@ -291,6 +298,8 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
                 <BTabs.Tab
                   className="mt-tab"
                   value={item.value}
+                  title={sideRail ? tabHint(item.label) : undefined}
+                  data-rail-icon={sideRail && item.icon != null && !!tabHint(item.label) || undefined}
                   disabled={item.disabled}
                   draggable={reorderable && !!onOrderChange && !item.disabled}
                   onDragStart={(event) => {
@@ -434,9 +443,9 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
                 (visited.has(item.value) || selected === item.value))
             }
           >
-            <TabsCollapsedContext.Provider value={false}>
+            <TabsPanelContext.Provider value={defaultPanelSettings}>
               {item.content}
-            </TabsCollapsedContext.Provider>
+            </TabsPanelContext.Provider>
           </BTabs.Panel>
         ))}
       </BTabs.Root>

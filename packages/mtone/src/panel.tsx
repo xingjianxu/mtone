@@ -1,7 +1,8 @@
 import React from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
+import { useDirection } from "@base-ui/react/direction-provider";
 import { Button, cn, useMtone } from "./basic";
-import { Tabs, TabsCollapsedContext, type TabItem, type TabsProps } from "./tabs";
+import { Tabs, TabsPanelContext, tabHint, type TabItem, type TabsProps } from "./tabs";
 
 type PanelTab = Pick<TabItem, "value" | "label" | "content" | "disabled" | "icon">;
 
@@ -11,6 +12,8 @@ export interface PanelProps extends Omit<
 >, Pick<TabsProps, "label" | "value" | "defaultValue" | "onValueChange"> {
   items: PanelTab[];
   actions?: React.ReactNode;
+  /** Physical edge of the tab bar, independent of the surrounding layout. */
+  tabPlacement?: "top" | "bottom" | "left" | "right";
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
@@ -19,6 +22,7 @@ export interface PanelProps extends Omit<
 export function Panel({
   items,
   actions,
+  tabPlacement = "top",
   collapsed,
   defaultCollapsed = false,
   onCollapsedChange,
@@ -29,6 +33,12 @@ export function Panel({
   ...props
 }: PanelProps) {
   const { locale } = useMtone();
+  const inheritedDirection = useDirection();
+  const rtl = (props.dir === "rtl" || props.dir === "ltr" ? props.dir : inheritedDirection) === "rtl";
+  const sideRail = tabPlacement === "left" || tabPlacement === "right";
+  const placement = !sideRail ? tabPlacement
+    : (tabPlacement === "left") !== rtl ? "start" : "end";
+  const compactRail = sideRail && items.every(item => item.icon != null && !!tabHint(item.label));
   const [localCollapsed, setLocalCollapsed] = React.useState(defaultCollapsed);
   const isCollapsed = collapsed ?? localCollapsed;
   const root = React.useRef<HTMLDivElement>(null);
@@ -45,17 +55,26 @@ export function Panel({
   }, [isCollapsed]);
 
   const zh = locale === "zh";
+  const DisclosureIcon = tabPlacement === "left"
+    ? (isCollapsed ? ChevronRight : ChevronLeft)
+    : tabPlacement === "right"
+      ? (isCollapsed ? ChevronLeft : ChevronRight)
+      : (isCollapsed ? ChevronUp : ChevronDown);
   return (
-    <TabsCollapsedContext.Provider value={isCollapsed}>
+    <TabsPanelContext.Provider value={{ collapsed: isCollapsed, sideRail }}>
       <Tabs
         {...props}
         ref={root}
         items={items}
+        placement={placement}
         size="small"
         indicatorColor="blue"
         destroyOnHidden={false}
         className={cn("mt-ide-panel", className)}
         data-collapsed={isCollapsed || undefined}
+        data-panel-tab-placement={tabPlacement}
+        data-side-rail={sideRail || undefined}
+        data-compact-rail={compactRail || undefined}
         onFocusCapture={(event) => {
           const target = event.target as HTMLElement;
           const body = target.closest(".mt-tab-panel");
@@ -70,7 +89,13 @@ export function Panel({
         }}
         extraEnd={
           <>
-            {actions != null && <div className="mt-ide-panel-actions">{actions}</div>}
+            {actions != null && (
+              <div className="mt-ide-panel-actions">
+                <TabsPanelContext.Provider value={{ collapsed: false, sideRail: false }}>
+                  {actions}
+                </TabsPanelContext.Provider>
+              </div>
+            )}
             <Button
               ref={toggle}
               iconOnly
@@ -84,11 +109,11 @@ export function Panel({
                 onCollapsedChange?.(next);
               }}
             >
-              {isCollapsed ? <ChevronUp size={15} aria-hidden="true" /> : <ChevronDown size={15} aria-hidden="true" />}
+              <DisclosureIcon size={15} aria-hidden="true" />
             </Button>
           </>
         }
       />
-    </TabsCollapsedContext.Provider>
+    </TabsPanelContext.Provider>
   );
 }

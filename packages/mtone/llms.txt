@@ -242,11 +242,13 @@ export default function Demo() {
 - items: Pick<TabItem, 'value' | 'label' | 'content' | 'disabled' | 'icon'>[]. 标签数据。已访问的标签内容在切换和收起后保持挂载。
 - label: string. 标签列表的无障碍名称。
 - value / defaultValue / onValueChange: string / string / (value: string) => void. 受控或非受控的选中标签。
-- actions: ReactNode. 标题行末端的附加操作，收起时仍可操作。
-- collapsed / defaultCollapsed / onCollapsedChange: boolean / boolean / (collapsed: boolean) => void (default: defaultCollapsed: false). 受控或非受控的收起状态，收起后只显示标题行。
+- tabPlacement: "top" | "bottom" | "left" | "right" (default: "top"). 标签栏相对内容的物理方位，与 Panel 的外部停靠无关。左右为纵向标签栏。
+- actions: ReactNode. 标签栏末端的附加操作，收起时仍可操作。
+- collapsed / defaultCollapsed / onCollapsedChange: boolean / boolean / (collapsed: boolean) => void (default: defaultCollapsed: false). 受控或非受控的收起状态，收起后只显示标签栏。
 - 原生属性: ComponentPropsWithRef<'div'>. 支持 className、style 和原生属性；ref 指向根 div。
-- Panel 不负责停靠和调整尺寸。与 Splitter 组合时，顶部和底部用纵向分栏，左右用横向分栏，标题栏始终在上方。示例在左右收起时保留紧凑标题宽度，并在展开后恢复此前的分栏尺寸。
-- 标题栏沿用 Tabs 的键盘操作与窄宽度溢出菜单；收起会隐藏内容区并使其不可聚焦，但保留内部状态。
+- Panel 不负责停靠和调整尺寸。与 Splitter 组合时，顶部和底部用纵向分栏，左右用横向分栏，停靠示例独立使用默认顶部标签栏，在展开后恢复此前的分栏尺寸。
+- 左右栏使用图标和文字提示；没有图标的标签仍显示文字。收起时操作和展开按钮保留在同一侧栏。
+- 标签栏沿用 Tabs 的键盘操作与窄宽度溢出菜单；收起会隐藏内容区并使其不可聚焦，但保留内部状态。
 
 ```tsx
 import { Panel } from "@bixlab/mtone";

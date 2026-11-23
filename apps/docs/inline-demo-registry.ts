@@ -1,3 +1,5 @@
+import PanelTabPlacement from "./inline-demos/panel-tab-placement";
+import PanelTabPlacementSource from "./inline-demos/panel-tab-placement.tsx?raw";
 import PanelIde from "./inline-demos/panel-ide";
 import PanelIdeSource from "./inline-demos/panel-ide.tsx?raw";
 import PanelStandalone from "./inline-demos/panel-standalone";
@@ -229,6 +231,7 @@ export const inlineDocSections: Readonly<
 > = {
   ToastProvider: toastSections,
   Panel: [
+    { id: "tab-placement", title: "标签栏位置", Demo: PanelTabPlacement, source: source(PanelTabPlacementSource) },
     { id: "ide", title: "IDE 四向停靠", Demo: PanelIde, source: source(PanelIdeSource) },
     { id: "standalone", title: "独立面板", Demo: PanelStandalone, source: source(PanelStandaloneSource) },
   ],

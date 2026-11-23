@@ -61,3 +61,25 @@ it("keeps controlled selection and collapse until the parent accepts each reques
   expect(screen.queryByRole("tabpanel")).not.toBeInTheDocument();
   expect(ref.current).toBe(document.getElementById("workbench"));
 });
+
+it("supports a physically left tab rail under RTL without remounting visited contents", async () => {
+  const user = userEvent.setup();
+  const railItems = [
+    { ...items[0], icon: <svg /> },
+    items[1],
+  ];
+  const view = render(<Panel label="Workbench" dir="rtl" items={railItems} tabPlacement="left" />);
+  const list = screen.getByRole("tablist", { name: "Workbench" });
+  expect(list).toHaveAttribute("aria-orientation", "vertical");
+  const problems = within(list).getByRole("tab", { name: "Problems" });
+  expect(problems).toHaveAttribute("title", "Problems");
+  problems.focus();
+  await user.keyboard("{ArrowDown}{Enter}");
+  const input = screen.getByRole("textbox", { name: "Command" });
+  await user.type(input, "npm run dev");
+  view.rerender(<Panel label="Workbench" dir="rtl" items={railItems} tabPlacement="bottom" />);
+  expect(list).not.toHaveAttribute("aria-orientation", "vertical");
+  expect(input).toHaveValue("npm run dev");
+  expect(input).toBe(screen.getByRole("textbox", { name: "Command" }));
+  expect(problems).not.toHaveAttribute("title");
+});
