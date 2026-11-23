@@ -100,7 +100,7 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Form, Card, CardGroup, Splitter, Table, DataTable, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
+import { MtoneProvider, MtoneScope, Input, ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Form, DataList, Toolbar, Card, CardGroup, Splitter, Table, DataTable, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
 assert.equal(formatShortcut('Mod+K', 'other'), 'Ctrl+K');
@@ -176,14 +176,28 @@ const nativeTable = renderToStaticMarkup(createElement(Table, {striped: true},
 assert.match(nativeTable, /^<table[^>]*>/);
 assert(nativeTable.includes('<caption>Native release table</caption>') && nativeTable.includes('<td colSpan="2">Merged cell</td>'));
 assert(!Object.hasOwn(Table, 'Summary'));
+const listToolbar = createElement(Toolbar, { 'aria-label': 'Release list toolbar', background: 'gray', controlStyle: 'borderless',
+  search: createElement(DataList.Search, { label: 'Find release records' }),
+  start: createElement(DataList.Selection),
+});
+const listHtml = renderToStaticMarkup(createElement(DataList, {
+  items: [{key:1}], getKey: row => row.key, renderItem: () => 'List row',
+  search: {}, selection: {}, toolbar: listToolbar,
+}));
+assert(listHtml.includes('Release list toolbar') && listHtml.includes('Find release records') && listHtml.includes('List row'));
+assert(listHtml.includes('data-control-style="borderless"'));
+assert.equal((listHtml.match(/class="mt-toolbar"/g) ?? []).length, 1, 'One supplied Toolbar');
+
 for (const virtual of [false, true]) {
   const tableHtml = renderToStaticMarkup(createElement(DataTable, {
     dataSource: [{key:1, name:'release-row'}],
     columns: [{key:'name',dataIndex:'name',title:'Name'}],
+    toolbar: createElement(Toolbar, {'aria-label':'Release data toolbar', start:'Actions'}),
     virtual, scroll: {x:500,y:200},
     summary: () => createElement(DataTable.Summary, {fixed: true}, createElement(DataTable.Summary.Row, null, createElement(DataTable.Summary.Cell, {index:0}, 'Summary'))),
   }));
   assert(tableHtml.includes('release-row'));
+  assert(tableHtml.includes('Release data toolbar') && tableHtml.indexOf('Release data toolbar') < tableHtml.indexOf('release-row'));
   assert(tableHtml.includes('Summary'), 'Summary should render for virtual=' + virtual);
 }
 assert(renderToStaticMarkup(createElement(Card, {title:"Card title",htmlTitle:"Tooltip"}, "Body")).includes("Card title"));
@@ -198,7 +212,7 @@ assert(import.meta.resolve('@bixlab/mtone/styles.css').endsWith('/dist/styles.cs
   execFileSync(process.execPath, ["smoke.mjs"], { cwd: dir, stdio: "inherit" });
   writeFileSync(
     join(dir, "smoke.tsx"),
-    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, type PopoverMenuProps, Typography, Text, Title, Paragraph, Link, Menu, type MenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, ToastProvider, useToast, Form, Input, ShortcutsProvider, ShortcutScope, useShortcut, type ShortcutOptions, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableProps, DataTable, type DataTableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
+    `import { MtoneProvider, MtoneScope, type MtoneTheme, type MtoneProviderProps, type MtoneScopeProps, TagSelect, type TagSelectProps, List, ListItem, type ListHandle, type ListProps, type ListSortHandleProps, Progress, type ProgressProps, LoadingOverlay, type LoadingOverlayProps, Menubar, type MenubarProps, Popover, type PopoverProps, type PopoverMenuProps, Typography, Text, Title, Paragraph, Link, Menu, type MenuProps, type MenuEntry, Transfer, Cascader, CascaderPanel, type CascaderProps, type CascaderPath, type CascaderOption, AutoComplete, Divider, type DividerProps, Tabs, type TabsProps, type TabItem, TableOfContents, type TableOfContentsProps, type TableOfContentsItem, type TableOfContentsHandle, Image, ImageGroup, ImagePreview, type ImageProps, type ImageItem, Tree, type TreeProps, type TreeRef, type TreeKey, Affix, Result, type AffixProps, Button, AdminLayout, type AdminLayoutProps, type AdminLayoutSiderProps, type AdminLayoutHeaderProps, type AdminLayoutContentProps, ToastProvider, useToast, Form, Input, DataList, Toolbar, ShortcutsProvider, ShortcutScope, useShortcut, type ShortcutOptions, Card, CardGroup, type CardGroupProps, type CardGroupItemProps, Splitter, Table, type TableProps, DataTable, type DataTableRef, Calendar, type CalendarProps, Timeline, type TimelineProps, Rate, type RateProps, Avatar, AvatarGroup, type AvatarProps, Popconfirm, type PopconfirmProps, Mentions, type MentionsRef, Questionnaire, type QuestionnaireItem, type QuestionnaireAnswers, PageLayout, type PageLayoutProps, NavSubmenu, NavItem, type NavSubmenuProps } from '@bixlab/mtone';
 // @ts-expect-error The former component and its props are no longer exported.
 import { Layout, type LayoutProps } from '@bixlab/mtone';
 // @ts-expect-error There is no old standalone Dropdown alias or type.
@@ -305,8 +319,20 @@ export const simpleTableDemo = <Table {...nativeTableProps} ref={nativeTableRef}
 // @ts-expect-error Basic Table accepts native markup, not the data-driven API.
 export const invalidTable = <Table columns={[]} dataSource={[]}/>;
 const tableRef = createRef<DataTableRef>();
-export const tableDemo = <DataTable<{key:number;name:string}> ref={tableRef} dataSource={[{key:1,name:'Release'}]} columns={[{key:'name',dataIndex:'name',title:'Name',sorter:(a,b)=>a.name.localeCompare(b.name)}]} rowSelection={{onChange:(keys,rows)=>rows.map(row=>row.name)}} pagination={{pageSize:10}} onTableChange={(page,filters,sorter,extra)=>console.log(extra.action)} />;
+export const tableDemo = <DataTable<{key:number;name:string}> ref={tableRef} toolbar={<Toolbar start={<Button>View</Button>} />} dataSource={[{key:1,name:'Release'}]} columns={[{key:'name',dataIndex:'name',title:'Name',sorter:(a,b)=>a.name.localeCompare(b.name)}]} rowSelection={{onChange:(keys,rows)=>rows.map(row=>row.name)}} pagination={{pageSize:10}} onTableChange={(page,filters,sorter,extra)=>console.log(extra.action)} />;
 tableRef.current?.scrollTo({index:0});
+export const listDemo = <DataList
+  items={[{key:1, name:'One'}]}
+  getKey={row=>row.key} renderItem={row=>row.name}
+  search={{match:(row, query)=>row.name.includes(query)}} selection={{}}
+  toolbar={<Toolbar background="gray" controlStyle="borderless" search={<DataList.Search label="Find records"/>}
+    start={<DataList.Selection>{({selectedKeys, clearSelection}) =>
+      <Button onClick={clearSelection}>{selectedKeys.length}</Button>
+    }</DataList.Selection>} />}
+/>;
+// @ts-expect-error DataList toolbar controls are passed only through toolbar.
+export const oldListToolbar = <DataList items={[1]} getKey={n=>n} renderItem={n=>n} filters={<Button>Filter</Button>}/>;
+
 function ShortcutTypeDemo() {
   const options: ShortcutOptions = {enabled:true, allowInInputs:false, preventDefault:true};
   useShortcut(['Mod+K', 'Ctrl+Shift+P'], event => { const key: string = event.key; console.log(key); }, options);

@@ -14,29 +14,33 @@ export default function Demo() {
   const [status, setStatus] = useState(statuses[0]);
   const shown = rows.filter((row) => row.name.includes(query.trim()) && (status === statuses[0] || row.status === status));
   return (
-    <div style={{ width: 344, maxWidth: "100%", boxSizing: "border-box", border: "1px solid var(--mt-border)", borderRadius: 8, overflow: "clip" }}>
-      <Toolbar
-        aria-label="窄容器项目操作"
-        style={{ borderBlockEnd: "1px solid var(--mt-border)" }}
-        background="gray"
-        search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" value={query} onChange={(event) => setQuery(event.target.value)} />}
-        start={<Popover.Menu trigger={status === statuses[0] ? "状态" : status} items={statuses.map((key) => ({ key, label: key }))} onSelect={setStatus} />}
-        end={<>
-          <Button render={<a download="projects.csv" href={"data:text/csv;charset=utf-8," + encodeURIComponent(shown.map((row) => [row.name, row.status].join(",")).join("\n"))} />}
-            nativeButton={false} leftSection={<Download size={16} aria-hidden="true" />}>导出</Button>
-          <Button variant="solid" leftSection={<Plus size={16} aria-hidden="true" />} onClick={() => {
-            setRows((current) => [...current, { id: current.length + 1, name: `新项目 ${current.length - 1}`, status: "进行中" }]);
-            setQuery("");
-            setStatus(statuses[0]);
-          }}>新建</Button>
-        </>}
-      />
-      <DataTable style={{ border: 0, borderRadius: 0 }} rowKey="id" rowSelection={{}} pagination={false} dataSource={shown}
-        columns={[
-          { title: "项目名称", dataIndex: "name" },
-          { title: "状态", dataIndex: "status", render: (value: string) => <Status tone={value === "进行中" ? "blue" : "green"}>{value}</Status> },
-        ]}
-      />
-    </div>
+    <DataTable
+      style={{ width: 344, maxWidth: "100%" }}
+      toolbar={
+        <Toolbar
+          aria-label="窄容器项目操作"
+          background="gray"
+          search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" value={query} onChange={(event) => setQuery(event.target.value)} />}
+          start={<Popover.Menu trigger={status === statuses[0] ? "状态" : status} items={statuses.map((key) => ({ key, label: key }))} onSelect={setStatus} />}
+          end={<>
+            <Button render={<a download="projects.csv" href={"data:text/csv;charset=utf-8," + encodeURIComponent(shown.map((row) => [row.name, row.status].join(",")).join("\n"))} />}
+              nativeButton={false} leftSection={<Download size={16} aria-hidden="true" />}>导出</Button>
+            <Button variant="solid" leftSection={<Plus size={16} aria-hidden="true" />} onClick={() => {
+              setRows((current) => [...current, { id: current.length + 1, name: `新项目 ${current.length - 1}`, status: "进行中" }]);
+              setQuery("");
+              setStatus(statuses[0]);
+            }}>新建</Button>
+          </>}
+        />
+      }
+      rowKey="id"
+      rowSelection={{}}
+      pagination={false}
+      dataSource={shown}
+      columns={[
+        { title: "项目名称", dataIndex: "name" },
+        { title: "状态", dataIndex: "status", render: (value: string) => <Status tone={value === "进行中" ? "blue" : "green"}>{value}</Status> },
+      ]}
+    />
   );
 }

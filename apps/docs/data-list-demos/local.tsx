@@ -5,6 +5,7 @@ import {
   DataList,
   Select,
   Text,
+  Toolbar,
 } from "../../../packages/mtone/src";
 
 const records = [
@@ -50,32 +51,43 @@ export default function LocalDataListDemo() {
         getKey={(item) => item.id}
         getLabel={(item) => item.title}
         search={{
-          placeholder: "搜索文档标题",
           match: (item, query) =>
             item.title.toLowerCase().includes(query.trim().toLowerCase()),
         }}
-        filters={
-          <Select
-            label="文档状态"
-            options={statuses}
-            value={status}
-            onValueChange={(value) => setStatus(value ?? "all")}
+        filter={(item) => status === "all" || item.status === status}
+        toolbar={
+          <Toolbar
+            background="gray"
+            aria-label="文档管理"
+            start={
+              <>
+                <DataList.Selection>
+                  {({ selectedKeys, clearSelection }) => (
+                    <Button
+                      onClick={() => {
+                        setNotice(`已处理 ${selectedKeys.length} 个选中条目（演示）`);
+                        clearSelection();
+                      }}
+                    >
+                      批量处理
+                    </Button>
+                  )}
+                </DataList.Selection>
+                <DataList.Search label="搜索列表" placeholder="搜索文档标题" />
+              </>
+            }
+            end={
+              <Select
+                label="文档状态"
+                options={statuses}
+                value={status}
+                onValueChange={(value) => setStatus(value ?? "all")}
+              />
+            }
           />
         }
-        filter={(item) => status === "all" || item.status === status}
-        toolbar={<Text>文档管理</Text>}
         pagination={{ pageSize: 2 }}
         selection={{ getDisabled: (item) => item.status === "archived" }}
-        renderBatchActions={({ selectedKeys, clearSelection }) => (
-          <Button
-            onClick={() => {
-              setNotice(`已处理 ${selectedKeys.length} 个选中条目（演示）`);
-              clearSelection();
-            }}
-          >
-            批量处理
-          </Button>
-        )}
         expansion={{ renderDetail: (item) => <Text muted>{item.detail}</Text> }}
         renderItem={(item) => (
           <div

@@ -252,6 +252,8 @@ export type DataTableProps<T> = Omit<
   onSelectionChange?: (keys: React.Key[]) => void;
   rowSelection?: DataTableRowSelection<T>;
   pagination?: false | DataTablePagination;
+  /** Toolbar inside the table frame, before top pagination and rows. */
+  toolbar?: React.ReactNode;
   empty?: React.ReactNode;
   locale?: DataTableLocale;
   size?: "small" | "middle" | "medium" | "large";

@@ -81,30 +81,64 @@ try {
     const toolbar = demo.getByRole("group", { name, exact: true });
     await expect(toolbar).toBeVisible();
     const metrics = await toolbar.evaluate((node) => {
-      const frame = node.parentElement;
-      const table = frame.querySelector(":scope > .mt-table-wrap");
+      const seam = node.parentElement;
+      const frame = seam.parentElement;
+      const table = frame.querySelector(":scope > .mt-table-container");
       const edges = (element) => {
         const rules = getComputedStyle(element);
-        return ["Top", "Right", "Bottom", "Left"].map((side) => rules[`border${side}Width`]);
+        return ["Top", "Right", "Bottom", "Left"].map((side) => rules["border" + side + "Width"]);
       };
       const { borderTopLeftRadius: outerRadius, overflow } = getComputedStyle(frame);
-      const { borderTopLeftRadius: tableRadius } = getComputedStyle(table);
-      const toolbarBox = node.getBoundingClientRect();
+      const { borderTopLeftRadius: toolbarRadius } = getComputedStyle(node);
+      const toolbarBox = seam.getBoundingClientRect();
       const tableBox = table.getBoundingClientRect();
-      return { frame: edges(frame), toolbar: edges(node), table: edges(table), overflow,
-        outerRadius, tableRadius, seam: toolbarBox.bottom - tableBox.top,
+      return { isDataTableSlot: seam.matches(".mt-table-toolbar") && frame.matches(".mt-table-wrap"),
+        frame: edges(frame), toolbar: edges(node), divider: edges(seam), table: edges(table), overflow,
+        outerRadius, toolbarRadius, seam: toolbarBox.bottom - tableBox.top,
         left: toolbarBox.left - tableBox.left, right: toolbarBox.right - tableBox.right };
     });
-    assert.deepEqual(metrics.frame, ["1px", "1px", "1px", "1px"], `${size}: one outer frame`);
-    assert.deepEqual(metrics.toolbar, ["0px", "0px", "1px", "0px"], `${size}: one seam`);
-    assert.deepEqual(metrics.table, ["0px", "0px", "0px", "0px"], `${size}: no nested Table frame`);
-    assert.equal(metrics.outerRadius, "8px");
-    assert.equal(metrics.tableRadius, "0px");
-    assert.equal(metrics.overflow, "clip");
+    assert(metrics.isDataTableSlot);
+    assert.deepEqual(metrics.frame, ["1px", "1px", "1px", "1px"]);
+    assert.deepEqual(metrics.divider, ["0px", "0px", "1px", "0px"]);
+    assert.deepEqual(metrics.toolbar, ["0px", "0px", "0px", "0px"]);
+    assert.deepEqual(metrics.table, ["0px", "0px", "0px", "0px"]);
+    assert(parseFloat(metrics.outerRadius) > 0);
+    assert.equal(metrics.toolbarRadius, metrics.outerRadius);
+    assert.equal(metrics.overflow, "visible");
     equalPx(metrics.seam, 0, `${size}: joined surfaces`);
     equalPx(metrics.left, 0, `${size}: left edges join the outer frame`);
     equalPx(metrics.right, 0, `${size}: right edges join the outer frame`);
   }
+  url.searchParams.delete("framed");
+  url.searchParams.set("control-style", "");
+  await page.goto(url.href);
+  const grayDefault = page.getByRole("group", { name: "gray default", exact: true });
+  const borderless = page.getByRole("group", { name: "gray borderless", exact: true });
+  const white = page.getByRole("group", { name: "white borderless", exact: true });
+  const regular = borderless.getByRole("button", { name: "Filter", exact: true });
+  const select = borderless.getByRole("combobox", { name: "Status" });
+  const borderColor = (control) => control.evaluate((node) => getComputedStyle(node).borderTopColor);
+  const surface = (control) => control.evaluate((node) => getComputedStyle(node).backgroundColor);
+  for (const scheme of ["light", "dark"]) {
+    await page.emulateMedia({colorScheme: scheme});
+    for (const control of [regular, select]) {
+      await page.mouse.move(999, 699);
+      const before = await surface(control);
+      assert.equal(await borderColor(control), "rgba(0, 0, 0, 0)");
+      await control.hover();
+      await expect.poll(() => surface(control)).not.toBe(before);
+    }
+    const defaultBorder = await borderColor(grayDefault.getByRole("button", {name:"Filter"}));
+    assert.notEqual(defaultBorder, "rgba(0, 0, 0, 0)");
+    assert.notEqual(await borderColor(white.getByRole("button", {name:"Filter"})), "rgba(0, 0, 0, 0)");
+    assert.equal(await borderColor(borderless.getByRole("button", {name:"Grid"})),
+      await borderColor(grayDefault.getByRole("button", {name:"Grid"})));
+  }
+  await select.focus();
+  assert.notEqual(await borderColor(select), "rgba(0, 0, 0, 0)", "Focused Select keeps its visible focus border");
+  await select.press("Enter");
+  await page.getByRole("option", {name:"Open records"}).click();
+  await expect(select).toContainText("Open records");
   console.log("Toolbar: standalone container wrapping, logical alignment, theme surfaces, actions and composed Table frames verified");
 } finally {
   await browser?.close();

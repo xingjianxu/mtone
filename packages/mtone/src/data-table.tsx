@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { cn, useMtone } from "./basic";
 import { Tooltip } from "./interactive";
+import { hasToolbarContent } from "./toolbar-slot";
 import type {
   DataTableProps,
   DataTableColumn,
@@ -266,6 +267,7 @@ function DataTableInner<T>(
     onChange,
     onTableChange,
     pagination = false,
+    toolbar,
     rowSelection,
     selectable,
     selectedKeys,
@@ -836,6 +838,9 @@ function DataTableInner<T>(
       style={{ ...style, ...resolvedStyles.root }}
       aria-busy={spinning || undefined}
     >
+      {hasToolbarContent(toolbar) && (
+        <div className="mt-table-toolbar">{toolbar}</div>
+      )}
       {paginationNodes("top")}
       <div className="mt-table-container">
         {virtual ? (

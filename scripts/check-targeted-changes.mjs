@@ -77,6 +77,7 @@ const aliases = {
   "table-selection": ["table"],
   "table-types": ["table"],
   theme: ["theme-palette", "theme-docs", "color-theme"],
+  "toolbar-slot": ["table", "data-list", "toolbar"],
   "tree-model": ["tree"],
   "tree-types": ["tree", "tree-select"],
 };

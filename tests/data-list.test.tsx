@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { DataList, MtoneProvider } from "../packages/mtone/src";
+import { DataList, MtoneProvider, Toolbar } from "../packages/mtone/src";
 
 // Base UI re-dispatches real checkbox clicks through PointerEvent.
 if (!window.PointerEvent)
@@ -31,7 +31,7 @@ const labels = () =>
     .map((row) => row.textContent);
 
 describe("DataList", () => {
-  it("uses one shared gray Toolbar while preserving DataList control order before the list", async () => {
+  it("uses only the supplied toolbar and connects selection, search and batch helpers in caller order", async () => {
     const user = userEvent.setup();
     render(
       english(
@@ -40,9 +40,28 @@ describe("DataList", () => {
           aria-label="Records"
           selection={{}}
           search={{}}
-          filters={<button>Filters</button>}
-          toolbar={<button>New record</button>}
-          renderBatchActions={() => <button>Process selected</button>}
+          toolbar={
+            <Toolbar
+              background="gray"
+              start={
+                <>
+                  <DataList.Selection>
+                    {() => <button>Process selected</button>}
+                  </DataList.Selection>
+                  <DataList.Search
+                    label="Find records"
+                    placeholder="Keywords"
+                  />
+                </>
+              }
+              end={
+                <>
+                  <button>Filters</button>
+                  <button>New record</button>
+                </>
+              }
+            />
+          }
         />,
       ),
     );
@@ -50,14 +69,21 @@ describe("DataList", () => {
     const header = frame.querySelector<HTMLElement>(
       ":scope > .mt-data-list-toolbar",
     )!;
-    expect(header).toHaveClass("mt-toolbar");
-    expect(header).toHaveAttribute("data-background", "gray");
+    expect(header).not.toHaveClass("mt-toolbar");
+    expect(header.firstElementChild).toHaveClass("mt-toolbar");
+    expect(header.firstElementChild).toHaveAttribute("data-background", "gray");
     expect(header).not.toHaveAttribute("role");
     expect(frame.querySelectorAll(".mt-toolbar")).toHaveLength(1);
     const selection = within(header).getByRole("checkbox", {
       name: "Select visible items",
     });
-    const search = within(header).getByRole("textbox", { name: "Search list" });
+    const search = within(header).getByRole("textbox", {
+      name: "Find records",
+    });
+    expect(search).toHaveAttribute("placeholder", "Keywords");
+    expect(
+      within(header).queryByRole("button", { name: "Process selected" }),
+    ).not.toBeInTheDocument();
     await user.tab();
     expect(selection).toHaveFocus();
     await user.tab();
@@ -76,13 +102,67 @@ describe("DataList", () => {
     expect(frame.children[1]).toBe(list());
   });
 
-  it("does not render an empty header when there are no controls", () => {
-    render(
-      english(<DataList {...props} aria-label="Records" filters={false} />),
+  it("keeps data-only search and row selection working without an implicit toolbar", () => {
+    const variants = [undefined, null, false, "", [], <></>];
+    const view = (toolbar: React.ReactNode) =>
+      english(
+        <DataList
+          {...props}
+          aria-label="Records"
+          toolbar={toolbar}
+          search={{
+            defaultValue: "Gamma",
+            match: (row, query) => row.title === query,
+          }}
+          selection={{ defaultSelectedKeys: ["c"] }}
+        />,
+      );
+    const { rerender } = render(view(variants[0]));
+    for (const toolbar of variants) {
+      rerender(view(toolbar));
+      expect(
+        screen.getByRole("region", { name: "Records" }).firstElementChild,
+      ).toBe(list());
+      expect(within(list()).getAllByRole("listitem")).toHaveLength(1);
+      expect(within(list()).getByText("Gamma")).toBeVisible();
+      expect(
+        screen.getByRole("checkbox", { name: "Select Gamma" }),
+      ).toBeChecked();
+      expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("checkbox", { name: "Select visible items" }),
+      ).not.toBeInTheDocument();
+    }
+  });
+
+  it("accepts an arbitrary toolbar and ignores disconnected helpers", () => {
+    const { container } = render(
+      english(
+        <>
+          <DataList.Search label="Disconnected search" />
+          <DataList.Selection />
+          <DataList
+            {...props}
+            toolbar={
+              <>
+                <DataList.Search label="Unconfigured search" />
+                <DataList.Selection />
+                <button>Arbitrary content</button>
+              </>
+            }
+          />
+        </>,
+      ),
     );
+    expect(container.querySelector(".mt-toolbar")).toBeNull();
+    const slot = container.querySelector(".mt-data-list-toolbar")!;
     expect(
-      screen.getByRole("region", { name: "Records" }).firstElementChild,
-    ).toBe(list());
+      within(slot as HTMLElement).getByRole("button", {
+        name: "Arbitrary content",
+      }),
+    ).toBeVisible();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   });
 
   it("filters and searches before pagination, resetting to page one once per actual page change", async () => {
@@ -98,8 +178,17 @@ describe("DataList", () => {
           }}
           filter={(row) => !row.archived}
           pagination={{ pageSize: 1, defaultPage: 3, onPageChange }}
-          filters={<button>Filters</button>}
-          toolbar={<button>New record</button>}
+          toolbar={
+            <Toolbar
+              search={<DataList.Search />}
+              end={
+                <>
+                  <button>Filters</button>
+                  <button>New record</button>
+                </>
+              }
+            />
+          }
         />,
       ),
     );
@@ -130,6 +219,7 @@ describe("DataList", () => {
             match: (row, query) => row.title.toLowerCase() === query,
           }}
           pagination={{ page: 3, pageSize: 1, onPageChange }}
+          toolbar={<DataList.Search />}
         />,
       ),
     );
@@ -157,6 +247,7 @@ describe("DataList", () => {
             onPageChange,
           }}
           search={{ defaultValue: "unmatched", onChange: onQuery, match }}
+          toolbar={<DataList.Search />}
           filter={filter}
         />,
       ),
@@ -182,11 +273,18 @@ describe("DataList", () => {
           {...props}
           pagination={{ pageSize: 2 }}
           selection={{ getDisabled: (row) => row.archived, onChange }}
-          renderBatchActions={({ selectedKeys }) => (
-            <button onClick={() => batch(selectedKeys)}>
-              Apply to {selectedKeys.length}
-            </button>
-          )}
+          toolbar={
+            <DataList.Selection>
+              {({ selectedKeys, clearSelection }) => (
+                <>
+                  <button onClick={() => batch(selectedKeys)}>
+                    Apply to {selectedKeys.length}
+                  </button>
+                  <button onClick={clearSelection}>Reset batch</button>
+                </>
+              )}
+            </DataList.Selection>
+          }
         />,
       ),
     );
@@ -207,6 +305,9 @@ describe("DataList", () => {
     expect(batch).toHaveBeenCalledWith(["a", "c", "d"]);
     await user.click(all);
     expect(onChange).toHaveBeenLastCalledWith(["a"]);
+    await user.click(screen.getByRole("button", { name: "Reset batch" }));
+    expect(onChange).toHaveBeenLastCalledWith([]);
+    await user.click(all);
     await user.click(screen.getByRole("button", { name: "Clear selection" }));
     expect(onChange).toHaveBeenLastCalledWith([]);
     expect(

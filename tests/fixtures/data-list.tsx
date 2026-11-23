@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Button, MtoneProvider, Popover } from "../../packages/mtone/src";
+import { Button, MtoneProvider, Popover, Toolbar } from "../../packages/mtone/src";
 import { DataList, type DataListKey } from "../../packages/mtone/src/data-list";
 import "../../packages/mtone/dist/styles.css";
 const items = [
@@ -34,19 +34,33 @@ function Fixture() {
               </div>
             )}
             search={{
-              label: "Find records",
-              placeholder: "Filter by name",
               match: (item, query) =>
                 item.name.toLowerCase().includes(query.toLowerCase()),
             }}
-            filters={
-              <Popover
-                trigger={<Button>Filter records</Button>}
-                title="Filter options"
-                content={<Button>Active records</Button>}
+            toolbar={
+              <Toolbar
+                background="gray"
+                start={<>
+                  <DataList.Selection>
+                    {({ selectedKeys, clearSelection }) => (
+                      <>
+                        <span data-testid="batch-count">Batch {selectedKeys.length}</span>
+                        <Button onClick={clearSelection}>Reset batch</Button>
+                      </>
+                    )}
+                  </DataList.Selection>
+                  <DataList.Search label="Find records" placeholder="Filter by name" />
+                </>}
+                end={<>
+                  <Popover
+                    trigger={<Button>Filter records</Button>}
+                    title="Filter options"
+                    content={<Button>Active records</Button>}
+                  />
+                  <Button>Create record</Button>
+                </>}
               />
             }
-            toolbar={<Button>Create record</Button>}
             pagination={{ pageSize: 2 }}
             selection={{
               selectedKeys: selected,
@@ -60,14 +74,6 @@ function Fixture() {
               <Button onClick={() => setAction(item.id)}>
                 Open {item.name}
               </Button>
-            )}
-            renderBatchActions={({ selectedKeys, clearSelection }) => (
-              <>
-                <span data-testid="batch-count">
-                  Batch {selectedKeys.length}
-                </span>
-                <Button onClick={clearSelection}>Reset batch</Button>
-              </>
             )}
           />
           <output data-testid="selection">
@@ -87,9 +93,9 @@ function Fixture() {
             search={{
               value: remoteQuery,
               onChange: setRemoteQuery,
-              label: "Remote query",
               match: () => false,
             }}
+            toolbar={<Toolbar search={<DataList.Search label="Remote query" />} />}
             pagination={{
               mode: "remote",
               page: remotePage,

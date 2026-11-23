@@ -40,3 +40,68 @@
     flex-basis: 100%;
   }
 }
+
+/* Only controls placed directly in these slots adopt the quiet chrome.
+ * A group, nested toolbar, custom control or portal remains independent. */
+.mt-toolbar[data-background="gray"][data-control-style="borderless"] {
+  --_mt-toolbar-control-hover: color-mix(
+    in srgb, var(--mt-subtle, #f7f7f5) 92%, var(--mt-fg, #37352f)
+  );
+
+  & > .mt-toolbar-layout > :is(.mt-toolbar-search, .mt-toolbar-start, .mt-toolbar-end) {
+    & > .mt-btn {
+      border-color: transparent;
+      background-color: transparent;
+      color: var(--mt-text, var(--mt-fg, #37352f));
+
+      &:where(.mt-danger) {
+        color: var(--mt-danger-text, #b6403b);
+      }
+
+      &:is(:hover, [data-popup-open]):where(:not(:disabled, [data-disabled], [aria-disabled="true"])) {
+        background-color: var(--_mt-toolbar-control-hover);
+      }
+
+      &[aria-pressed="true"]:not([data-toggle-mode="icon"]) {
+        background-color: var(--mt-nav-selected, #e5e5e5);
+
+        &:hover:where(:not(:disabled, [data-disabled], [aria-disabled="true"])) {
+          background-color: color-mix(
+            in srgb, var(--mt-nav-selected, #e5e5e5) 95%, var(--mt-fg, #37352f)
+          );
+        }
+
+        @media (forced-colors: active) {
+          &,
+          &:hover {
+            forced-color-adjust: none;
+            border-color: Highlight;
+            background-color: Highlight;
+            color: HighlightText;
+          }
+
+          &:focus-visible {
+            outline-color: HighlightText;
+          }
+        }
+      }
+    }
+
+    & > :is(.mt-select, .mt-select-multiple),
+    /* Built-in popup mode uses a plain span; clearable triggers have a class. */
+    & > span:where(.mt-select-clearable, :not([class])) > .mt-select {
+      &:not(:focus-within, [aria-expanded="true"], :has([aria-expanded="true"])) {
+        background-color: transparent;
+
+        &:not([aria-invalid="true"], [data-invalid], :has([aria-invalid="true"], [data-invalid])) {
+          border-color: transparent;
+        }
+      }
+
+      &:hover:where(:not(:disabled, [data-disabled], [aria-disabled="true"],
+        :has(input:disabled, input[data-disabled], input[aria-disabled="true"]))) {
+        background-color: var(--_mt-toolbar-control-hover);
+      }
+    }
+  }
+}

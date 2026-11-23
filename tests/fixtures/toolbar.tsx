@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Button, Input, MtoneProvider, Toolbar } from "../../packages/mtone/src";
+import { Button, ButtonGroup, Input, MtoneProvider, Select, Toolbar } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 import NarrowDemo from "../../apps/docs/inline-demos/toolbar-narrow";
 import WideDemo from "../../apps/docs/inline-demos/toolbar-table";
@@ -37,7 +37,26 @@ function Example({ name, width, theme, dir, background, flexRow }: {
   );
 }
 
+function ControlStyleExamples() {
+  const [choice, setChoice] = React.useState("all");
+  return <MtoneProvider theme="system" locale="en">
+    {(["gray default", "gray borderless", "white borderless"] as const).map((name) => (
+      <Toolbar
+        key={name}
+        aria-label={name}
+        background={name.startsWith("gray") ? "gray" : "white"}
+        controlStyle={name.endsWith("borderless") ? "borderless" : "default"}
+        start={<><Button>Filter</Button>
+          <Select label="Status" options={[{value:"all",label:"All records"},{value:"open",label:"Open records"}]} value={choice} onValueChange={value => setChoice(value ?? "all")} />
+        </>}
+        end={<ButtonGroup aria-label="View options" connected><Button>Grid</Button><Button>List</Button></ButtonGroup>}
+      />
+    ))}
+  </MtoneProvider>;
+}
+
 createRoot(document.getElementById("root")!).render(
+  new URLSearchParams(location.search).has("control-style") ? <ControlStyleExamples /> :
   new URLSearchParams(location.search).has("framed") ? (
     <MtoneProvider>
       <div data-testid="wide-frame-demo" style={{ width: 720, maxWidth: "100%" }}><WideDemo /></div>

@@ -2208,11 +2208,12 @@ export default function Demo() {
       { name: "start", type: "ReactNode", description: "可选起始侧控件，例如筛选、分类或状态。" },
       { name: "end", type: "ReactNode", description: "可选末端控件，例如导出、视图切换或新建。在窄容器内可换行，沿逻辑末端对齐。" },
       { name: "background", type: '"white" | "gray"', default: '"white"', description: "使用 mtone 正常或浅灰表面，随亮暗主题适配。" },
+      { name: "controlStyle", type: '"default" | "borderless"', default: '"default"', description: "仅在 background=\"gray\" 时可选用 borderless。当前工具栏中的独立普通按钮和 Select 不显示静止边框，悬停时加深灰底；ButtonGroup 及键盘焦点样式不变。" },
       { name: "原生属性 / ref", type: "div 原生属性（不含 children）/ HTMLDivElement", description: "支持 className、style、ref 和可访问名称；有 aria-label 或 aria-labelledby 时默认作为 group。内容通过三个插槽传入。" },
     ],
     notes: [
       "响应自己的容器宽度，而不是只看视口。start 和 end 使用逻辑方向，RTL 自动镜像。",
-      "只负责布局；不执行搜索、过滤、数据更新或快捷键，也不接管 Tab 顺序。表格、列表、普通页面的状态由应用各自管理，不要求与 DataList、Table 或 DataTable 绑定。",
+      "只负责布局；不执行搜索、过滤、数据更新或快捷键，也不接管 Tab 顺序。表格、列表、普通页面的状态由应用各自管理，可独立使用，也可传入 DataTable 或 DataList 的 toolbar 插槽，让工具栏与内容共享外框。",
     ],
   },
   {
@@ -4732,7 +4733,7 @@ export default function Demo() {
     name: "DataList",
     description: "用于管理记录的列表，支持搜索筛选、分页、跨页选择、批量操作和行详情。",
     importNames: ["DataList"],
-    code: `import { DataList, Text } from "@bixlab/mtone";
+    code: `import { DataList, Text, Toolbar } from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
 const records = [
@@ -4749,6 +4750,12 @@ export default function Demo() {
       getLabel={(item) => item.title}
       renderItem={(item) => <Text>{item.title}</Text>}
       search={{ match: (item, query) => item.title.includes(query) }}
+      selection={{}}
+      toolbar={
+        <Toolbar background="gray" aria-label="文档操作"
+          search={<DataList.Search placeholder="搜索文档标题" />}
+          start={<DataList.Selection />} />
+      }
       pagination={{ pageSize: 10 }}
     />
   );
@@ -4757,19 +4764,21 @@ export default function Demo() {
       { name: "items / getKey", type: "readonly T[] / (item: T) => string | number", description: "必填。提供数据与稳定唯一的条目键（字符串或有限数值）；远程模式只传当前页记录。" },
       { name: "getLabel", type: "(item: T) => string", description: "为条目选择和展开按钮提供可读名称；省略时使用键的字符串。" },
       { name: "renderItem", type: "(item: T, index: number) => ReactNode", description: "必填。仅返回行内容；index 是从 0 开始的当前页索引，不要返回 li 或 ListItem。" },
-      { name: "search", type: "{ value?, defaultValue?, onChange?, placeholder?, label?, match? }", description: "传入后显示搜索框。match(item, query) 用于本地搜索，query 已去掉首尾空白；未传 match 时不自动筛选。" },
-      { name: "filter / filters / toolbar", type: "((item: T) => boolean) / ReactNode / ReactNode", description: "本地筛选条件、筛选控件与工具栏末端的额外内容。toolbar 仍接收 ReactNode，可直接传按钮等控件，不必再包一层 Toolbar。远程模式只呈现应用提供的结果。" },
+      { name: "search", type: "{ value?, defaultValue?, onChange?, match? }", description: "配置查询状态和本地匹配，不自动渲染控件。match(item, query) 接收去掉首尾空白的查询；省略 match 不自动筛选。" },
+      { name: "DataList.Search", type: "DataListSearchProps（label?: string；placeholder?: string）", description: "放在当前列表的 toolbar 内，连接 search 配置。默认可访问名称为“搜索列表”，占位符为“搜索…”，随语言设置变化。" },
+      { name: "filter", type: "(item: T) => boolean", description: "额外的本地筛选条件；筛选控件放在 Toolbar 插槽中。远程模式只呈现应用提供的结果。" },
+      { name: "toolbar", type: "ReactNode", description: "可选的头部内容，例如 <Toolbar background=\"gray\" search={...} start={...} end={...} />。工具栏与列表、分页共享外框；不传时不渲染工具栏。" },
       { name: "pagination", type: "DataListPagination", description: "省略时不分页。本地配置为 { mode?: 'local', page?, defaultPage?, pageSize?, onPageChange? }，默认第 1 页、每页 10 条；远程配置为 { mode: 'remote', page, pageSize, total, onPageChange }。" },
       { name: "selection", type: "{ selectedKeys?, defaultSelectedKeys?, onChange?, getDisabled? }", description: "启用选择。使用稳定键保留跨页选择；全选或取消全选只影响当前页的可选条目。" },
       { name: "expansion", type: "{ expandedKeys?, defaultExpandedKeys?, onChange?, isExpandable?, renderDetail }", description: "启用行详情；renderDetail(item) 返回详情内容。展开不会改变选中状态。" },
       { name: "renderActions", type: "(item: T) => ReactNode", description: "行尾操作；业务行为由应用处理，不会触发隐式选中。" },
-      { name: "renderBatchActions", type: "({ selectedKeys, clearSelection }) => ReactNode", description: "已选时渲染批量操作；clearSelection() 清除全部选中键，包括其他页。" },
+      { name: "DataList.Selection", type: "DataListSelectionProps（children?: (ctx: DataListBatchContext) => ReactNode）", description: "放在当前列表的 toolbar 内，连接 selection 配置。提供本页全选、已选数量与清除；已有选中项时调用可选的渲染函数。ctx.clearSelection() 清除全部选中键，包括其他页。" },
       { name: "loading / empty", type: "boolean / ReactNode", description: "加载状态与空内容；请求、错误和记录更新由应用处理。" },
       { name: "原生属性", type: "HTMLAttributes<HTMLElement>", description: "转发 section 根元素属性，例如 aria-label、className、style；行由 renderItem 提供。" },
     ],
     notes: [
       "DataList 用于行内容由应用渲染的数据管理页。仅需基础列表、分组吸顶或虚拟滚动时，使用 List。",
-      "统一边框包围工具栏、行和分页。头部用灰色 Toolbar 排布：选择、批量操作和搜索在起始侧，筛选和自定义控件在末端。窄容器中搜索单独成行；无控件时不显示空工具栏。",
+      "工具栏显式组合：可把 DataList.Search 放进 Toolbar.search，DataList.Selection 放进 Toolbar.start，应用的筛选和操作放进 Toolbar.end。窄容器中搜索可独占一行。两个辅助控件在工具栏外或没有相应配置时不渲染。",
       "本地搜索与筛选先于分页。输入搜索词会请求回到第 1 页；本地结果缩小时限制页码范围。",
       "远程模式不会过滤或再次切分 items。应用提供当前页记录、总数、加载及错误状态，管理请求取消；外部筛选变化时由应用重置页码。",
       "目前不提供卡片网格、内联编辑或虚拟滚动。过滤和翻页后若需批量修改，应按键操作，不以当前页的条目数组为准。",
@@ -4975,6 +4984,11 @@ export default function Demo() {
         default: "false / 38",
       },
       {
+        name: "toolbar",
+        type: "ReactNode",
+        description: "可选的表格工具栏，放在同一外框内、表头和滚动区域之前。可传入 Toolbar；应用负责搜索、过滤和操作状态。",
+      },
+      {
         name: "title / footer / summary",
         type: "(currentData: T[]) => ReactNode",
         description:
@@ -5053,7 +5067,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "需要搜索、筛选或导出时，可在 DataTable 上方放置独立的 Toolbar。示例的交互由应用控制，不增加 DataTable 属性。",
+      "需要搜索、筛选或导出时，使用 toolbar={<Toolbar ... />} 放入表格外框。Toolbar 和 title 可以同时使用；示例的交互由应用控制。",
       "旧 onChange(state)、pagination=false 默认值和文本筛选继续保留；高级事件使用 onTableChange。",
       "DataTable.EXPAND_COLUMN / DataTable.SELECTION_COLUMN 控制特殊列顺序；DataTable.SELECTION_ALL / SELECTION_INVERT / SELECTION_NONE 可用于选择菜单。",
       "列 onCell 返回 rowSpan/colSpan 可合并单元格，0 隐藏被合并的单元格；固定列需要合理宽度和足够的横向滚动空间。",

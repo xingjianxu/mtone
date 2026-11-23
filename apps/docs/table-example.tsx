@@ -651,7 +651,7 @@ export const dataTableDocSections = [
   {
     id: "toolbar",
     title: "工具栏与表格",
-    note: "Toolbar 与 DataTable 同级放置，搜索、状态筛选和导出由应用控制，不需要给 DataTable 添加属性。",
+    note: "用 DataTable 的 toolbar 插槽把 Toolbar 放进同一个表格外框。搜索、状态筛选和导出仍由应用控制。",
     Demo: ToolbarTable,
     source: displayTableSource(toolbarTableSource),
   },

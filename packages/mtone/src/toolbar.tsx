@@ -10,6 +10,8 @@ export interface ToolbarProps extends Omit<React.ComponentPropsWithoutRef<"div">
   end?: React.ReactNode;
   /** Surface color resolved from the active mtone theme. */
   background?: "white" | "gray";
+  /** Use quiet, borderless Button and Select chrome on a gray surface. */
+  controlStyle?: "default" | "borderless";
 }
 
 const hasSlot = (node: React.ReactNode) =>
@@ -18,7 +20,7 @@ const hasSlot = (node: React.ReactNode) =>
 /** Standalone presentation for search, filters and actions. */
 export const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
   function Toolbar({
-    search, start, end, background = "white", className, role, ...props
+    search, start, end, background = "white", controlStyle = "default", className, role, ...props
   }, ref) {
     const named = props["aria-label"]?.trim() || props["aria-labelledby"]?.trim();
     return (
@@ -27,6 +29,7 @@ export const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
         ref={ref}
         className={cn("mt-toolbar", className)}
         data-background={background}
+        data-control-style={background === "gray" ? controlStyle : "default"}
         role={role ?? (named ? "group" : undefined)}
       >
         <div className="mt-toolbar-layout">

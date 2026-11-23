@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
-import { DataTable, MtoneProvider } from "../packages/mtone/src";
+import { DataTable, MtoneProvider, Toolbar, type DataTableProps } from "../packages/mtone/src";
 const render = (node: React.ReactNode) =>
   rtlRender(<MtoneProvider locale="en">{node}</MtoneProvider>);
 const rows = [
@@ -245,6 +245,61 @@ test("loading delay, hide single page and page placement", async () => {
   expect(screen.queryByRole("status")).toBeNull();
   expect(screen.getAllByRole("navigation")).toHaveLength(2);
 });
+test("renders one toolbar inside the table frame before top pagination and keeps actions working", () => {
+  const action = vi.fn();
+  const selected = vi.fn();
+  const { container } = render(
+    <DataTable
+      bordered
+      dataSource={rows}
+      columns={[{ title: "Name", dataIndex: "name" }]}
+      toolbar={<Toolbar aria-label="Table tools" end={<button onClick={action}>Refresh</button>} />}
+      pagination={{ pageSize: 1, placement: ["topStart", "bottomEnd"] }}
+      rowSelection={{ onChange: selected }}
+    />,
+  );
+
+  const wrapper = container.querySelector(".mt-table-wrap")!;
+  const [slot, topPagination, body, bottomPagination] = Array.from(wrapper.children);
+  expect(wrapper).toHaveClass("mt-table-bordered");
+  expect(wrapper.querySelectorAll(".mt-table-toolbar")).toHaveLength(1);
+  expect(slot).toHaveClass("mt-table-toolbar");
+  expect(slot).toContainElement(screen.getByRole("group", { name: "Table tools" }));
+  expect(topPagination).toBe(screen.getAllByRole("navigation", { name: "Pagination" })[0]);
+  expect(body).toHaveClass("mt-table-container");
+  expect(bottomPagination).toBe(screen.getAllByRole("navigation", { name: "Pagination" })[1]);
+
+  fireEvent.click(within(slot as HTMLElement).getByRole("button", { name: "Refresh" }));
+  expect(action).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByRole("checkbox", { name: "Select row 1" }));
+  expect(selected.mock.calls[0][0]).toEqual([1]);
+  fireEvent.click(within(topPagination as HTMLElement).getByRole("button", { name: "Next page" }));
+  expect(screen.getByText("Ann")).toBeVisible();
+});
+
+test("does not insert a toolbar or change the pagination order without a rendered slot", () => {
+  const configuration = {
+    dataSource: rows,
+    columns: [{ title: "Name", dataIndex: "name" }],
+    pagination: { pageSize: 1, placement: ["topStart"] },
+  } satisfies DataTableProps<(typeof rows)[number]>;
+  const { container, rerender } = render(<DataTable {...configuration} />);
+  const assertNoToolbar = () => {
+    const wrapper = container.querySelector(".mt-table-wrap")!;
+    expect(wrapper.querySelector(".mt-table-toolbar")).toBeNull();
+    expect(wrapper.firstElementChild).toBe(screen.getByRole("navigation", { name: "Pagination" }));
+  };
+  assertNoToolbar();
+  for (const toolbar of [false, [], " ", <>{false}{null}</>]) {
+    rerender(
+      <MtoneProvider locale="en">
+        <DataTable {...configuration} toolbar={toolbar} />
+      </MtoneProvider>,
+    );
+    assertNoToolbar();
+  }
+});
+
 test("virtual table mounts bounded rows and imperative scroll is available", () => {
   const data = Array.from({ length: 1000 }, (_, key) => ({
     key,

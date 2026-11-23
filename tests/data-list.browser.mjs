@@ -38,8 +38,9 @@ try {
         name: "Select visible items",
         exact: true,
       });
-      await expect(header).toHaveClass(/\bmt-toolbar\b/);
-      await expect(header).toHaveAttribute("data-background", "gray");
+      const toolbar = header.locator(":scope > .mt-toolbar");
+      await expect(toolbar).toHaveCount(1);
+      await expect(toolbar).toHaveAttribute("data-background", "gray");
       const leading = header.locator(".mt-toolbar-start");
       const searchSlot = leading.locator(":scope > .mt-search");
       const trailing = header.locator(".mt-toolbar-end");
@@ -73,7 +74,7 @@ try {
             ],
             frameColor: scope.borderTopColor,
             rowColor: getComputedStyle(rows[0]).borderBottomColor,
-            headerTint: getComputedStyle(header).backgroundColor,
+            headerTint: getComputedStyle(header.querySelector(":scope > .mt-toolbar")).backgroundColor,
             bodyTint: scope.backgroundColor,
           };
         });

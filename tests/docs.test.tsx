@@ -55,6 +55,28 @@ describe("documentation", () => {
     expect(screen.getByRole("table", { name: "本周项目" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "项目" })).toHaveAttribute("scope", "col");
   });
+  it("shows explicit framed Toolbar composition in DataTable and DataList demos", () => {
+    const table = docSections.DataTable.find(({ id }) => id === "toolbar")?.source;
+    expect(table).toContain("toolbar={");
+    expect(table).toContain("<Toolbar");
+    expect(table).not.toMatch(/borderRadius|overflow:\s*["']clip/);
+    const narrow = docSections.Toolbar.find(({ id }) => id === "narrow")?.source;
+    expect(narrow).toContain("toolbar={");
+    const local = docSections.DataList.find(({ id }) => id === "local-data")?.source;
+    expect(local).toContain("<Toolbar");
+    expect(local).toMatch(/start=\{[\s\S]*<DataList\.Selection>[\s\S]*<DataList\.Search/);
+    expect(local).not.toMatch(/filters=|renderBatchActions=/);
+    const remote = docSections.DataList.find(({ id }) => id === "remote-data")?.source;
+    expect(remote).toContain("search={<DataList.Search");
+  });
+  it("documents gray borderless Toolbar controls as an opt-in with a connected view switch", () => {
+    const demo = docSections.Toolbar.find(({ id }) => id === "borderless-controls");
+    expect(demo?.source).toContain('background="gray"');
+    expect(demo?.source).toContain('controlStyle="borderless"');
+    expect(demo?.source).toContain("<Select");
+    expect(demo?.source).toContain("<ButtonGroup connected");
+    expect(docSections.Toolbar.find(({ id }) => id === "standalone")?.source).not.toContain("controlStyle");
+  });
   it("documents keyboard-shortcut utilities together and demos switching active scopes", () => {
     const route = "#/components/ShortcutsProvider?section=usage";
     expect(parseRoute(route)).toEqual({ kind: "component", name: "ShortcutsProvider", section: "usage" });

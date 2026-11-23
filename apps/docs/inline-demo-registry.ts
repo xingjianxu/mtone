@@ -2,6 +2,8 @@ import ShortcutsUsage from "./inline-demos/shortcuts-usage";
 import ShortcutsUsageSource from "./inline-demos/shortcuts-usage.tsx?raw";
 import TableNative from "./inline-demos/table-native";
 import TableNativeSource from "./inline-demos/table-native.tsx?raw";
+import ToolbarBorderless from "./inline-demos/toolbar-borderless";
+import ToolbarBorderlessSource from "./inline-demos/toolbar-borderless.tsx?raw";
 import ToolbarStandalone from "./inline-demos/toolbar-standalone";
 import ToolbarStandaloneSource from "./inline-demos/toolbar-standalone.tsx?raw";
 import ToolbarTable from "./inline-demos/toolbar-table";
@@ -362,6 +364,13 @@ export const inlineDocSections: Readonly<
   ],
   Toolbar: [
     { id: "standalone", title: "独立工具栏", Demo: ToolbarStandalone, source: source(ToolbarStandaloneSource) },
+    {
+      id: "borderless-controls",
+      title: "灰底无边框控件",
+      note: "仅对这条灰底工具栏启用。独立的按钮和 Select 默认不显示边框，悬停时底色加深；末端相连的 ButtonGroup 保持原样。",
+      Demo: ToolbarBorderless,
+      source: source(ToolbarBorderlessSource),
+    },
     { id: "table", title: "表格", Demo: ToolbarTable, source: source(ToolbarTableSource) },
     { id: "list", title: "列表", Demo: ToolbarList, source: source(ToolbarListSource) },
     { id: "page", title: "普通页面", Demo: ToolbarPage, source: source(ToolbarPageSource) },

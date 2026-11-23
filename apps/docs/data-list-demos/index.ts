@@ -16,14 +16,14 @@ export const dataListDocSections = [
   {
     id: "issue-list",
     title: "事项列表样式",
-    note: "头部复用灰色 Toolbar。搜索置于前方，全选与已选数量在起始侧，状态筛选和视图切换在末端；窄容器中搜索独占一行。",
+    note: "在 toolbar 插槽中放入灰色 Toolbar。DataList.Selection 在起始侧显示本页全选和已选数量，应用把状态筛选和视图切换放在末端。",
     Demo: IssueListDemo,
     source: packageSource(issueSource),
   },
   {
     id: "local-data",
     title: "本地列表",
-    note: "搜索与状态筛选在分页前应用。全选只影响当前页可选条目，翻页会保留其他已选键。试试展开详情或批量处理；演示不会修改文档。",
+    note: "搜索与状态筛选在分页前应用。将选择和搜索依次放进 Toolbar.start，可让键盘先到达选择控件。全选只影响当前页可选条目，翻页会保留其他已选键。试试展开详情或批量处理；演示不会修改文档。",
     Demo: LocalDataListDemo,
     source: packageSource(localSource),
   },

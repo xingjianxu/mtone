@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DataList, Text } from "../../../packages/mtone/src";
+import { DataList, Text, Toolbar } from "../../../packages/mtone/src";
 
 type DocumentRecord = { id: string; title: string };
 type Query = { page: number; keyword: string };
@@ -68,12 +68,18 @@ export default function RemoteDataListDemo() {
         renderItem={(item) => <Text>{item.title}</Text>}
         search={{
           value: query.keyword,
-          placeholder: "输入“设计”或“工程”",
           onChange: (keyword) =>
             setQuery((previous) =>
               previous.keyword === keyword ? previous : { page: 1, keyword },
             ),
         }}
+        toolbar={
+          <Toolbar
+            background="gray"
+            aria-label="远程文档搜索"
+            search={<DataList.Search label="搜索列表" placeholder="输入“设计”或“工程”" />}
+          />
+        }
         pagination={{
           mode: "remote",
           page: query.page,

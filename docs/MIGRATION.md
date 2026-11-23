@@ -17,6 +17,43 @@ const projects = <DataTable rowKey="id" columns={columns} dataSource={[{ id: "p1
 
 The new `Table` is for native JSX cells, not data-driven props. Its `TableProps` are non-generic native table props plus `bordered`, `striped`, and `highlightOnHover`. See the separate [Table](https://xingjianxu.github.io/mtone/#/components/Table) and [DataTable](https://xingjianxu.github.io/mtone/#/components/DataTable) examples.
 
+## DataTable and DataList toolbar slots
+
+Replace a separate Toolbar over DataTable with `toolbar={<Toolbar … />}` when
+they should share a frame. Remove any extra wrapper border, clipping and
+DataTable border reset used to make the old arrangement look like one box.
+
+DataList no longer constructs a toolbar from `search`, `selection` or
+`toolbar`. The optional `toolbar` prop now takes the complete header
+content, typically a `Toolbar` with explicit slots.
+
+| Before | Now |
+| --- | --- |
+| Set `search.label` or `search.placeholder` | Pass them to `<DataList.Search />` inside the toolbar. Keep `value`, `defaultValue`, `onChange` and `match` in `search`. |
+| Set `filters` to a filter control | Put the control in a Toolbar slot. Keep the local predicate in `filter`. |
+| Let `selection` automatically show select-all and a count | Keep `selection` for row checkboxes and add `<DataList.Selection />` to the toolbar for the header controls. |
+| Set `renderBatchActions` | Pass the same render function as children of `DataList.Selection`; `selectedKeys` and `clearSelection` are unchanged. |
+| Pass extra controls to `toolbar` | Put them in a slot of the complete toolbar you provide. |
+
+For example, replace the header-related props with the following composition:
+
+```tsx
+<DataList
+  aria-label="Documents"
+  items={documents}
+  getKey={(item) => item.id}
+  renderItem={(item) => item.title}
+  search={{ match: (item, query) => item.title.includes(query) }}
+  selection={{}}
+  toolbar={
+    <Toolbar background="gray"
+      search={<DataList.Search label="Search documents" />}
+      start={<DataList.Selection />}
+    />
+  }
+/>
+```
+
 # Upgrade notes for 0.12.0
 
 Start with the Select migration when upgrading from 0.11.1 to 0.12.0. The later sections also cover earlier releases.

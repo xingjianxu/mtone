@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, expectTypeOf, test, vi } from "vitest";
-import { Toolbar, type ToolbarProps } from "../packages/mtone/src";
+import { Button, ButtonGroup, Select, Toolbar, type ToolbarProps } from "../packages/mtone/src";
 
 test("groups standalone controls without managing their state or native tab order", async () => {
   const user = userEvent.setup();
@@ -62,4 +62,38 @@ test("supports gray and white surfaces, optional slots and an optional accessibl
   expect(screen.getByTestId("unnamed")).toHaveTextContent("0");
   expect(screen.getByRole("region", { name: "Header commands" })).toBe(screen.getByTestId("custom-role"));
   expect(container.querySelector("#page-controls-label")).toBeVisible();
+});
+
+test("enables borderless controls only on gray toolbars without changing control semantics", async () => {
+  expectTypeOf<ToolbarProps["controlStyle"]>().toEqualTypeOf<"default" | "borderless" | undefined>();
+  const user = userEvent.setup();
+  const select = vi.fn();
+  render(<>
+    <Toolbar
+      aria-label="Quiet controls"
+      background="gray"
+      controlStyle="borderless"
+      start={<>
+        <Button disabled>Unavailable</Button>
+        <Select label="Labels" options={[{ value: "bug", label: "Bug" }]} onValueChange={select} />
+      </>}
+      end={<ButtonGroup connected><Button>List</Button><Button>Compact</Button></ButtonGroup>}
+    />
+    <Toolbar aria-label="Regular gray" background="gray" />
+    <Toolbar aria-label="Regular white" controlStyle="borderless" />
+  </>);
+
+  const toolbar = screen.getByRole("group", { name: "Quiet controls" });
+  expect(toolbar).toHaveAttribute("data-control-style", "borderless");
+  expect(screen.getByRole("group", { name: "Regular gray" })).toHaveAttribute("data-control-style", "default");
+  expect(screen.getByRole("group", { name: "Regular white" })).toHaveAttribute("data-control-style", "default");
+  expect(within(toolbar).getByRole("button", { name: "Unavailable" })).toBeDisabled();
+  const trigger = within(toolbar).getByRole("combobox", { name: "Labels" });
+  await user.tab();
+  expect(trigger).toHaveFocus();
+  await user.keyboard("{Enter}");
+  expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await user.click(await screen.findByRole("option", { name: "Bug" }));
+  expect(select).toHaveBeenCalledWith("bug");
+  expect(within(toolbar).getByRole("button", { name: "List" }).closest(".mt-button-group")).toHaveClass("mt-button-group-connected");
 });

@@ -123,7 +123,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 ## Navigation
 
 - [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): single-page frame with a required `title`, optional `headingLevel` (default 1), `icon`, `subtitle`, `actions`, `description`, `extra`, `tabs`, and body children. Pass a complete `Tabs` instance to render its own panels after the header, or omit `tabs` to leave no tab row. PageLayout does not manage navigation or tab state; it can sit inside `AdminLayout.Content`. Compose a page-local `Sidebar` through the optional `sidebar` slot. `sidebarPosition="left"` (default) or `"right"` picks a physical side; `headerSpan="full"` (default) spans both columns with the header and tabs; `"header"` spans both columns with the header only, leaving tabs and body in the main column; `"main"` keeps the header and tabs in the main column. The header includes the title, icon, subtitle, actions, description and extra content. `maxWidth` constrains both columns. At an available width of 640px or more the sidebar defaults to 240px (override with `--mt-page-layout-sidebar-width`, up to half the layout width); below that it stacks before or after the main column in reading order. No sidebar leaves the single-column markup unchanged.
-- [Toolbar](https://xingjianxu.github.io/mtone/#/components/Toolbar) is a standalone layout for consumer controls, with optional `search`, `start`, and `end` ReactNode slots. `background="white"` (default) and `"gray"` pick theme-aware surfaces. It responds to its container: the search can take a full first row, while actions wrap and remain aligned to the logical end. Set an accessible name to get a labeled group; native Tab order stays search, start, end. Pass div props and a div ref, and use slots instead of `children`. Toolbar owns neither query nor actions and does not require Table, DataTable, List, DataList or PageLayout.
+- [Toolbar](https://xingjianxu.github.io/mtone/#/components/Toolbar) is a standalone layout for consumer controls, with optional `search`, `start`, and `end` ReactNode slots. `background="white"` (default) and `"gray"` pick theme-aware surfaces. It responds to its container: the search can take a full first row, while actions wrap and remain aligned to the logical end. Set an accessible name to get a labeled group; native Tab order stays search, start, end. Pass div props and a div ref, and use slots instead of `children`. Toolbar owns neither query nor actions. Use it standalone or pass it to the `toolbar` slot of DataTable or DataList for a shared outer frame. On a gray toolbar, opt into `controlStyle="borderless"` (default `"default"`) to hide resting borders on ordinary ungrouped buttons and Select controls and use a darker gray hover surface. The option is local to the toolbar; connected ButtonGroup controls, keyboard focus and interaction remain unchanged. See the [gray borderless controls example](https://xingjianxu.github.io/mtone/#/components/Toolbar?section=borderless-controls).
 - AdminLayout: application shell; compose `AdminLayout.Sider`, `AdminLayout.Header`, `AdminLayout.Content`, and optional `AdminLayout.Footer`. The root `notice?: ReactNode` slot spans the shell above the sidebar and main column; keep the shell mounted for cross-route notices. This replaces `Layout` starting with 0.6.0, without a compatibility alias.
 - [Sidebar](https://xingjianxu.github.io/mtone/#/components/Sidebar?section=tabs) accepts optional `tabs: SidebarTabsOptions`: a readonly `items` list (unique `value`, renderable `label` and `content`, optional `disabled` and `icon`), plus `label` and `value` / `defaultValue` / `onValueChange`. Nonempty items replace ordinary children; otherwise Sidebar behaves as before. A compact 32px line tab uses a blue underline while NavItem keeps its neutral active background. In a bounded-height sidebar only the active panel's navigation scrolls, leaving identity, tabs and footer in place. Collapsing hides the tab strip and preserves active icon navigation; expanding restores the selected tab. Visited panels stay mounted. Tabs are local, not a routing API: use your own links or navigation state within each panel. `AdminLayout.Sider` forwards `tabs`; pass a `Sidebar` instance through `PageLayout.sidebar` if the navigation is page-local.
 - Sidebar, NavGroup(label), NavItem(active, icon, optional href and actions): layout and navigation. NavItem is a button by default; an href renders a native anchor with corresponding props and ref. Native anchor navigation is unchanged. Pass one or more `{ content, visibility? }` descriptors for independent trailing actions. Visibility can be `always` (default), `hover` (also keyboard focus or touch-only), or `active`. The collapsed icon rail hides actions; the full rows in a submenu popup retain them.
@@ -304,19 +304,20 @@ the base list contract. Provide `items: readonly T[]`, stable unique
 a `ListItem` or `li`; the index is zero-based within the current page). Use
 `getLabel(item)` for readable selection and disclosure names; it defaults to
 the key as a string. Numeric keys must be finite. The root accepts section attributes such as `aria-label`,
-`className` and `style`. The frame surrounds the rows and any pagination. When
-controls are present, DataList uses the shared gray Toolbar to lay out the
-search first, selection and bulk actions at the start, and filters and custom
-controls at the end. Search takes a full row in narrow containers; when none
-are supplied the header is omitted.
+`className` and `style`. The optional `toolbar` slot accepts a ReactNode
+that shares the outer frame with the rows and pagination. DataList does not
+create a toolbar by default. Compose the toolbar with `Toolbar.search`,
+`Toolbar.start` and `Toolbar.end`; choose a background explicitly for a gray
+surface, for example.
 
-- `search` enables a search input. Use `value` with `onChange` for controlled
-  search or `defaultValue` for the initial query. Set `placeholder`/`label` and
-  a local `match(item, query)` predicate if needed. The local predicate receives
-  a trimmed query. Without `match`, the input does not filter the records.
-  `filter(item)` applies another local predicate; use `filters` to render filter
-  controls and `toolbar` to supply other controls or context at the end. Keep
-  passing React content; do not wrap the slot in another Toolbar.
+- `search` configures the query. Use `value` with `onChange` for controlled
+  search or `defaultValue` for the initial query. The local `match(item, query)`
+  predicate receives a trimmed query. Without `match`, DataList does not
+  filter records by query. Render `DataList.Search` inside the toolbar slot to
+  connect an input to this configuration; set its optional `placeholder` and
+  `label` there. The defaults follow the locale (English: “Search…” and
+  “Search list”). Use `filter(item)` for additional local filtering, and place
+  the matching controls in your Toolbar.
 - `pagination` is optional. Local mode applies search and filters before paging;
   `page`/`defaultPage`, `pageSize` (default 10) and `onPageChange` configure it.
   Local results clamp to the available page range. Editing the search requests
@@ -324,11 +325,15 @@ are supplied the header is omitted.
   `onPageChange` and the current page of `items`. DataList neither slices nor
   filters those items. The application resets the page when external filters
   change.
-- `selection` provides row checkboxes and select-all for enabled items on the
-  current page; `selectedKeys`/`defaultSelectedKeys`, `onChange` and
-  `getDisabled(item)` configure it. Selection is keyed across pages.
-  `renderBatchActions({ selectedKeys, clearSelection })` provides an optional
-  bulk-action area; clearing it clears keys on other pages too.
+- `selection` enables row checkboxes. Use `selectedKeys`/`defaultSelectedKeys`,
+  `onChange` and `getDisabled(item)` to configure selection across pages.
+  Render `DataList.Selection` inside the toolbar slot for current-page
+  select-all, an announcement of the selected count, and clear across pages.
+  Its optional render-function children receive
+  `DataListBatchContext` (`{ selectedKeys, clearSelection }`) when keys are
+  selected, for example to add a batch-action button.
+  Both DataList toolbar helpers render nothing outside the current toolbar
+  or without their matching configuration.
 - `expansion` requires `renderDetail(item)` and optionally accepts
   `expandedKeys`/`defaultExpandedKeys`, `onChange` and `isExpandable(item)`.
   `renderActions(item)` provides row-level controls; neither they nor the
@@ -376,7 +381,7 @@ Table does not accept a data source or column configuration and does not impleme
 
 Current source exposes the advanced data-driven table as `DataTable`. Its features were previously exported as `Table` (the advanced API dates to 0.3.0 under that name). The [live documentation](https://xingjianxu.github.io/mtone/#/components/DataTable) follows `master` and may be newer than npm. Check your installed declarations and the [migration notes](MIGRATION.md#split-native-table-and-datatable) before changing imports.
 
-For external search, filtering or export, compose a standalone [Toolbar above the DataTable](https://xingjianxu.github.io/mtone/#/components/DataTable?section=toolbar). Keep the query, filters and actions in the application; neither component requires the other.
+For search, filtering or export, compose [a Toolbar in the DataTable frame](https://xingjianxu.github.io/mtone/#/components/DataTable?section=toolbar) with `toolbar={<Toolbar … />}`. The toolbar appears above the table’s scroll area and can coexist with `title`; keep the query, filters and actions in the application. An external Toolbar remains supported when a separate surface is intentional.
 
 ### Basic usage (legacy API retained)
 

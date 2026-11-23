@@ -8,8 +8,7 @@
 }
 .mt-data-list-selection,
 .mt-data-list-row,
-.mt-data-list-actions,
-.mt-data-list-filters {
+.mt-data-list-actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -21,19 +20,22 @@
   border-start-start-radius: inherit;
   border-start-end-radius: inherit;
 }
-/* Keep the selection group before search in the native focus order. The
- * composite start slot gives both controls room; the trailing slot stays free
- * to hold filters and caller actions without changing the standalone Toolbar. */
-.mt-data-list-toolbar > .mt-toolbar-layout > .mt-toolbar-start:has(> .mt-search) {
+.mt-data-list-toolbar > .mt-toolbar {
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+/* An explicit Toolbar can put both helpers in its start slot to retain
+ * selection-first tab order. Give only the connected search a full narrow row. */
+.mt-data-list-toolbar > .mt-toolbar > .mt-toolbar-layout > .mt-toolbar-start:has(> .mt-data-list-search) {
   flex: 1 1 22rem;
 }
-.mt-data-list-toolbar > .mt-toolbar-layout > .mt-toolbar-start > .mt-search {
+.mt-data-list-toolbar > .mt-toolbar > .mt-toolbar-layout > .mt-toolbar-start > .mt-data-list-search {
   flex: 1 1 10rem;
   min-inline-size: 0;
   max-inline-size: 20rem;
 }
 @container mt-toolbar (max-width: 28rem) {
-  .mt-data-list-toolbar > .mt-toolbar-layout > .mt-toolbar-start > .mt-search {
+  .mt-data-list-toolbar > .mt-toolbar > .mt-toolbar-layout > .mt-toolbar-start > .mt-data-list-search {
     flex-basis: 100%;
     max-inline-size: none;
   }

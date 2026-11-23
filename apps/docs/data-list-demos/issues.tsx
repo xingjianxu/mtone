@@ -6,6 +6,7 @@ import {
   Select,
   Tag,
   Text,
+  Toolbar,
 } from "../../../packages/mtone/src";
 
 const issues = [
@@ -50,39 +51,46 @@ export default function IssueListDemo() {
         getLabel={(item) => item.title}
         selection={{}}
         filter={(item) => status === "all" || item.open === (status === "open")}
-        filters={
-          <Select
-            label="事项状态"
-            options={statuses}
-            value={status}
-            onValueChange={(value) => setStatus(value ?? "all")}
-          />
-        }
         toolbar={
-          <div
-            role="group"
-            aria-label="事项列表视图"
-            style={{ display: "flex", gap: 2 }}
-          >
-            <Button
-              iconOnly
-              variant={compact ? "ghost" : "soft"}
-              aria-pressed={!compact}
-              aria-label="详细视图"
-              onClick={() => setCompact(false)}
-            >
-              <Rows3 size={16} />
-            </Button>
-            <Button
-              iconOnly
-              variant={compact ? "soft" : "ghost"}
-              aria-pressed={compact}
-              aria-label="紧凑视图"
-              onClick={() => setCompact(true)}
-            >
-              <List size={16} />
-            </Button>
-          </div>
+          <Toolbar
+            background="gray"
+            aria-label="事项列表操作"
+            start={<DataList.Selection />}
+            end={
+              <>
+                <Select
+                  label="事项状态"
+                  options={statuses}
+                  value={status}
+                  onValueChange={(value) => setStatus(value ?? "all")}
+                />
+                <div
+                  role="group"
+                  aria-label="事项列表视图"
+                  style={{ display: "flex", gap: 2 }}
+                >
+                  <Button
+                    iconOnly
+                    variant={compact ? "ghost" : "soft"}
+                    aria-pressed={!compact}
+                    aria-label="详细视图"
+                    onClick={() => setCompact(false)}
+                  >
+                    <Rows3 size={16} />
+                  </Button>
+                  <Button
+                    iconOnly
+                    variant={compact ? "soft" : "ghost"}
+                    aria-pressed={compact}
+                    aria-label="紧凑视图"
+                    onClick={() => setCompact(true)}
+                  >
+                    <List size={16} />
+                  </Button>
+                </div>
+              </>
+            }
+          />
         }
         renderItem={(item) => {
           const Status = item.open ? CircleDot : CircleCheck;

@@ -15,6 +15,15 @@
   background: var(--mt-bg, #fff);
   /* Do not clip sticky headers: the page or configured container owns scrolling. */
 }
+.mt-table-toolbar {
+  min-inline-size: 0;
+  border-block-end: 1px solid var(--mt-border, #e9e9e7);
+}
+.mt-table-toolbar,
+.mt-table-toolbar > .mt-toolbar {
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
 .mt-table-container,
 .mt-table {
   position: relative;
@@ -532,7 +541,8 @@
 .mt-table-pagination {
   background: var(--mt-bg, #fff);
 }
-.mt-table-pagination:first-child {
+.mt-table-pagination:first-child,
+.mt-table-toolbar + .mt-table-pagination {
   border-bottom: 1px solid var(--mt-border, #e9e9e7);
 }
 .mt-table-pagination:last-child {

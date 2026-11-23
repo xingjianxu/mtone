@@ -5,7 +5,7 @@ import { Pagination } from "./data";
 import { Input } from "./input";
 import { Checkbox } from "./interactive";
 import { List } from "./list";
-import { Toolbar } from "./toolbar";
+import { hasToolbarContent } from "./toolbar-slot";
 
 export type DataListKey = string | number;
 
@@ -13,8 +13,6 @@ export interface DataListSearch<T> {
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
-  placeholder?: string;
-  label?: string;
   /** Client-side matcher. Remote lists ignore it. */
   match?: (item: T, query: string) => boolean;
 }
@@ -52,6 +50,14 @@ export interface DataListBatchContext {
   selectedKeys: readonly DataListKey[];
   clearSelection: () => void;
 }
+export interface DataListSearchProps {
+  label?: string;
+  placeholder?: string;
+}
+export interface DataListSelectionProps {
+  children?: (context: DataListBatchContext) => React.ReactNode;
+}
+
 export interface DataListProps<T> extends Omit<
   React.HTMLAttributes<HTMLElement>,
   "children"
@@ -66,15 +72,72 @@ export interface DataListProps<T> extends Omit<
   search?: DataListSearch<T>;
   /** Client-side predicate. Remote lists ignore it. */
   filter?: (item: T) => boolean;
-  filters?: React.ReactNode;
+  /** Explicit top slot. Compose a Toolbar and connected controls if needed. */
   toolbar?: React.ReactNode;
   pagination?: DataListPagination;
   selection?: DataListSelection<T>;
   expansion?: DataListExpansion<T>;
   renderActions?: (item: T) => React.ReactNode;
-  renderBatchActions?: (context: DataListBatchContext) => React.ReactNode;
   loading?: boolean;
   empty?: React.ReactNode;
+}
+
+type ToolbarContext = {
+  search?: { value: string; onChange: (value: string) => void };
+  selection?: DataListBatchContext & {
+    all: boolean;
+    partial: boolean;
+    disabled: boolean;
+    selectVisible: (checked: boolean) => void;
+  };
+};
+const DataListToolbarContext = React.createContext<ToolbarContext | null>(null);
+
+function DataListSearchField({ label, placeholder }: DataListSearchProps) {
+  const zh = useMtone().locale === "zh";
+  const search = React.useContext(DataListToolbarContext)?.search;
+  if (!search) return null;
+  return (
+    <Input.Search
+      wrapperClassName="mt-data-list-search"
+      aria-label={label ?? (zh ? "搜索列表" : "Search list")}
+      placeholder={placeholder ?? (zh ? "搜索…" : "Search…")}
+      value={search.value}
+      onChange={(event) => search.onChange(event.currentTarget.value)}
+      allowClear
+    />
+  );
+}
+
+function DataListSelectionControl({ children }: DataListSelectionProps) {
+  const zh = useMtone().locale === "zh";
+  const selection = React.useContext(DataListToolbarContext)?.selection;
+  if (!selection) return null;
+  const { selectedKeys, clearSelection } = selection;
+  return (
+    <div className="mt-data-list-selection">
+      <Checkbox
+        label={zh ? "选择当前可见项" : "Select visible items"}
+        checked={selection.all}
+        indeterminate={selection.partial}
+        disabled={selection.disabled}
+        onCheckedChange={selection.selectVisible}
+      />
+      <span className="mt-data-list-count" aria-live="polite">
+        {zh
+          ? `已选择 ${selectedKeys.length} 项`
+          : `${selectedKeys.length} selected`}
+      </span>
+      {selectedKeys.length > 0 && (
+        <div className="mt-data-list-actions">
+          {children?.({ selectedKeys, clearSelection })}
+          <Button variant="ghost" type="button" onClick={clearSelection}>
+            {zh ? "清除选择" : "Clear selection"}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 const integer = (value: number | undefined, fallback: number, min: number) =>
@@ -120,7 +183,8 @@ function DataListRow({
         {(actions != null || detail) && (
           <div className="mt-data-list-actions">
             {detail && (
-              <Button iconOnly
+              <Button
+                iconOnly
                 className="mt-data-list-disclosure"
                 variant="ghost"
                 type="button"
@@ -153,20 +217,18 @@ function DataListRow({
   );
 }
 
-export function DataList<T>({
+function DataListRoot<T>({
   items,
   getKey,
   getLabel,
   renderItem,
   search,
   filter,
-  filters,
   toolbar,
   pagination,
   selection,
   expansion,
   renderActions,
-  renderBatchActions,
   loading = false,
   empty,
   className,
@@ -274,135 +336,99 @@ export function DataList<T>({
     if (selected.size) changeSelection([]);
   };
 
-  const hasFilters =
-    filters != null && typeof filters !== "boolean" && filters !== "";
-  const hasToolbar =
-    toolbar != null && typeof toolbar !== "boolean" && toolbar !== "";
-  const hasLeadingControls = selection || search;
-  const hasTrailingControls = hasFilters || hasToolbar;
+  const toolbarContext: ToolbarContext | null = hasToolbarContent(toolbar)
+    ? {
+        search: search ? { value: query, onChange: changeQuery } : undefined,
+        selection: selection
+          ? {
+              all,
+              partial: picked > 0 && !all,
+              disabled: !enabledKeys.length,
+              selectedKeys: [...selected],
+              selectVisible: (checked) =>
+                changeSelection(updateKeys(selected, enabledKeys, checked)),
+              clearSelection,
+            }
+          : undefined,
+      }
+    : null;
 
   return (
-    <section {...props} className={cn("mt-data-list", className)}>
-      {(hasLeadingControls || hasTrailingControls) && (
-        <Toolbar
-          className="mt-data-list-toolbar"
-          background="gray"
-          start={hasLeadingControls && (
-            <>
-              {selection && (
-                <div className="mt-data-list-selection">
-                  <Checkbox
-                    label={zh ? "选择当前可见项" : "Select visible items"}
-                    checked={all}
-                    indeterminate={picked > 0 && !all}
-                    disabled={!enabledKeys.length}
-                    onCheckedChange={(checked) =>
-                      changeSelection(updateKeys(selected, enabledKeys, checked))
-                    }
-                  />
-                  <span className="mt-data-list-count" aria-live="polite">
-                    {zh
-                      ? `已选择 ${selected.size} 项`
-                      : `${selected.size} selected`}
-                  </span>
-                  {selected.size > 0 && (
-                    <div className="mt-data-list-actions">
-                      {renderBatchActions?.({
-                        selectedKeys: [...selected],
-                        clearSelection,
-                      })}
-                      <Button
-                        variant="ghost"
-                        type="button"
-                        onClick={clearSelection}
-                      >
-                        {zh ? "清除选择" : "Clear selection"}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              )}
-              {search && (
-                <Input.Search
-                  aria-label={search.label ?? (zh ? "搜索列表" : "Search list")}
-                  placeholder={search.placeholder ?? (zh ? "搜索…" : "Search…")}
-                  value={query}
-                  onChange={(event) => changeQuery(event.currentTarget.value)}
-                  allowClear
-                />
-              )}
-            </>
-          )}
-          end={hasTrailingControls && (
-            <>
-              {hasFilters && (
-                <div className="mt-data-list-filters">{filters}</div>
-              )}
-              {hasToolbar && toolbar}
-            </>
-          )}
-        />
-      )}
-      <List
-        items={visible}
-        getKey={(row) => row.key}
-        loading={loading}
-        loadingContent={zh ? "加载中…" : "Loading…"}
-        emptyContent={empty ?? (zh ? "暂无数据" : "No items")}
-        renderItem={({ item, key }, index) => {
-          const label = getLabel?.(item) ?? String(key);
-          const isExpanded = expanded.has(key);
-          const detail =
-            expansion && (expansion.isExpandable?.(item) ?? true)
-              ? {
-                  expanded: isExpanded,
-                  label: zh
-                    ? `${isExpanded ? "收起" : "展开"} ${label}`
-                    : `${isExpanded ? "Collapse" : "Expand"} ${label}`,
-                  render: () => expansion.renderDetail(item),
-                  onToggle: () => {
-                    const next = updateKeys(expanded, [key], !isExpanded);
-                    if (expansion.expandedKeys === undefined)
-                      setLocalExpanded(next);
-                    expansion.onChange?.(next);
-                  },
+    <DataListToolbarContext.Provider value={null}>
+      <section {...props} className={cn("mt-data-list", className)}>
+        {toolbarContext && (
+          <div className="mt-data-list-toolbar">
+            <DataListToolbarContext.Provider value={toolbarContext}>
+              {toolbar}
+            </DataListToolbarContext.Provider>
+          </div>
+        )}
+        <List
+          items={visible}
+          getKey={(row) => row.key}
+          loading={loading}
+          loadingContent={zh ? "加载中…" : "Loading…"}
+          emptyContent={empty ?? (zh ? "暂无数据" : "No items")}
+          renderItem={({ item, key }, index) => {
+            const label = getLabel?.(item) ?? String(key);
+            const isExpanded = expanded.has(key);
+            const detail =
+              expansion && (expansion.isExpandable?.(item) ?? true)
+                ? {
+                    expanded: isExpanded,
+                    label: zh
+                      ? `${isExpanded ? "收起" : "展开"} ${label}`
+                      : `${isExpanded ? "Collapse" : "Expand"} ${label}`,
+                    render: () => expansion.renderDetail(item),
+                    onToggle: () => {
+                      const next = updateKeys(expanded, [key], !isExpanded);
+                      if (expansion.expandedKeys === undefined)
+                        setLocalExpanded(next);
+                      expansion.onChange?.(next);
+                    },
+                  }
+                : undefined;
+            return (
+              <DataListRow
+                checkbox={
+                  selection && (
+                    <Checkbox
+                      className="mt-data-list-row-check"
+                      checked={selected.has(key)}
+                      disabled={selection.getDisabled?.(item)}
+                      onCheckedChange={(checked) =>
+                        changeSelection(updateKeys(selected, [key], checked))
+                      }
+                    >
+                      <span className="mt-data-list-sr-only">
+                        {zh ? `选择 ${label}` : `Select ${label}`}
+                      </span>
+                    </Checkbox>
+                  )
                 }
-              : undefined;
-          return (
-            <DataListRow
-              checkbox={
-                selection && (
-                  <Checkbox
-                    className="mt-data-list-row-check"
-                    checked={selected.has(key)}
-                    disabled={selection.getDisabled?.(item)}
-                    onCheckedChange={(checked) =>
-                      changeSelection(updateKeys(selected, [key], checked))
-                    }
-                  >
-                    <span className="mt-data-list-sr-only">
-                      {zh ? `选择 ${label}` : `Select ${label}`}
-                    </span>
-                  </Checkbox>
-                )
-              }
-              actions={renderActions?.(item)}
-              detail={detail}
-            >
-              {renderItem(item, index)}
-            </DataListRow>
-          );
-        }}
-      />
-      {pagination && (
-        <Pagination
-          className="mt-data-list-pagination"
-          page={page}
-          pageSize={pageSize}
-          total={total}
-          onPageChange={changePage}
+                actions={renderActions?.(item)}
+                detail={detail}
+              >
+                {renderItem(item, index)}
+              </DataListRow>
+            );
+          }}
         />
-      )}
-    </section>
+        {pagination && (
+          <Pagination
+            className="mt-data-list-pagination"
+            page={page}
+            pageSize={pageSize}
+            total={total}
+            onPageChange={changePage}
+          />
+        )}
+      </section>
+    </DataListToolbarContext.Provider>
   );
 }
+
+export const DataList = Object.assign(DataListRoot, {
+  Search: DataListSearchField,
+  Selection: DataListSelectionControl,
+});
