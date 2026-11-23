@@ -35,6 +35,34 @@
   flex: none;
   margin-inline-start: auto;
 }
+.mt-tree-actions,
+.mt-tree-action {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+.mt-tree-actions {
+  /* Controls reserve horizontal room without growing the tree's row height. */
+  block-size: 20px;
+  margin-inline-start: auto;
+  gap: 2px;
+}
+.mt-tree-end + .mt-tree-actions {
+  margin-inline-start: 0;
+}
+.mt-tree-item:not([aria-selected="true"])
+  > .mt-tree-actions > .mt-tree-action[data-visibility="active"]:not(:has([aria-expanded="true"], [data-popup-open])) {
+  visibility: hidden;
+}
+@media (hover: hover) {
+  /* Opacity lets a keyboard or a closing portalled menu restore trigger focus
+     even before :focus-within is re-matched on the row. */
+  .mt-tree-item:not(:hover):not(:focus-within)
+    > .mt-tree-actions > .mt-tree-action[data-visibility="hover"]:not(:has([aria-expanded="true"], [data-popup-open])) {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
 .mt-tree-check {
   display: inline-flex;
   flex-shrink: 0;

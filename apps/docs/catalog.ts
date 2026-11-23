@@ -15,7 +15,7 @@ const taxonomy = {
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
-    "Paragraph", "Link", "Blockquote",
+    "Paragraph", "Link", "Blockquote", "HoverMarquee",
   ],
   "导航切换": [
     "Sidebar", "NavGroup", "NavItem", "NavSubmenu", "Breadcrumb",
@@ -475,6 +475,21 @@ export default function Demo() {
     "高级定位元素或更高层级的后代可能显示在遮罩之上；按布局设置 zIndex。状态提示名称默认 Loading，可通过 label 本地化。"
   ]
 },
+  {
+    name: "HoverMarquee",
+    description: "单行文字溢出时显示省略号，悬停或聚焦时滚动查看全文。",
+    importNames: ["HoverMarquee"],
+    code: 'import { HoverMarquee } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <div style={{ maxWidth: 240 }}>\n    <HoverMarquee>面向多模态教学数据的人工智能实验记录与阶段性研究报告</HoverMarquee>\n  </div>;\n}',
+    props: [
+      { name: "children", type: "ReactNode", description: "单行文本或非交互行内内容。" },
+      { name: "tabIndex", type: "number", description: "默认仅文字溢出时可通过 Tab 聚焦；可覆盖。" },
+      { name: "原生属性", type: "ComponentPropsWithRef<'span'>", description: "支持 className、style、ARIA 属性，ref 指向外层 span。" },
+    ],
+    notes: [
+      "在宽度受限的容器中使用。仅溢出时滚动；从行首移动到行尾，短暂停留后重复。悬停与焦点都离开时恢复省略状态。RTL 反向滚动。",
+      "启用减少动态效果或设备不支持悬停时不自动滚动：聚焦后可用方向键横向滚动，触屏可横向滑动。原文始终保留在同一个可访问文本节点中。",
+    ],
+  },
   {
     name: "HoverCard",
     description: "悬停或键盘聚焦显示的富内容预览卡片。",
@@ -3690,6 +3705,11 @@ export default function Demo() {
         name: "endContent",
         type: "(info: TreeNodeInfo) => ReactNode",
         description: "在行的逻辑末端独立显示计数或简短状态；标题省略不会压缩此区域。info 含 node、expanded、selected、checked、loading。",
+      },
+      {
+        name: "actions",
+        type: "(info: TreeNodeInfo) => TreeAction | readonly TreeAction[] | null | undefined",
+        description: "为可用节点渲染独立的末端按钮或菜单。TreeAction 含 content 和可选 visibility：always（默认）、hover（行悬停、进入键盘焦点时显示，无悬停设备也可用）、active（节点已选中时显示）。隐藏仍占位，操作不选择、展开或拖动节点；请为纯图标按钮提供可访问名称。",
       },
       {
         name: "filterTreeNode",

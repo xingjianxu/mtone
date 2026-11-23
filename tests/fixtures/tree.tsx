@@ -7,6 +7,7 @@ import {
   type TreeItem,
   type TreeRef,
 } from "../../packages/mtone/src";
+import NodeActionsDemo from "../../apps/docs/secondary-demos/tree-node-actions";
 import DocumentNavigationDemo from "../../apps/docs/secondary-demos/tree-document-navigation";
 import "../../packages/mtone/dist/styles.css";
 function App() {
@@ -58,6 +59,9 @@ function App() {
           items={basic}
           defaultExpandAll
           draggable
+          actions={({ node }) => node.id === "a" ? {
+            content: <Button type="button" size="sm" variant="ghost">Drag row action</Button>,
+          } : undefined}
           onDrop={(info) => setDrop(`${info.dragNode.id}:${info.node.id}`)}
         />
         <output>{drop}</output>
@@ -85,6 +89,7 @@ function App() {
         />
         <Tree label="Tight gap" gap={0} items={basic} defaultExpandAll showLine />
         <DocumentNavigationDemo />
+        <NodeActionsDemo />
       </main>
     </MtoneProvider>
   );

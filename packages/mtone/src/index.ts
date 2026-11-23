@@ -65,3 +65,5 @@ export * from "./floating-window";
 
 export { ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut } from "./shortcuts";
 export type { ShortcutsProviderProps, ShortcutScopeProps, ShortcutOptions } from "./shortcuts";
+
+export * from "./hover-marquee";

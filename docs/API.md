@@ -244,6 +244,14 @@ provider per application. Nested providers share the same listener.
 - Alert: tone info/success/warning/error, title, children, onClose.
 - Empty(title,description,action), Skeleton(native div props), Spinner(label).
 
+## HoverMarquee
+
+Use `<HoverMarquee>` for a non-interactive, single-line label in a constrained container.
+Fitting labels stay still. Overflowed text is ellipsized until hovered or focused,
+then pans to the logical end, pauses, and repeats. Leaving both restores the ellipsis.
+Reduced-motion and no-hover devices instead support manual horizontal scrolling.
+The component accepts native span attributes and a ref to its outer span.
+
 ## Typography.Code
 
 Use `<Typography.Code>` inline or `<Typography.Code block>` for a semantic preformatted block.
@@ -298,6 +306,13 @@ the switcher or the Right Arrow key to expand, and Left Arrow to collapse.
 - `indent` sets per-level spacing in pixels (default 20) and keeps guide lines aligned.
   `endContent(info)` shows a count or short status at the logical end of the
   row, separately from the ellipsized title.
+- `actions(info)` renders a `TreeAction`, an array, or no actions for an
+  enabled node. Set each action's `content` to a compact, accessibly named
+  button or menu trigger and use `visibility: "always"` (default), `"hover"`
+  (row hover or keyboard focus; always available on touch-only devices), or
+  `"active"` (selected rows). Controls reserve space after passive
+  `endContent` even when hidden, and do not select, expand or drag the node.
+  See the [node actions example](https://xingjianxu.github.io/mtone/#/components/Tree?section=node-actions).
 - `gap` sets the space between adjacent rows in pixels (default 2). Use
   `gap={0}` to remove that space or a finite, nonnegative decimal for a custom
   gap. Invalid values fall back to 2. Normal and virtual rows share this

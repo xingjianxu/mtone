@@ -79,6 +79,7 @@ jobs:
       - run: node tests/divider.browser.mjs
       - run: node tests/button-group.browser.mjs
       - run: node tests/typography.browser.mjs
+      - run: node tests/hover-marquee.browser.mjs
       - name: List browser regressions
         run: |
           for browser in chromium firefox webkit; do

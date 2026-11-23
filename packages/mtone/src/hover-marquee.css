@@ -1,0 +1,45 @@
+.mt-hover-marquee {
+  display: inline-block;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  vertical-align: bottom;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.mt-hover-marquee:focus-visible {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
+}
+.mt-hover-marquee-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Give keyboard and mouse users the same single restrained reveal; the
+   pauses make the start and end readable before the track starts again. */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within) > .mt-hover-marquee-text {
+    inline-size: max-content;
+    animation: mt-hover-marquee-pan var(--mt-marquee-duration) linear infinite;
+    --mt-marquee-offset: calc(-1 * var(--mt-marquee-travel));
+  }
+  .mt-hover-marquee[data-overflow]:dir(rtl):is(:hover, :focus-within) > .mt-hover-marquee-text {
+    --mt-marquee-offset: var(--mt-marquee-travel);
+  }
+}
+
+/* A native scroll viewport preserves the full text without autoplay. */
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within) {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within) > .mt-hover-marquee-text {
+    inline-size: max-content;
+  }
+}
+@keyframes mt-hover-marquee-pan {
+  0%, 12% { transform: translateX(0); }
+  80%, 100% { transform: translateX(var(--mt-marquee-offset)); }
+}

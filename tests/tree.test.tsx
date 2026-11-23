@@ -346,3 +346,48 @@ test("connector ancestry continues when parent has later siblings", () => {
     borderInlineStartStyle: "solid",
   });
 });
+
+test("independent node actions do not select, expand, open a row context action or start its drag", () => {
+  const action = vi.fn(), select = vi.fn(), expand = vi.fn();
+  const drag = vi.fn(), rightClick = vi.fn(), doubleClick = vi.fn();
+  render(
+    <Tree directory items={items} draggable onSelect={select} onExpand={expand}
+      onDragStart={drag} onRightClick={rightClick} onDoubleClick={doubleClick}
+      actions={({ node, selected }) => node.id === "p" ? {
+        content: <button type="button" onClick={action}>{selected ? "Add another" : "Add child"}</button>,
+      } : null} />,
+  );
+  const actionButton = screen.getByRole("button", { name: "Add child" });
+  fireEvent.click(actionButton);
+  fireEvent.doubleClick(actionButton);
+  fireEvent.contextMenu(actionButton);
+  expect(action).toHaveBeenCalledTimes(1);
+  expect(select).not.toHaveBeenCalled();
+  expect(expand).not.toHaveBeenCalled();
+  expect(rightClick).not.toHaveBeenCalled();
+  expect(doubleClick).not.toHaveBeenCalled();
+  expect(row("Parent")).toHaveAttribute("aria-expanded", "false");
+  fireEvent.pointerDown(actionButton);
+  // The draggable ancestor is the browser's source, even if the pointer is on a button.
+  expect(fireEvent.dragStart(row("Parent"))).toBe(false);
+  expect(drag).not.toHaveBeenCalled();
+  fireEvent.pointerDown(row("Parent"));
+  expect(fireEvent.dragStart(row("Parent"))).toBe(true);
+  expect(drag).toHaveBeenCalledTimes(1);
+  fireEvent.click(row("Parent"));
+  expect(screen.getByRole("button", { name: "Add another" })).toBeInTheDocument();
+  expect(row("Parent")).toHaveAttribute("aria-expanded", "true");
+});
+
+test("Tree actions don't rename nodes or show actions for disabled nodes", () => {
+  render(<Tree items={[
+    { id: "custom", label: <em>Custom node</em> },
+    { id: "disabled", label: "Disabled node", disabled: true },
+  ]} actions={({ node }) => [
+    { content: <button>{node.id} command</button>, visibility: "hover" },
+    { content: <button>{node.id} add</button>, visibility: "active" },
+  ]} />);
+  expect(row("Custom node")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "custom command" })).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "disabled command" })).not.toBeInTheDocument();
+});

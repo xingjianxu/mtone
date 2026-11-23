@@ -34,6 +34,11 @@ export type TreeNodeInfo = {
   checked: boolean;
   loading: boolean;
 };
+/** An independent control at the logical end of a tree row. */
+export interface TreeAction {
+  content: React.ReactNode;
+  visibility?: "always" | "hover" | "active";
+}
 export type TreeDropInfo = {
   event: React.DragEvent;
   node: TreeItem;
@@ -125,6 +130,8 @@ export interface TreeProps extends Omit<
   gap?: number;
   /** Renders separate display content at the logical end of each row. */
   endContent?: (info: TreeNodeInfo) => React.ReactNode;
+  /** Renders independent trailing controls for enabled nodes. */
+  actions?: (info: TreeNodeInfo) => TreeAction | readonly TreeAction[] | null | undefined;
   filterTreeNode?: (node: TreeItem) => boolean;
   loadData?: (node: TreeItem) => Promise<unknown>;
   loadedKeys?: TreeKey[];
@@ -194,6 +201,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     indent = DEFAULT_TREE_INDENT,
     gap = DEFAULT_TREE_ROW_GAP,
     endContent,
+    actions,
     filterTreeNode,
     loadData,
     loadedKeys,
@@ -224,6 +232,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
   ref,
 ) {
   const zh = useMtone().locale === "zh";
+  const treeId = React.useId();
   const nodes = React.useMemo(
     () => normalizeTree(items, treeData, fieldNames),
     [items, treeData, fieldNames],
@@ -534,6 +543,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     });
   };
   const dragKey = React.useRef<TreeKey | undefined>(undefined);
+  const pressedActionRow = React.useRef<TreeKey | undefined>(undefined);
   const [dropTarget, setDropTarget] = React.useState<{
     key: TreeKey;
     position: -1 | 0 | 1;
@@ -614,7 +624,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
       {isVirtual && <div aria-hidden style={{ height: start * rowStride }} />}
       {visible
         .slice(start, end)
-        .map(({ item: node, level, parent, posInSet, setSize }) => {
+        .map(({ item: node, level, parent, posInSet, setSize }, rowIndex) => {
           const isDisabled = disabled || !!node.disabled,
             isBranch = branch(node),
             isOpen = openSet.has(node.id),
@@ -637,6 +647,16 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                 ? icon(info)
                 : icon;
           const end = endContent?.(info);
+          const renderedActions = isDisabled ? null : actions?.(info);
+          const rowActions = !renderedActions
+            ? []
+            : "content" in renderedActions
+              ? [renderedActions]
+              : renderedActions;
+          // Controls must not become part of the row's accessible name.
+          const titleId = rowActions.length && typeof node.label !== "string"
+            ? `${treeId}-title-${start + rowIndex}`
+            : undefined;
           return (
             <div
               key={`${typeof node.id}:${node.id}`}
@@ -648,6 +668,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               aria-label={
                 typeof node.label === "string" ? node.label : undefined
               }
+              aria-labelledby={titleId}
               aria-level={level}
               aria-posinset={posInSet}
               aria-setsize={setSize}
@@ -777,8 +798,14 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                 !isDisabled &&
                 (typeof draggable === "function" ? draggable(node) : draggable)
               }
+              onPointerDownCapture={() => { pressedActionRow.current = undefined; }}
+              onPointerUpCapture={() => { pressedActionRow.current = undefined; }}
+              onPointerCancelCapture={() => { pressedActionRow.current = undefined; }}
               onDragStart={(e) => {
                 if (
+                  // When a pointer drags a button, the native dragstart target
+                  // can be the draggable ancestor rather than that button.
+                  pressedActionRow.current === node.id ||
                   isDisabled ||
                   !(typeof draggable === "function"
                     ? draggable(node)
@@ -926,7 +953,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                     ) : null)}
                 </span>
               )}
-              <span className="mt-tree-title">
+              <span className="mt-tree-title" id={titleId}>
                 {titleRender ? titleRender(node) : node.label}
               </span>
               {errors.has(node.id) && (
@@ -936,6 +963,23 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               )}
               {end != null && typeof end !== "boolean" && end !== "" && (
                 <span className="mt-tree-end">{end}</span>
+              )}
+              {rowActions.length > 0 && (
+                <div
+                  className="mt-tree-actions"
+                  onPointerDownCapture={() => { pressedActionRow.current = node.id; }}
+                  onClick={(event) => event.stopPropagation()}
+                  onDoubleClick={(event) => event.stopPropagation()}
+                  onContextMenu={(event) => event.stopPropagation()}
+                  onDragStart={(event) => event.stopPropagation()}
+                  onDragEnd={(event) => event.stopPropagation()}
+                >
+                  {rowActions.map(({ content, visibility = "always" }, actionIndex) => (
+                    <div className="mt-tree-action" key={actionIndex} data-visibility={visibility}>
+                      {content}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           );

@@ -36,7 +36,7 @@ test("sidebar keeps semantic neighbors together and renders each component and g
     "Select", "TreeSelect",
   ]);
   expect(Array.from(sidebar.querySelectorAll('a:not([href^="#/components/"])'), (link) => link.getAttribute("href")))
-    .toEqual(["#/start", "#/gallery", "./showcase.html", "#/theme", "#/theme/color-presets"]);
+    .toEqual(["#/start", "#/gallery", "./showcase.html", "#/theme", "#/theme/color-presets", "/llms.txt"]);
   expect(sidebar.querySelector('a[href="#/start"]')).toHaveAttribute("aria-current", "page");
   expect(sidebar.querySelectorAll("nav a:not(.mt-nav-item)")).toHaveLength(0);
   expect(sidebar.querySelector('a[href="./showcase.html"]')).toHaveAttribute("target", "_blank");

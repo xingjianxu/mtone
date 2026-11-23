@@ -19,6 +19,76 @@ test("component page gives access to a shareable API anchor", () => {
   expect(within(outline).getByRole("link", { name: "API" }).getAttribute("href")).toBe("#/components/Button?section=props");
 });
 
+test.each([
+  ["#/components/Button", "Button", undefined],
+  ["#/components/Title", "Title", "typography-title"],
+  ["#/components/Avatar?section=groups", "AvatarGroup", "groups"],
+  ["#/components/AiChat?section=ai-message", "AiMessage", "ai-message"],
+  ["#/components/Input?section=input-search-submit", "Input", undefined],
+] as const)("links to the proper AI reference on %s", (hash, name, anchor) => {
+  window.location.hash = hash;
+  const { container } = render(<DocsApp />);
+  const nav = screen.getByRole("navigation", { name: "文档导航" });
+  const globalLink = within(nav).getByRole("link", { name: "llms.txt" });
+  expect(globalLink).toHaveAttribute("href", "/llms.txt");
+  expect(globalLink).toHaveAttribute("target", "_blank");
+  expect(globalLink).toHaveAttribute("rel", "noopener noreferrer");
+  const importBar = within(container.querySelector(".component-import") as HTMLElement);
+  const href = `/components/${name}/llms.txt`;
+  const pageLink = importBar.getByRole("link", { name: `${name} llms.txt` });
+  expect(pageLink).toHaveAttribute("href", href);
+  expect(pageLink).toHaveAttribute("target", "_blank");
+  expect(pageLink).toHaveAttribute("rel", "noopener noreferrer");
+  expect(importBar.getByRole("button", { name: "复制导入语句" })).toBeVisible();
+  if (anchor) {
+    const section = document.getElementById(anchor)!.closest("section")!;
+    const sectionLink = within(section).getByRole("link", { name: `${name} llms.txt` });
+    expect(sectionLink).toHaveAttribute("href", href);
+    expect(sectionLink).toHaveAttribute("target", "_blank");
+    expect(sectionLink).toHaveAttribute("rel", "noopener noreferrer");
+  }
+});
+
+test("copies a nested component's plain-text reference, not its URL, and reports fetch errors", async () => {
+  window.location.hash = "#/components/AiChat?section=ai-message";
+  const text = "# AiMessage\n\n- Import: AiMessage from @bixlab/mtone\n示例内容\n";
+  const getReference = vi.fn()
+    .mockResolvedValueOnce(new Response(text, { headers: { "Content-Type": "text/plain; charset=utf-8" } }))
+    .mockResolvedValueOnce(new Response("<html>SPA fallback</html>", { headers: { "Content-Type": "text/html" } }))
+    .mockResolvedValueOnce(new Response("not found", { status: 404, headers: { "Content-Type": "text/plain" } }));
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  const descriptor = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+  vi.stubGlobal("fetch", getReference);
+  try {
+    const { container } = render(<DocsApp />);
+    const header = container.querySelector(".component-import") as HTMLElement;
+    const reference = within(header.querySelector(".component-reference") as HTMLElement);
+    const copy = reference.getByRole("button", { name: "复制 AiMessage llms.txt 内容" });
+    fireEvent.click(copy);
+    await waitFor(() => expect(reference.getByRole("status")).toHaveTextContent("已复制"));
+    expect(getReference).toHaveBeenLastCalledWith("/components/AiMessage/llms.txt");
+    expect(writeText).toHaveBeenLastCalledWith(text);
+
+    fireEvent.click(copy);
+    await waitFor(() => expect(reference.getByRole("status")).toHaveTextContent("复制失败"));
+    expect(writeText).toHaveBeenCalledTimes(1);
+    expect(reference.getByRole("link", { name: "AiMessage llms.txt" })).toBeVisible();
+
+    fireEvent.click(copy);
+    await waitFor(() => expect(reference.getByRole("status")).toHaveTextContent("复制失败"));
+    expect(writeText).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(within(header).getByRole("button", { name: "复制导入语句" }));
+    await waitFor(() => expect(writeText).toHaveBeenLastCalledWith(header.querySelector("code")!.textContent));
+    expect(writeText.mock.lastCall?.[0]).toContain("import { AiMessage");
+  } finally {
+    vi.unstubAllGlobals();
+    if (descriptor) Object.defineProperty(navigator, "clipboard", descriptor);
+    else Reflect.deleteProperty(navigator, "clipboard");
+  }
+});
+
 test("every canonical doc link lands on a labeled page or nested section with source for each preview", () => {
   const sectionIds = new Map<string, Set<string>>();
   for (const doc of componentDocs) {

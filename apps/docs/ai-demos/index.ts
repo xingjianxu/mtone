@@ -1,16 +1,11 @@
 import type { DocSection } from "../doc-section";
 import { componentDocs } from "../catalog";
+import { aiDemoId } from "../component-navigation";
 import { aiExamples } from "./examples";
 import IntegratedChat from "./integrated-chat";
 import integratedSource from "./integrated-chat.tsx?raw";
 
 export { aiExamples };
-
-export const aiDemoId = (name: string) =>
-  name
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .toLowerCase()
-    .replace(/^ai(?=[a-z])/, "ai-");
 
 const docs = componentDocs.filter((doc) => doc.category === "AI 界面");
 const componentSection = (doc: (typeof docs)[number]): DocSection => ({
@@ -44,10 +39,3 @@ export const aiDocSections: Record<string, readonly DocSection[]> =
       ],
     ]),
   );
-
-export function aiSectionHref(name: string) {
-  const parent = docs.find((doc) => doc.name === name)?.sidebarParent;
-  return parent
-    ? `#/components/${parent}?section=${aiDemoId(name)}`
-    : undefined;
-}

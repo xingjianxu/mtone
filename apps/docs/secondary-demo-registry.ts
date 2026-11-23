@@ -293,6 +293,8 @@ import Tree5 from "./secondary-demos/tree-virtual";
 import Tree5Source from "./secondary-demos/tree-virtual.tsx?raw";
 import Tree6 from "./secondary-demos/tree-sorting";
 import Tree6Source from "./secondary-demos/tree-sorting.tsx?raw";
+import TreeNodeActions from "./secondary-demos/tree-node-actions";
+import TreeNodeActionsSource from "./secondary-demos/tree-node-actions.tsx?raw";
 import TreeDocumentNavigation from "./secondary-demos/tree-document-navigation";
 import TreeDocumentNavigationSource from "./secondary-demos/tree-document-navigation.tsx?raw";
 
@@ -1131,6 +1133,12 @@ export default function Demo() {
     },
   ],
   Tree: [
+    {
+      id: "node-actions",
+      title: "节点右侧操作",
+      Demo: TreeNodeActions,
+      source: source(TreeNodeActionsSource),
+    },
     {
       id: "document-navigation",
       title: "侧栏文档树",

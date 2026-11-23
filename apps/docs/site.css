@@ -680,16 +680,17 @@ section:not(:where(.example-stage *)) > p {
 }
 .component-import {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 9px;
+  gap: 4px;
   padding: 3px 5px 3px 12px;
   border: 1px solid var(--docs-border);
   border-radius: 6px;
   background: var(--docs-subtle);
   margin: 0 0 14px;
 }
-.component-import > code { overflow-wrap: anywhere; font-size: 12px; }
-.component-import > button {
+.component-import > code { min-width: 0; overflow-wrap: anywhere; font-size: 12px; }
+.component-copy-button {
   flex: none;
   display: grid;
   place-items: center;
@@ -700,7 +701,22 @@ section:not(:where(.example-stage *)) > p {
   background: transparent;
   color: var(--docs-component-muted);
 }
-.component-import > button:hover { background: var(--docs-hover); }
+.component-copy-button:hover { background: var(--docs-hover); }
+
+.component-reference {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  border-inline-start: 1px solid var(--docs-border);
+  padding-inline-start: 8px;
+  font-size: 12px;
+}
+.component-reference a { color: var(--docs-component-muted); text-decoration: underline; text-underline-offset: 2px; }
+.component-reference-section { margin: -3px 0 6px; }
+.component-reference-section .component-reference { padding-inline-start: 0; border-inline-start: 0; }
+.component-reference a:focus-visible,
+.component-copy-button:focus-visible { outline: 1px solid var(--mt-focus); outline-offset: 1px; }
 
 .theme-samples {
   display: grid;

@@ -1,4 +1,5 @@
 import NavGroupExample from "./inline-demos/nav-group-usage";
+import HoverMarqueeExample from "./inline-demos/hover-marquee-usage";
 import NavSubmenuExample from "./secondary-demos/nav-submenu-usage";
 import PageLayoutExample from "./secondary-demos/page-layout-usage";
 import CheckCardExample from "./secondary-demos/check-card-usage";
@@ -511,6 +512,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <CardGroupExample />;
     case "Card":
       return <CardExample />;
+    case "HoverMarquee":
+      return <HoverMarqueeExample />;
     case "Blockquote":
       return <M.Typography.Blockquote cite="— mtone 设计笔记">让内容成为主角，用一致的间距建立层次。</M.Typography.Blockquote>;
     case "Typography":
