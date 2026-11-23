@@ -82,6 +82,19 @@ test("controls popup mounting, fresh content, portal target and semantic slots",
   }
 });
 
+test("an initially open tooltip mounts directly in a same-render ancestor container ref", async () => {
+  function Example() {
+    const host = React.useRef<HTMLElement>(null);
+    return <main ref={host}>
+      <Tooltip open container={host} content="Local help"><button>Trigger</button></Tooltip>
+    </main>;
+  }
+
+  render(<Example />);
+  const popup = await screen.findByRole("tooltip");
+  expect(screen.getByRole("main")).toContainElement(popup);
+});
+
 test("disabled tooltip leaves a live child alone; explicit disabled wrapper is keyboard focusable", async () => {
   const user = userEvent.setup();
   const action = vi.fn();

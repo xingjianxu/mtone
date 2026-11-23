@@ -63,6 +63,27 @@ function hasContent(node: React.ReactNode): boolean {
 
 type ChildProps = React.HTMLAttributes<HTMLElement> & { disabled?: boolean };
 
+function usePortalContainer(container: TooltipProps["container"]) {
+  const ref = container && "current" in container ? container : null;
+  const [resolved, setResolved] = React.useState<{
+    ref: NonNullable<typeof ref>;
+    element: HTMLElement | ShadowRoot | null;
+  } | null>(null);
+  React.useEffect(() => {
+    if (!ref) {
+      if (resolved) setResolved(null);
+      return;
+    }
+    // An ancestor's host ref can still be null in Base UI's descendant
+    // layout effect. Read it after commit and never fall back to body
+    // while the caller's container is unresolved.
+    if (resolved?.ref !== ref || resolved.element !== ref.current) {
+      setResolved({ ref, element: ref.current });
+    }
+  });
+  return ref ? (resolved?.ref === ref ? resolved.element : null) : container;
+}
+
 function TooltipInstance({
   children,
   content,
@@ -90,6 +111,7 @@ function TooltipInstance({
   onOpenChange,
 }: TooltipProps) {
   const id = React.useId();
+  const portalContainer = usePortalContainer(container);
   const popupId = `${id}-tooltip`;
   const [localOpen, setOpen] = React.useState(defaultOpen);
   const open = controlledOpen ?? localOpen;
@@ -174,7 +196,7 @@ function TooltipInstance({
         }}
       />
       {!inactive && (
-        <Base.Portal keepMounted={keepMounted} container={container}>
+        <Base.Portal keepMounted={keepMounted} container={portalContainer}>
           <MtoneScope>
             <Base.Positioner
               className={cn("mt-positioner", classNames?.positioner)}
