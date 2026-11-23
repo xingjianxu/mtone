@@ -12,7 +12,6 @@ import { Menu as BMenu } from "@base-ui/react/menu";
 import { useDirection } from "@base-ui/react/direction-provider";
 import { ContextMenu as BContextMenu } from "@base-ui/react/context-menu";
 import { Popover as BPopover } from "@base-ui/react/popover";
-import { Tooltip as BTooltip } from "@base-ui/react/tooltip";
 import { Dialog as BDialog } from "@base-ui/react/dialog";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Drawer as BDrawer } from "@base-ui/react/drawer";
@@ -980,34 +979,9 @@ function PopoverRoot(props: PopoverProps) {
 
 export const Popover = Object.assign(PopoverRoot, { Menu: PopoverMenu });
 
-export function Tooltip({
-  children,
-  content,
-  side = "top",
-  ...props
-}: OpenProps & Pick<PopoverProps, "content" | "side"> & { children: React.ReactElement }) {
-  const id = useId();
-  return (
-    <BTooltip.Provider>
-      <BTooltip.Root {...props}>
-        <BTooltip.Trigger render={children} aria-describedby={id} />
-        <BTooltip.Portal>
-          <MtoneScope>
-            <BTooltip.Positioner
-              className="mt-positioner"
-              sideOffset={6}
-              side={side}
-            >
-              <BTooltip.Popup className="mt-tooltip" role="tooltip" id={id}>
-                {content}
-              </BTooltip.Popup>
-            </BTooltip.Positioner>
-          </MtoneScope>
-        </BTooltip.Portal>
-      </BTooltip.Root>
-    </BTooltip.Provider>
-  );
-}
+export { Tooltip, TooltipProvider } from "./tooltip";
+export type { TooltipPart, TooltipProps, TooltipProviderProps, TooltipTrigger } from "./tooltip";
+
 interface DialogFrameProps extends OpenProps {
   title: React.ReactNode;
   description?: React.ReactNode;

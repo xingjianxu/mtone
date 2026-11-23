@@ -140,7 +140,7 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - `Popover.Menu` (type `PopoverMenuProps`) hosts an action menu with a string or React element `trigger`, `items`, optional `label` and `onSelect(key)`, `width`, `align`, and `open` / `defaultOpen` / `onOpenChange`. It keeps menu semantics, keyboard navigation, nested menus and focus return, without wrapping the menu in a dialog. A string trigger uses the content-width dropdown Button preset. `triggerMode="click" | "hover"` defaults to click; desktop mouse hover can cross the trigger gap and enter submenus without stealing keyboard focus, while click, keyboard and touch still work. Replace prior `<Menu trigger=…>` usage with `<Popover.Menu trigger=…>`. See [trigger mode examples](https://xingjianxu.github.io/mtone/#/components/Popover?section=trigger-mode).
 - `ContextMenu` uses the same item schema and open contract, with children as the right-click area. `Menubar` coordinates multiple action menus.
 - `Popover` remains a nonmodal popup for arbitrary `content`, with a `trigger` and optional title, side, alignment, width and open state. Set `unstyled` only if the content supplies its own visual shell: it removes the Popover background, border, shadow and padding without changing positioning, keyboard behavior or open/close state. Compose a standalone `Menu` in its content when needed; the caller can close the outer Popover from the menu's `onSelect` by controlling `open`.
-- Tooltip: child trigger element, content, side. Supply accessible names on icon-only children.
+- [Tooltip](#tooltip): short, non-interactive descriptions for a single trigger.
 - Dialog/Drawer: title, description, children, footer, optional trigger; open/defaultOpen/onOpenChange. Escape and close button restore focus. Drawer has right-edge interaction.
 - [FloatingWindow](https://xingjianxu.github.io/mtone/#/components/FloatingWindow) is a fixed, nonmodal window named by its `title`. It does not trap focus, lock background scrolling, add a backdrop, or dismiss on Escape or outside clicks. Use an optional string or React element `trigger` or control visibility through `open`, `defaultOpen` and `onOpenChange`. Set initial viewport coordinates with `initialPosition={{ left, top }}`, initial dimensions with `initialSize={{ width, height }}`, or omit them for a centered 440 × 320 window. Optional `minWidth`, `minHeight`, `maxWidth`, and `maxHeight` use pixels; the default minimum is 220 × 140, subject to viewport bounds. Moving, corner resizing, and minimizing are on by default (`draggable`, `resizable`, `minimizable`); keyboard users can focus the move/resize controls and use arrow keys (8px, or 24px with Shift). Minimize to the bottom-right restore button without losing geometry or child state; customize its icon with `minimizedIcon`. `zIndex` defaults to 1150. Closing unmounts the body and returns focus to an available trigger; minimizing does not unmount it.
 - ConfirmDialog: same basic dialog properties, onConfirm (sync/async), confirmText/cancelText/danger. Async failures remain open with error; pending action disables buttons.
@@ -148,6 +148,42 @@ Pass `defaultAnswers` for initial drafts or `answers` and `onAnswersChange` for 
 - ToastProvider: wraps application, timeout and limit. `useToast().add({title,description})` creates a dismissible toast. Place inside MtoneProvider.
 
 Triggers use Base UI's `render` composition. Custom trigger components must forward ref and DOM props; standard mtone Button does this.
+
+## Tooltip
+
+Use `<Tooltip content={description}><Button>Action</Button></Tooltip>` to
+describe one element. Custom trigger components forward their ref and DOM
+props. Give an icon-only trigger its own accessible name; tooltip content
+supplements, rather than replaces, that name. Use Popover for interactive help
+or controls. Keep essential instructions available without opening a tooltip.
+
+- **Triggers:** `trigger="hover"` is the default and also opens on keyboard
+  focus. Choose `"focus"`, `"click"` or `"contextMenu"` to use a different
+  trigger. Open the context hint with right-click, the Context Menu key or
+  Shift+F10. Click and context hints dismiss on Escape or an outside click.
+  `open` with `onOpenChange` controls visibility, and `defaultOpen`
+  sets an uncontrolled initial value.
+- **Delay:** `delay` and `closeDelay` are pointer hover delays in milliseconds.
+  Wrap related triggers in `TooltipProvider` to set shared `delay`,
+  `closeDelay` and a `timeout` for opening adjacent hints quickly. Individual
+  delays can override the provider. This is not single-tooltip exclusivity.
+- **Position:** `side` defaults to `"top"` and `align` to `"center"`. Offsets
+  (`offset`, `alignOffset`) are pixels. The default collision handling can
+  flip the direction or alignment as needed. Set `shift={true}` to allow
+  sliding along the alignment axis or `shift={false}` to allow only direction
+  flips. `avoidCollisions={false}` disables all adjustment. Set `arrow` to show
+  an arrow and use `arrowPadding` to keep it away from corners.
+- **Rendering:** `tone` uses the standard tooltip surface or a theme accent.
+  Target `trigger`, `positioner`, `popup` or `arrow` through `classNames` and
+  `styles`. Set `zIndex` to override the local layer or `keepMounted` to
+  retain the tooltip when closed. `container` selects where the portal is
+  mounted (document body by default); it does not set the collision boundary.
+  Check clipping with a custom container.
+- **Disabled controls:** `disabled` suppresses the tooltip, not its child.
+  For a native disabled trigger, opt into `wrapDisabledTrigger` so a wrapper
+  can show the tooltip without enabling the control.
+
+See the [interactive Tooltip examples](https://xingjianxu.github.io/mtone/#/components/Tooltip).
 
 ## Keyboard shortcuts
 

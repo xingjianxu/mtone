@@ -4099,43 +4099,44 @@ export default function Demo() {
   },
   {
     name: "Tooltip",
-    description: "悬停或聚焦时显示简短说明。",
-    importNames: ["Tooltip", "Button"],
-    code: 'import { Tooltip, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Tooltip content="复制当前链接"><Button>复制链接</Button></Tooltip>\n  );\n}',
+    description: "为单个触发元素提供简短说明，支持位置、箭头和不同触发方式；使用 TooltipProvider 共享延迟。",
+    importNames: ["Tooltip", "TooltipProvider"],
+    code: `import { Button, Tooltip, TooltipProvider } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return (
+    <TooltipProvider delay={250}>
+      <Tooltip content="复制当前链接" side="top" arrow>
+        <Button>复制链接</Button>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}`,
     props: [
-      {
-        name: "children",
-        type: "ReactElement",
-        description: "必填；单个可聚焦触发元素。",
-      },
-      {
-        name: "content",
-        type: "ReactNode",
-        description: "必填；提示内容。",
-      },
-      {
-        name: "side",
-        type: '"top" | "bottom" | "left" | "right"',
-        description: "优先显示位置。",
-        default: "top",
-      },
-      {
-        name: "open",
-        type: "boolean",
-        description: "受控开关。",
-      },
-      {
-        name: "defaultOpen",
-        type: "boolean",
-        description: "非受控初始开关。",
-      },
-      {
-        name: "onOpenChange",
-        type: "(open: boolean) => void",
-        description: "开关变化回调。",
-      },
+      { name: "children", type: "ReactElement", description: "必填；单个触发元素，自定义元素需转发 ref 和 DOM 属性。" },
+      { name: "content", type: "ReactNode", description: "必填；简短说明，不要放交互控件。" },
+      { name: "trigger", type: '"hover" | "focus" | "click" | "contextMenu"', default: '"hover"', description: "默认支持悬停和键盘聚焦；focus 仅聚焦，click 点按切换，contextMenu 支持右键、菜单键或 Shift+F10。" },
+      { name: "open / defaultOpen / onOpenChange", type: "boolean / boolean / (open: boolean) => void", description: "受控状态、非受控初值和变化通知。使用 open 时在回调中更新状态。" },
+      { name: "delay / closeDelay", type: "number", default: "600 / 0 ms", description: "鼠标悬停打开与离开的延迟；省略时继承 TooltipProvider 的设置。" },
+      { name: "side / align", type: '"top" | "bottom" | "left" | "right" / "start" | "center" | "end"', default: '"top" / "center"', description: "优先显示方向与对齐方式；开启避让时可按可用空间调整。" },
+      { name: "offset / alignOffset", type: "number", default: "6 / 0 px", description: "沿主轴离开触发元素的距离与沿对齐轴的偏移。" },
+      { name: "avoidCollisions", type: "boolean", default: "true", description: "空间不足时自动调整首选方向或对齐方式；false 关闭全部避让。" },
+      { name: "shift", type: "boolean", description: "省略时保留默认避让规则；true 启用沿对齐轴移动，false 仅允许翻转方向。avoidCollisions 为 false 时不生效。" },
+      { name: "arrow / arrowPadding", type: "boolean / number", default: "false / 5 px", description: "是否显示指向触发元素的箭头，以及箭头距离提示边缘的最小间距。" },
+      { name: "tone", type: '"default" | MtoneAccent', default: '"default"', description: "使用默认配色或 mtone 的色调预设。" },
+      { name: "classNames / styles", type: "各部位 CSS 类 / CSSProperties", description: "可为 trigger、positioner、popup 与 arrow 指定独立样式。" },
+      { name: "disabled / wrapDisabledTrigger", type: "boolean", default: "false", description: "前者禁用提示但不禁用触发元素；后者可包装原生 disabled 元素，使其提示仍可用。" },
+      { name: "container", type: "HTMLElement | ShadowRoot | ref", description: "Portal 挂载容器，默认挂载到文档 body；自定义容器的 overflow 可能裁切内容。" },
+      { name: "keepMounted", type: "boolean", default: "false", description: "关闭时仍保留浮层 DOM；默认关闭后卸载。" },
+      { name: "zIndex", type: "number", description: "为此提示覆盖浮层层级，不改变应用的全局层级。" },
+      { name: "TooltipProvider.delay / closeDelay / timeout", type: "number", description: "可选；共享悬停延迟，timeout 控制相邻提示快速切换的时间窗口，单位毫秒。" },
     ],
-    notes: ["不要在提示中放必须操作的交互内容；图标触发器仍需 aria-label。"],
+    notes: [
+      "图标触发器仍需 aria-label；Tooltip 提供补充说明，不替代控件名称。不要把重要操作、唯一说明或交互控件放在提示里；复杂内容请使用 Popover。",
+      "默认不渲染箭头，保持旧版外观。空间不足时位置可能不同于首选 side 和 align；自定义容器只是改变挂载位置。",
+      "TooltipProvider 只管理同组的悬停延迟，不强制同一时刻仅打开一个提示。单个 Tooltip 可覆盖 delay 和 closeDelay。",
+    ],
   },
 {
   "name": "CardGroup",

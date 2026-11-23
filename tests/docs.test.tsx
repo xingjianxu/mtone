@@ -5,10 +5,10 @@ import * as M from "../packages/mtone/src";
 import { componentDocs } from "../apps/docs/catalog";
 import { ComponentExample } from "../apps/docs/examples";
 import { docSections, parseRoute, searchDocs } from "../apps/docs/docs-app";
-// The shortcut utilities, including the scope wrapper, share their provider guide.
+// These supporting exports share a component guide instead of having standalone pages.
 const nonStandaloneExports = [
   "cn", "useMtone", "useToast", "getMentions",
-  "ShortcutScope", "useShortcut", "formatShortcut",
+  "ShortcutScope", "useShortcut", "formatShortcut", "TooltipProvider",
 ];
 
 describe("documentation", () => {
@@ -76,6 +76,21 @@ describe("documentation", () => {
     expect(demo?.source).toContain("<Select");
     expect(demo?.source).toContain("<ButtonGroup connected");
     expect(docSections.Toolbar.find(({ id }) => id === "standalone")?.source).not.toContain("controlStyle");
+  });
+  it("keeps Tooltip usage and publishes copyable advanced examples", () => {
+    const sections = docSections.Tooltip;
+    expect(searchDocs("TooltipProvider")).toContainEqual(expect.objectContaining({ name: "Tooltip" }));
+    expect(sections.map(({ id }) => id)).toEqual([
+      "usage", "placement", "triggers", "appearance", "disabled", "container",
+    ]);
+    for (const { id, Demo, source } of sections) {
+      expect(parseRoute(`#/components/Tooltip?section=${id}`)).toEqual({
+        kind: "component", name: "Tooltip", section: id,
+      });
+      expect(Demo).toBeDefined();
+      expect(source).toContain('from "@bixlab/mtone"');
+      expect(source).toContain("Tooltip");
+    }
   });
   it("documents keyboard-shortcut utilities together and demos switching active scopes", () => {
     const route = "#/components/ShortcutsProvider?section=usage";

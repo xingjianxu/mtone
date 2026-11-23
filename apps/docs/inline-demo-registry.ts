@@ -95,6 +95,16 @@ import Example19_0 from "./inline-demos/popover-usage";
 import Example19_0Raw from "./inline-demos/popover-usage.tsx?raw";
 import Example20_0 from "./inline-demos/tooltip-usage";
 import Example20_0Raw from "./inline-demos/tooltip-usage.tsx?raw";
+import TooltipPlacement from "./inline-demos/tooltip-placement";
+import TooltipPlacementSource from "./inline-demos/tooltip-placement.tsx?raw";
+import TooltipTriggers from "./inline-demos/tooltip-triggers";
+import TooltipTriggersSource from "./inline-demos/tooltip-triggers.tsx?raw";
+import TooltipAppearance from "./inline-demos/tooltip-appearance";
+import TooltipAppearanceSource from "./inline-demos/tooltip-appearance.tsx?raw";
+import TooltipDisabled from "./inline-demos/tooltip-disabled";
+import TooltipDisabledSource from "./inline-demos/tooltip-disabled.tsx?raw";
+import TooltipContainer from "./inline-demos/tooltip-container";
+import TooltipContainerSource from "./inline-demos/tooltip-container.tsx?raw";
 import Example21_0 from "./inline-demos/divider-usage";
 import Example21_0Raw from "./inline-demos/divider-usage.tsx?raw";
 import Example21_1 from "./inline-demos/divider-title";
@@ -484,6 +494,41 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example20_0,
       source: source(Example20_0Raw),
+    },
+    {
+      id: "placement",
+      title: "位置与箭头",
+      note: "side 和 align 指定优先位置。空间不足时，提示默认调整方向或对齐；可开启 shift 沿边缘移动，可按需显示箭头。",
+      Demo: TooltipPlacement,
+      source: source(TooltipPlacementSource),
+    },
+    {
+      id: "triggers",
+      title: "触发、延迟与受控开关",
+      note: "默认悬停或聚焦。把鼠标从一个提示移到另一个，可体验 TooltipProvider 的共享延迟；也可仅聚焦、点按或右键触发。按 Escape 可关闭提示。",
+      Demo: TooltipTriggers,
+      source: source(TooltipTriggersSource),
+    },
+    {
+      id: "appearance",
+      title: "颜色与自定义内容",
+      note: "可选择主题色调，或用 styles 和 classNames 分别自定义触发器、定位层、提示和箭头。提示只放说明，不放交互控件。",
+      Demo: TooltipAppearance,
+      source: source(TooltipAppearanceSource),
+    },
+    {
+      id: "disabled",
+      title: "禁用与原生触发元素",
+      note: "禁用 Tooltip 不会禁用按钮。wrapDisabledTrigger 可让原生 disabled 按钮通过外层触发说明；不要把必要说明只放在提示里。",
+      Demo: TooltipDisabled,
+      source: source(TooltipDisabledSource),
+    },
+    {
+      id: "container",
+      title: "挂载容器与边缘避让",
+      note: "container 指定 Portal 的挂载位置，不改变优先方向。缩窄浏览器或滚动到视口边缘，观察提示如何自动避让。",
+      Demo: TooltipContainer,
+      source: source(TooltipContainerSource),
     },
   ],
   Divider: [
