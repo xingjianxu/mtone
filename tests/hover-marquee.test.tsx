@@ -2,6 +2,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { render, screen } from "@testing-library/react";
 import { expect, it } from "vitest";
+import HoverMarqueeDemo from "../apps/docs/inline-demos/hover-marquee-usage";
 import { HoverMarquee } from "../packages/mtone/src";
 
 it("keeps one accessible copy of the original text and forwards native attributes", () => {
@@ -14,4 +15,12 @@ it("keeps one accessible copy of the original text and forwards native attribute
   expect(screen.getAllByText("Project notes")).toHaveLength(1);
   expect(screen.getByText("Project notes")).not.toHaveAttribute("aria-hidden");
   expect(renderToStaticMarkup(<HoverMarquee>Server content</HoverMarquee>)).toContain("Server content");
+});
+
+it("puts the demonstrably long label first in the shared docs and gallery example", () => {
+  const { container } = render(<HoverMarqueeDemo />);
+  const labels = container.querySelectorAll(".mt-hover-marquee");
+  expect(labels).toHaveLength(1);
+  expect(labels[0].textContent?.length).toBeGreaterThan(36);
+  expect(labels[0].parentElement).toHaveStyle({ inlineSize: "100%", maxInlineSize: "15rem" });
 });

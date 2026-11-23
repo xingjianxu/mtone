@@ -232,7 +232,13 @@ export const inlineDocSections: Readonly<
     { id: "ide", title: "IDE 四向停靠", Demo: PanelIde, source: source(PanelIdeSource) },
     { id: "standalone", title: "独立面板", Demo: PanelStandalone, source: source(PanelStandaloneSource) },
   ],
-  HoverMarquee: [{ id: "usage", title: "文字溢出", Demo: HoverMarqueeUsage, source: source(HoverMarqueeUsageSource) }],
+  HoverMarquee: [{
+    id: "usage",
+    title: "文字溢出",
+    note: "长标题在限宽容器内先显示省略号，鼠标悬停或按 Tab 聚焦后可查看全文。",
+    Demo: HoverMarqueeUsage,
+    source: source(HoverMarqueeUsageSource),
+  }],
   ButtonGroup: [
     {
       id: "usage",

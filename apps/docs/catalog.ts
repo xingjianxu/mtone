@@ -497,7 +497,7 @@ export default function Demo() {
     name: "HoverMarquee",
     description: "单行文字溢出时显示省略号，悬停或聚焦时滚动查看全文。",
     importNames: ["HoverMarquee"],
-    code: 'import { HoverMarquee } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <div style={{ maxWidth: 240 }}>\n    <HoverMarquee>面向多模态教学数据的人工智能实验记录与阶段性研究报告</HoverMarquee>\n  </div>;\n}',
+    code: 'import { HoverMarquee } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <div style={{ inlineSize: "100%", maxInlineSize: "15rem", minInlineSize: 0 }}>\n      <HoverMarquee>面向多模态教学数据的人工智能实验记录、阶段性研究报告与后续模型评估计划及数据整理说明</HoverMarquee>\n    </div>\n  );\n}',
     props: [
       { name: "children", type: "ReactNode", description: "单行文本或非交互行内内容。" },
       { name: "tabIndex", type: "number", description: "默认仅文字溢出时可通过 Tab 聚焦；可覆盖。" },
