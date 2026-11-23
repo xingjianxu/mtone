@@ -130,6 +130,7 @@ jobs:
       - run: node tests/button-toggle.browser.mjs
       - run: node tests/menu-doc-trigger-width.browser.mjs
       - run: node tests/page-layout-docs.browser.mjs
+      - run: node tests/panel.browser.mjs
       - run: node tests/tabs-attached.browser.mjs
       - run: node tests/typography-code.browser.mjs
       - run: node tests/global-notice.browser.mjs

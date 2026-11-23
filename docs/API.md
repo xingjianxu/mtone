@@ -244,6 +244,18 @@ provider per application. Nested providers share the same listener.
 - Alert: tone info/success/warning/error, title, children, onClose.
 - Empty(title,description,action), Skeleton(native div props), Spinner(label).
 
+## Panel
+
+Use `Panel` for IDE-style work areas. Pass `items` (tab value, label, content, optional
+icon and disabled flag), `label` to name the tab strip, and `actions` for header
+controls. `value` / `defaultValue` and `collapsed` / `defaultCollapsed` allow
+controlled or independent tab selection and disclosure. A collapsed Panel keeps
+the header and all visited content mounted but hides the tab bodies.
+
+Use Splitter to dock on any edge: vertical orientation for top/bottom and horizontal
+for left/right. Keep the header at the top. The [IDE example](https://xingjianxu.github.io/mtone/#/components/Panel?section=ide)
+retains enough space for the side header when collapsed and restores the previous pane size on expansion.
+
 ## HoverMarquee
 
 Use `<HoverMarquee>` for a non-interactive, single-line label in a constrained container.

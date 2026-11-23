@@ -1,3 +1,7 @@
+import PanelIde from "./inline-demos/panel-ide";
+import PanelIdeSource from "./inline-demos/panel-ide.tsx?raw";
+import PanelStandalone from "./inline-demos/panel-standalone";
+import PanelStandaloneSource from "./inline-demos/panel-standalone.tsx?raw";
 import HoverMarqueeUsage from "./inline-demos/hover-marquee-usage";
 import HoverMarqueeUsageSource from "./inline-demos/hover-marquee-usage.tsx?raw";
 import SelectIntrinsic from "./inline-demos/select-intrinsic";
@@ -224,6 +228,10 @@ export const inlineDocSections: Readonly<
   Record<string, readonly DocSection[]>
 > = {
   ToastProvider: toastSections,
+  Panel: [
+    { id: "ide", title: "IDE 四向停靠", Demo: PanelIde, source: source(PanelIdeSource) },
+    { id: "standalone", title: "独立面板", Demo: PanelStandalone, source: source(PanelStandaloneSource) },
+  ],
   HoverMarquee: [{ id: "usage", title: "文字溢出", Demo: HoverMarqueeUsage, source: source(HoverMarqueeUsageSource) }],
   ButtonGroup: [
     {

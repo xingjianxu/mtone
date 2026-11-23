@@ -57,6 +57,9 @@ export interface TabsProps extends Omit<
   onOrderChange?: (values: string[]) => void;
 }
 
+/** Internal: let Panel hide its tab bodies without destroying visited content. */
+export const TabsCollapsedContext = React.createContext(false);
+
 export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   {
     items,
@@ -89,6 +92,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   ref,
 ) {
   const { locale } = useMtone();
+  const panelsCollapsed = React.useContext(TabsCollapsedContext);
   const zh = locale === "zh";
   const inheritedDirection = useDirection();
   const direction =
@@ -423,13 +427,16 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
             className="mt-tab-panel"
             key={item.value}
             value={item.value}
+            {...(panelsCollapsed ? { hidden: true, inert: true } : {})}
             keepMounted={
               !!item.forceRender ||
               (!(item.destroyOnHidden ?? destroyOnHidden) &&
                 (visited.has(item.value) || selected === item.value))
             }
           >
-            {item.content}
+            <TabsCollapsedContext.Provider value={false}>
+              {item.content}
+            </TabsCollapsedContext.Provider>
           </BTabs.Panel>
         ))}
       </BTabs.Root>

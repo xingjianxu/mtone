@@ -11,7 +11,7 @@ export type PropDoc = {
  */
 const taxonomy = {
   "布局容器": [
-    "AdminLayout", "PageLayout", "Toolbar", "SectionGroup", "Splitter", "Affix", "Divider",
+    "AdminLayout", "PageLayout", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
@@ -475,6 +475,24 @@ export default function Demo() {
     "高级定位元素或更高层级的后代可能显示在遮罩之上；按布局设置 zIndex。状态提示名称默认 Loading，可通过 label 本地化。"
   ]
 },
+  {
+    name: "Panel",
+    description: "IDE 风格的标签面板，可独立使用，也可与 Splitter 组合停靠和调节大小。",
+    importNames: ["Panel"],
+    code: 'import { Panel } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Panel label="工作区" items={[{ value: "output", label: "输出", content: <code>编译完成</code> }]} />;\n}',
+    props: [
+      { name: "items", type: "Pick<TabItem, 'value' | 'label' | 'content' | 'disabled' | 'icon'>[]", description: "标签数据。已访问的标签内容在切换和收起后保持挂载。" },
+      { name: "label", type: "string", description: "标签列表的无障碍名称。" },
+      { name: "value / defaultValue / onValueChange", type: "string / string / (value: string) => void", description: "受控或非受控的选中标签。" },
+      { name: "actions", type: "ReactNode", description: "标题行末端的附加操作，收起时仍可操作。" },
+      { name: "collapsed / defaultCollapsed / onCollapsedChange", type: "boolean / boolean / (collapsed: boolean) => void", default: "defaultCollapsed: false", description: "受控或非受控的收起状态，收起后只显示标题行。" },
+      { name: "原生属性", type: "ComponentPropsWithRef<'div'>", description: "支持 className、style 和原生属性；ref 指向根 div。" },
+    ],
+    notes: [
+      "Panel 不负责停靠和调整尺寸。与 Splitter 组合时，顶部和底部用纵向分栏，左右用横向分栏，标题栏始终在上方。示例在左右收起时保留紧凑标题宽度，并在展开后恢复此前的分栏尺寸。",
+      "标题栏沿用 Tabs 的键盘操作与窄宽度溢出菜单；收起会隐藏内容区并使其不可聚焦，但保留内部状态。",
+    ],
+  },
   {
     name: "HoverMarquee",
     description: "单行文字溢出时显示省略号，悬停或聚焦时滚动查看全文。",
