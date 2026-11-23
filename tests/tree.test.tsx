@@ -22,6 +22,15 @@ const items = [
   { id: "z", label: "Last" },
 ];
 const row = (name: string) => screen.getByRole("treeitem", { name });
+test("uses a 2px row gap by default and accepts zero or fractional values", () => {
+  const { rerender } = render(<Tree items={items} />);
+  const actual = () => screen.getByRole("tree").style.getPropertyValue("--_mt-tree-row-gap");
+  expect(actual()).toBe("2px");
+  for (const [gap, expected] of [[0, "0px"], [5.5, "5.5px"], [-1, "2px"], [NaN, "2px"], [Infinity, "2px"]] as const) {
+    rerender(<Tree items={items} gap={gap} />);
+    expect(actual()).toBe(expected);
+  }
+});
 test("custom indentation moves rows and guides together without changing the default gutter", () => {
   const deep = [{ id: "p", label: "Parent", children: [
     { id: "c", label: "Child", children: [{ id: "g", label: "Grandchild" }] },

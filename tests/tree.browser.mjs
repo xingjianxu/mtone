@@ -34,10 +34,6 @@ try {
       const checked = page.getByRole("tree", { name: "Checked", exact: true });
       const selected = checked.getByRole("treeitem", { selected: true });
       await expect(selected).toHaveCount(2);
-      const navigationGap = await page.locator(".mt-nav-group > .mt-nav-item").evaluateAll(
-        ([first, second]) => second.getBoundingClientRect().top - first.getBoundingClientRect().bottom,
-      );
-      assert(navigationGap > 0, "the comparison NavGroup has real space between items");
       const visual = await selected.evaluateAll(([first, second]) => {
         const a = first.getBoundingClientRect(), b = second.getBoundingClientRect();
         const guideA = first.querySelector(".mt-tree-guide-direct");
@@ -56,14 +52,18 @@ try {
           secondJointOffset: jointB - (b.top + b.height / 2),
         };
       });
-      assert(Math.abs(visual.gap - navigationGap) < 0.1,
-        `selected Tree rows and NavGroup items have the same gap (${visual.gap} vs ${navigationGap})`);
+      assert(Math.abs(visual.gap - 2) < 0.1,
+        `selected Tree rows have the 2px default gap (actual ${visual.gap})`);
       assert.equal(visual.firstFill, visual.secondFill);
       assert.notEqual(visual.firstFill, "rgba(0, 0, 0, 0)", "the selected fills are visible");
       assert.equal(visual.hitsRowInGap, false, "space between highlights is not a row hit target");
       assert(Math.abs(visual.continuousLine) < 0.1, "the guide line crosses the row gap");
       assert(Math.abs(visual.firstJointOffset) < 0.6 && Math.abs(visual.secondJointOffset) < 0.6,
         "branch joints stay at the row centers");
+      const tight = page.getByRole("tree", { name: "Tight gap", exact: true });
+      const zeroGap = await tight.getByRole("treeitem").evaluateAll(([a, b]) =>
+        b.getBoundingClientRect().top - a.getBoundingClientRect().bottom);
+      assert(Math.abs(zeroGap) < 0.1, "an explicit zero removes the row gap");
       await checked
         .getByRole("checkbox", { name: "Alpha", exact: true })
         .click();
@@ -112,11 +112,11 @@ try {
         return { top: a.top - bounds.top, gap: b.top - a.bottom, rowHeight: a.height, scrollHeight: viewport.scrollHeight };
       });
       assert(Math.abs(virtualMetrics.top) < 0.1, "scrollTo aligns the requested row, excluding its preceding gap");
-      assert(Math.abs(virtualMetrics.gap - navigationGap) < 0.1, "virtual selections use the same gap");
+      assert(Math.abs(virtualMetrics.gap - 5.5) < 0.1, "virtual rows retain the configured fractional gap");
       assert(Math.abs(virtualMetrics.rowHeight - 34) < 0.1, "itemHeight still sets the actual row height");
-      assert.equal(virtualMetrics.scrollHeight, 1000 * 34 + 999 * navigationGap,
+      assert.equal(virtualMetrics.scrollHeight, 1001 * 34 + 1000 * 5.5,
         "virtual scroll extent includes each inter-row gap exactly once");
-      const last = v.getByRole("treeitem", { name: "Node 999", exact: true });
+      const last = v.getByRole("treeitem", { name: "Node 1000", exact: true });
       await v.getByRole("treeitem", { name: "Node 900", exact: true }).focus();
       await page.keyboard.press("End");
       await expect(last).toBeFocused();

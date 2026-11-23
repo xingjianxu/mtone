@@ -287,6 +287,10 @@ the switcher or the Right Arrow key to expand, and Left Arrow to collapse.
 - `indent` sets per-level spacing in pixels (default 20) and keeps guide lines aligned.
   `endContent(info)` shows a count or short status at the logical end of the
   row, separately from the ellipsized title.
+- `gap` sets the space between adjacent rows in pixels (default 2). Use
+  `gap={0}` to remove that space or a finite, nonnegative decimal for a custom
+  gap. Invalid values fall back to 2. Normal and virtual rows share this
+  spacing; `itemHeight` does not include the gap.
 - Set `icon` on an individual `TreeItem` or `TreeNode` to override the tree-wide
   icon. A per-node callback receives the normalized item. Use `isLeaf: true`
   for terminal documents.

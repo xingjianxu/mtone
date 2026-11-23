@@ -21,9 +21,7 @@ import {
   expandTreeParents,
 } from "./tree-model";
 
-// Match the spacing of adjacent NavGroup rows without changing the height of
-// the interactive row. Keep the CSS and virtual scroll stride in sync.
-const TREE_ROW_GAP = 3;
+const DEFAULT_TREE_ROW_GAP = 2;
 const DEFAULT_TREE_INDENT = 20;
 
 export type { TreeItem, TreeKey, TreeNode } from "./tree-types";
@@ -123,6 +121,8 @@ export interface TreeProps extends Omit<
   titleRender?: (node: TreeItem) => React.ReactNode;
   /** Pixels of indentation per level; defaults to 20. */
   indent?: number;
+  /** Space between adjacent rows in pixels; defaults to 2. */
+  gap?: number;
   /** Renders separate display content at the logical end of each row. */
   endContent?: (info: TreeNodeInfo) => React.ReactNode;
   filterTreeNode?: (node: TreeItem) => boolean;
@@ -192,6 +192,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     switcherLoadingIcon,
     titleRender,
     indent = DEFAULT_TREE_INDENT,
+    gap = DEFAULT_TREE_ROW_GAP,
     endContent,
     filterTreeNode,
     loadData,
@@ -307,7 +308,10 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     Number.isFinite(itemHeight) && itemHeight > 0
       ? Math.max(24, itemHeight)
       : 30;
-  const rowStride = rowHeight + TREE_ROW_GAP;
+  // Use the same gap for CSS, virtual spacers and scroll positioning while
+  // keeping itemHeight as the actual (clickable) row height.
+  const rowGap = Number.isFinite(gap) && gap >= 0 ? gap : DEFAULT_TREE_ROW_GAP;
+  const rowStride = rowHeight + rowGap;
   const levelIndent = Number.isFinite(indent) ? Math.max(0, indent) : DEFAULT_TREE_INDENT;
   const viewport =
     typeof height === "number" && Number.isFinite(height) && height > 0
@@ -597,7 +601,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
       )}
       style={{
         ...style,
-        "--_mt-tree-row-gap": `${TREE_ROW_GAP}px`,
+        "--_mt-tree-row-gap": `${rowGap}px`,
         "--_mt-tree-indent": `${levelIndent}px`,
         ...(viewport ? { height: viewport, overflow: "auto" } : {}),
       } as React.CSSProperties}

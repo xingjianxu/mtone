@@ -7,7 +7,7 @@
 
 ### Fixed
 - A single PageLayout directly inside AdminLayout.Content fills the available height without introducing a separate scrollbar.
-- Tree rows keep a 3px gap between adjacent highlights, including in virtual lists, while preserving guide lines and interactive row heights.
+- Tree rows have a configurable `gap` (default 2px; use 0 for no gap), including in virtual lists, without changing guide continuity or interactive row heights.
 
 ## 0.13.1
 

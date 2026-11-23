@@ -3673,6 +3673,12 @@ export default function Demo() {
         description: "每层新增的逻辑缩进（px），同时调整节点、引导线和连接线；负值按 0，无效值回退到 20。",
       },
       {
+        name: "gap",
+        type: "number",
+        default: "2",
+        description: "相邻行间距（px）。接受有限非负数（可含小数）；设为 0 取消间距，无效值回退到 2。普通和虚拟列表一致，不改变单行的高度或命中区域。",
+      },
+      {
         name: "endContent",
         type: "(info: TreeNodeInfo) => ReactNode",
         description: "在行的逻辑末端独立显示计数或简短状态；标题省略不会压缩此区域。info 含 node、expanded、selected、checked、loading。",
@@ -3704,7 +3710,7 @@ export default function Demo() {
         name: "height / itemHeight / virtual",
         type: "number / number / boolean",
         description:
-          "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px，不含与 NavGroup 一致的 3px 行间距；virtual=false 保留滚动容器但渲染全部节点。",
+          "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px，不包含 gap；virtual=false 保留滚动容器但渲染全部节点。",
         default: "— / 30 / true",
       },
       {

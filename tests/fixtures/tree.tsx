@@ -4,8 +4,6 @@ import {
   Tree,
   MtoneProvider,
   Button,
-  NavGroup,
-  NavItem,
   type TreeItem,
   type TreeRef,
 } from "../../packages/mtone/src";
@@ -73,9 +71,10 @@ function App() {
           label="Virtual"
           height={150}
           itemHeight={34}
+          gap={5.5}
           multiple
           defaultSelectedKeys={["900", "901"]}
-          items={Array.from({ length: 1000 }, (_, i) => ({
+          items={Array.from({ length: 1001 }, (_, i) => ({
             id: String(i),
             label: `Node ${i}`,
           }))}
@@ -84,10 +83,7 @@ function App() {
           label="Long"
           items={[{ id: "long", label: "LongLabel".repeat(80) }]}
         />
-        <NavGroup label="Navigation spacing">
-          <NavItem href="#alpha">Navigation Alpha</NavItem>
-          <NavItem href="#beta">Navigation Beta</NavItem>
-        </NavGroup>
+        <Tree label="Tight gap" gap={0} items={basic} defaultExpandAll showLine />
         <DocumentNavigationDemo />
       </main>
     </MtoneProvider>
