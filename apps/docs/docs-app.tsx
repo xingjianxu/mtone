@@ -12,9 +12,9 @@ import {
   BookOpen,
 } from "lucide-react";
 import * as M from "../../packages/mtone/src";
-import { componentCategories, componentDocGroups, componentDocs, familyDocHref, type ComponentDoc } from "./catalog";
+import { componentCategories, componentDocGroups, componentDocs, type ComponentDoc } from "./catalog";
 import { ComponentExample } from "./examples";
-import { standaloneTypographySections, focusTypographySection, isTypographySection, typographySectionId, componentDocHref as baseComponentDocHref, handleTypographyNavigation } from "./typography-navigation";
+import { standaloneTypographySections, focusTypographySection, isTypographySection, typographySectionId, handleTypographyNavigation } from "./typography-navigation";
 import { componentSectionHref, focusDocSection, type DocSection, type OutlineEntry } from "./doc-section";
 import { inputDocSections } from "./input-demos";
 import { buttonDocSections } from "./button-demos";
@@ -22,7 +22,9 @@ import { dataTableDocSections } from "./table-example";
 import { dataListDocSections } from "./data-list-demos";
 import { secondaryDocSections } from "./secondary-demo-registry";
 import { inlineDocSections } from "./inline-demo-registry";
-import { aiDocSections, aiSectionHref } from "./ai-demos";
+import { aiDocSections } from "./ai-demos";
+import { componentDocHref, nestedComponentDoc } from "./component-navigation";
+import { componentLlmsPath, globalLlmsPath } from "./llms-reference";
 import { ShowcasePage } from "./showcase-page";
 import { ThemeSelect, useThemePreference } from "./theme-preference";
 import { CodeBlock, DemoSource } from "./code-block";
@@ -62,33 +64,77 @@ const sidebarGroups = componentDocGroups.map(({ label, members }) => ({
     !doc.sidebarParent && !isTypographySection(doc.name),
   ),
 }));
-export const componentDocHref = (name: string) => familyDocHref(name) ?? aiSectionHref(name) ?? baseComponentDocHref(name);
-function ImportLine({ code }: { code: string }) {
+export { componentDocHref };
+const llmsHref = import.meta.env.BASE_URL + globalLlmsPath;
+
+function CopyControl({ name, copy }: { name: string; copy: () => Promise<void> }) {
   const [status, setStatus] = useState("");
+  return <>
+    <button type="button" className="component-copy-button" aria-label={name} onClick={async () => {
+      setStatus("");
+      try {
+        await copy();
+        setStatus("已复制");
+      } catch {
+        setStatus("复制失败，请手动复制");
+      }
+    }}>{status === "已复制" ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}</button>
+    <span className="sr-only" role="status">{status}</span>
+  </>;
+}
+
+async function fetchLlmsText(href: string) {
+  const response = await fetch(href);
+  if (!response.ok || !/^text\/plain(?:;|$)/i.test(response.headers.get("Content-Type") ?? "")) {
+    throw new Error("The reference is not available as plain text");
+  }
+  return response.text();
+}
+
+async function copyLlms(href: string) {
+  const clipboard = navigator.clipboard;
+  if (typeof ClipboardItem !== "undefined" && typeof clipboard?.write === "function") {
+    // Schedule the clipboard write in the click gesture; Safari requires this
+    // even when the plain-text asset is still being loaded.
+    const data = fetchLlmsText(href).then((text) => new Blob([text], { type: "text/plain" }));
+    void data.catch(() => undefined); // The browser may reject permission before consuming the data.
+    await clipboard.write([new ClipboardItem({ "text/plain": data })]);
+  } else {
+    if (!clipboard?.writeText) throw new Error("Clipboard unavailable");
+    await clipboard.writeText(await fetchLlmsText(href));
+  }
+}
+
+function ComponentReference({ name }: { name: string }) {
+  const href = import.meta.env.BASE_URL + componentLlmsPath(name);
+  return <span className="component-reference">
+    <a href={href} target="_blank" rel="noopener noreferrer" aria-label={`${name} llms.txt`}>llms.txt</a>
+    <CopyControl name={`复制 ${name} llms.txt 内容`} copy={() => copyLlms(href)} />
+  </span>;
+}
+
+function ImportLine({ code, name }: { code: string; name: string }) {
   return <div className="component-import">
     <code>{code}</code>
-    <button type="button" aria-label="复制导入语句" onClick={async () => {
-      try {
-        await navigator.clipboard.writeText(code);
-        setStatus("已复制导入语句");
-      } catch {
-        setStatus("复制失败，请手动选择代码");
-      }
-    }}>{status.startsWith("已") ? <Check size={14} /> : <Copy size={14} />}</button>
-    <span className="sr-only" role="status">{status}</span>
+    <CopyControl name="复制导入语句" copy={() => navigator.clipboard.writeText(code)} />
+    <ComponentReference name={name} />
   </div>;
 }
-function DocDemo({ item, level }: { item: DocSection; level: number }) {
+function DocDemo({ item, level, owner }: { item: DocSection; level: number; owner: string }) {
   const Heading = level === 2 ? "h2" : level === 3 ? "h3" : "h4";
+  const nested = nestedComponentDoc(owner, item.id.startsWith("typography-")
+    ? standaloneTypographySections.find(({ name }) => typographySectionId(name) === item.id)?.name
+    : item.id);
   return <section className="component-doc-section">
     <Heading id={item.id} tabIndex={-1}>{item.title}</Heading>
+    {nested && <div className="component-reference-section"><ComponentReference name={nested.name} /></div>}
     {item.note && <p>{item.note}</p>}
     {item.relatedLink && <p>另见：<a className="docs-inline-link" href={item.relatedLink.href}>{item.relatedLink.label}</a>。</p>}
     {item.Demo && <div className="component-demo-card">
       <div className="component-demo-stage example-stage"><item.Demo /></div>
       {item.source && <DemoSource code={item.source} />}
     </div>}
-    {item.children?.map((child) => <DocDemo key={child.id} item={child} level={level + 1} />)}
+    {item.children?.map((child) => <DocDemo key={child.id} item={child} level={level + 1} owner={owner} />)}
   </section>;
 }
 export const docSections: Record<string, readonly DocSection[]> = {
@@ -126,11 +172,12 @@ function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }
     doc.name === "Typography" && section && isTypographySection(section)
       ? typographySectionId(section)
       : section;
-  const importCode = doc.importNames.length ? `import { ${doc.importNames.join(", ")} } from "@bixlab/mtone";` : undefined;
+  const reference = nestedComponentDoc(doc.name, section) ?? doc;
+  const importCode = `import { ${reference.importNames.join(", ")} } from "@bixlab/mtone";`;
   return (
     <>
       <h1>{doc.name}</h1>
-      {importCode && <ImportLine code={importCode} />}
+      <ImportLine key={reference.name} code={importCode} name={reference.name} />
       <aside className="component-outline">
         <M.TableOfContents
           aria-label="本页目录"
@@ -154,7 +201,7 @@ function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }
           }}
         />
       </aside>
-      {sections.map((item) => <DocDemo key={item.id} item={item} level={2} />)}
+      {sections.map((item) => <DocDemo key={item.id} item={item} level={2} owner={doc.name} />)}
       <section id="props" tabIndex={-1}>
         <h2>API</h2>
         <div className="props-scroll">
@@ -249,7 +296,7 @@ function Start() {
       </section>
       <section id="ai-coding">
         <h2>与 AI 一起编程</h2>
-        <p><a href="./llms.txt">打开 llms.txt</a>，将内容提供给支持文件或网页上下文的 AI 编程工具。它包含安装方式、组件入口、重要 API、示例与文档链接。</p>
+        <p><a href={llmsHref} target="_blank" rel="noopener noreferrer">打开 llms.txt</a>，将内容提供给支持文件或网页上下文的 AI 编程工具。它包含安装方式、组件入口、重要 API、示例与文档链接。</p>
         <CodeBlock code={'先读取 node_modules/@bixlab/mtone/llms.txt 和 dist/index.d.ts。使用已安装版本的 mtone 组件实现一个设置页，导入 styles.css，复用组件，不猜测其他 UI 库的 API。最后执行类型检查并验证键盘交互。'} />
         <p>从 npm 安装的 @bixlab/mtone 自 0.6.0 起包含此文件，可在 <code>node_modules/@bixlab/mtone/llms.txt</code> 读取。</p>
         <p>网站文件跟随仓库 master，可能领先 npm。优先使用已安装包中的文件和类型声明；llms.txt 不会被所有 AI 工具自动读取，也不能代替完整类型、测试或后端实现。</p>
@@ -533,6 +580,7 @@ function DocsBody() {
               <M.NavItem href={colorPresetsHref} active={route.kind === "color-presets"}>
                 颜色预设
               </M.NavItem>
+              <M.NavItem href={llmsHref} target="_blank" rel="noopener noreferrer">llms.txt</M.NavItem>
             </M.NavGroup>
             {sidebarGroups.map(({ label, members }) => (
               <M.NavGroup key={label} label={label}>

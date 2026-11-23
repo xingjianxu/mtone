@@ -124,6 +124,9 @@ try {
         row.getBoundingClientRect().bottom - row.parentElement.getBoundingClientRect().bottom)) < 0.1,
       "the last virtual item scrolls flush to the bottom without a trailing gap");
       const drag = page.getByRole("tree", { name: "Drag tree", exact: true });
+      const dropRow = drag.getByRole("treeitem", { name: "Last", exact: true });
+      await drag.getByRole("button", { name: "Drag row action" }).dragTo(dropRow);
+      await expect(page.locator("output")).toHaveText("");
       await drag
         .getByRole("treeitem", { name: "Alpha", exact: true })
         .dragTo(drag.getByRole("treeitem", { name: "Last", exact: true }));
@@ -170,6 +173,87 @@ try {
       await expect(history).toBeFocused();
       await page.keyboard.press("Enter");
       await expect(history).toHaveAttribute("aria-selected", "true");
+      const actions = page.getByRole("tree", { name: "文档节点操作" });
+      const manual = actions.getByRole("treeitem", { name: "项目手册", exact: true });
+      const references = actions.getByRole("treeitem", { name: "参考资料", exact: true });
+      const more = manual.getByRole("button", { name: "更多操作：项目手册" });
+      const add = manual.getByRole("button", { name: "添加子文档：项目手册" });
+      const hoverMore = references.locator('[aria-label="更多操作：参考资料"]');
+      const inactiveAdd = references.locator('[aria-label="添加子文档：参考资料"]');
+      await expect(more).toBeVisible();
+      await expect(add).toBeVisible();
+      await expect(hoverMore.locator("..")).toHaveCSS("opacity", "0");
+      await expect(hoverMore).toHaveCSS("pointer-events", "none");
+      await expect(inactiveAdd).toBeHidden();
+
+      const measures = (row) => {
+        const title = row.querySelector(".mt-tree-title").getBoundingClientRect();
+        const controls = row.querySelector(".mt-tree-actions").getBoundingClientRect();
+        const bounds = row.getBoundingClientRect();
+        return { height: bounds.height, titleWidth: title.width, offsetFromEnd: bounds.right - controls.right };
+      };
+      const before = await references.evaluate(measures);
+      const standardHeight = await tight.getByRole("treeitem").first().evaluate((row) => row.getBoundingClientRect().height);
+      assert(Math.abs(before.height - standardHeight) < 0.1, "action content doesn't grow the node row");
+      assert(Math.abs(before.offsetFromEnd - (await manual.evaluate(measures)).offsetFromEnd) < 0.1,
+        "both action groups align at the logical row edge");
+      await references.hover();
+      await expect(hoverMore.locator("..")).toHaveCSS("opacity", "1");
+      await expect(inactiveAdd).toBeHidden();
+      assert.deepEqual(await references.evaluate(measures), before, "hover shows an action without moving or widening the row");
+      await page.mouse.move(0, 0);
+
+      await manual.focus();
+      await page.keyboard.press("Tab");
+      await expect(more).toBeFocused();
+      await page.keyboard.press("Enter");
+      const pin = page.getByRole("menuitem", { name: "标记为常用" });
+      await expect(pin).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(more).toBeFocused();
+      await page.keyboard.press("Enter");
+      await expect(pin).toBeFocused();
+      await page.keyboard.press("Enter");
+      await expect(page.getByText("「项目手册」已标记为常用。")).toBeVisible();
+      await expect(manual).toHaveAttribute("aria-expanded", "false");
+      await expect(manual).toHaveAttribute("aria-selected", "true");
+      await expect(manual.locator(".mt-tree-end")).toHaveText("已标记");
+      await expect(more).toBeFocused();
+      await page.keyboard.press("Tab");
+      await expect(add).toBeFocused();
+      await page.keyboard.press("Space");
+      await expect(page.getByText("已在「项目手册」下添加新文档 1。")).toBeVisible();
+      await expect(manual).toHaveAttribute("aria-expanded", "false");
+      await expect(manual).toHaveAttribute("aria-selected", "true");
+      await page.keyboard.press("Shift+Tab");
+      await expect(more).toBeFocused();
+      await manual.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(actions.getByRole("treeitem", { name: "新文档 1" })).toBeVisible();
+
+      await references.focus();
+      await expect(hoverMore.locator("..")).toHaveCSS("opacity", "1");
+      await page.keyboard.press("Tab");
+      await expect(hoverMore).toBeFocused();
+      await page.keyboard.press("Enter");
+      await expect(pin).toBeFocused();
+      await expect(hoverMore.locator("..")).toHaveCSS("opacity", "1");
+      await page.keyboard.press("Escape");
+      await expect(hoverMore).toBeFocused();
+      await expect(references).toHaveAttribute("aria-selected", "false");
+      await expect(references).toHaveAttribute("aria-expanded", "true");
+      await page.evaluate(() => document.activeElement?.blur());
+      await expect(hoverMore.locator("..")).toHaveCSS("opacity", "0");
+      await expect(hoverMore).toHaveCSS("pointer-events", "none");
+      await actions.evaluate((tree) => tree.setAttribute("dir", "rtl"));
+      const rtl = await manual.evaluate((row) => {
+        const controls = row.querySelector(".mt-tree-actions").getBoundingClientRect();
+        const counter = row.querySelector(".mt-tree-end").getBoundingClientRect();
+        return { offset: controls.left - row.getBoundingClientRect().left, counterGap: counter.left - controls.right };
+      });
+      assert(Math.abs(rtl.offset - before.offsetFromEnd) < 0.1 && rtl.counterGap > 0,
+        "RTL puts the controls at the logical end, beyond passive endContent");
+      await actions.evaluate((tree) => tree.removeAttribute("dir"));
       for (const width of [900, 375, 320]) {
         await page.setViewportSize({ width, height: 1000 });
         await page.waitForTimeout(50);

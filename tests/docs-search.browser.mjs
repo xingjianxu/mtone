@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { preview } from "vite";
 import { chromium, firefox, webkit } from "@playwright/test";
@@ -31,6 +31,20 @@ try {
   const engine = process.env.BROWSER || "chromium";
   browser = await ({ chromium, firefox, webkit })[engine].launch({ headless: true, executablePath: process.env.CHROMIUM_PATH });
   const page = await browser.newPage();
+  const publishedReference = await page.request.get(base + "llms.txt");
+  assert(publishedReference.ok(), "The full text reference is shipped in the Pages base");
+  assert.match(publishedReference.headers()["content-type"], /^text\/plain/);
+  assert.deepEqual(await publishedReference.body(), await readFile(new URL("../packages/mtone/llms.txt", import.meta.url)));
+  await page.goto(base + "#/components/AiChat?section=ai-message");
+  const componentReference = page.locator(".component-import a[aria-label='AiMessage llms.txt']");
+  await componentReference.waitFor();
+  assert.equal(await componentReference.getAttribute("href"), "/mtone/components/AiMessage/llms.txt");
+  assert.equal(await componentReference.getAttribute("target"), "_blank");
+  const scopedReference = await page.request.get(new URL(await componentReference.getAttribute("href"), base).href);
+  assert(scopedReference.ok(), "The linked component reference is shipped as a static file");
+  assert.match(scopedReference.headers()["content-type"], /^text\/plain/);
+  assert.match(await scopedReference.text(), /^# AiMessage\n/);
+  assert.doesNotMatch(await scopedReference.text(), /^## (Setup|Components)$/m);
   const sidebar = page.locator(".docs-sidebar");
   const goToStart = async () => {
     await page.goto(`${base}#/start`);

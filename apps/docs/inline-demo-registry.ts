@@ -1,3 +1,5 @@
+import HoverMarqueeUsage from "./inline-demos/hover-marquee-usage";
+import HoverMarqueeUsageSource from "./inline-demos/hover-marquee-usage.tsx?raw";
 import SelectIntrinsic from "./inline-demos/select-intrinsic";
 import SelectIntrinsicSource from "./inline-demos/select-intrinsic.tsx?raw";
 import ShortcutsUsage from "./inline-demos/shortcuts-usage";
@@ -222,6 +224,7 @@ export const inlineDocSections: Readonly<
   Record<string, readonly DocSection[]>
 > = {
   ToastProvider: toastSections,
+  HoverMarquee: [{ id: "usage", title: "文字溢出", Demo: HoverMarqueeUsage, source: source(HoverMarqueeUsageSource) }],
   ButtonGroup: [
     {
       id: "usage",

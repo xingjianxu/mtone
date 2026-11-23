@@ -2,9 +2,13 @@ import { readFileSync, writeFileSync } from "node:fs";
 import ts from "typescript";
 const root = new URL("../", import.meta.url);
 const pkg = JSON.parse(readFileSync(new URL("packages/mtone/package.json", root), "utf8"));
-const source = readFileSync(new URL("apps/docs/catalog.ts", root), "utf8");
-const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
-const { componentDocs, familyDocHref } = await import("data:text/javascript;base64," + Buffer.from(js).toString("base64"));
+async function loadDocsSource(path) {
+  const source = readFileSync(new URL(path, root), "utf8");
+  const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
+  return import("data:text/javascript;base64," + Buffer.from(js).toString("base64"));
+}
+const { componentDocs, familyDocHref } = await loadDocsSource("apps/docs/catalog.ts");
+const { componentLlmsLines } = await loadDocsSource("apps/docs/llms-reference.ts");
 const site = "https://xingjianxu.github.io/mtone/";
 const lines = [
 "# mtone",
@@ -49,11 +53,8 @@ const lines = [
 ""
 ];
 for (const doc of componentDocs) {
-  lines.push("### " + doc.name, "", "- [" + doc.name + "](" + site + (familyDocHref(doc.name) ?? "#/components/" + doc.name) + "): " + doc.description,
-    "- Import: " + doc.importNames.join(", ") + " from @bixlab/mtone");
-  for (const prop of doc.props) lines.push("- " + prop.name + ": " + prop.type + (prop.default === undefined ? "" : " (default: " + prop.default + ")") + ". " + prop.description);
-  for (const note of doc.notes) lines.push("- " + note);
-  lines.push("", "```tsx", doc.code, "```", "");
+  lines.push("### " + doc.name,
+    ...componentLlmsLines(doc, site + (familyDocHref(doc.name) ?? "#/components/" + doc.name)));
 }
 writeFileSync(new URL("packages/mtone/llms.txt", root), lines.join("\n"));
 console.log("Generated llms.txt for " + componentDocs.length + " documented exports");

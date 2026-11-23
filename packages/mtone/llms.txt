@@ -235,6 +235,27 @@ export default function Demo() {
 }
 ```
 
+### HoverMarquee
+
+- [HoverMarquee](https://xingjianxu.github.io/mtone/#/components/HoverMarquee): 单行文字溢出时显示省略号，悬停或聚焦时滚动查看全文。
+- Import: HoverMarquee from @bixlab/mtone
+- children: ReactNode. 单行文本或非交互行内内容。
+- tabIndex: number. 默认仅文字溢出时可通过 Tab 聚焦；可覆盖。
+- 原生属性: ComponentPropsWithRef<'span'>. 支持 className、style、ARIA 属性，ref 指向外层 span。
+- 在宽度受限的容器中使用。仅溢出时滚动；从行首移动到行尾，短暂停留后重复。悬停与焦点都离开时恢复省略状态。RTL 反向滚动。
+- 启用减少动态效果或设备不支持悬停时不自动滚动：聚焦后可用方向键横向滚动，触屏可横向滑动。原文始终保留在同一个可访问文本节点中。
+
+```tsx
+import { HoverMarquee } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <div style={{ maxWidth: 240 }}>
+    <HoverMarquee>面向多模态教学数据的人工智能实验记录与阶段性研究报告</HoverMarquee>
+  </div>;
+}
+```
+
 ### HoverCard
 
 - [HoverCard](https://xingjianxu.github.io/mtone/#/components/HoverCard): 悬停或键盘聚焦显示的富内容预览卡片。
@@ -1706,6 +1727,7 @@ export default function Demo() {
 - indent: number (default: 20). 每层新增的逻辑缩进（px），同时调整节点、引导线和连接线；负值按 0，无效值回退到 20。
 - gap: number (default: 2). 相邻行间距（px）。接受有限非负数（可含小数）；设为 0 取消间距，无效值回退到 2。普通和虚拟列表一致，不改变单行的高度或命中区域。
 - endContent: (info: TreeNodeInfo) => ReactNode. 在行的逻辑末端独立显示计数或简短状态；标题省略不会压缩此区域。info 含 node、expanded、selected、checked、loading。
+- actions: (info: TreeNodeInfo) => TreeAction | readonly TreeAction[] | null | undefined. 为可用节点渲染独立的末端按钮或菜单。TreeAction 含 content 和可选 visibility：always（默认）、hover（行悬停、进入键盘焦点时显示，无悬停设备也可用）、active（节点已选中时显示）。隐藏仍占位，操作不选择、展开或拖动节点；请为纯图标按钮提供可访问名称。
 - filterTreeNode: (node: TreeItem) => boolean. 高亮返回 true 的节点，不删除其他节点或自动展开祖先。
 - loadData: (node: TreeItem) => Promise<unknown>. 展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。
 - loadedKeys / defaultLoadedKeys: TreeKey[]. 受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。

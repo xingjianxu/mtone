@@ -43,7 +43,7 @@ export { Table } from "./table";
 export type { DataTableColumn, DataTableState, DataTableProps } from "./table-types";
 
 export { Tree } from "./tree";
-export type { TreeProps, TreeItem, TreeKey, TreeNode, TreeRef, TreeNodeInfo, TreeCheckedKeys, TreeDropInfo } from "./tree";
+export type { TreeProps, TreeItem, TreeKey, TreeNode, TreeRef, TreeNodeInfo, TreeAction, TreeCheckedKeys, TreeDropInfo } from "./tree";
 
 export type DatePickerProps = {
   value?: string;

@@ -11,7 +11,7 @@ const expected: Record<string, string[]> = {
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
-    "Paragraph", "Link", "Blockquote",
+    "Paragraph", "Link", "Blockquote", "HoverMarquee",
   ],
   "导航切换": [
     "Sidebar", "NavGroup", "NavItem", "NavSubmenu", "Breadcrumb",
@@ -93,7 +93,7 @@ describe("documentation taxonomy", () => {
       "AiFileTree", "AiStackTrace", "AiTerminal", "AiTestResults",
     ]);
     const expectedLinks = [
-      ["快速开始", "Component gallery", "应用示例", "主题与样式", "颜色预设"],
+      ["快速开始", "Component gallery", "应用示例", "主题与样式", "颜色预设", "llms.txt"],
       ...categories.map((category) =>
         expected[category].filter((name) => !sectionOnly.has(name)),
       ),
