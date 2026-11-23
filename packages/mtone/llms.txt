@@ -1330,7 +1330,7 @@ export default function Demo() {
 - label: string. 提供可访问名称。
 - disabled: boolean. 禁用交互。
 - name: string. 表单字段名称。
-- className: string. 附加样式类。
+- className: string. 附加样式类；可通过 CSS width 设置固定宽度或铺满容器。普通 clearable 单选铺满时还应给其清除按钮外层设 100% 宽。
 - mode: "single" | "multiple" | "tags" (default: "single"). 单选值为 string | null，多选与标签模式均为可搜索的 string[]；只有 tags 可以创建自定义值。
 - searchable / searchPlaceholder: boolean | "popup" / string. 仅单选使用。true 在可见选择框内搜索，下拉只显示选项；"popup" 用按钮打开带独立搜索框的浮层。searchPlaceholder 设置搜索提示。
 - trigger / popupWidth / popupTitle: ReactElement | string / number | string / ReactNode. 仅 searchable="popup" 使用。SelectPopupSearchProps 支持可选的自定义触发器、宽度和标题。宽度默认 320px（数字为 px）且受视口限制。省略触发器时使用标准 Select；省略标题时用 label 或本地化默认标题。
@@ -1346,6 +1346,8 @@ export default function Demo() {
 - open: boolean. 受控开关。
 - defaultOpen: boolean. 非受控初始开关。
 - onOpenChange: (open: boolean) => void. 开关变化回调。
+- 不带搜索的普通单选按占位提示和所有选项的最宽文字定宽，不再设 160px 下限。选择或清除不跳宽，空间不足时省略长标签；搜索、多选、标签和浮层搜索模式宽度不变。
+- 富标签用可提取的静态文字估算宽度，无文字时用 searchText 或 value。带图标或自定义排版的富内容可通过 className 明确设置宽度。
 - 浮层搜索适合仓库切换等独立触发器场景；打开聚焦搜索，Enter 或点击确认，Esc 返回触发器，关闭后清空查询。字符串触发器使用下拉预设 Button；自定义按钮须转发 ref 与触发器属性。searchable={true} 的输入框内搜索保持不变。
 - 保留富文本标签。搜索按 searchText 匹配；未提供时使用字符串或数字标签，再回退到 value。输入搜索不改变已提交的选择；按 Enter 选中高亮选项或点击才提交，Esc、失焦或外部点击撤销搜索。
 - 默认值和受控值按 mode 区分。空字符串可以作为显式选项值，原生和 Form.Item 的必填检查都将其视为已选；未选择单项用 null，多选未选择用 []。Form.Item 随 mode 集成。
@@ -1365,6 +1367,7 @@ export default function Demo() {
   const options = [{value:"design",label:"设计"},{value:"code",label:"开发"}];
   return (
     <>
+      <Select label="类别" placeholder="选择类别" options={options} />
       <Select label="分类" searchable clearable defaultValue="design" options={options} />
       <Select label="切换分类" searchable="popup" popupTitle="分类" options={options} />
       <Select mode="multiple" label="标签" clearable defaultValue={["design"]} options={options} />

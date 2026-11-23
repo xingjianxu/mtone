@@ -451,6 +451,67 @@ try {
   await tagsForm.getByRole("button", { name: "Reset tags" }).click();
   assert.deepEqual(await tagsValues(), []);
 
+  await page.goto("http://127.0.0.1:5187/tests/fixtures/select-layout.html?intrinsic");
+  const combos = (name) => page.getByRole("combobox", { name, exact: true });
+  const widthOf = async (locator) => (await locator.boundingBox()).width;
+  const intrinsic = combos("Intrinsic");
+  const originalWidth = await widthOf(intrinsic);
+  assert(originalWidth < 160, "Ordinary single Select no longer has a 160px floor");
+  assert(originalWidth > await widthOf(combos("Short labels only")) + 25, "Longest unselected grouped label contributes to the intrinsic width");
+  assert(await widthOf(combos("Longest placeholder")) > await widthOf(combos("Short labels only")) + 30, "Placeholder can determine the intrinsic width");
+  const stableWidth = async () => assert(Math.abs(await widthOf(intrinsic) - originalWidth) < 1, "Single Select width stays stable");
+  await intrinsic.click();
+  await page.getByRole("option", { name: "Documentation", exact: true }).click();
+  await expect(intrinsic).toHaveText("Documentation");
+  await stableWidth();
+  await intrinsic.hover();
+  await intrinsic.locator("..").getByRole("button", { name: "Clear selection", exact: true }).click();
+  await expect(intrinsic).toHaveText("Pick");
+  await stableWidth();
+  await expect(combos("Fixed width")).toHaveCSS("width", "142px");
+  await expect(combos("Full width")).toHaveCSS("width", "270px");
+  await expect(combos("Full width clearable")).toHaveCSS("width", "270px");
+
+  const narrow = combos("Narrow");
+  const narrowHost = page.getByTestId("narrow-intrinsic");
+  await expect(narrow).toHaveCSS("width", "112px");
+  assert(await narrowHost.evaluate((node) => node.scrollWidth <= node.clientWidth), "Select stays inside the 112px container including its clearable wrapper");
+  const narrowValue = narrow.locator(".mt-select-value");
+  await expect(narrowValue).toHaveCSS("text-overflow", "ellipsis");
+  assert(await narrowValue.evaluate((node) => node.scrollWidth > node.clientWidth), "The long rendered label is clipped in its track");
+  const narrowBox = await narrow.boundingBox();
+  const iconBox = await narrow.locator(".mt-select-icon").boundingBox();
+  assert(iconBox.width === 16 && iconBox.x + iconBox.width <= narrowBox.x + narrowBox.width, "The arrow retains its full width inside the trigger");
+
+  const inline = combos("Unaffected inline search").locator("xpath=ancestor::*[contains(@class,'mt-select-inline-search')]");
+  await expect(inline).toHaveCSS("min-width", "160px");
+  await expect(page.getByRole("button", { name: "Unaffected popup search", exact: true })).toHaveCSS("min-width", "160px");
+  for (const name of ["Unaffected multiple", "Unaffected tags"]) {
+    const surface = combos(name).locator("xpath=ancestor::*[contains(@class,'mt-select-multiple')]");
+    assert(await widthOf(surface) >= 200, `${name} retains its prior surface width`);
+  }
+
+  const toolbar = page.getByRole("group", { name: "事项筛选与视图", exact: true });
+  await expect(toolbar).toHaveAttribute("data-control-style", "borderless");
+  assert(await widthOf(toolbar.getByRole("combobox", { name: "按负责人筛选" })) < 160, "Real gray Toolbar uses the compact Select width");
+  const listView = toolbar.getByRole("button", { name: "列表视图", exact: true });
+  const gridView = toolbar.getByRole("button", { name: "网格视图", exact: true });
+  const assertViewBorders = async (selected, other) => {
+    await expect(selected).toHaveAttribute("aria-pressed", "true");
+    await expect(other).toHaveAttribute("aria-pressed", "false");
+    for (const view of [selected, other]) {
+      for (const edge of ["top", "right", "bottom", "left"]) {
+        await expect(view).not.toHaveCSS(`border-${edge}-color`, "rgba(0, 0, 0, 0)");
+        await expect(view).toHaveCSS(`border-${edge}-width`, "1px");
+      }
+    }
+  };
+  await assertViewBorders(listView, gridView);
+  await gridView.click();
+  await assertViewBorders(gridView, listView);
+  await listView.click();
+  await assertViewBorders(listView, gridView);
+
   console.log("Select geometry, shared clear slot, keyboard, touch, tags and unified form checks passed");
 } finally {
   await browser?.close();

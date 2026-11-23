@@ -4,6 +4,7 @@ import { Select, Checkbox } from "../../packages/mtone/src/interactive";
 import { DatePicker } from "../../packages/mtone/src/data";
 import { MtoneProvider } from "../../packages/mtone/src/basic";
 import "../../packages/mtone/dist/styles.css";
+import ToolbarDemo from "../../apps/docs/inline-demos/toolbar-borderless";
 const text =
   "A very long selected option that must not push the dropdown arrow outside the trigger";
 const pickerOptions = [
@@ -59,9 +60,39 @@ function ClearSlotFixture() {
     </MtoneProvider>
   );
 }
+function IntrinsicFixture() {
+  const concise = [
+    { value: "all", label: "All" },
+    { label: "Groups", options: [{ value: "short", label: "Open" }, { value: "long", label: "Documentation" }] },
+  ];
+  return (
+    <MtoneProvider locale="en">
+      <style>{`
+        .fixture-fixed { width: 142px; }
+        .fixture-full, .mt-select-clearable:has(> .fixture-full) { width: 100%; }
+      `}</style>
+      <div style={{ display: "grid", gap: 10, justifyItems: "start", margin: 16 }}>
+        <Select label="Intrinsic" clearable placeholder="Pick" defaultValue="all" options={concise} />
+        <Select label="Longest placeholder" placeholder="Pick one project" options={[{ value: "one", label: "One" }]} />
+        <Select label="Short labels only" placeholder="Pick" options={[{ value: "one", label: "One" }]} />
+        <Select label="Fixed width" className="fixture-fixed" placeholder="Pick" options={concise} />
+        <div style={{ width: 270 }}><Select label="Full width" className="fixture-full" options={concise} /></div>
+        <div style={{ width: 270 }}><Select label="Full width clearable" clearable className="fixture-full" options={concise} /></div>
+        <div data-testid="narrow-intrinsic" style={{ width: 112 }}>
+          <Select label="Narrow" clearable defaultValue="long" options={[{ value: "long", label: text }]} />
+        </div>
+        <Select label="Unaffected inline search" searchable placeholder="Pick" options={concise} />
+        <Select label="Unaffected popup search" searchable="popup" placeholder="Pick" options={concise} />
+        <Select label="Unaffected multiple" mode="multiple" options={concise} />
+        <Select label="Unaffected tags" mode="tags" options={concise} />
+        <ToolbarDemo />
+      </div>
+    </MtoneProvider>
+  );
+}
 const query = new URLSearchParams(location.search);
 createRoot(document.getElementById("root")!).render(
-  query.has("tags") ? <TagsFixture /> : query.has("clearSlot") ? <ClearSlotFixture /> : query.has("unified") ? <UnifiedFixture /> : <>
+  query.has("intrinsic") ? <IntrinsicFixture /> : query.has("tags") ? <TagsFixture /> : query.has("clearSlot") ? <ClearSlotFixture /> : query.has("unified") ? <UnifiedFixture /> : <>
     <style>{`.case .mt-select { width: var(--width); min-width: 0; box-sizing: border-box; } .case { margin: 12px; } .case .tall { width: 200px; height: 48px; font-size: 24px; }`}</style>
     {(["light", "dark"] as const).map((theme) => (
       <MtoneProvider key={theme} theme={theme}>

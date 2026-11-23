@@ -347,3 +347,27 @@ test("ordinary multiple Select does not offer a custom option", async () => {
   expect(screen.queryByRole("option", { name: /^Create/ })).not.toBeInTheDocument();
   expect(changed).not.toHaveBeenCalled();
 });
+
+test("only ordinary single Select measures placeholder and every option label independently of the current value", async () => {
+  const user = userEvent.setup();
+  const { container } = render(
+    <MtoneProvider locale="en">
+      <Select label="Plain" clearable placeholder="Choose" options={grouped} defaultValue="vault" />
+      <Select label="Inline search" searchable options={grouped} />
+      <Select label="Popup search" searchable="popup" options={grouped} />
+      <Select label="Multiple" mode="multiple" options={grouped} />
+      <Select label="Tags" mode="tags" options={grouped} />
+    </MtoneProvider>,
+  );
+  const select = screen.getByRole("combobox", { name: "Plain" });
+  const measure = select.querySelector(".mt-select-measure");
+  expect(container.querySelectorAll(".mt-select-measure")).toHaveLength(1);
+  expect(measure).toHaveAttribute("aria-hidden", "true");
+  const candidates = "Choose\nDefault workspace\nVault\nLocked\nHelp desk";
+  expect(measure).toHaveAttribute("data-labels", candidates);
+  expect(screen.queryByText("Help desk")).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole("button", { name: "Clear selection" }));
+  expect(select).toHaveTextContent("Choose");
+  expect(measure).toHaveAttribute("data-labels", candidates);
+});

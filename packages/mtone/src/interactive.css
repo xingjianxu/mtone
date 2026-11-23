@@ -98,6 +98,35 @@
   min-width: 160px;
   justify-content: space-between;
 }
+/* Only ordinary Select owns a text-driven track. Do not set width: an
+   explicit class width and the parent's own flex/grid rules still win. */
+.mt-select:where(.mt-select-intrinsic) {
+  display: inline-grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.mt-select-clearable:where(:has(> .mt-select-intrinsic)) {
+  min-inline-size: 0;
+}
+.mt-select-intrinsic > :is(.mt-select-value, .mt-select-measure) {
+  grid-area: 1 / 1;
+}
+.mt-select-intrinsic > .mt-select-value {
+  contain: inline-size;
+}
+.mt-select-intrinsic > .mt-select-icon {
+  grid-area: 1 / 2;
+}
+.mt-select-measure {
+  visibility: hidden;
+  block-size: 0;
+  overflow: hidden;
+  white-space: pre;
+}
+.mt-select-measure::before {
+  content: attr(data-labels);
+}
 .mt-select-value {
   min-width: 0;
   overflow: hidden;

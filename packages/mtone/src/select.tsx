@@ -96,6 +96,28 @@ function optionText(option: SelectOption | undefined, value: string) {
       ? String(option.label) : value);
 }
 
+/** Measure static label text, not a second rendering of caller-owned nodes. */
+function selectLabelText(label: React.ReactNode): string {
+  if (typeof label === "string" || typeof label === "number" || typeof label === "bigint") return String(label);
+  if (Array.isArray(label)) return label.map(selectLabelText).join("");
+  if (React.isValidElement<{
+    children?: React.ReactNode;
+    "aria-hidden"?: React.AriaAttributes["aria-hidden"];
+    "aria-label"?: string;
+  }>(label)) {
+    if (label.props["aria-hidden"] === true || label.props["aria-hidden"] === "true") return "";
+    return selectLabelText(label.props.children) || label.props["aria-label"] || "";
+  }
+  return "";
+}
+function selectMeasureText(prompt: string, options: readonly SelectOption[]): string {
+  return [prompt, ...options.map((option) =>
+    typeof option.label === "string" || typeof option.label === "number" || typeof option.label === "bigint"
+      ? String(option.label)
+      : selectLabelText(option.label) || option.searchText || option.value,
+  )].map((label) => label.replace(/[\t\n\f\r ]+/g, " ").trim()).join("\n");
+}
+
 // The primitives handle native submission and validation. Keep the committed value
 // controlled internally so clear and real form.reset() share the same selection.
 function useSelection<T>(
@@ -176,6 +198,7 @@ function SelectSingle({ options, clearable, emptyContent, renderOption,
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const empty = emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results");
   const prompt = placeholder ?? (locale === "zh" ? "请选择" : "Select…");
+  const measureText = React.useMemo(() => selectMeasureText(prompt, optionData.items), [prompt, optionData.items]);
   const rootProps = {
     value: selection.value, onValueChange: selection.change, inputRef: selection.inputRef,
     open: popup.open, onOpenChange: popup.change, disabled, name, form,
@@ -185,7 +208,7 @@ function SelectSingle({ options, clearable, emptyContent, renderOption,
   const triggerProps = {
     id, ref: triggerRef, "aria-label": label, "aria-invalid": invalid, "aria-busy": busy,
     "aria-describedby": describedBy, "aria-labelledby": labelledBy, "aria-required": required || undefined,
-    className: cn("mt-select", className),
+    className: cn("mt-select mt-select-intrinsic", className),
   };
   const clear = clearable && !disabled && selection.value !== null && (
     <ClearSelection locale={locale} focus={() => triggerRef.current?.focus()} clear={() => selection.change(null)} />
@@ -207,6 +230,7 @@ function SelectSingle({ options, clearable, emptyContent, renderOption,
             {renderOption && selection.value !== null
               ? optionData.byValue.get(selection.value)?.label ?? selection.value : undefined}
           </BSelect.Value>
+          <span className="mt-select-measure" aria-hidden="true" data-labels={measureText} />
           <BSelect.Icon className="mt-select-icon"><ChevronDown size={16} aria-hidden="true" /></BSelect.Icon>
         </BSelect.Trigger>,
       )}

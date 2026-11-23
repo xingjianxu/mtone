@@ -1,3 +1,5 @@
+import SelectIntrinsic from "./inline-demos/select-intrinsic";
+import SelectIntrinsicSource from "./inline-demos/select-intrinsic.tsx?raw";
 import ShortcutsUsage from "./inline-demos/shortcuts-usage";
 import ShortcutsUsageSource from "./inline-demos/shortcuts-usage.tsx?raw";
 import TableNative from "./inline-demos/table-native";
@@ -294,6 +296,13 @@ export const inlineDocSections: Readonly<
       title: "基础用法",
       Demo: Example5_0,
       source: source(Example5_0Raw),
+    },
+    {
+      id: "intrinsic-width",
+      title: "内容宽度与铺满容器",
+      note: "普通单选默认按占位和所有选项中最宽的标签文字定宽；选择短选项或清除都不跳宽。设置 className 对应的 width 可改为固定或铺满容器，长内容在可用宽度内省略。",
+      Demo: SelectIntrinsic,
+      source: source(SelectIntrinsicSource),
     },
     {
       id: "disabled-option",

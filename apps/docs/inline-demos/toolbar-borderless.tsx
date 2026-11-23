@@ -31,12 +31,10 @@ export default function Demo() {
         </>}
         end={
           <ButtonGroup connected aria-label="事项视图">
-            <Button iconOnly aria-label="列表视图" aria-pressed={view === "list"}
-              variant={view === "list" ? "soft" : "outline"} onClick={() => setView("list")}>
+            <Button iconOnly aria-label="列表视图" variant="outline" toggle pressed={view === "list"} onClick={() => setView("list")}>
               <Rows3 size={16} aria-hidden="true" />
             </Button>
-            <Button iconOnly aria-label="网格视图" aria-pressed={view === "grid"}
-              variant={view === "grid" ? "soft" : "outline"} onClick={() => setView("grid")}>
+            <Button iconOnly aria-label="网格视图" variant="outline" toggle pressed={view === "grid"} onClick={() => setView("grid")}>
               <LayoutGrid size={16} aria-hidden="true" />
             </Button>
           </ButtonGroup>
