@@ -758,3 +758,24 @@ section:not(:where(.example-stage *)) > p {
   font-size: 12px;
   overflow-wrap: anywhere;
 }
+
+/* Switch by the available main-column width, including embedded demos. */
+.admin-layout-demo-topbar {
+  container: admin-layout-demo-topbar / inline-size;
+}
+.admin-layout-demo-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.admin-layout-demo-more {
+  display: none;
+}
+@container admin-layout-demo-topbar (max-width: 280px) {
+  .admin-layout-demo-actions {
+    display: none;
+  }
+  .admin-layout-demo-more {
+    display: block;
+  }
+}

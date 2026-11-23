@@ -2317,7 +2317,7 @@ export default function Demo() {
       {
         name: "AdminLayout.Header.children",
         type: "ReactNode",
-        description: "顶部左侧补充内容；窄屏允许换行。",
+        description: "顶部左侧补充内容；请使用单行内容。",
       },
       {
         name: "AdminLayout.Content.as",
@@ -2335,7 +2335,7 @@ export default function Demo() {
     ],
     notes: [
       "将跨页面的状态通知放在持续挂载的外层 AdminLayout.notice，不要放在会随路由切换的 Content 子页面。应用负责状态、异步操作和关闭后的焦点。",
-      "主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行使用 --mt-layout-header-height（默认 48px），窄屏内容换行时可自然增高。",
+      "主体 Footer 与侧栏版本/折叠底栏是独立区域，默认高度均为 42px。需要时加入 <AdminLayout.Footer>内容</AdminLayout.Footer>；主体 Footer 可用 style.height 覆盖高度；--mt-layout-footer-height 可统一覆盖左右两个底栏高度。Topbar 与品牌行共用固定的 --mt-layout-header-height（默认 48px，包含底边框），内容垂直居中。顶栏保持单行，面包屑过长时省略；窄栏操作较多时，可在 extra 中将次要操作收进 Popover.Menu。",
       "使用 AdminLayout.Sider、AdminLayout.Header、AdminLayout.Content、AdminLayout.Footer 组合，不需要单独安装子组件。支持的属性以 mtone 文档与类型声明为准。",
       "AdminLayout.Sider 复用本库 Sidebar 的状态、32px 高的 NavItem、图标窄栏和键盘提示，不重写导航逻辑。Header 推荐复用 Breadcrumb、Button 等已有组件。",
       "默认头部 48px，侧栏 240px，窄栏 52px；可通过 width、collapsedWidth 和区域 style 配置。使用有限高度或 fullHeight 后，侧栏内容和 Content 独立滚动，品牌、侧栏底部版本/折叠行与顶部操作保持可见。",

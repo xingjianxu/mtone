@@ -7,6 +7,7 @@ import {
   Grid2X2,
   Home,
   Layers,
+  Ellipsis,
   Pipette,
   Search,
   Settings,
@@ -18,6 +19,7 @@ import {
   Card,
   AdminLayout,
   NavItem,
+  Popover,
   Text,
   Button,
 } from "../../packages/mtone/src";
@@ -59,6 +61,32 @@ export function AdminLayoutExample({ compact = false }: { compact?: boolean }) {
       mtone
     </span>
   );
+  const actions = [
+    {
+      key: "search",
+      label: "搜索示例",
+      Icon: Search,
+      onSelect: () =>
+        setNotice(
+          "搜索是应用层功能，可在 extra 插槽接入 Input.Search 或自有搜索面板。此示例没有发送查询。",
+        ),
+    },
+    {
+      key: "notifications",
+      label: "查看通知",
+      Icon: Bell,
+      onSelect: () => setNotice("暂时没有新通知。"),
+    },
+    {
+      key: "settings",
+      label: "打开设置",
+      Icon: Settings,
+      onSelect: () => {
+        setPage("设置");
+        setNotice("");
+      },
+    },
+  ];
   return (
     <AdminLayout
       hasSider
@@ -100,43 +128,34 @@ export function AdminLayoutExample({ compact = false }: { compact?: boolean }) {
       </AdminLayout.Sider>
       <AdminLayout>
         <AdminLayout.Header
-          style={compact ? { padding: "6px 10px" } : undefined}
+          className="admin-layout-demo-topbar"
+          style={compact ? { paddingInline: 10 } : undefined}
           breadcrumb={
             <Breadcrumb items={[{ label: "知识库" }, { label: title }]} />
           }
           extra={
             compact ? null : (
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <Button iconOnly
-                  variant="ghost"
-                  aria-label="搜索示例"
-                  onClick={() =>
-                    setNotice(
-                      "搜索是应用层功能，可在 extra 插槽接入 Input.Search 或自有搜索面板。此示例没有发送查询。",
-                    )
-                  }
-                >
-                  <Search size={17} />
-                </Button>
-                <Button iconOnly
-                  variant="ghost"
-                  aria-label="查看通知"
-                  onClick={() => setNotice("暂时没有新通知。")}
-                >
-                  <Bell size={17} />
-                </Button>
-                <Button iconOnly
-                  variant="ghost"
-                  aria-label="打开设置"
-                  onClick={() => {
-                    setPage("设置");
-                    setNotice("");
-                  }}
-                >
-                  <Settings size={17} />
-                </Button>
-                <Avatar name="用户" />
-              </div>
+              <>
+                <div className="admin-layout-demo-actions">
+                  {actions.map(({ key, label, Icon, onSelect }) => (
+                    <Button key={key} iconOnly variant="ghost" aria-label={label} onClick={onSelect}>
+                      <Icon size={17} />
+                    </Button>
+                  ))}
+                  <Avatar name="用户" />
+                </div>
+                <div className="admin-layout-demo-more">
+                  <Popover.Menu
+                    align="end"
+                    items={actions}
+                    trigger={
+                      <Button iconOnly variant="ghost" aria-label="更多操作">
+                        <Ellipsis size={17} />
+                      </Button>
+                    }
+                  />
+                </div>
+              </>
             )
           }
         />

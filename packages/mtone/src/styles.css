@@ -835,6 +835,7 @@ button.mt-breadcrumb-content:hover, .mt-breadcrumb-menu-trigger[data-popup-open]
 .mt-breadcrumb-icon, .mt-breadcrumb-separator { display: inline-flex; align-items: center; flex-shrink: 0; }
 .mt-breadcrumb-icon > svg { width: 14px; height: 14px; }
 .mt-breadcrumb-menu-trigger { min-height: 20px; }
+.mt-breadcrumb-menu-label { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
 .mt-breadcrumb-menu-arrow, .mt-breadcrumb-menu-trigger > svg { flex-shrink: 0; }
 .mt-breadcrumb-content:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
 .mt-sidebar[data-collapsed="true"] {

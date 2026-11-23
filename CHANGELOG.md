@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.13.1
+
+### Fixed
+- Keep the AdminLayout sidebar brand and top bar at the same fixed height (48px by default), with centered controls and a single-line breadcrumb. The responsive docs example keeps narrow-width actions available in a More menu.
+
 ## 0.13.0
 
 ### Breaking changes

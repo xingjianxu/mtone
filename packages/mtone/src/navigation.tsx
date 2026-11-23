@@ -511,7 +511,9 @@ export function Breadcrumb({
                             : undefined
                         }
                       >
-                        {!separateTrigger && content}
+                        {!separateTrigger && (
+                          <span className="mt-breadcrumb-menu-label">{content}</span>
+                        )}
                         <ChevronDown size={12} aria-hidden="true" />
                       </button>
                     }
