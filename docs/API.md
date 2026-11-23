@@ -277,6 +277,27 @@ width. `variant` is `outlined` (default), `filled`, `borderless` or `underlined`
 
 See [Input examples and full API](https://xingjianxu.github.io/mtone/#/components/Input).
 
+## Tree
+
+Use `<Sidebar><Tree … /></Sidebar>` for a document navigator. Pass
+`selectedKeys` and `onSelect` to track the current document. With
+`directory expandAction={false}`, selecting a row does not expand it; use
+the switcher or the Right Arrow key to expand, and Left Arrow to collapse.
+
+- `indent` sets per-level spacing in pixels (default 20) and keeps guide lines aligned.
+  `endContent(info)` shows a count or short status at the logical end of the
+  row, separately from the ellipsized title.
+- Set `icon` on an individual `TreeItem` or `TreeNode` to override the tree-wide
+  icon. A per-node callback receives the normalized item. Use `isLeaf: true`
+  for terminal documents.
+- `loadData(node)` may request children, but the application must update
+  `items` or `treeData` immutably rather than returning them as a Promise
+  result. Use `defaultLoadedKeys` for preloaded folders and `onLoad` /
+  `onLoadError` to report completion or failure. A failed uncontrolled branch
+  can retry through another expansion.
+
+See the [document navigation example](https://xingjianxu.github.io/mtone/#/components/Tree?section=document-navigation).
+
 ## TreeSelect
 
 `TreeSelect` accepts `items: TreeItem[]`, using the tree node shape

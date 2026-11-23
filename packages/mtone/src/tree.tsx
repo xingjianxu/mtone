@@ -24,6 +24,7 @@ import {
 // Match the spacing of adjacent NavGroup rows without changing the height of
 // the interactive row. Keep the CSS and virtual scroll stride in sync.
 const TREE_ROW_GAP = 3;
+const DEFAULT_TREE_INDENT = 20;
 
 export type { TreeItem, TreeKey, TreeNode } from "./tree-types";
 export type TreeCheckedKeys =
@@ -120,6 +121,10 @@ export interface TreeProps extends Omit<
   switcherIcon?: React.ReactNode | ((info: TreeNodeInfo) => React.ReactNode);
   switcherLoadingIcon?: React.ReactNode;
   titleRender?: (node: TreeItem) => React.ReactNode;
+  /** Pixels of indentation per level; defaults to 20. */
+  indent?: number;
+  /** Renders separate display content at the logical end of each row. */
+  endContent?: (info: TreeNodeInfo) => React.ReactNode;
   filterTreeNode?: (node: TreeItem) => boolean;
   loadData?: (node: TreeItem) => Promise<unknown>;
   loadedKeys?: TreeKey[];
@@ -186,6 +191,8 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     switcherIcon,
     switcherLoadingIcon,
     titleRender,
+    indent = DEFAULT_TREE_INDENT,
+    endContent,
     filterTreeNode,
     loadData,
     loadedKeys,
@@ -301,6 +308,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
       ? Math.max(24, itemHeight)
       : 30;
   const rowStride = rowHeight + TREE_ROW_GAP;
+  const levelIndent = Number.isFinite(indent) ? Math.max(0, indent) : DEFAULT_TREE_INDENT;
   const viewport =
     typeof height === "number" && Number.isFinite(height) && height > 0
       ? height
@@ -590,6 +598,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
       style={{
         ...style,
         "--_mt-tree-row-gap": `${TREE_ROW_GAP}px`,
+        "--_mt-tree-indent": `${levelIndent}px`,
         ...(viewport ? { height: viewport, overflow: "auto" } : {}),
       } as React.CSSProperties}
       onScroll={(e) => {
@@ -623,6 +632,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               : typeof icon === "function"
                 ? icon(info)
                 : icon;
+          const end = endContent?.(info);
           return (
             <div
               key={`${typeof node.id}:${node.id}`}
@@ -660,7 +670,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               )}
               data-match={filterTreeNode?.(node) || undefined}
               style={{
-                paddingInlineStart: 8 + (level - 1) * 20,
+                paddingInlineStart: 8 + (level - 1) * levelIndent,
                 ...(isVirtual
                   ? {
                       height: rowHeight,
@@ -833,7 +843,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                             "mt-tree-guide-last",
                         )}
                         style={{
-                          insetInlineStart: 16 + depth * 20,
+                          insetInlineStart: 16 + depth * levelIndent,
                           borderInlineStartStyle:
                             direct || ancestor.posInSet < ancestor.setSize
                               ? "solid"
@@ -919,6 +929,9 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                 <span className="mt-tree-load-error" role="status">
                   {zh ? "加载失败，请重试" : "Load failed. Retry"}
                 </span>
+              )}
+              {end != null && typeof end !== "boolean" && end !== "" && (
+                <span className="mt-tree-end">{end}</span>
               )}
             </div>
           );

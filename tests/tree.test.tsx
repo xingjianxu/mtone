@@ -22,6 +22,38 @@ const items = [
   { id: "z", label: "Last" },
 ];
 const row = (name: string) => screen.getByRole("treeitem", { name });
+test("custom indentation moves rows and guides together without changing the default gutter", () => {
+  const deep = [{ id: "p", label: "Parent", children: [
+    { id: "c", label: "Child", children: [{ id: "g", label: "Grandchild" }] },
+  ] }];
+  const { rerender } = render(<Tree items={deep} defaultExpandAll showLine indent={32} dir="rtl" />);
+  expect(row("Parent").style.paddingInlineStart).toBe("8px");
+  expect(row("Child").style.paddingInlineStart).toBe("40px");
+  expect(row("Grandchild").style.paddingInlineStart).toBe("72px");
+  const guides = row("Grandchild").querySelectorAll<HTMLElement>(".mt-tree-guide");
+  expect(Array.from(guides, (guide) => guide.style.insetInlineStart)).toEqual(["16px", "48px"]);
+  rerender(<Tree items={deep} defaultExpandAll showLine />);
+  expect(row("Grandchild").style.paddingInlineStart).toBe("48px");
+  rerender(<Tree items={deep} defaultExpandAll showLine indent={0} />);
+  expect(row("Grandchild").style.paddingInlineStart).toBe("8px");
+  rerender(<Tree items={deep} defaultExpandAll showLine indent={NaN} />);
+  expect(row("Grandchild").style.paddingInlineStart).toBe("48px");
+});
+test("renders row end content outside the title, preserves zero and resolves per-node icons", () => {
+  render(<Tree treeData={[
+    { key: "start", title: "Start", icon: (node) => <span data-testid={`icon-${node.id}`}>📄</span> },
+    { key: "end", title: "End", icon: <span data-testid="icon-end">📁</span> },
+    { key: "silent", title: "No counter" },
+  ]} defaultSelectedKeys={["start"]} endContent={({ node, selected }) =>
+    node.id === "silent" ? null : selected ? 0 : 12} />);
+  expect(row("Start").querySelector(".mt-tree-title")).toHaveTextContent("Start");
+  expect(row("Start").querySelector(".mt-tree-title")).not.toHaveTextContent("0");
+  expect(row("Start").querySelector(".mt-tree-end")).toHaveTextContent("0");
+  expect(row("End").querySelector(".mt-tree-end")).toHaveTextContent("12");
+  expect(row("No counter").querySelector(".mt-tree-end")).toBeNull();
+  expect(row("Start")).toContainElement(screen.getByTestId("icon-start"));
+  expect(row("End")).toContainElement(screen.getByTestId("icon-end"));
+});
 test("old single selection aliases and controlled empty expansion work", () => {
   const change = vi.fn();
   const { rerender } = render(
@@ -105,8 +137,10 @@ test("load deduplicates, reports failure, and permits retry", async () => {
   fireEvent.keyDown(row("Parent"), { key: "ArrowRight" });
   fireEvent.keyDown(row("Parent"), { key: "ArrowRight" });
   await waitFor(() => expect(load).toHaveBeenCalledTimes(1));
+  expect(row("Parent")).toHaveAttribute("aria-busy", "true");
   await act(async () => fail(new Error("offline")));
   expect(error).toHaveBeenCalled();
+  expect(row("Parent")).not.toHaveAttribute("aria-busy");
   fireEvent.keyDown(row("Parent"), { key: "ArrowRight" });
   await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
 });

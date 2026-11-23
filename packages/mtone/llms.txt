@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.13.1. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 0.13.2. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 
@@ -1513,6 +1513,7 @@ export default function Demo() {
 - 顶部标签复用小尺寸 32px Tabs 与蓝色下划线，NavItem 的当前项保持灰色。设置有限高度后仅中间面板滚动；收起后隐藏标签栏但保留当前导航，展开恢复。已访问的面板保持挂载，标签不接管路由。AdminLayout.Sider 可直接传 tabs，PageLayout 可在 sidebar 插槽中传入同一个 Sidebar。
 - 不接管路由、固定定位、持久化或响应式断点。不要用固定 width 覆盖收起宽度；自定义内容需自行适配窄栏。
 - 版本、部署和包信息等非导航内容，可使用 SectionGroup 分区；示例使用不收起的 Sidebar，不影响导航图标窄栏。
+- 文档目录可把 Tree 直接放进 Sidebar；见 Tree 的「侧栏文档树」示例，当前文档和异步子节点由应用维护。
 
 ```tsx
 import { Sidebar, NavItem } from "@bixlab/mtone";
@@ -1699,6 +1700,8 @@ export default function Demo() {
 - icon / switcherIcon: ReactNode | (info: TreeNodeInfo) => ReactNode. 根级节点图标或展开图标；info 含 node、expanded、selected、checked、loading。节点自身 icon 优先，节点 icon 函数接收 TreeItem。
 - switcherLoadingIcon: ReactNode. 自定义加载图标。
 - titleRender: (node: TreeItem) => ReactNode. 自定义标题内容；节点 label 仍提供默认可访问名称。
+- indent: number (default: 20). 每层新增的逻辑缩进（px），同时调整节点、引导线和连接线；负值按 0，无效值回退到 20。
+- endContent: (info: TreeNodeInfo) => ReactNode. 在行的逻辑末端独立显示计数或简短状态；标题省略不会压缩此区域。info 含 node、expanded、selected、checked、loading。
 - filterTreeNode: (node: TreeItem) => boolean. 高亮返回 true 的节点，不删除其他节点或自动展开祖先。
 - loadData: (node: TreeItem) => Promise<unknown>. 展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。
 - loadedKeys / defaultLoadedKeys: TreeKey[]. 受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。
@@ -1718,6 +1721,7 @@ export default function Demo() {
 - 支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。
 - loadData 只管理异步状态，不负责请求协议或合并数据；叶节点需 isLeaf=true。defaultExpandAll 仅初始化有效，加载后展开由 expandedKeys 控制。
 - 虚拟化要求标题单行、固定行高；不支持自动测量变高行。长标题省略显示。scrollTo 自动展开只适用于已存在的数据，不能自动加载未知后代。
+- 侧栏文档树可用 directory + expandAction={false} 分开标题选择与箭头展开，以 selectedKeys 标记当前文档；右方向键仍可展开。items 与 treeData 的每个节点都可分别指定 icon，包括图标组件或 Emoji。已预载分支可通过 defaultLoadedKeys 避免重复请求；加载失败后可重新展开重试。
 - 拖放使用桌面原生 HTML 拖放事件，不包含触摸拖放或键盘拖动。onDrop 不自动修改树，应用负责不可变移动和持久化数据。
 - 未实现 JSX TreeNode、Tree.useTree、motion、语义 classNames / styles，以及 showLine / draggable 的对象配置。
 - 使用 mtone 主题变量与本库复选框视觉风格。

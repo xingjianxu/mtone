@@ -128,6 +128,48 @@ try {
         .getByRole("treeitem", { name: "Alpha", exact: true })
         .dragTo(drag.getByRole("treeitem", { name: "Last", exact: true }));
       await expect(page.locator("output")).toHaveText("a:z");
+      const sidebar = page.getByRole("complementary", { name: "文档导航侧栏" });
+      const docs = sidebar.getByRole("tree", { name: "文档目录" });
+      const guide = docs.getByRole("treeitem", { name: "使用指南", exact: true });
+      const startDoc = docs.getByRole("treeitem", { name: "快速开始", exact: true });
+      const longDoc = docs.getByRole("treeitem", { name: "如何在狭窄侧边栏中整理、维护和查阅标题很长的组件文档", exact: true });
+      const archive = docs.getByRole("treeitem", { name: "归档文档", exact: true });
+      await expect(startDoc).toHaveAttribute("aria-selected", "true");
+      const layout = await docs.evaluate((tree) => {
+        const [first, second, long] = tree.querySelectorAll("[role=treeitem]");
+        const numbers = [second, long].map((row) => row.querySelector(".mt-tree-end").getBoundingClientRect().right);
+        const title = long.querySelector(".mt-tree-title");
+        const indentation = (row) => row.querySelector(".mt-tree-toggle").getBoundingClientRect().left;
+        return {
+          sameCounterEnd: Math.abs(numbers[0] - numbers[1]) < 0.1,
+          ellipsized: title.scrollWidth > title.clientWidth && getComputedStyle(title).textOverflow === "ellipsis",
+          indent: indentation(second) - indentation(first),
+          elbow: Number.parseFloat(getComputedStyle(second.querySelector(".mt-tree-guide-direct"), "::after").inlineSize),
+        };
+      });
+      assert(layout.ellipsized && layout.sameCounterEnd, "long titles truncate without moving the right counters");
+      assert(Math.abs(layout.indent - 26) < 0.1 && Math.abs(layout.elbow - 20) < 0.1,
+        "custom indentation adjusts both row and guide geometry");
+      await expect(longDoc.locator(".mt-tree-icon")).toHaveText("📝");
+      await longDoc.locator(".mt-tree-title").click();
+      await expect(longDoc).toHaveAttribute("aria-selected", "true");
+      await expect(guide).toHaveAttribute("aria-expanded", "true");
+      await archive.locator(".mt-tree-title").click();
+      await expect(archive).toHaveAttribute("aria-selected", "true");
+      await expect(archive).toHaveAttribute("aria-expanded", "false");
+      await archive.locator(".mt-tree-toggle").click();
+      await expect(page.getByText("归档加载失败，按右方向键或点击箭头重试。")).toBeVisible();
+      await expect(archive).toHaveAttribute("aria-expanded", "false");
+      await expect(archive).toHaveAttribute("aria-selected", "true");
+      await archive.focus();
+      await page.keyboard.press("ArrowRight");
+      const history = docs.getByRole("treeitem", { name: "历史版本", exact: true });
+      await expect(history).toBeVisible();
+      await expect(page.getByText("归档子节点已由应用写入数据。")).toBeVisible();
+      await page.keyboard.press("ArrowRight");
+      await expect(history).toBeFocused();
+      await page.keyboard.press("Enter");
+      await expect(history).toHaveAttribute("aria-selected", "true");
       for (const width of [900, 375, 320]) {
         await page.setViewportSize({ width, height: 1000 });
         await page.waitForTimeout(50);

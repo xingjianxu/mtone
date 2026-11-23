@@ -9,6 +9,7 @@ import {
   type TreeItem,
   type TreeRef,
 } from "../../packages/mtone/src";
+import DocumentNavigationDemo from "../../apps/docs/secondary-demos/tree-document-navigation";
 import "../../packages/mtone/dist/styles.css";
 function App() {
   const [items, setItems] = React.useState<TreeItem[]>([
@@ -87,6 +88,7 @@ function App() {
           <NavItem href="#alpha">Navigation Alpha</NavItem>
           <NavItem href="#beta">Navigation Beta</NavItem>
         </NavGroup>
+        <DocumentNavigationDemo />
       </main>
     </MtoneProvider>
   );

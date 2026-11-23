@@ -29,6 +29,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.mt-tree-end {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  margin-inline-start: auto;
+}
 .mt-tree-check {
   display: inline-flex;
   flex-shrink: 0;
@@ -85,14 +91,14 @@
   position: absolute;
   top: calc(-1 * var(--_mt-tree-row-gap));
   bottom: 0;
-  width: 20px;
+  inline-size: var(--_mt-tree-indent);
   border-inline-start: 1px solid var(--mt-border, #ddd);
 }
 .mt-tree-guide-direct::after {
   content: "";
   position: absolute;
   inset-inline-start: 0;
-  width: 14px;
+  inline-size: max(0px, calc(var(--_mt-tree-indent) - 6px));
   /* Keep the branch on the row center after extending the trunk through
    * the preceding gap. */
   top: calc(50% + var(--_mt-tree-row-gap) / 2);

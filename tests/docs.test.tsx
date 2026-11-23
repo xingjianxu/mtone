@@ -55,6 +55,20 @@ describe("documentation", () => {
     expect(screen.getByRole("table", { name: "本周项目" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "项目" })).toHaveAttribute("scope", "col");
   });
+  it("publishes the composed Sidebar and Tree document navigation example", () => {
+    const section = "document-navigation";
+    expect(parseRoute(`#/components/Tree?section=${section}`)).toEqual({ kind: "component", name: "Tree", section });
+    const demo = docSections.Tree.find(({ id }) => id === section);
+    expect(demo?.source).toContain('from "@bixlab/mtone"');
+    for (const fragment of ["<Sidebar", "<Tree", "expandAction={false}", "endContent=", "loadData="]) {
+      expect(demo?.source).toContain(fragment);
+    }
+    const Demo = demo!.Demo!;
+    render(<Demo />);
+    const panel = screen.getByRole("complementary", { name: "文档导航侧栏" });
+    expect(panel).toContainElement(screen.getByRole("tree", { name: "文档目录" }));
+    expect(screen.getByRole("treeitem", { name: "快速开始", selected: true })).toBeVisible();
+  });
   it("shows explicit framed Toolbar composition in DataTable and DataList demos", () => {
     const table = docSections.DataTable.find(({ id }) => id === "toolbar")?.source;
     expect(table).toContain("toolbar={");

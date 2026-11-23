@@ -289,6 +289,8 @@ import Tree5 from "./secondary-demos/tree-virtual";
 import Tree5Source from "./secondary-demos/tree-virtual.tsx?raw";
 import Tree6 from "./secondary-demos/tree-sorting";
 import Tree6Source from "./secondary-demos/tree-sorting.tsx?raw";
+import TreeDocumentNavigation from "./secondary-demos/tree-document-navigation";
+import TreeDocumentNavigationSource from "./secondary-demos/tree-document-navigation.tsx?raw";
 
 const source = (tsx: string) =>
   tsx.replaceAll("../../../packages/mtone/src", "@bixlab/mtone");
@@ -1123,6 +1125,12 @@ export default function Demo() {
     },
   ],
   Tree: [
+    {
+      id: "document-navigation",
+      title: "侧栏文档树",
+      Demo: TreeDocumentNavigation,
+      source: source(TreeDocumentNavigationSource),
+    },
     {
       id: "usage",
       title: "受控多选与连线",
