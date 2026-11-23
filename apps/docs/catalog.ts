@@ -2202,13 +2202,13 @@ export default function Demo() {
     name: "Toolbar",
     description: "独立排列搜索、筛选和操作，可放在表格、列表或普通页面。",
     importNames: ["Toolbar"],
-    code: 'import { Button, Input, Toolbar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Toolbar aria-label="项目操作" background="gray" search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" />} start={<Button>筛选</Button>} end={<Button variant="solid">新建</Button>} />;\n}',
+    code: 'import { Button, Input, Toolbar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Toolbar aria-label="项目操作" search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" />} start={<Button>筛选</Button>} end={<Button>新建</Button>} />;\n}',
     props: [
       { name: "search", type: "ReactNode", description: "可选搜索控件，空间不足时独占第一行。" },
       { name: "start", type: "ReactNode", description: "可选起始侧控件，例如筛选、分类或状态。" },
       { name: "end", type: "ReactNode", description: "可选末端控件，例如导出、视图切换或新建。在窄容器内可换行，沿逻辑末端对齐。" },
-      { name: "background", type: '"white" | "gray"', default: '"white"', description: "使用 mtone 正常或浅灰表面，随亮暗主题适配。" },
-      { name: "controlStyle", type: '"default" | "borderless"', default: '"default"', description: "仅在 background=\"gray\" 时可选用 borderless。当前工具栏中的独立普通按钮和 Select 不显示静止边框，悬停时加深灰底；ButtonGroup 及键盘焦点样式不变。" },
+      { name: "background", type: '"white" | "gray"', default: '"gray"', description: "默认使用随主题适配的灰色表面。显式传入 white 时恢复普通表面及标准控件样式。" },
+      { name: "controlStyle", type: '"default" | "borderless"', default: '"borderless"', description: "灰底默认无边框：独立按钮和 Select 悬停有灰色反馈。显式传入 default 恢复标准控件样式；white 始终使用标准样式。ButtonGroup 和键盘焦点样式不变。" },
       { name: "原生属性 / ref", type: "div 原生属性（不含 children）/ HTMLDivElement", description: "支持 className、style、ref 和可访问名称；有 aria-label 或 aria-labelledby 时默认作为 group。内容通过三个插槽传入。" },
     ],
     notes: [

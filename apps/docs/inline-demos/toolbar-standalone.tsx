@@ -13,7 +13,6 @@ export default function Demo() {
     <div style={{ width: "100%", minWidth: 0, display: "grid", gap: 8 }}>
       <Toolbar
         aria-label="查找操作"
-        background="gray"
         search={<Input.Search aria-label="关键词" placeholder="输入关键词" value={query} onChange={(event) => setQuery(event.target.value)} />}
         start={<Popover.Menu trigger={scope} items={scopes.map((key) => ({ key, label: key }))} onSelect={setScope} />}
         end={<>

@@ -39,13 +39,19 @@ function Example({ name, width, theme, dir, background, flexRow }: {
 
 function ControlStyleExamples() {
   const [choice, setChoice] = React.useState("all");
+  const examples = [
+    { name: "implicit defaults" },
+    { name: "explicit gray", background: "gray" },
+    { name: "gray standard", controlStyle: "default" },
+    { name: "white standard", background: "white" },
+    { name: "white borderless requested", background: "white", controlStyle: "borderless" },
+  ] as const;
   return <MtoneProvider theme="system" locale="en">
-    {(["gray default", "gray borderless", "white borderless"] as const).map((name) => (
+    {examples.map(({ name, ...appearance }) => (
       <Toolbar
         key={name}
         aria-label={name}
-        background={name.startsWith("gray") ? "gray" : "white"}
-        controlStyle={name.endsWith("borderless") ? "borderless" : "default"}
+        {...appearance}
         start={<><Button>Filter</Button>
           <Select label="Status" options={[{value:"all",label:"All records"},{value:"open",label:"Open records"}]} value={choice} onValueChange={value => setChoice(value ?? "all")} />
         </>}

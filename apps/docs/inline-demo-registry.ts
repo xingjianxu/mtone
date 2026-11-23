@@ -377,7 +377,7 @@ export const inlineDocSections: Readonly<
     {
       id: "borderless-controls",
       title: "灰底无边框控件",
-      note: "仅对这条灰底工具栏启用。独立的按钮和 Select 默认不显示边框，悬停时底色加深；末端相连的 ButtonGroup 保持原样。",
+      note: "不用传入外观属性就能得到灰底和无边框控件。设 controlStyle=\"default\" 可保留灰底并恢复控件边框，设 background=\"white\" 则使用白底及标准控件样式。ButtonGroup 始终保持原样。",
       Demo: ToolbarBorderless,
       source: source(ToolbarBorderlessSource),
     },

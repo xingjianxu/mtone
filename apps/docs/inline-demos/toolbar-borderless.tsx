@@ -23,8 +23,6 @@ export default function Demo() {
     <div style={{ width: "100%", minWidth: 0, display: "grid", gap: 8 }}>
       <Toolbar
         aria-label="事项筛选与视图"
-        background="gray"
-        controlStyle="borderless"
         start={<>
           <Button aria-pressed={status === "open"} onClick={() => setStatus("open")} rightSection={<Tag>8</Tag>}>待处理</Button>
           <Button aria-pressed={status === "closed"} onClick={() => setStatus("closed")} rightSection={<Tag>12</Tag>}>已完成</Button>

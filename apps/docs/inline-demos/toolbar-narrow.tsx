@@ -19,7 +19,6 @@ export default function Demo() {
       toolbar={
         <Toolbar
           aria-label="窄容器项目操作"
-          background="gray"
           search={<Input.Search aria-label="搜索项目" placeholder="搜索项目" value={query} onChange={(event) => setQuery(event.target.value)} />}
           start={<Popover.Menu trigger={status === statuses[0] ? "状态" : status} items={statuses.map((key) => ({ key, label: key }))} onSelect={setStatus} />}
           end={<>

@@ -28,7 +28,8 @@ test("groups standalone controls without managing their state or native tab orde
   expect(group).toHaveAttribute("title", "Independent toolbar");
   expect(group).toHaveClass("custom");
   expect(group.style.marginBlockEnd).toBe("7px");
-  expect(group).toHaveAttribute("data-background", "white");
+  expect(group).toHaveAttribute("data-background", "gray");
+  expect(group).toHaveAttribute("data-control-style", "borderless");
   expect(container.querySelector("table")).toBeNull();
   expect(screen.queryByRole("toolbar")).not.toBeInTheDocument();
   const search = within(group).getByRole("textbox", { name: "Search projects" });
@@ -64,29 +65,37 @@ test("supports gray and white surfaces, optional slots and an optional accessibl
   expect(container.querySelector("#page-controls-label")).toBeVisible();
 });
 
-test("enables borderless controls only on gray toolbars without changing control semantics", async () => {
+test("defaults to gray borderless controls and honors explicit appearance opt-outs", async () => {
   expectTypeOf<ToolbarProps["controlStyle"]>().toEqualTypeOf<"default" | "borderless" | undefined>();
   const user = userEvent.setup();
   const select = vi.fn();
   render(<>
     <Toolbar
       aria-label="Quiet controls"
-      background="gray"
-      controlStyle="borderless"
       start={<>
         <Button disabled>Unavailable</Button>
         <Select label="Labels" options={[{ value: "bug", label: "Bug" }]} onValueChange={select} />
       </>}
       end={<ButtonGroup connected><Button>List</Button><Button>Compact</Button></ButtonGroup>}
     />
-    <Toolbar aria-label="Regular gray" background="gray" />
-    <Toolbar aria-label="Regular white" controlStyle="borderless" />
+    <Toolbar aria-label="Explicit gray" background="gray" />
+    <Toolbar aria-label="Regular gray" controlStyle="default" />
+    <Toolbar aria-label="Regular white" background="white" />
+    <Toolbar aria-label="White with borderless requested" background="white" controlStyle="borderless" />
   </>);
 
   const toolbar = screen.getByRole("group", { name: "Quiet controls" });
+  expect(toolbar).toHaveAttribute("data-background", "gray");
   expect(toolbar).toHaveAttribute("data-control-style", "borderless");
-  expect(screen.getByRole("group", { name: "Regular gray" })).toHaveAttribute("data-control-style", "default");
-  expect(screen.getByRole("group", { name: "Regular white" })).toHaveAttribute("data-control-style", "default");
+  expect(screen.getByRole("group", { name: "Explicit gray" })).toHaveAttribute("data-control-style", "borderless");
+  const regularGray = screen.getByRole("group", { name: "Regular gray" });
+  expect(regularGray).toHaveAttribute("data-background", "gray");
+  expect(regularGray).toHaveAttribute("data-control-style", "default");
+  for (const name of ["Regular white", "White with borderless requested"]) {
+    const white = screen.getByRole("group", { name });
+    expect(white).toHaveAttribute("data-background", "white");
+    expect(white).toHaveAttribute("data-control-style", "default");
+  }
   expect(within(toolbar).getByRole("button", { name: "Unavailable" })).toBeDisabled();
   const trigger = within(toolbar).getByRole("combobox", { name: "Labels" });
   await user.tab();

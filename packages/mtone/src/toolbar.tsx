@@ -8,9 +8,9 @@ export interface ToolbarProps extends Omit<React.ComponentPropsWithoutRef<"div">
   start?: React.ReactNode;
   /** Controls aligned at the logical end. */
   end?: React.ReactNode;
-  /** Surface color resolved from the active mtone theme. */
+  /** Surface color resolved from the active mtone theme; defaults to gray. */
   background?: "white" | "gray";
-  /** Use quiet, borderless Button and Select chrome on a gray surface. */
+  /** Gray surfaces default to borderless Button and Select chrome; white stays standard. */
   controlStyle?: "default" | "borderless";
 }
 
@@ -20,7 +20,7 @@ const hasSlot = (node: React.ReactNode) =>
 /** Standalone presentation for search, filters and actions. */
 export const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
   function Toolbar({
-    search, start, end, background = "white", controlStyle = "default", className, role, ...props
+    search, start, end, background = "gray", controlStyle = "borderless", className, role, ...props
   }, ref) {
     const named = props["aria-label"]?.trim() || props["aria-labelledby"]?.trim();
     return (

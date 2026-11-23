@@ -112,27 +112,39 @@ try {
   url.searchParams.delete("framed");
   url.searchParams.set("control-style", "");
   await page.goto(url.href);
-  const grayDefault = page.getByRole("group", { name: "gray default", exact: true });
-  const borderless = page.getByRole("group", { name: "gray borderless", exact: true });
-  const white = page.getByRole("group", { name: "white borderless", exact: true });
-  const regular = borderless.getByRole("button", { name: "Filter", exact: true });
-  const select = borderless.getByRole("combobox", { name: "Status" });
+  const group = (name) => page.getByRole("group", { name, exact: true });
+  const borderless = group("implicit defaults");
+  const explicitGray = group("explicit gray");
+  const grayStandard = group("gray standard");
+  const filter = (toolbar) => toolbar.getByRole("button", { name: "Filter", exact: true });
+  const status = (toolbar) => toolbar.getByRole("combobox", { name: "Status" });
+  const select = status(borderless);
   const borderColor = (control) => control.evaluate((node) => getComputedStyle(node).borderTopColor);
   const surface = (control) => control.evaluate((node) => getComputedStyle(node).backgroundColor);
+  const transparent = "rgba(0, 0, 0, 0)";
   for (const scheme of ["light", "dark"]) {
-    await page.emulateMedia({colorScheme: scheme});
-    for (const control of [regular, select]) {
-      await page.mouse.move(999, 699);
-      const before = await surface(control);
-      assert.equal(await borderColor(control), "rgba(0, 0, 0, 0)");
-      await control.hover();
-      await expect.poll(() => surface(control)).not.toBe(before);
+    await page.emulateMedia({ colorScheme: scheme });
+    for (const toolbar of [borderless, explicitGray]) {
+      await expect(toolbar).toHaveAttribute("data-background", "gray");
+      await expect(toolbar).toHaveAttribute("data-control-style", "borderless");
+      for (const control of [filter(toolbar), status(toolbar)]) {
+        await page.mouse.move(999, 699);
+        await expect.poll(() => borderColor(control)).toBe(transparent);
+        await expect.poll(() => surface(control)).toBe(transparent);
+        await control.hover();
+        await expect.poll(() => surface(control)).not.toBe(transparent);
+      }
     }
-    const defaultBorder = await borderColor(grayDefault.getByRole("button", {name:"Filter"}));
-    assert.notEqual(defaultBorder, "rgba(0, 0, 0, 0)");
-    assert.notEqual(await borderColor(white.getByRole("button", {name:"Filter"})), "rgba(0, 0, 0, 0)");
-    assert.equal(await borderColor(borderless.getByRole("button", {name:"Grid"})),
-      await borderColor(grayDefault.getByRole("button", {name:"Grid"})));
+    for (const name of ["gray standard", "white standard", "white borderless requested"]) {
+      const toolbar = group(name);
+      await expect(toolbar).toHaveAttribute("data-background", name.startsWith("gray") ? "gray" : "white");
+      await expect(toolbar).toHaveAttribute("data-control-style", "default");
+      assert.notEqual(await borderColor(filter(toolbar)), transparent);
+      assert.notEqual(await borderColor(status(toolbar)), transparent);
+    }
+    const gridButton = (toolbar) => toolbar.getByRole("button", { name: "Grid" });
+    assert.equal(await borderColor(gridButton(borderless)), await borderColor(gridButton(grayStandard)));
+    assert.equal(await surface(gridButton(borderless)), await surface(gridButton(grayStandard)));
   }
   await select.focus();
   assert.notEqual(await borderColor(select), "rgba(0, 0, 0, 0)", "Focused Select keeps its visible focus border");

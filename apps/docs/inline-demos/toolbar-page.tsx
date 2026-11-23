@@ -11,6 +11,7 @@ export default function Demo() {
         <Divider />
         <Toolbar
           aria-label="发布说明操作"
+          background="white"
           start={<Popover.Menu trigger={published ? "已发布" : "草稿"} items={[
             { key: "draft", label: "草稿" }, { key: "published", label: "已发布" },
           ]} onSelect={(key) => setPublished(key === "published")} />}

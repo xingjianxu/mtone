@@ -69,10 +69,13 @@ describe("documentation", () => {
     const remote = docSections.DataList.find(({ id }) => id === "remote-data")?.source;
     expect(remote).toContain("search={<DataList.Search");
   });
-  it("documents gray borderless Toolbar controls as an opt-in with a connected view switch", () => {
+  it("documents default gray borderless Toolbar controls and an explicit white alternative", () => {
     const demo = docSections.Toolbar.find(({ id }) => id === "borderless-controls");
-    expect(demo?.source).toContain('background="gray"');
-    expect(demo?.source).toContain('controlStyle="borderless"');
+    expect(demo?.source).not.toMatch(/background=|controlStyle=/);
+    const appearance = componentDocs.find(({ name }) => name === "Toolbar")?.props;
+    expect(appearance?.find(({ name }) => name === "background")?.default).toBe('"gray"');
+    expect(appearance?.find(({ name }) => name === "controlStyle")?.default).toBe('"borderless"');
+    expect(docSections.Toolbar.find(({ id }) => id === "page")?.source).toContain('background="white"');
     expect(demo?.source).toContain("<Select");
     expect(demo?.source).toContain("<ButtonGroup connected");
     expect(docSections.Toolbar.find(({ id }) => id === "standalone")?.source).not.toContain("controlStyle");

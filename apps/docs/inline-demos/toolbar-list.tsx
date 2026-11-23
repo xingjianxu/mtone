@@ -28,7 +28,6 @@ export default function Demo() {
     <div style={{ width: "100%", minWidth: 0, border: "1px solid var(--mt-border)", borderRadius: 8 }}>
       <Toolbar
         aria-label="资料列表操作"
-        background="gray"
         search={<Input.Search aria-label="搜索资料" placeholder="搜索资料" value={query} onChange={(event) => setQuery(event.target.value)} />}
         start={<Popover.Menu trigger={category === categories[0] ? "分类" : category} items={categories.map((key) => ({ key, label: key }))} onSelect={setCategory} />}
         end={<>
