@@ -32,10 +32,20 @@
 ## 日常发布
 
 1. 完成改动及合并前的针对性检查；用 `npm version patch -w @bixlab/mtone --no-git-tag-version`（也可 minor/major）同步更新包版本和 lockfile，按仓库流程合入 `master`。
-2. 明确授权发布后，从该提交创建 GitHub Release，标签严格为 `v<package.json版本>`，如 `v0.1.1`；只发布正式 Release，不勾选 prerelease。草稿、预发布、普通代码或标签推送均不运行 npm 的全量发布检查，也不会发布 npm。
-3. **Publish npm package** 锁定 Release 的提交和标签，运行全量类型检查、单元测试、浏览器回归（包含 Chromium、Firefox 和 WebKit 检查）、文档构建、真实 tarball 安装和包内容检查。工作流不提供手动触发。需要日常验证时，使用针对性检查或本地命令，不要为跑测试而发布 GitHub Release。
-4. 全量检查成功后，发布任务从同一提交构建，等待 `npm` environment 审批（若配置），然后通过 OIDC 发布到 npm `latest`。任何发布检查失败都不会进入发布。
+2. 明确授权发布后，从该提交创建 GitHub Release，标签严格为 `v<package.json版本>`，如 `v0.1.1`；只发布正式 Release，不勾选 prerelease。草稿、预发布、普通代码或标签推送均不会发布 npm。
+3. **Publish npm package** 锁定 Release 的提交和标签，仅核对版本、许可证和提交，检查类型、文档构建和包内容，并实际安装 tarball 做冒烟验证。默认不重跑全量单元或浏览器回归。
+4. 发包检查成功后，发布任务从同一提交构建，等待 `npm` environment 审批（若配置），然后通过 OIDC 发布到 npm `latest`。任何发布检查失败都不会进入发布。
 5. 核对工作流、npm 页面版本及 provenance，再用 `npm install @bixlab/mtone` 验证。已发布版本不能覆盖，失败重试前先检查 registry，必要时递增版本。
+
+### 按需运行全量回归
+
+只在明确要求全量回归时，在 Actions 中打开 **Full regression (on demand)**，使用 **Run workflow** 选择要检查的分支或标签；也可运行：
+
+```sh
+gh workflow run full-regression.yml --ref <已核对的分支或标签>
+```
+
+确认目标引用指向待检查的提交。这个手动工作流覆盖全量单元测试及 Chromium、Firefox、WebKit 浏览器用例，不会发 npm，也不使用 npm 环境或可信发布权限。若要求全量回归通过后才发版，先等待该候选的手动工作流通过，再从同一提交创建正式 Release。
 
 CI 使用 Node 24（npm 要求至少 11.5.1 / Node 22.14）。发布任务不使用依赖缓存，只拥有读取仓库和签发 OIDC 的权限。
 

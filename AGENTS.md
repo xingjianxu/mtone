@@ -34,8 +34,9 @@ the Pages build still checks the generated reference.
 Application, component, package and shared changes check the affected tests
 and applicable type/build/package smoke. The docs build emits the same generated
 file as `dist/docs/llms.txt`; do not maintain a separate website reference.
-Keep the full unit and comprehensive browser suite for the stable npm release
-gate in [the release guide](docs/RELEASING.md), not routine merges or Pages.
+Run the full unit and comprehensive browser suite only on explicit request
+using the manual workflow in [the release guide](docs/RELEASING.md). Routine
+merges, Pages and stable npm releases do not run the full suite.
 
 For an authorized fast-forward, use
 `node scripts/merge-verified.mjs --expect-master <exact-remote-SHA> [candidate]`.
