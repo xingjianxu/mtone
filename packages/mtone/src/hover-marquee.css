@@ -10,22 +10,49 @@
   outline: 1px solid var(--mt-focus, #93b4dc);
   outline-offset: -1px;
 }
-.mt-hover-marquee-text {
+.mt-hover-marquee-text,
+.mt-hover-marquee-original {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.mt-hover-marquee-text {
+  position: relative;
+}
+.mt-hover-marquee-copy {
+  display: none;
+}
 
-/* Give keyboard and mouse users the same single restrained reveal; the
-   pauses make the start and end readable before the track starts again. */
+/* One full stride aligns the hidden repetition exactly with the start of the
+   original so a new animation iteration does not visibly jump. */
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
-  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within) > .mt-hover-marquee-text {
+  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within)
+    > .mt-hover-marquee-text {
     inline-size: max-content;
-    animation: mt-hover-marquee-pan var(--mt-marquee-duration) linear infinite;
-    --mt-marquee-offset: calc(-1 * var(--mt-marquee-travel));
+    overflow: visible;
+    --mt-marquee-offset: calc(-100% - var(--mt-marquee-gap));
+    animation: mt-hover-marquee-pan var(--mt-marquee-duration)
+      linear(
+        0 0% var(--mt-marquee-head-end),
+        var(--mt-marquee-tail-progress) var(--mt-marquee-tail-start)
+          var(--mt-marquee-tail-end),
+        1 100%
+      )
+      infinite;
   }
-  .mt-hover-marquee[data-overflow]:dir(rtl):is(:hover, :focus-within) > .mt-hover-marquee-text {
-    --mt-marquee-offset: var(--mt-marquee-travel);
+  .mt-hover-marquee[data-overflow]:dir(rtl):is(:hover, :focus-within)
+    > .mt-hover-marquee-text {
+    --mt-marquee-offset: calc(100% + var(--mt-marquee-gap));
+  }
+  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within)
+    .mt-hover-marquee-copy {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: calc(100% + var(--mt-marquee-gap));
+    display: block;
+    inline-size: 100%;
+    pointer-events: none;
+    user-select: none;
   }
 }
 
@@ -35,11 +62,16 @@
     overflow-x: auto;
     overflow-y: hidden;
   }
-  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within) > .mt-hover-marquee-text {
+  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within)
+    > .mt-hover-marquee-text {
     inline-size: max-content;
   }
 }
 @keyframes mt-hover-marquee-pan {
-  0%, 12% { transform: translateX(0); }
-  80%, 100% { transform: translateX(var(--mt-marquee-offset)); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--mt-marquee-offset));
+  }
 }

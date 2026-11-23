@@ -32,6 +32,13 @@ describe("AI reference", () => {
       expect(text).not.toMatch(/^### [A-Za-z]/m);
     }
   });
+  it("documents Tree's 32px default row height in the API table and full reference", () => {
+    const tree = componentDocs.find(({ name }) => name === "Tree");
+    expect(tree?.props.find(({ name }) => name === "height / itemHeight / virtual")?.default)
+      .toBe("— / 32 / true");
+    expect(readFileSync("packages/mtone/llms.txt", "utf8"))
+      .toContain("- height / itemHeight / virtual: number / number / boolean (default: — / 32 / true).");
+  });
   it("includes and exposes the same file in npm", () => {
     const pkg = JSON.parse(readFileSync("packages/mtone/package.json", "utf8"));
     expect(pkg.files).toContain("llms.txt");

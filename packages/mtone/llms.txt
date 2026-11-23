@@ -264,7 +264,7 @@ export default function Demo() {
 - children: ReactNode. 单行文本或非交互行内内容。
 - tabIndex: number. 默认仅文字溢出时可通过 Tab 聚焦；可覆盖。
 - 原生属性: ComponentPropsWithRef<'span'>. 支持 className、style、ARIA 属性，ref 指向外层 span。
-- 在宽度受限的容器中使用。仅溢出时滚动；从行首移动到行尾，短暂停留后重复。悬停与焦点都离开时恢复省略状态。RTL 反向滚动。
+- 在宽度受限的容器中使用。仅溢出时滚动；到达行尾短暂停留，再平滑经过一小段留白，连续接到下一轮。悬停与焦点都离开时恢复省略状态。RTL 反向滚动。
 - 启用减少动态效果或设备不支持悬停时不自动滚动：聚焦后可用方向键横向滚动，触屏可横向滑动。原文始终保留在同一个可访问文本节点中。
 
 ```tsx
@@ -1756,7 +1756,7 @@ export default function Demo() {
 - loadData: (node: TreeItem) => Promise<unknown>. 展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。
 - loadedKeys / defaultLoadedKeys: TreeKey[]. 受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。
 - onLoad / onLoadError: (keys, { node }) => void / (error, node) => void. 加载成功或失败回调。失败显示错误提示并允许通过展开控件重试。
-- height / itemHeight / virtual: number / number / boolean (default: — / 30 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 控制所有模式的实际行高，默认 32px，最小 24px，不包含 gap。非正数或非有限值回退到默认值；virtual=false 保留滚动容器但渲染全部节点。
+- height / itemHeight / virtual: number / number / boolean (default: — / 32 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 控制所有模式的实际行高，默认 32px，最小 24px，不包含 gap。非正数或非有限值回退到默认值；virtual=false 保留滚动容器但渲染全部节点。
 - draggable: boolean | (node: TreeItem) => boolean (default: false). 启用 HTML 原生拖放，可按节点决定是否允许拖动。
 - allowDrop: ({ dragNode, dropNode, dropPosition }) => boolean. 可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。
 - onDrop: (info: TreeDropInfo) => void. info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap。应用按结果更新数据，组件不自动移动节点。

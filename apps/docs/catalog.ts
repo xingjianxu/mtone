@@ -504,7 +504,7 @@ export default function Demo() {
       { name: "原生属性", type: "ComponentPropsWithRef<'span'>", description: "支持 className、style、ARIA 属性，ref 指向外层 span。" },
     ],
     notes: [
-      "在宽度受限的容器中使用。仅溢出时滚动；从行首移动到行尾，短暂停留后重复。悬停与焦点都离开时恢复省略状态。RTL 反向滚动。",
+      "在宽度受限的容器中使用。仅溢出时滚动；到达行尾短暂停留，再平滑经过一小段留白，连续接到下一轮。悬停与焦点都离开时恢复省略状态。RTL 反向滚动。",
       "启用减少动态效果或设备不支持悬停时不自动滚动：聚焦后可用方向键横向滚动，触屏可横向滑动。原文始终保留在同一个可访问文本节点中。",
     ],
   },
@@ -3757,7 +3757,7 @@ export default function Demo() {
         type: "number / number / boolean",
         description:
           "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 控制所有模式的实际行高，默认 32px，最小 24px，不包含 gap。非正数或非有限值回退到默认值；virtual=false 保留滚动容器但渲染全部节点。",
-        default: "— / 30 / true",
+        default: "— / 32 / true",
       },
       {
         name: "draggable",

@@ -1,6 +1,39 @@
 import React from "react";
 import { cn } from "./basic";
 
+const LOOP_GAP = 16;
+const PIXELS_PER_SECOND = 30;
+const HEAD_PAUSE = 0.45;
+const TAIL_PAUSE = 0.65;
+
+/** Copy rendered markup without a second React mount, duplicate IDs, or controls. */
+function syncVisualCopy(original: HTMLElement, copy: HTMLElement) {
+  const snapshot = original.cloneNode(true) as HTMLElement;
+  for (const element of snapshot.querySelectorAll(
+    "script,style,link,iframe,object,embed",
+  )) {
+    element.remove();
+  }
+  for (const element of snapshot.querySelectorAll(
+    "a[href],area[href],button,input,select,textarea,summary,details,audio[controls],video[controls],[tabindex],[contenteditable],[role=button],[role=link]",
+  )) {
+    element.replaceWith(
+      original.ownerDocument.createTextNode(element.textContent ?? ""),
+    );
+  }
+  for (const element of snapshot.querySelectorAll("*")) {
+    for (const attribute of element.getAttributeNames()) {
+      if (
+        attribute === "id" ||
+        attribute === "autofocus" ||
+        attribute.startsWith("on")
+      )
+        element.removeAttribute(attribute);
+    }
+  }
+  copy.replaceChildren(...snapshot.childNodes);
+}
+
 export interface HoverMarqueeProps extends React.ComponentPropsWithRef<"span"> {
   /** Short text or non-interactive inline content on a single line. */
   children: React.ReactNode;
@@ -18,31 +51,60 @@ export function HoverMarquee({
 }: HoverMarqueeProps) {
   const viewport = React.useRef<HTMLSpanElement>(null);
   const text = React.useRef<HTMLSpanElement>(null);
+  const repeat = React.useRef<HTMLSpanElement>(null);
   React.useImperativeHandle(ref, () => viewport.current!, []);
-  const [distance, setDistance] = React.useState(0);
+  const [{ distance, advance }, setTravel] = React.useState({
+    distance: 0,
+    advance: 0,
+  });
+  const overflowing = distance > 0;
 
   const measure = React.useCallback(() => {
     const frame = viewport.current;
     const track = text.current;
     if (!frame || !track) return;
-    // The track is full-width when idle and max-content during the reveal.
-    // Its scrollWidth includes clipping without depending on its transform.
-    const next = Math.max(0, track.scrollWidth - frame.clientWidth);
-    setDistance(next);
+    // Measure original text only: the decorative next copy never contributes.
+    const distance = Math.max(0, track.scrollWidth - frame.clientWidth);
+    const advance = distance > 0 ? track.scrollWidth + LOOP_GAP : 0;
+    setTravel((previous) =>
+      previous.distance === distance && previous.advance === advance
+        ? previous
+        : { distance, advance },
+    );
   }, []);
 
-  React.useLayoutEffect(measure, [children, measure]);
+  const updateCopy = React.useCallback(() => {
+    if (text.current && repeat.current)
+      syncVisualCopy(text.current, repeat.current);
+  }, []);
+
+  React.useLayoutEffect(() => {
+    measure();
+    updateCopy();
+  }, [children, measure, overflowing, updateCopy]);
   React.useEffect(() => {
     const frame = viewport.current;
     const track = text.current;
     if (!frame || !track) return;
     const doc = frame.ownerDocument;
     const view = doc.defaultView;
-    const resize = view?.ResizeObserver ? new view.ResizeObserver(measure) : null;
-    const mutation = view?.MutationObserver ? new view.MutationObserver(measure) : null;
+    const resize = view?.ResizeObserver
+      ? new view.ResizeObserver(measure)
+      : null;
+    const mutation = view?.MutationObserver
+      ? new view.MutationObserver(() => {
+          measure();
+          updateCopy();
+        })
+      : null;
     resize?.observe(frame);
     resize?.observe(track);
-    mutation?.observe(track, { childList: true, subtree: true, characterData: true });
+    mutation?.observe(track, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+    });
     track.addEventListener("load", measure, true);
     doc.fonts?.addEventListener("loadingdone", measure);
     view?.addEventListener("resize", measure);
@@ -53,18 +115,24 @@ export function HoverMarquee({
       doc.fonts?.removeEventListener("loadingdone", measure);
       view?.removeEventListener("resize", measure);
     };
-  }, [measure]);
+  }, [measure, updateCopy]);
+
+  // Both moving segments have the same pace. Only the head and tail hold still.
+  const duration = HEAD_PAUSE + TAIL_PAUSE + advance / PIXELS_PER_SECOND;
+  const tailStart = HEAD_PAUSE + distance / PIXELS_PER_SECOND;
+  const percent = (seconds: number) => `${(100 * seconds) / duration}%`;
 
   return (
     <span
       {...props}
       ref={viewport}
       className={cn("mt-hover-marquee", className)}
-      tabIndex={tabIndex ?? (distance > 0 ? 0 : undefined)}
-      data-overflow={distance > 0 ? "" : undefined}
+      tabIndex={tabIndex ?? (overflowing ? 0 : undefined)}
+      data-overflow={overflowing ? "" : undefined}
       onBlur={(event) => {
         const frame = event.currentTarget;
-        if (!frame.matches(":hover") && !frame.contains(event.relatedTarget)) frame.scrollLeft = 0;
+        if (!frame.matches(":hover") && !frame.contains(event.relatedTarget))
+          frame.scrollLeft = 0;
         onBlur?.(event);
       }}
       onPointerLeave={(event) => {
@@ -74,14 +142,31 @@ export function HoverMarquee({
       }}
     >
       <span
-        ref={text}
         className="mt-hover-marquee-text"
-        style={{
-          "--mt-marquee-travel": `${distance}px`,
-          "--mt-marquee-duration": `${Math.max(2.8, distance / 30 + 1.3)}s`,
-        } as React.CSSProperties}
+        style={
+          overflowing
+            ? ({
+                "--mt-marquee-duration": `${duration}s`,
+                "--mt-marquee-gap": `${LOOP_GAP}px`,
+                "--mt-marquee-head-end": percent(HEAD_PAUSE),
+                "--mt-marquee-tail-start": percent(tailStart),
+                "--mt-marquee-tail-end": percent(tailStart + TAIL_PAUSE),
+                "--mt-marquee-tail-progress": distance / advance,
+              } as React.CSSProperties)
+            : undefined
+        }
       >
-        {children}
+        <span ref={text} className="mt-hover-marquee-original">
+          {children}
+        </span>
+        {overflowing && (
+          <span
+            ref={repeat}
+            className="mt-hover-marquee-copy"
+            aria-hidden="true"
+            inert
+          />
+        )}
       </span>
     </span>
   );

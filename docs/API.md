@@ -258,9 +258,12 @@ retains enough space for the side header when collapsed and restores the previou
 
 ## HoverMarquee
 
-Use `<HoverMarquee>` for a non-interactive, single-line label in a constrained container.
-Fitting labels stay still. Overflowed text is ellipsized until hovered or focused,
-then pans to the logical end, pauses, and repeats. Leaving both restores the ellipsis.
+Use `<HoverMarquee>` for a non-interactive, single-line label in a constrained
+container. Fitting labels stay still. Overflowed text is ellipsized until hovered
+or focused, then pans to the logical end, pauses, and glides across a short gap
+into the next repetition without jumping. The visual repetition is inert and
+hidden from assistive technology. Leaving hover and focus restores the ellipsis.
+
 Reduced-motion and no-hover devices instead support manual horizontal scrolling.
 The component accepts native span attributes and a ref to its outer span.
 
