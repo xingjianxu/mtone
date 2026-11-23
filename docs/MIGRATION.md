@@ -1,6 +1,6 @@
-# Changes on master after 0.12.0
+# Upgrade notes for 0.13.0
 
-These changes are not in 0.12.0. Use the documentation for your installed release.
+Use this section when moving from 0.12.0 to 0.13.0. The live documentation follows master; consult the declarations bundled with your installed version.
 
 ## Split native Table and DataTable
 
@@ -53,6 +53,41 @@ For example, replace the header-related props with the following composition:
   }
 />
 ```
+
+## Toolbar defaults
+
+Toolbar now defaults to a gray surface and borderless standalone controls.
+To retain the old default surface and control styles, pass
+`background="white"`. To keep gray with standard controls, pass
+`background="gray" controlStyle="default"`. Connected ButtonGroup controls
+and keyboard behavior are unchanged.
+
+```tsx
+<Toolbar background="white" start={<Button>Filter</Button>} />
+<Toolbar background="gray" controlStyle="default" start={<Button>Filter</Button>} />
+```
+
+## Ordinary Select width
+
+A non-searchable Select in single mode no longer imposes a 160px minimum.
+It uses the widest placeholder or option text within the available space,
+with room for the icon and padding. If a layout depends on a fixed width,
+set `width` via the existing trigger class. For full-width clearable Select,
+also size its wrapper; see [Select in the API guide](API.md#selection).
+Searchable single, multiple, tags and popup search retain their sizing.
+
+## Shortcut and Tooltip additions
+
+The new keyboard shortcut APIs are opt-in. Wrap actions in
+`ShortcutsProvider`, register them with `useShortcut` and use `ShortcutScope`
+to control which actions take priority. Spotlight keeps its existing key
+configuration and joins the shared registry inside a provider. Menu items'
+`shortcut` remains a display label; use `formatShortcut` to generate a label.
+
+Existing Tooltip children, `content`, `side`, and controlled visibility
+continue to work. Arrows remain off by default, and hovering and keyboard
+focus are still the default triggers. Adopt the new props or `TooltipProvider`
+only as needed; see the [Tooltip API](API.md#tooltip).
 
 # Upgrade notes for 0.12.0
 

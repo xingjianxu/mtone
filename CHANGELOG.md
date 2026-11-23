@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.13.0
+
+### Breaking changes
+- Split the former advanced `Table` into `DataTable` and a new native JSX `Table`. Move existing data-driven imports, table-specific types, compound components, and constants to `DataTable`; there is no alias for the old meaning of `Table`.
+- Pass complete toolbar content via `DataList.toolbar`. Replace `filters` with controls in Toolbar slots, move the search label and placeholder into `DataList.Search`, and replace `renderBatchActions` with render-function children of `DataList.Selection`. Keep the data configuration and cross-page selection in DataList. See the [migration guide](docs/MIGRATION.md#upgrade-notes-for-0130).
+
+### Added
+- Compose `toolbar={<Toolbar … />}` inside DataTable or DataList to share the same frame. Native `Table` keeps HTML table semantics and offers `bordered`, `striped`, and `highlightOnHover`.
+- Register app keyboard shortcuts with `ShortcutsProvider`, `ShortcutScope`, and `useShortcut`. Use `formatShortcut` for platform-specific hints. Spotlight can use the shared registry without changing its existing shortcut format or standalone behavior; menu shortcut text remains display-only.
+- Extend Tooltip with alignment, optional arrows, collision controls, alternate triggers, controlled visibility, colors and part styles, and custom portal mounting. `TooltipProvider` coordinates hover delays. The original content, child trigger, side, and default hover-plus-focus behavior are retained.
+
+### Changed
+- Toolbar defaults to a gray background with borderless standalone buttons and Select controls; set `background="white"` for the previous surface, or `controlStyle="default"` for standard controls on gray. ButtonGroup and keyboard interactions are unchanged.
+- Ordinary non-searchable single Select sizes to the widest placeholder or option text instead of a 160px minimum, preserves its width when selecting or clearing, and truncates long labels in narrow containers. Existing explicit widths still work; searchable, multiple, tags, and popup search sizing is unchanged.
+
 ## 0.12.0
 
 ### Breaking changes
