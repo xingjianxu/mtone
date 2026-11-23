@@ -329,6 +329,10 @@ the switcher or the Right Arrow key to expand, and Left Arrow to collapse.
   `gap={0}` to remove that space or a finite, nonnegative decimal for a custom
   gap. Invalid values fall back to 2. Normal and virtual rows share this
   spacing; `itemHeight` does not include the gap.
+- `itemHeight` sets the actual row height in all modes, including ordinary
+  trees and scroll containers with `virtual={false}`. It defaults to 32px;
+  positive values below 24px are clamped to 24px, and invalid values fall back
+  to 32px. Size custom row content for the resulting fixed height.
 - Set `icon` on an individual `TreeItem` or `TreeNode` to override the tree-wide
   icon. A per-node callback receives the normalized item. Use `isLeaf: true`
   for terminal documents.

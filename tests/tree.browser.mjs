@@ -32,6 +32,34 @@ try {
       page.on("pageerror", (e) => errors.push(e.message));
       await page.goto("http://127.0.0.1:5217/tests/fixtures/tree.html");
       const checked = page.getByRole("tree", { name: "Checked", exact: true });
+      const measureRows = (name) => page.getByRole("tree", { name, exact: true })
+        .getByRole("treeitem").evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height));
+      assert.deepEqual(await measureRows("Checked"), [32, 32, 32, 32], "Default Tree nodes are 32px tall");
+      assert.deepEqual(await measureRows("Height only"), [38, 38, 38, 38], "itemHeight works without a scroll viewport");
+      assert.deepEqual(await measureRows("Height with nonvirtual scrolling"), [36.5, 36.5, 36.5, 36.5], "itemHeight works with virtual=false and preserves fractional heights");
+      assert.deepEqual(await measureRows("Minimum height"), [24, 24], "Positive small heights are clamped to 24px");
+      assert.deepEqual(await measureRows("Invalid height"), [32, 32], "Invalid heights use 32px");
+      assert.deepEqual(await measureRows("Default virtual height"), [32, 32, 32, 32], "The virtual default matches ordinary rows");
+      const scrolling = page.getByRole("tree", { name: "Height with nonvirtual scrolling", exact: true });
+      const geometry = await scrolling.evaluate((tree) => {
+        const rows = [...tree.querySelectorAll('[role="treeitem"]')].map(row => ({
+          row: row.getBoundingClientRect(),
+          action: row.querySelector('button[aria-label="Height demo action"]').getBoundingClientRect(),
+        }));
+        return {
+          gap: rows[1].row.top - rows[0].row.bottom,
+          height: tree.scrollHeight,
+          actionsContained: rows.every(({row, action}) => action.top >= row.top && action.bottom <= row.bottom),
+        };
+      });
+      assert(Math.abs(geometry.height - 156.5) <= 0.5, "Nonvirtual extent includes all row heights and only inter-row gaps");
+      assert.equal(geometry.gap, 3.5);
+      assert.equal(geometry.actionsContained, true);
+      assert(await page.getByRole("tree", { name: "Minimum height", exact: true })
+        .getByRole("treeitem").first().evaluate((row) => {
+          const bounds = row.getBoundingClientRect(), action = row.querySelector("button[aria-label='Compact action']").getBoundingClientRect();
+          return action.height >= 24 && action.top >= bounds.top && action.bottom <= bounds.bottom;
+        }), "Compact actions fit the 24px minimum row height");
       const selected = checked.getByRole("treeitem", { selected: true });
       await expect(selected).toHaveCount(2);
       const visual = await selected.evaluateAll(([first, second]) => {
@@ -60,6 +88,46 @@ try {
       assert(Math.abs(visual.continuousLine) < 0.1, "the guide line crosses the row gap");
       assert(Math.abs(visual.firstJointOffset) < 0.6 && Math.abs(visual.secondJointOffset) < 0.6,
         "branch joints stay at the row centers");
+      for (const label of ["Guide LTR", "Guide RTL", "Guide zero"]) {
+        const tree = page.getByRole("tree", { name: label, exact: true });
+        for (const name of ["Guide first", "Guide last", "Guide sibling", "Guide folder"]) {
+          const row = tree.getByRole("treeitem", { name, exact: true });
+          const line = await row.evaluate((element) => {
+            const guide = element.querySelector(".mt-tree-guide-direct");
+            const toggle = element.querySelector(".mt-tree-toggle");
+            const rtl = getComputedStyle(element).direction === "rtl";
+            const r = element.getBoundingClientRect(), g = guide.getBoundingClientRect(), t = toggle.getBoundingClientRect();
+            const elbow = getComputedStyle(guide, "::after");
+            const inset = parseFloat(elbow.insetInlineStart) + parseFloat(getComputedStyle(guide).borderInlineStartWidth);
+            const width = parseFloat(elbow.inlineSize);
+            const direction = rtl ? -1 : 1;
+            const origin = rtl ? g.right : g.left;
+            const position = (point) => direction * (point - origin);
+            const stub = getComputedStyle(toggle, "::before");
+            return {
+              inset,
+              width,
+              leafTarget: position((t.left + t.right) / 2) + 3.5,
+              controlClearance: position(rtl ? t.right : t.left),
+              y: g.top + parseFloat(elbow.top) - (r.top + r.height / 2),
+              oldStub: stub.content !== "none",
+              isLast: guide.classList.contains("mt-tree-guide-last"),
+              trunkEndY: g.bottom - (r.top + r.height / 2),
+            };
+          });
+          const branch = name === "Guide folder";
+          assert(Math.abs(line.inset) < 0.6 && !line.oldStub,
+            `A single segment starts on the trunk, not a disconnected leaf stub: ${label} ${name} ${JSON.stringify(line)}`);
+          const end = line.inset + line.width;
+          assert(Math.abs(end - (branch ? Math.max(0, line.controlClearance) : line.leafTarget)) < 0.6,
+            `The elbow reaches the leaf end or stops at the button edge: ${label} ${name} ${JSON.stringify(line)}`);
+          assert(Math.abs(line.y) < 0.6, "The horizontal connector is on the row center");
+          if (line.isLast) assert(Math.abs(line.trunkEndY) < 0.6, "The last child's trunk also ends on center");
+        }
+        const rootLeaf = tree.getByRole("treeitem", { name: "Guide root leaf" });
+        assert(await rootLeaf.locator(".mt-tree-toggle").evaluate(toggle => getComputedStyle(toggle, "::before").content !== "none"),
+          "A root leaf retains its standalone guide dash");
+      }
       const tight = page.getByRole("tree", { name: "Tight gap", exact: true });
       const zeroGap = await tight.getByRole("treeitem").evaluateAll(([a, b]) =>
         b.getBoundingClientRect().top - a.getBoundingClientRect().bottom);
@@ -151,7 +219,7 @@ try {
         };
       });
       assert(layout.ellipsized && layout.sameCounterEnd, "long titles truncate without moving the right counters");
-      assert(Math.abs(layout.indent - 26) < 0.1 && Math.abs(layout.elbow - 20) < 0.1,
+      assert(Math.abs(layout.indent - 26) < 0.1 && Math.abs(layout.elbow - 29.5) < 0.1,
         "custom indentation adjusts both row and guide geometry");
       await expect(longDoc.locator(".mt-tree-icon")).toHaveText("📝");
       await longDoc.locator(".mt-tree-title").click();

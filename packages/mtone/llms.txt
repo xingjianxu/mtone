@@ -1756,7 +1756,7 @@ export default function Demo() {
 - loadData: (node: TreeItem) => Promise<unknown>. 展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。
 - loadedKeys / defaultLoadedKeys: TreeKey[]. 受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。
 - onLoad / onLoadError: (keys, { node }) => void / (error, node) => void. 加载成功或失败回调。失败显示错误提示并允许通过展开控件重试。
-- height / itemHeight / virtual: number / number / boolean (default: — / 30 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px，不包含 gap；virtual=false 保留滚动容器但渲染全部节点。
+- height / itemHeight / virtual: number / number / boolean (default: — / 30 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 控制所有模式的实际行高，默认 32px，最小 24px，不包含 gap。非正数或非有限值回退到默认值；virtual=false 保留滚动容器但渲染全部节点。
 - draggable: boolean | (node: TreeItem) => boolean (default: false). 启用 HTML 原生拖放，可按节点决定是否允许拖动。
 - allowDrop: ({ dragNode, dropNode, dropPosition }) => boolean. 可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。
 - onDrop: (info: TreeDropInfo) => void. info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap。应用按结果更新数据，组件不自动移动节点。
@@ -1766,6 +1766,7 @@ export default function Demo() {
 - directory / expandAction: boolean / false | "click" | "doubleClick" (default: false / "click"). 设置 directory 开启目录模式；默认点击展开，false 禁用标题触发展开但保留箭头 / 方向键。
 - label / className / style: string / string / CSSProperties. 可访问名称、根类名与样式；支持其余不冲突的 div 属性。
 - ref: React.Ref<TreeRef>. 暴露 nativeElement、focus()、scrollTo({ key, align?, offset?, autoExpand? })；align 为 top / bottom / auto。autoExpand 只在非受控展开模式生效。
+- 文档的交互配置示例可即时切换连接线、节点图标、复选框、多选，并调整 itemHeight 和 gap；使用恢复默认可重置示例。
 - TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。
 - 勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。
 - 支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。

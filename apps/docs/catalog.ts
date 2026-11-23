@@ -3756,7 +3756,7 @@ export default function Demo() {
         name: "height / itemHeight / virtual",
         type: "number / number / boolean",
         description:
-          "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 为固定行高，至少 24px，不包含 gap；virtual=false 保留滚动容器但渲染全部节点。",
+          "正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 控制所有模式的实际行高，默认 32px，最小 24px，不包含 gap。非正数或非有限值回退到默认值；virtual=false 保留滚动容器但渲染全部节点。",
         default: "— / 30 / true",
       },
       {
@@ -3813,6 +3813,7 @@ export default function Demo() {
       },
     ],
     notes: [
+      "文档的交互配置示例可即时切换连接线、节点图标、复选框、多选，并调整 itemHeight 和 gap；使用恢复默认可重置示例。",
       "TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。",
       "勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。",
       "支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。",

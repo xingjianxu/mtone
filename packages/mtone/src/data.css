@@ -630,7 +630,6 @@
   font-size: 14px;
 }
 .mt-tree-item {
-  min-height: 28px;
   display: flex;
   align-items: center;
   gap: 6px;

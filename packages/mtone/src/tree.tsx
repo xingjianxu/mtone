@@ -21,6 +21,8 @@ import {
   expandTreeParents,
 } from "./tree-model";
 
+const DEFAULT_TREE_ROW_HEIGHT = 32;
+const MIN_TREE_ROW_HEIGHT = 24;
 const DEFAULT_TREE_ROW_GAP = 2;
 const DEFAULT_TREE_INDENT = 20;
 
@@ -139,6 +141,7 @@ export interface TreeProps extends Omit<
   onLoad?: (keys: TreeKey[], info: { node: TreeItem }) => void;
   onLoadError?: (error: unknown, node: TreeItem) => void;
   height?: number;
+  /** Actual row height in pixels, excluding the gap. Defaults to 32, minimum 24. */
   itemHeight?: number;
   virtual?: boolean;
   draggable?: boolean | ((node: TreeItem) => boolean);
@@ -209,7 +212,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     onLoad,
     onLoadError,
     height,
-    itemHeight = 30,
+    itemHeight = DEFAULT_TREE_ROW_HEIGHT,
     virtual = true,
     draggable = false,
     allowDrop,
@@ -315,8 +318,8 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     : enabled[0]?.item.id;
   const rowHeight =
     Number.isFinite(itemHeight) && itemHeight > 0
-      ? Math.max(24, itemHeight)
-      : 30;
+      ? Math.max(MIN_TREE_ROW_HEIGHT, itemHeight)
+      : DEFAULT_TREE_ROW_HEIGHT;
   // Use the same gap for CSS, virtual spacers and scroll positioning while
   // keeping itemHeight as the actual (clickable) row height.
   const rowGap = Number.isFinite(gap) && gap >= 0 ? gap : DEFAULT_TREE_ROW_GAP;
@@ -611,6 +614,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
       )}
       style={{
         ...style,
+        "--_mt-tree-row-height": `${rowHeight}px`,
         "--_mt-tree-row-gap": `${rowGap}px`,
         "--_mt-tree-indent": `${levelIndent}px`,
         ...(viewport ? { height: viewport, overflow: "auto" } : {}),
@@ -696,13 +700,6 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               data-match={filterTreeNode?.(node) || undefined}
               style={{
                 paddingInlineStart: 8 + (level - 1) * levelIndent,
-                ...(isVirtual
-                  ? {
-                      height: rowHeight,
-                      minHeight: rowHeight,
-                      maxHeight: rowHeight,
-                    }
-                  : {}),
               }}
               onFocus={() => setActive(node.id)}
               onClick={(e) => {

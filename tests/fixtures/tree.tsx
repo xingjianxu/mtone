@@ -27,6 +27,15 @@ function App() {
     },
     { id: "z", label: "Last" },
   ];
+  const guides = [{
+    id: "guide-root", label: "Guide root", children: [
+      { id: "guide-folder", label: "Guide folder", children: [
+        { id: "guide-first", label: "Guide first" },
+        { id: "guide-last", label: "Guide last" },
+      ] },
+      { id: "guide-sibling", label: "Guide sibling" },
+    ],
+  }, { id: "guide-root-leaf", label: "Guide root leaf" }];
   return (
     <MtoneProvider locale="en">
       <main style={{ display: "grid", gap: 20, minWidth: 0 }}>
@@ -88,6 +97,27 @@ function App() {
           items={[{ id: "long", label: "LongLabel".repeat(80) }]}
         />
         <Tree label="Tight gap" gap={0} items={basic} defaultExpandAll showLine />
+        <Tree label="Height only" itemHeight={38} gap={0} items={basic} defaultExpandAll showLine />
+        <Tree
+          label="Height with nonvirtual scrolling"
+          height={100}
+          virtual={false}
+          itemHeight={36.5}
+          gap={3.5}
+          items={basic}
+          defaultExpandAll
+          showLine
+          actions={() => ({ content: <Button size="sm" aria-label="Height demo action">A</Button> })}
+        />
+        <Tree label="Minimum height" itemHeight={10} items={basic}
+          actions={() => ({ content: <Button size="sm" aria-label="Compact action">A</Button> })}
+        />
+        <Tree label="Invalid height" itemHeight={Number.NaN} items={basic} />
+        <Tree label="Default virtual height" height={100} items={basic} defaultExpandAll />
+        <Tree label="Guide LTR" indent={26} gap={2} items={guides} defaultExpandAll showLine />
+        <Tree label="Guide RTL" dir="rtl" indent={21.5} gap={3.5} itemHeight={36.5} height={120}
+          items={guides} defaultExpandAll showLine />
+        <Tree label="Guide zero" indent={0} gap={0} itemHeight={24} items={guides} defaultExpandAll showLine />
         <DocumentNavigationDemo />
         <NodeActionsDemo />
       </main>

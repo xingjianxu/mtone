@@ -6,6 +6,7 @@
   box-sizing: border-box;
   position: relative;
   min-width: 0;
+  height: var(--_mt-tree-row-height, 32px);
   gap: 6px;
 }
 .mt-tree > .mt-tree-item + .mt-tree-item {
@@ -47,6 +48,9 @@
   margin-inline-start: auto;
   gap: 2px;
 }
+.mt-tree-action > :is(button, a) {
+  max-height: var(--_mt-tree-row-height, 32px);
+}
 .mt-tree-end + .mt-tree-actions {
   margin-inline-start: 0;
 }
@@ -84,7 +88,7 @@
 .mt-tree-loading svg {
   animation: mt-tree-spin 1s linear infinite;
 }
-.mt-tree-lines .mt-tree-toggle:empty::before {
+.mt-tree-lines > .mt-tree-item[aria-level="1"] > .mt-tree-toggle:empty::before {
   content: "";
   width: 7px;
   border-bottom: 1px solid var(--mt-border, #ddd);
@@ -125,12 +129,19 @@
 .mt-tree-guide-direct::after {
   content: "";
   position: absolute;
-  inset-inline-start: 0;
-  inline-size: max(0px, calc(var(--_mt-tree-indent) - 6px));
+  /* Paint from the outer edge of the one-pixel trunk. Folders stop at their
+   * toggle's leading edge (8px before its center). */
+  inset-inline-start: -1px;
+  inline-size: max(0px, calc(var(--_mt-tree-indent) - 8px));
   /* Keep the branch on the row center after extending the trunk through
    * the preceding gap. */
   top: calc(50% + var(--_mt-tree-row-gap) / 2);
   border-top: 1px solid var(--mt-border, #ddd);
+}
+/* A child leaf needs no toggle clearance. Continue in one segment to
+ * the far edge of the former 7px dash, without a second painted seam. */
+.mt-tree-item:has(> .mt-tree-toggle:empty) > .mt-tree-guide-direct::after {
+  inline-size: calc(var(--_mt-tree-indent) + 3.5px);
 }
 .mt-tree-guide-last {
   bottom: 50%;

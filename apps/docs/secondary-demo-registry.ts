@@ -293,6 +293,8 @@ import Tree5 from "./secondary-demos/tree-virtual";
 import Tree5Source from "./secondary-demos/tree-virtual.tsx?raw";
 import Tree6 from "./secondary-demos/tree-sorting";
 import Tree6Source from "./secondary-demos/tree-sorting.tsx?raw";
+import TreePlayground from "./secondary-demos/tree-playground";
+import TreePlaygroundSource from "./secondary-demos/tree-playground.tsx?raw";
 import TreeNodeActions from "./secondary-demos/tree-node-actions";
 import TreeNodeActionsSource from "./secondary-demos/tree-node-actions.tsx?raw";
 import TreeDocumentNavigation from "./secondary-demos/tree-document-navigation";
@@ -1133,6 +1135,13 @@ export default function Demo() {
     },
   ],
   Tree: [
+    {
+      id: "playground",
+      title: "交互配置",
+      note: "切换连接线、节点图标、复选框与多选，或调整行高和间距，预览会即时更新。恢复默认也会清除当前选择和勾选。",
+      Demo: TreePlayground,
+      source: source(TreePlaygroundSource),
+    },
     {
       id: "node-actions",
       title: "节点右侧操作",
