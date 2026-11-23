@@ -134,8 +134,13 @@ it('keeps single and multiple Select highlights background-only, including force
 it('keeps Splitter forced-color rules inside a valid top-level media query', () => {
   const css = readFileSync('packages/mtone/src/splitter.css', 'utf8');
   expect(css).not.toMatch(/>\s*@media/);
-  expect(css).toMatch(/@media \(forced-colors: active\)\s*\{\s*\.mt-splitter\s*>\s*\.mt-splitter-separator\s*\{\s*border: 1px solid ButtonText;/);
-  expect(css).toMatch(/\.mt-splitter\s*>\s*\.mt-splitter-separator\s*>\s*\.mt-splitter-grip\s*\{\s*background: ButtonText;/);
+  const forcedColors = css.match(/@media \(forced-colors: active\)\s*\{((?:[^{}]*\{[^{}]*\}\s*)+)\}/)?.[1];
+  expect(forcedColors).toBeDefined();
+  const separator = forcedColors?.match(/\.mt-splitter\s*>\s*\.mt-splitter-separator\s*\{([^{}]*)\}/)?.[1];
+  const grip = forcedColors?.match(/\.mt-splitter\s*>\s*\.mt-splitter-separator\s*>\s*\.mt-splitter-grip\s*\{([^{}]*)\}/)?.[1];
+  expect(separator).toMatch(/(?:^|;)\s*border:\s*1px solid ButtonText\s*;/);
+  expect(grip).toMatch(/(?:^|;)\s*background:\s*ButtonText\s*;/);
+  expect(grip).toMatch(/(?:^|;)\s*forced-color-adjust:\s*none\s*;/);
 });
 
 it('keeps breadcrumb hover neutral and underline-free without removing keyboard focus', () => {

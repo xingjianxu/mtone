@@ -716,7 +716,7 @@ section:not(:where(.example-stage *)) > p {
 .component-reference-section { margin: -3px 0 6px; }
 .component-reference-section .component-reference { padding-inline-start: 0; border-inline-start: 0; }
 .component-reference a:focus-visible,
-.component-copy-button:focus-visible { outline: 1px solid var(--mt-focus); outline-offset: 1px; }
+.component-copy-button:focus-visible { outline: 1px solid var(--mt-focus, #93b4dc); outline-offset: -1px; }
 
 .theme-samples {
   display: grid;
