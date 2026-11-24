@@ -3857,7 +3857,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "文档的交互配置示例可即时切换连接线、节点图标、复选框、多选，并调整 itemHeight 和 gap；使用恢复默认可重置示例。",
+      "文档的交互配置示例可切换连接线、节点图标、整行铺满、复选框、独立勾选、多选、选择、禁用与目录模式，调整目录标题展开方式、行高、间距、缩进和可视高度。恢复默认会还原展开状态并清除选择和勾选；异步加载、虚拟滚动、拖放和节点渲染见独立示例。",
       "TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。",
       "勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。",
       "支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。",
@@ -5494,10 +5494,12 @@ export default function Demo() {
         description: "组件内容。",
       },
     ],
-    notes: ["使用 dl 语义，与 PropertyItem 搭配。"],
+    notes: ["使用 dl 语义，与本页 PropertyItem 小节中的属性行搭配。"],
   },
   {
     name: "PropertyItem",
+    sidebarParent: "PropertyList",
+    sidebarSection: "property-item",
     description: "展示一行属性名和值。",
     importNames: ["PropertyItem", "PropertyList"],
     code: 'import { PropertyItem, PropertyList } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <PropertyList><PropertyItem label="负责人">张三</PropertyItem></PropertyList>\n  );\n}',

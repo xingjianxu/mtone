@@ -53,7 +53,7 @@
   outline-offset: -1px;
 }
 .mt-check-card:has(> .mt-check-card-control:checked) {
-  background: var(--mt-badge-blue-bg, #e7f0f9);
+  background: var(--mt-select-surface, #e9eef4);
 }
 .mt-check-card[data-bordered="true"]:has(> .mt-check-card-control:checked) {
   border-color: var(--mt-focus, #93b4dc);

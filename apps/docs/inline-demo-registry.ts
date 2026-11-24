@@ -656,11 +656,10 @@ export const inlineDocSections: Readonly<
       Demo: Example28_0,
       source: source(Example28_0Raw),
     },
-  ],
-  PropertyItem: [
     {
-      id: "usage",
-      title: "基础用法",
+      id: "property-item",
+      title: "PropertyItem",
+      note: "在 PropertyList 内展示单条属性。用 label 指定属性名，属性值放在子内容中。",
       Demo: Example29_0,
       source: source(Example29_0Raw),
     },

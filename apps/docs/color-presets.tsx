@@ -77,6 +77,26 @@ export function ColorPresets() {
         <p>珊瑚色浅色为 <code>#D1634B</code>，深色为 <code>#FD8C73</code>。适合指示线等装饰；若用作文字颜色，请另行检查对比度。</p>
       </section>
 
+      <section aria-labelledby="selection-surfaces-heading">
+        <h2 id="selection-surfaces-heading">语义背景</h2>
+        <h3>浅蓝选中背景</h3>
+        <p>
+          使用 <code>--mt-select-surface</code> 表示浅蓝选中状态或定位到的设置项。
+          它不同于蓝色指示线、键盘焦点边框和信息提示色。
+        </p>
+        <ul className="accent-palette" role="list">
+          {(["light", "dark"] as const).map((theme) => (
+            <li key={theme}>
+              <MtoneProvider theme={theme}>
+                <div className="accent-palette-swatch" aria-hidden="true" style={{ backgroundColor: "var(--mt-select-surface)" }} />
+              </MtoneProvider>
+              <strong>{theme === "light" ? "浅色主题" : "深色主题"}</strong>
+              <code>{theme === "light" ? "#E9EEF4" : "#293746"}</code>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section>
         <h2>在自己的界面中复用</h2>
         <p>

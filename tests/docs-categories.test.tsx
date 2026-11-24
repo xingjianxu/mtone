@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import * as catalog from "../apps/docs/catalog";
 import { inlineDocSections } from "../apps/docs/inline-demo-registry";
-import { DocsApp, parseRoute, searchDocs } from "../apps/docs/docs-app";
+import { componentDocHref, DocsApp, parseRoute, searchDocs } from "../apps/docs/docs-app";
 // Independent expected taxonomy. Within each group names are in reading order.
 const expected: Record<string, string[]> = {
   "布局容器": [
@@ -86,7 +86,7 @@ describe("documentation taxonomy", () => {
     }
     const sectionOnly = new Set([
       "Title", "Text", "Paragraph", "Link", "Blockquote", "Textarea",
-      "ImageGroup", "ImagePreview", "CascaderPanel", "AvatarGroup", "DocumentCard",
+      "ImageGroup", "ImagePreview", "CascaderPanel", "AvatarGroup", "DocumentCard", "PropertyItem",
       "AiMessage", "AiPromptInput", "AiSuggestion", "AiModelSelector",
       "AiReasoning", "AiTask", "AiQueue", "AiSubagent",
       "AiTool", "AiCheckpoint", "AiConfirmation", "AiInlineCitation", "AiContext",
@@ -112,6 +112,22 @@ describe("documentation taxonomy", () => {
     expect(
       screen.getByRole("heading", { name: "Button", level: 1 }),
     ).toBeInTheDocument();
+  });
+  it("keeps PropertyItem as a section and API of the single PropertyList page", () => {
+    expect(componentDocHref("PropertyItem")).toBe("#/components/PropertyList?section=property-item");
+    for (const old of ["", "?section=usage", "?section=props", "?section=notes"]) {
+      expect(parseRoute("#/components/PropertyItem" + old)).toEqual({ kind: "not-found" });
+    }
+    window.location.hash = "#/components/PropertyList?section=property-item";
+    render(<DocsApp />);
+    expect(screen.getByRole("heading", { name: "PropertyList", level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "PropertyItem", level: 2 })).toHaveAttribute("id", "property-item");
+    const api = screen.getByRole("region", { name: "PropertyItem 属性与接口" });
+    expect(within(api).getByRole("row", { name: /label ReactNode/ })).toBeInTheDocument();
+    expect(within(api).getByRole("row", { name: /children ReactNode/ })).toBeInTheDocument();
+    expect(within(screen.getByRole("navigation", { name: "本页目录" })).getByRole("link", { name: /^PropertyItem$/ }))
+      .toHaveAttribute("href", "#/components/PropertyList?section=property-item");
+    expect(within(screen.getByRole("navigation", { name: "文档导航" })).queryByRole("link", { name: "PropertyItem" })).toBeNull();
   });
   it("does not retain the removed icon button page, redirect, or search result", () => {
     expect(parseRoute("#/components/IconButton")).toEqual({ kind: "not-found" });
