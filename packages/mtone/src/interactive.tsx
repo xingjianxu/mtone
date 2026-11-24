@@ -155,13 +155,16 @@ export function Slider({ label, className, ...props }: SliderProps) {
   );
 }
 export interface NumberInputProps
-  extends Common, Omit<ValueProps<number | null>, "defaultValue"> {
+  extends Common, Omit<ValueProps<number | null>, "defaultValue">,
+    Pick<React.AriaAttributes, "aria-labelledby" | "aria-describedby"> {
   defaultValue?: number;
   min?: number;
   max?: number;
   step?: number;
 }
-export function NumberInput({ label, className, ...props }: NumberInputProps) {
+export function NumberInput({
+  label, className, "aria-labelledby": labelledBy, "aria-describedby": describedBy, ...props
+}: NumberInputProps) {
   props = { ...props, disabled: useFieldsetDisabled(props.disabled) };
   const { locale } = useMtone();
   return (
@@ -173,7 +176,9 @@ export function NumberInput({ label, className, ...props }: NumberInputProps) {
         >
           −
         </NumberField.Decrement>
-        <NumberField.Input className="mt-number-input" aria-label={label} />
+        <NumberField.Input className="mt-number-input" aria-label={label}
+          {...(labelledBy === undefined ? {} : { "aria-labelledby": labelledBy })}
+          aria-describedby={describedBy} />
         <NumberField.Increment
           aria-label={locale === "zh" ? "增加" : "Increase"}
           className="mt-number-step"
