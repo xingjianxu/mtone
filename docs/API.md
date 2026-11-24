@@ -252,6 +252,13 @@ controls. `value` / `defaultValue` and `collapsed` / `defaultCollapsed` allow
 controlled or independent tab selection and disclosure. A collapsed Panel keeps
 the tab bar and all visited content mounted but hides the tab bodies.
 
+By default, activating the selected tab of an expanded Panel collapses it.
+Activating any enabled tab while collapsed opens the Panel on that tab.
+Click, Enter, and Space activate tabs; arrow keys only move focus.
+Set `collapseOnTabClick={false}` for selection-only tab activation. The disclosure
+button still works. In controlled mode handle `onCollapsedChange` to accept the
+requested disclosure state.
+
 Use Splitter to dock on any edge: vertical orientation for top/bottom and horizontal
 for left/right. Docking does not set the internal tab position. The [IDE example](https://xingjianxu.github.io/mtone/#/components/Panel?section=ide)
 retains enough space for the side header when collapsed and restores the previous pane size on expansion.

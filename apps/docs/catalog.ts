@@ -488,12 +488,13 @@ export default function Demo() {
       { name: "tabPlacement", type: '"top" | "bottom" | "left" | "right"', default: '"top"', description: "标签栏相对内容的物理方位，与 Panel 的外部停靠无关。左右为纵向标签栏。" },
       { name: "actions", type: "ReactNode", description: "标签栏末端的附加操作，收起时仍可操作。" },
       { name: "collapsed / defaultCollapsed / onCollapsedChange", type: "boolean / boolean / (collapsed: boolean) => void", default: "defaultCollapsed: false", description: "受控或非受控的收起状态，收起后只显示标签栏。" },
+      { name: "collapseOnTabClick", type: "boolean", default: "true", description: "再次激活已选中的展开标签时收起；收起时激活任一可用标签会展开。设为 false 时，激活标签只改变选中项。" },
       { name: "原生属性", type: "ComponentPropsWithRef<'div'>", description: "支持 className、style 和原生属性；ref 指向根 div。" },
     ],
     notes: [
       "Panel 不负责停靠和调整尺寸。与 Splitter 组合时，顶部和底部用纵向分栏，左右用横向分栏，停靠示例使用默认顶部标签栏；双击分隔条或聚焦后按 Enter 可收起或展开工作面板，展开后恢复此前的分栏尺寸。",
       "左右栏使用图标和文字提示；没有图标的标签仍显示文字。收起时操作和展开按钮保留在同一侧栏。",
-      "标签栏沿用 Tabs 的键盘操作与窄宽度溢出菜单；收起会隐藏内容区并使其不可聚焦，但保留内部状态。",
+      "鼠标点击、Enter 或空格键都可激活标签；方向键只移动焦点。窄宽度下也可通过溢出菜单激活。面板收起时保留选中标签和已访问内容的状态。",
     ],
   },
   {

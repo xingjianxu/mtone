@@ -18,6 +18,8 @@ export interface PanelProps extends Omit<
   tabPlacement?: "top" | "bottom" | "left" | "right";
   collapsed?: boolean;
   defaultCollapsed?: boolean;
+  /** Activate the open tab to collapse, or any tab to reopen. Defaults to true. */
+  collapseOnTabClick?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
 }
 
@@ -28,6 +30,7 @@ export function Panel({
   tabPlacement = "top",
   collapsed,
   defaultCollapsed = false,
+  collapseOnTabClick = true,
   onCollapsedChange,
   className,
   ref,
@@ -44,6 +47,13 @@ export function Panel({
   const compactRail = sideRail && items.every(item => item.icon != null && !!tabHint(item.label));
   const [localCollapsed, setLocalCollapsed] = React.useState(defaultCollapsed);
   const isCollapsed = collapsed ?? localCollapsed;
+  const changeCollapsed = (next: boolean) => {
+    if (collapsed === undefined) setLocalCollapsed(next);
+    onCollapsedChange?.(next);
+  };
+  const onTabActivate = collapseOnTabClick ? (isSelected: boolean) => {
+    if (isCollapsed || isSelected) changeCollapsed(!isCollapsed);
+  } : undefined;
   const root = React.useRef<HTMLDivElement>(null);
   const toggle = React.useRef<HTMLButtonElement>(null);
   const bodyFocus = React.useRef<HTMLElement | null>(null);
@@ -64,7 +74,7 @@ export function Panel({
       ? (isCollapsed ? ChevronLeft : ChevronRight)
       : (isCollapsed ? ChevronUp : ChevronDown);
   return (
-    <TabsPanelContext.Provider value={{ collapsed: isCollapsed, sideRail }}>
+    <TabsPanelContext.Provider value={{ collapsed: isCollapsed, sideRail, onTabActivate }}>
       <Tabs
         {...props}
         ref={root}
@@ -106,11 +116,7 @@ export function Panel({
               variant="ghost"
               aria-label={isCollapsed ? (zh ? "展开面板" : "Expand panel") : (zh ? "收起面板" : "Collapse panel")}
               aria-expanded={!isCollapsed}
-              onClick={() => {
-                const next = !isCollapsed;
-                if (collapsed === undefined) setLocalCollapsed(next);
-                onCollapsedChange?.(next);
-              }}
+              onClick={() => changeCollapsed(!isCollapsed)}
             >
               <DisclosureIcon size={15} aria-hidden="true" />
             </Button>

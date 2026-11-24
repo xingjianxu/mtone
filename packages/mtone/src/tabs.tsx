@@ -60,9 +60,14 @@ export interface TabsProps extends Omit<
   onOrderChange?: (values: string[]) => void;
 }
 
-/** Internal: let Panel hide its tab bodies without destroying visited content. */
+/** Internal: layer Panel disclosure over ordinary tab selection. */
+interface TabsPanelSettings {
+  collapsed: boolean;
+  sideRail: boolean;
+  onTabActivate?: (selected: boolean) => void;
+}
 const defaultPanelSettings = { collapsed: false, sideRail: false };
-export const TabsPanelContext = React.createContext(defaultPanelSettings);
+export const TabsPanelContext = React.createContext<TabsPanelSettings>(defaultPanelSettings);
 
 /** Plain labels can be represented by an icon with an accessible name and a tooltip. */
 export function tabHint(label: React.ReactNode): string | undefined {
@@ -102,7 +107,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   ref,
 ) {
   const { locale } = useMtone();
-  const { collapsed: panelsCollapsed, sideRail } = React.useContext(TabsPanelContext);
+  const { collapsed: panelsCollapsed, sideRail, onTabActivate } = React.useContext(TabsPanelContext);
   const zh = locale === "zh";
   const inheritedDirection = useDirection();
   const direction =
@@ -313,7 +318,12 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
                   onDragEnd={() => {
                     dragValue.current = null;
                   }}
-                  onClick={(event) => onTabClick?.(item.value, event)}
+                  onClick={(event) => {
+                    onTabClick?.(item.value, event);
+                    if (!event.defaultPrevented && event.button === 0 && !item.disabled) {
+                      onTabActivate?.(selected === item.value);
+                    }
+                  }}
                   onKeyDown={(event) => {
                     if (
                       reorderable &&
@@ -409,6 +419,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
                           onClick={() => {
                             select(item.value);
                             menuSelection.current = true;
+                            onTabActivate?.(selected === item.value);
                           }}
                         >
                           {item.label}

@@ -42,6 +42,14 @@ try {
   await expect(input).toHaveValue("Preserved");
   await expect(standalone.getByRole("button", { name: "Collapse panel" })).toBeFocused();
 
+  const moreTabs = standalone.getByRole("button", { name: "More tabs" });
+  await moreTabs.click();
+  await page.getByRole("menuitem", { name: "Visible", exact: true }).click();
+  await expect(standalone.getByRole("tabpanel")).toHaveCount(0);
+  await moreTabs.click();
+  await page.getByRole("menuitem", { name: "Second tab with a long name" }).click();
+  await expect(standalone.getByRole("tabpanel")).toHaveText("Second panel");
+
   const ide = page.getByTestId("ide");
   const dockControls = ide.getByRole("group", { name: "停靠位置" });
   const placementControls = ide.getByRole("group", { name: "标签位置" });
@@ -79,6 +87,26 @@ try {
   await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(34, 0);
   await sep.press("Enter");
   await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(resizedAfterRestore, 0);
+
+  const terminalTab = workbench.getByRole("tab", { name: "终端" });
+  const outputTab = workbench.getByRole("tab", { name: "输出" });
+  await terminalTab.click();
+  await expect(terminalTab).toBeFocused();
+  await expect(terminalTab).toHaveAttribute("aria-selected", "true");
+  await expect(command).toHaveCount(0);
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(34, 0);
+  await terminalTab.press("Space");
+  await expect(command).toHaveValue("npm run dev");
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(resizedAfterRestore, 0);
+
+  await terminalTab.press("Enter");
+  await expect(command).toHaveCount(0);
+  await outputTab.click();
+  await expect(outputTab).toHaveAttribute("aria-selected", "true");
+  await expect(workbench.getByText("编译完成")).toBeVisible();
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(resizedAfterRestore, 0);
+  await terminalTab.click();
+  await expect(command).toHaveValue("npm run dev");
 
   for (const [dock, orientation, first] of [
     ["顶部", "vertical", true],

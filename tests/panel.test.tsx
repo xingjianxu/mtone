@@ -3,8 +3,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
-import { Panel } from "../packages/mtone/src";
+import { Panel, Tabs } from "../packages/mtone/src";
 import PanelIde from "../apps/docs/inline-demos/panel-ide";
+
+// jsdom does not provide PointerEvent, which Base UI uses for Space activation.
+if (!window.PointerEvent) window.PointerEvent = MouseEvent as typeof PointerEvent;
 
 const items = [
   { value: "problems", label: "Problems", content: <p>No problems</p> },
@@ -105,4 +108,75 @@ it("toggles the docked panel from its separator without losing the command", () 
 
   fireEvent.keyDown(separator, { key: "Enter" });
   expect(screen.getByRole("textbox", { name: "输入命令" })).toHaveValue("npm run dev");
+});
+
+
+it("toggles the current Panel tab, retains visited content, and reopens on another enabled tab", async () => {
+  const user = userEvent.setup();
+  const onValueChange = vi.fn();
+  const onCollapsedChange = vi.fn();
+  render(<Panel label="Workbench" items={[...items, { value: "disabled", label: "Unavailable", content: null, disabled: true }]}
+    onValueChange={onValueChange} onCollapsedChange={onCollapsedChange} />);
+  const terminal = screen.getByRole("tab", { name: "Terminal" });
+  const problems = screen.getByRole("tab", { name: "Problems" });
+  await user.click(terminal);
+  const input = screen.getByRole("textbox", { name: "Command" });
+  await user.type(input, "npm run dev");
+  expect(onCollapsedChange).not.toHaveBeenCalled();
+
+  await user.click(terminal);
+  expect(onCollapsedChange.mock.calls).toEqual([[true]]);
+  expect(terminal).toHaveAttribute("aria-selected", "true");
+  expect(terminal).toHaveFocus();
+  expect(screen.queryByRole("tabpanel")).not.toBeInTheDocument();
+  expect(input.isConnected).toBe(true);
+  await user.click(screen.getByRole("tab", { name: "Unavailable" }));
+  expect(onCollapsedChange.mock.calls).toEqual([[true]]);
+
+  await user.click(terminal);
+  expect(screen.getByRole("textbox", { name: "Command" })).toBe(input);
+  expect(input).toHaveValue("npm run dev");
+  await user.click(terminal);
+  await user.click(problems);
+  expect(screen.getByRole("tabpanel", { name: "Problems" })).toBeVisible();
+  expect(onValueChange.mock.calls).toEqual([["terminal"], ["problems"]]);
+  expect(onCollapsedChange.mock.calls).toEqual([[true], [false], [true], [false]]);
+});
+
+it("only toggles controlled disclosure on explicit keyboard activation", async () => {
+  const user = userEvent.setup();
+  const onCollapsedChange = vi.fn();
+  const common = { items, value: "problems", onCollapsedChange };
+  const view = render(<Panel {...common} collapsed={false} />);
+  const problems = screen.getByRole("tab", { name: "Problems" });
+  problems.focus();
+  await user.keyboard("{ArrowRight}{Home}");
+  expect(problems).toHaveFocus();
+  expect(onCollapsedChange).not.toHaveBeenCalled();
+
+  await user.keyboard("{Enter}");
+  expect(onCollapsedChange.mock.calls).toEqual([[true]]);
+  expect(screen.getByRole("tabpanel")).toBeVisible();
+  view.rerender(<Panel {...common} collapsed />);
+  expect(screen.queryByRole("tabpanel")).not.toBeInTheDocument();
+  await user.keyboard(" ");
+  expect(onCollapsedChange.mock.calls).toEqual([[true], [false]]);
+  expect(screen.queryByRole("tabpanel")).not.toBeInTheDocument();
+});
+
+it("retains selection-only activation for ordinary Tabs and Panels that opt out", async () => {
+  const user = userEvent.setup();
+  const onCollapsedChange = vi.fn();
+  render(<>
+    <Panel label="Opted out" items={items} collapseOnTabClick={false} onCollapsedChange={onCollapsedChange} />
+    <Tabs label="Regular tabs" items={items} />
+  </>);
+  for (const label of ["Opted out", "Regular tabs"]) {
+    const list = screen.getByRole("tablist", { name: label });
+    const active = within(list).getByRole("tab", { name: "Problems" });
+    await user.click(active);
+    const panel = document.getElementById(active.getAttribute("aria-controls")!);
+    expect(panel).toBeVisible();
+  }
+  expect(onCollapsedChange).not.toHaveBeenCalled();
 });
