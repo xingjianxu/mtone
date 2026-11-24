@@ -13,6 +13,7 @@ type Dock = (typeof placements)[number]["value"];
 export default function Demo() {
   const [dock, setDock] = React.useState<Dock>("bottom");
   const [collapsed, setCollapsed] = React.useState(false);
+  const toggleCollapsed = () => setCollapsed(previous => !previous);
   const [tab, setTab] = React.useState("terminal");
   const [log, setLog] = React.useState("VITE ready");
   const [terminal, setTerminal] = React.useState("");
@@ -48,7 +49,7 @@ export default function Demo() {
   if (sizes && !first) sizes.reverse();
 
   const workbench = <Splitter.Panel key="workbench" id="panel-demo-workbench"
-    label="工作面板" min={minSize} defaultSize={collapsed ? headerSize : defaultSize}>
+    label="工作面板" min={minSize} max={collapsed ? headerSize : undefined} defaultSize={collapsed ? headerSize : defaultSize}>
     <Panel label="工作区标签" collapsed={collapsed} onCollapsedChange={setCollapsed}
       value={tab} onValueChange={setTab}
       actions={<Button iconOnly size="sm" variant="ghost" aria-label="清空终端记录" onClick={() => setLog("")}><Trash2 size={14} /></Button>}
@@ -78,7 +79,14 @@ export default function Demo() {
         key={dock}
         orientation={vertical ? "vertical" : "horizontal"}
         sizes={sizes}
-        disabled={collapsed}
+        onDraggerDoubleClick={toggleCollapsed}
+        onKeyDownCapture={(event) => {
+          const target = event.target as HTMLElement;
+          if (event.defaultPrevented || event.key !== "Enter"
+            || target.parentElement !== event.currentTarget || !target.hasAttribute("data-separator")) return;
+          event.preventDefault();
+          if (!event.repeat) toggleCollapsed();
+        }}
         style={{ width: "100%", height: "100%" }}
         onResize={(next) => {
           if (!collapsed) setRemembered(previous => ({ ...previous, [dock]: next[first ? 0 : 1] }));
