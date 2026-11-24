@@ -13,6 +13,14 @@ type Dock = (typeof placements)[number]["value"];
 export default function Demo() {
   const [dock, setDock] = React.useState<Dock>("bottom");
   const [collapsed, setCollapsed] = React.useState(false);
+  const ignoreResizeUntilNextInteraction = React.useRef(false);
+  const changeCollapsed = (next: boolean) => {
+    // Double-click follows two pointer sessions. Their trailing resize callbacks
+    // must not save a size produced by changing the collapse constraints.
+    ignoreResizeUntilNextInteraction.current = true;
+    setCollapsed(next);
+  };
+  const toggleCollapsed = () => changeCollapsed(!collapsed);
   const [tab, setTab] = React.useState("terminal");
   const [log, setLog] = React.useState("VITE ready");
   const [terminal, setTerminal] = React.useState("");
@@ -22,7 +30,7 @@ export default function Demo() {
   const vertical = dock === "top" || dock === "bottom";
   const first = dock === "top" || dock === "left";
   const headerSize = vertical ? 34 : 144;
-  const minSize = vertical && !collapsed ? 80 : headerSize;
+  const expandedMinSize = vertical ? 80 : headerSize;
   const defaultSize = vertical ? 142 : 224;
 
   React.useLayoutEffect(() => {
@@ -43,13 +51,13 @@ export default function Demo() {
   const desired = collapsed ? headerSize : remembered[dock] ?? defaultSize;
   const paneSize = collapsed
     ? headerSize
-    : Math.min(Math.max(minSize, desired), Math.max(minSize, available - 64));
-  const sizes = available > minSize ? [paneSize, available - paneSize] : undefined;
+    : Math.min(Math.max(expandedMinSize, desired), Math.max(expandedMinSize, available - 64));
+  const sizes = available > headerSize ? [paneSize, available - paneSize] : undefined;
   if (sizes && !first) sizes.reverse();
 
   const workbench = <Splitter.Panel key="workbench" id="panel-demo-workbench"
-    label="工作面板" min={minSize} defaultSize={collapsed ? headerSize : defaultSize}>
-    <Panel label="工作区标签" collapsed={collapsed} onCollapsedChange={setCollapsed}
+    label="工作面板" min={headerSize} defaultSize={defaultSize}>
+    <Panel label="工作区标签" collapsed={collapsed} onCollapsedChange={changeCollapsed}
       value={tab} onValueChange={setTab}
       actions={<Button iconOnly size="sm" variant="ghost" aria-label="清空终端记录" onClick={() => setLog("")}><Trash2 size={14} /></Button>}
       items={[
@@ -78,10 +86,24 @@ export default function Demo() {
         key={dock}
         orientation={vertical ? "vertical" : "horizontal"}
         sizes={sizes}
-        disabled={collapsed}
+        onDraggerDoubleClick={toggleCollapsed}
+        onKeyDownCapture={(event) => {
+          const target = event.target as HTMLElement;
+          if (event.defaultPrevented || event.key !== "Enter"
+            || target.parentElement !== event.currentTarget || !target.hasAttribute("data-separator")) return;
+          event.preventDefault();
+          if (!event.repeat) toggleCollapsed();
+        }}
         style={{ width: "100%", height: "100%" }}
+        onResizeStart={() => { ignoreResizeUntilNextInteraction.current = false; }}
         onResize={(next) => {
-          if (!collapsed) setRemembered(previous => ({ ...previous, [dock]: next[first ? 0 : 1] }));
+          if (ignoreResizeUntilNextInteraction.current) return;
+          const resized = next[first ? 0 : 1];
+          // Keep native constraints stable across disclosure changes so that
+          // controlled writes cannot use the previous collapsed bounds.
+          if (collapsed && resized <= headerSize + 1) return;
+          setRemembered(previous => ({ ...previous, [dock]: Math.max(expandedMinSize, resized) }));
+          if (collapsed) setCollapsed(false);
         }}
       >
         {first ? [workbench, editor] : [editor, workbench]}
