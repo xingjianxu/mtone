@@ -1,7 +1,7 @@
 import React from "react";
 import { Terminal } from "lucide-react";
 import { createRoot } from "react-dom/client";
-import { MtoneProvider, Panel } from "../../packages/mtone/src";
+import { MtoneProvider, Panel, Splitter } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 import PanelIde from "../../apps/docs/inline-demos/panel-ide";
 
@@ -24,7 +24,15 @@ function Fixture() {
         />
       </div>
     </MtoneProvider>
-    <div data-testid="ide"><PanelIde /></div>
+    <MtoneProvider theme="system">
+      <div data-testid="ide"><PanelIde /></div>
+      <div data-testid="plain-splitter" style={{ width: 180, height: 60 }}>
+        <Splitter>
+          <Splitter.Panel label="First pane">First</Splitter.Panel>
+          <Splitter.Panel label="Second pane">Second</Splitter.Panel>
+        </Splitter>
+      </div>
+    </MtoneProvider>
     <MtoneProvider theme="dark" locale="en">
       <div data-testid="rtl-rail" style={{ width: "min(100%, 260px)", height: 132 }}>
         <Panel label="RTL tabs" tabPlacement="right" dir="rtl"

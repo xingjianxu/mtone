@@ -11,6 +11,22 @@ const placements = [
 type Placement = (typeof placements)[number]["value"];
 const tabSizes = ["sm", "md", "lg"] as const;
 
+// Paint the editor-facing edge without affecting the separator's hit area.
+const editorSeam = `
+  .panel-ide-splitter[data-dock="top"] > .mt-splitter-separator {
+    box-shadow: inset 0 -1px var(--mt-border);
+  }
+  .panel-ide-splitter[data-dock="bottom"] > .mt-splitter-separator {
+    box-shadow: inset 0 1px var(--mt-border);
+  }
+  .panel-ide-splitter[data-dock="left"] > .mt-splitter-separator {
+    box-shadow: inset -1px 0 var(--mt-border);
+  }
+  .panel-ide-splitter[data-dock="right"] > .mt-splitter-separator {
+    box-shadow: inset 1px 0 var(--mt-border);
+  }
+`;
+
 export default function Demo() {
   const [dock, setDock] = React.useState<Placement>("bottom");
   const [tabPlacement, setTabPlacement] = React.useState<Placement>("top");
@@ -84,6 +100,7 @@ export default function Demo() {
     </pre>
   </Splitter.Panel>;
   return <div style={{ display: "grid", gap: 10, width: "100%", minWidth: 0 }}>
+    <style>{editorSeam}</style>
     <div style={{ display: "flex", alignItems: "center", gap: "8px 14px", flexWrap: "wrap" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <span aria-hidden="true">停靠</span>
@@ -110,6 +127,8 @@ export default function Demo() {
     <div ref={frame} style={{ height: 320, minWidth: 0, border: "1px solid var(--mt-border)", borderRadius: 6, overflow: "hidden" }}>
       <Splitter
         key={dock}
+        className="panel-ide-splitter"
+        data-dock={dock}
         orientation={vertical ? "vertical" : "horizontal"}
         sizes={sizes}
         onDraggerDoubleClick={toggleCollapsed}

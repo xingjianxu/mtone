@@ -102,6 +102,52 @@ try {
     await sep.press("Enter");
     await expect.poll(async () => (await workbench.boundingBox())[dimension]).toBeCloseTo(pane[dimension], 0);
   }
+  const plainSeparator = page.getByTestId("plain-splitter").getByRole("separator");
+  const themeColors = [];
+  for (const colorScheme of ["light", "dark"]) {
+    await page.emulateMedia({ colorScheme });
+    await expect(plainSeparator).toHaveCSS("box-shadow", "none");
+    for (const [dock, axis, x, y] of [
+      ["底部", "height", 0, 1],
+      ["顶部", "height", 0, -1],
+      ["左侧", "width", -1, 0],
+      ["右侧", "width", 1, 0],
+    ]) {
+      await dockControls.getByRole("button", { name: dock }).click();
+      await sep.scrollIntoViewIfNeeded();
+      const paint = await sep.evaluate((element, axis) => {
+        const style = getComputedStyle(element);
+        const probe = document.createElement("span");
+        probe.style.color = "var(--mt-border)";
+        element.append(probe);
+        const borderColor = getComputedStyle(probe).color;
+        probe.remove();
+        const rect = element.getBoundingClientRect();
+        const grip = element.querySelector(".mt-splitter-grip");
+        return {
+          boxShadow: style.boxShadow,
+          borderColor,
+          thickness: rect[axis],
+          sidesHitSeparator: [0.5, rect[axis] - 0.5].every(offset => {
+            const x = rect.left + (axis === "width" ? offset : rect.width / 2);
+            const y = rect.top + (axis === "height" ? offset : rect.height / 2);
+            return element.contains(document.elementFromPoint(x, y));
+          }),
+          threeDots: grip && getComputedStyle(grip).width === "3px"
+            && getComputedStyle(grip, "::before").content === '""'
+            && getComputedStyle(grip, "::after").content === '""',
+        };
+      }, axis);
+      assert.equal(paint.boxShadow, `${paint.borderColor} ${x}px ${y}px 0px 0px inset`, `${colorScheme}: ${dock} 编辑区侧`);
+      assert.equal(paint.thickness, 6, `${dock}: separator geometry`);
+      assert(paint.sidesHitSeparator, `${dock}: the visual line does not shrink the hit target`);
+      assert(paint.threeDots, `${dock}: retains all three grip dots`);
+      if (dock === "底部") themeColors.push(paint.borderColor);
+    }
+  }
+  assert.notEqual(...themeColors, "light and dark use different border tokens");
+  await page.emulateMedia({ colorScheme: "light" });
+  console.log("Panel divider: four editor-facing 1px edges in light and dark, hit geometry and three grips unchanged");
   await page.setViewportSize({ width: 320, height: 850 });
   await workbench.getByRole("button", { name: "收起面板" }).click();
   await expect(workbench.getByRole("button", { name: "展开面板" })).toBeVisible();
