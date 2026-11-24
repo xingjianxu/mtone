@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.14.0
+
+### Added
+- Use `SettingsDialog` for settings organized by category. It has independently scrolling desktop panes and a compact list-and-detail layout, with optional application-provided search. Compose `SettingRow` and `SettingRow.Group` for labeled settings, descriptions, shortcut hints, and accessible controls.
+- Dock an IDE-style `Panel` on any side, place tabs on any edge, and choose tab heights for Tabs and Panel. The active Panel tab can collapse the panel when activated again.
+- Enable optional drag resizing for AdminLayout and PageLayout sidebars; use Splitter directly to resize a standalone Sidebar.
+- Add `HoverMarquee` for overflow that scrolls on hover. The documentation site links to the site-wide and per-component AI references.
+- Set Tree row heights and provide node-level actions alongside icons and metadata.
+
+### Fixed
+- Align and connect Tree guide lines with the configured row height and gap.
+- Keep HoverMarquee cycles continuous and make the docs example overflow at practical viewport sizes.
+- Improve Splitter grip visibility and Panel docking seams, restore double-click collapse, and keep the tab strip aligned when the size changes.
+
 ## 0.13.2
 
 ### Added

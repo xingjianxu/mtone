@@ -11,6 +11,7 @@ export * from "./page-layout";
 export * from "./panel";
 export * from "./section-group";
 export * from "./setting-row";
+export * from "./settings-dialog";
 
 export * from "./spotlight";
 

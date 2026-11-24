@@ -18,7 +18,7 @@ const expected: Record<string, string[]> = {
     "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
-    "Form", "Fieldset", "SettingRow", "Input",
+    "Form", "Fieldset", "SettingRow", "SettingsDialog", "Input",
     "Mentions", "NumberInput", "AutoComplete", "Select",
     "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",

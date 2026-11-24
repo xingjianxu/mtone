@@ -22,7 +22,7 @@ const taxonomy = {
     "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
-    "Form", "Fieldset", "SettingRow", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
+    "Form", "Fieldset", "SettingRow", "SettingsDialog", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
     "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker",
@@ -3386,6 +3386,25 @@ export default function Demo() {
       { name: "SettingRow.Group", type: "HTMLAttributes<HTMLDivElement>", description: "默认 role=group，直接放入多行以共享底色和行间细线；可用 aria-label 或 aria-labelledby 命名。" },
     ],
     notes: ["窄容器中控件可换到下一行，仍靠行尾对齐。组件不管理设置值；直接传入控件时由调用方提供可访问名称。"],
+  },
+  {
+    name: "SettingsDialog",
+    description: "带分类导航的设置对话框，设置项由调用方提供。",
+    importNames: ["SettingsDialog", "SettingRow", "Button", "Switch", "NumberInput", "Select"],
+    code: "import React from \"react\";\nimport { Button, NumberInput, Select, SettingRow, SettingsDialog, Switch } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  return <SettingsDialog\n    title=\"应用设置\"\n    trigger={<Button>打开设置</Button>}\n    categories={[\n      { value: \"general\", label: \"常规\", content: (\n        <SettingRow.Group aria-label=\"常规设置\">\n          <SettingRow title=\"自动保存\" description=\"编辑时自动保存草稿。\"\n            control={props => <Switch {...props} defaultChecked />} />\n          <SettingRow title=\"通知\" description=\"在任务完成时发送提醒。\"\n            control={props => <Switch {...props} />} />\n        </SettingRow.Group>\n      ) },\n      { value: \"editor\", label: \"编辑器\", content: (\n        <SettingRow.Group aria-label=\"编辑器设置\">\n          <SettingRow title=\"光标上下文行数\" control={props => <NumberInput {...props} defaultValue={3} />} />\n          <SettingRow title=\"Tab 空格数\" control={props => (\n            <Select {...props} defaultValue=\"4\" options={[2, 4, 8].map(value => ({\n              value: String(value),\n              label: `${value} 个空格`,\n            }))} />\n          )} />\n        </SettingRow.Group>\n      ) },\n      { value: \"privacy\", label: \"隐私\", content: (\n        <SettingRow title=\"使用情况统计\" description=\"发送匿名使用数据。\"\n          control={props => <Switch {...props} />} />\n      ) },\n    ]}\n  />;\n}\n",
+    props: [
+      { name: "categories", type: "readonly SettingsDialogCategory[]", description: "依次传入各分类的唯一 value、label、可选 icon 和 content。" },
+      { name: "value / defaultValue", type: "string", description: "受控或非受控的当前分类；未提供或找不到对应分类时使用第一项。" },
+      { name: "onValueChange", type: "(value: string) => void", description: "请求切换到另一分类时触发。" },
+      { name: "categoriesLabel", type: "string", description: "为分类导航提供自定义的可访问名称。" },
+      { name: "search", type: "ReactNode | (context: SettingsDialogSearchContext) => ReactNode", description: "可选的搜索入口；调用方自行实现输入和匹配，函数参数中的 selectCategory 可跳到目标分类。" },
+      { name: "Dialog 属性", type: "Omit<DialogProps, 'children'>", description: "沿用 Dialog 的 title、description、trigger、open、defaultOpen、onOpenChange、footer、modal 和 className。" },
+    ],
+    notes: [
+      "宽屏分类与详情分别滚动；视口不宽于 600px 时先展示分类，打开详情时聚焦标题，返回时聚焦当前分类。",
+      "弹窗保持打开时，访问过的分类切换后仍保留挂载，可暂存该分类中的界面状态。",
+      "设置值、保存逻辑、权限和搜索均由调用方管理；可以用 SettingRow 组织各分类的控件。",
+    ],
   },
   {
     name: "SectionGroup",

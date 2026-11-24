@@ -1,3 +1,5 @@
+import SettingsDialogUsage from "./inline-demos/settings-dialog-usage";
+import SettingsDialogUsageSource from "./inline-demos/settings-dialog-usage.tsx?raw";
 import SettingRowUsage from "./inline-demos/setting-row-usage";
 import SettingRowUsageSource from "./inline-demos/setting-row-usage.tsx?raw";
 import PanelIde from "./inline-demos/panel-ide";
@@ -444,6 +446,7 @@ export const inlineDocSections: Readonly<
       source: source(SidebarResizeDemoRaw),
     },
   ],
+  SettingsDialog: [{ id: "usage", title: "应用设置", Demo: SettingsDialogUsage, source: source(SettingsDialogUsageSource) }],
   SettingRow: [{ id: "usage", title: "编辑器设置", Demo: SettingRowUsage, source: source(SettingRowUsageSource) }],
   SectionGroup: [
     {

@@ -10,8 +10,7 @@ import { Popover as BPopover } from "@base-ui/react/popover";
 import { Button, cn, MtoneScope, useMtone } from "./basic";
 import { Popover, type PopoverMenuProps, Tooltip } from "./interactive";
 import { Tabs, type TabItem, type TabsProps } from "./tabs";
-const SidebarContext = React.createContext(false);
-const NavSubmenuSelectionContext = React.createContext<(() => void) | null>(null);
+import { NavSubmenuSelectionContext, SidebarContext } from "./navigation-context";
 export interface SidebarTabsOptions extends Pick<TabsProps, "label" | "value" | "defaultValue" | "onValueChange"> {
   items: readonly Pick<TabItem, "value" | "label" | "content" | "disabled" | "icon">[];
 }
