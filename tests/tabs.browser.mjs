@@ -9,15 +9,21 @@ const server = await createServer({
 await server.listen();
 await mkdir("artifacts/tabs-browser", { recursive: true });
 let failed = false;
+const only = process.env.MTONE_TABS_BROWSER;
+if (only && !["chromium", "firefox", "webkit"].includes(only)) throw new Error(`Unknown Tabs browser: ${only}`);
 try {
   for (const [name, engine] of [
     ["chromium", chromium],
     ["firefox", firefox],
     ["webkit", webkit],
   ]) {
+    if (only && name !== only) continue;
     let browser, page;
     try {
-      browser = await engine.launch({ headless: true });
+      browser = await engine.launch({
+        headless: true,
+        executablePath: name === "chromium" ? process.env.CHROMIUM_PATH : undefined,
+      });
       page = await browser.newPage({ viewport: { width: 900, height: 800 } });
       const errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
@@ -87,7 +93,32 @@ try {
       await expect(
         page.getByRole("tab", { name: "Second RTL", exact: true }),
       ).toBeFocused();
+      await page.goto("http://127.0.0.1:5212/tests/fixtures/tabs.html?sizes");
+      for (const [size, height] of [["sm", 28], ["md", 32], ["lg", 36]]) {
+        for (const variant of ["line", "card", "editable-card", "attached"]) {
+          for (const placement of ["top", "bottom", "start", "end"]) {
+            const tabs = page.getByTestId(`preset-${variant}-${size}-${placement}`);
+            const list = tabs.getByRole("tablist");
+            const frames = list.locator(".mt-tab-item");
+            await expect(frames).toHaveCount(2);
+            const heights = await frames.evaluateAll(nodes =>
+              nodes.map(node => node.getBoundingClientRect().height));
+            expect(heights, `${variant} ${size} ${placement}`).toEqual([height, height]);
+            const first = list.getByRole("tab", { name: "First", exact: true });
+            const [frame, hit] = await Promise.all([frames.first().boundingBox(), first.boundingBox()]);
+            expect(hit.height).toBeCloseTo(height - (["card", "editable-card"].includes(variant) ? 2 : 0));
+            expect(hit.y).toBeGreaterThanOrEqual(frame.y);
+            if (variant === "attached" && placement === "top") {
+              await expect(list).toHaveCSS("min-block-size", `${height}px`);
+              const body = await tabs.getByRole("tabpanel").boundingBox();
+              expect(frame.y + frame.height).toBeCloseTo(body.y, 0);
+            }
+          }
+        }
+      }
+      await expect(page.getByRole("tablist", { name: "Inner default", exact: true }).locator(".mt-tab-item")).toHaveCSS("height", "32px");
       await page.goto("http://127.0.0.1:5212/tests/fixtures/tabs-compact.html");
+      await expect(page.getByRole("tablist", { name: "Unchanged line", exact: true }).locator(".mt-tab-item")).toHaveCSS("height", "32px");
       for (const variant of ["line", "card", "editable-card"]) {
         for (const [size, font] of [["small", 12], ["medium", 14], ["large", 15]]) {
           for (const placement of ["top", "bottom", "start", "end"]) {

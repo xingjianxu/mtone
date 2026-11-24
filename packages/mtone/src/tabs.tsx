@@ -20,6 +20,8 @@ export interface TabItem {
   forceRender?: boolean;
   destroyOnHidden?: boolean;
 }
+/** Shared tab item height presets for Tabs and Panel. */
+export type TabsSize = "sm" | "md" | "lg";
 /** A theme accent preset, or any valid CSS color value. */
 export type TabsIndicatorColor = MtoneAccent | (string & {});
 
@@ -35,7 +37,8 @@ export interface TabsProps extends Omit<
   placement?: "top" | "bottom" | "start" | "end";
   /** Attached connects to the panel at top; other placements use line styling. */
   variant?: "line" | "card" | "editable-card" | "attached";
-  size?: "small" | "medium" | "large";
+  /** Tab item height preset; the legacy size names only vary typography. */
+  size?: TabsSize | "small" | "medium" | "large";
   /** Color of the selected line indicator; defaults to currentColor. */
   indicatorColor?: TabsIndicatorColor;
   centered?: boolean;
@@ -76,7 +79,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     label,
     placement = "top",
     variant = "line",
-    size = "medium",
+    size = "md",
     indicatorColor,
     centered = false,
     gap,

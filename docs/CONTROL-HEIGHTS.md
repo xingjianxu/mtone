@@ -6,7 +6,7 @@ This is the rendered outer **border-box**, including borders, rather than a chil
 | Surface | Default |
 | --- | --- |
 | Button, including inherited ButtonGroup size and icon-only mode | 32px normal |
-| Tabs item in every variant, size and placement | 32px |
+| Tabs and Panel tab item, all variants and placements | `sm` 28px, `md` (default) 32px, `lg` 36px |
 | Input, Input.Search, DatePicker input | 32px |
 | Single Select, TreeSelect, Cascader and AutoComplete trigger/input | 32px |
 | NumberInput complete group | 32px |
@@ -28,7 +28,7 @@ Navigation row gaps, group headings and the collapsed sidebar controls are uncha
   consult the installed declarations for an older release.
 - The 32px baseline does not resize typography, icons, Input.TextArea, option lists,
   calendar popups, plain tags, checkbox/radio controls, switches, sliders or layout regions.
-  Tabs use the same item height at every size; size changes typography only.
+  The shared Tabs and Panel height presets are independent of the global 32px baseline; legacy Tabs sizes still change typography only.
 - Independent component size variants remain supported. TreeSelect, Cascader and
   AutoComplete keep 24px small and 34px large variants; their default is now 32px.
 - Button and ButtonGroup use `small` / `normal` / `large` (28 / 32 / 36px).

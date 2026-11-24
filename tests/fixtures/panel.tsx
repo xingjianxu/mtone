@@ -4,7 +4,6 @@ import { createRoot } from "react-dom/client";
 import { MtoneProvider, Panel } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 import PanelIde from "../../apps/docs/inline-demos/panel-ide";
-import PanelTabPlacement from "../../apps/docs/inline-demos/panel-tab-placement";
 
 function Fixture() {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -26,7 +25,6 @@ function Fixture() {
       </div>
     </MtoneProvider>
     <div data-testid="ide"><PanelIde /></div>
-    <div data-testid="placement"><PanelTabPlacement /></div>
     <MtoneProvider theme="dark" locale="en">
       <div data-testid="rtl-rail" style={{ width: "min(100%, 260px)", height: 132 }}>
         <Panel label="RTL tabs" tabPlacement="right" dir="rtl"

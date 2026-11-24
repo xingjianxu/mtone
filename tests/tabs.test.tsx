@@ -208,3 +208,14 @@ it.each(["bottom", "start", "end"] as const)(
     expect(orientation).toBe(placement === "bottom" ? "horizontal" : "vertical");
   },
 );
+
+
+it("defaults to md and exposes the requested height preset without remounting tab content", () => {
+  const items = [{ value: "a", label: "A", content: <input aria-label="Draft" defaultValue="Keep" /> }];
+  const { rerender } = render(<Tabs items={items} />);
+  const field = screen.getByRole("textbox", { name: "Draft" });
+  expect(screen.getByRole("tablist").closest(".mt-tabs")).toHaveAttribute("data-size", "md");
+  rerender(<Tabs items={items} size="sm" />);
+  expect(screen.getByRole("tablist").closest(".mt-tabs")).toHaveAttribute("data-size", "sm");
+  expect(screen.getByRole("textbox", { name: "Draft" })).toBe(field);
+});

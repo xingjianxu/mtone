@@ -242,6 +242,7 @@ export default function Demo() {
 - items: Pick<TabItem, 'value' | 'label' | 'content' | 'disabled' | 'icon'>[]. 标签数据。已访问的标签内容在切换和收起后保持挂载。
 - label: string. 标签列表的无障碍名称。
 - value / defaultValue / onValueChange: string / string / (value: string) => void. 受控或非受控的选中标签。
+- size: "sm" | "md" | "lg" (default: "md"). 标签项含边框的高度为 28px、32px 或 36px。不会修改外部分栏尺寸。
 - tabPlacement: "top" | "bottom" | "left" | "right" (default: "top"). 标签栏相对内容的物理方位，与 Panel 的外部停靠无关。左右为纵向标签栏。
 - actions: ReactNode. 标签栏末端的附加操作，收起时仍可操作。
 - collapsed / defaultCollapsed / onCollapsedChange: boolean / boolean / (collapsed: boolean) => void (default: defaultCollapsed: false). 受控或非受控的收起状态，收起后只显示标签栏。
@@ -1804,7 +1805,7 @@ export default function Demo() {
 - onValueChange: (value: string) => void. 用户切换及非受控有效回退时触发。
 - placement: "top" | "bottom" | "start" | "end". 默认 top；start/end 为逻辑方向。
 - variant: "line" | "card" | "editable-card" | "attached". 默认 line。attached 的顶部选中项与内容区相接；bottom/start/end 保留指定位置并使用 line 样式。
-- size: "small" | "medium" | "large". 默认 medium。所有变体、尺寸和位置的标签项外高均为 32px（含边框）；size 仍区分字号。
+- size: "sm" | "md" | "lg" | "small" | "medium" | "large" (default: "md"). 标签项外高（含边框）：sm 28px、md 32px、lg 36px，适用于全部变体和位置。旧值 small、medium、large 保留原字号和 32px 外高。
 - indicatorColor: TabsIndicatorColor (default: currentColor). 使用 line 样式时的选中指示线颜色，包含 attached 在非顶部位置的线型回退。支持主题预设 neutral/blue/green/orange/red/purple/teal/coral，或任意有效 CSS 颜色；不改变基准线和文字颜色。
 - centered / gap: boolean / number. 居中排列（溢出时回到起点）；间隔单位 px，最小 0。默认线型为 6px，card/editable-card 和顶部 attached 为 4px。
 - extraStart / extraEnd: ReactNode. 导航栏前后附加内容。

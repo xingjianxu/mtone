@@ -1,8 +1,11 @@
 .mt-tabs {
   --mt-tabs-gap: initial;
+  --_mt-tab-item-height: 32px;
   --mt-tabs-indicator-color: initial;
   min-width: 0;
 }
+.mt-tabs[data-size="sm"] { --_mt-tab-item-height: 28px; }
+.mt-tabs[data-size="lg"] { --_mt-tab-item-height: 36px; }
 .mt-tab-bar {
   display: flex;
   align-items: center;
@@ -19,7 +22,7 @@
 }
 .mt-tab-item {
   box-sizing: border-box;
-  height: 32px;
+  height: var(--_mt-tab-item-height);
   display: flex;
   align-items: stretch;
   flex-shrink: 0;
@@ -342,7 +345,7 @@
 }
 
 /* Align both states one pixel down. Their unpainted bottom edge leaves
-   the single list divider visible without changing the 32px frame. */
+   the single list divider visible without changing the frame height. */
 .mt-tabs:is([data-variant="card"], [data-variant="editable-card"])[data-placement="top"] > .mt-tab-bar > .mt-tab-list > .mt-tab-item {
   position: relative;
   top: 1px;
@@ -386,7 +389,7 @@
 }
 .mt-tabs[data-variant="attached"] > .mt-tab-bar > .mt-tab-list {
   align-self: flex-end;
-  min-block-size: 32px;
+  min-block-size: var(--_mt-tab-item-height);
   overflow-y: hidden;
   border-block-end: 0;
   scrollbar-color: var(--mt-muted, #787774) var(--mt-tabs-attached-surface);

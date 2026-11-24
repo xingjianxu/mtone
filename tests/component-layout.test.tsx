@@ -179,3 +179,10 @@ test("demo disclosure uses Typography.Code and copies the exact source", async (
     else Reflect.deleteProperty(navigator, "clipboard");
   }
 });
+
+
+test("redirects the former Panel tab placement section to the combined IDE example", () => {
+  expect(parseRoute("#/components/Panel?section=tab-placement")).toEqual({
+    kind: "component", name: "Panel", section: "ide",
+  });
+});

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FileText } from "lucide-react";
 import { createRoot } from "react-dom/client";
 import { Tabs, Card, MtoneProvider } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
@@ -102,4 +103,25 @@ function App() {
     </MtoneProvider>
   );
 }
-createRoot(document.getElementById("root")!).render(<App />);
+function SizeFixture() {
+  return <MtoneProvider locale="en"><main>
+{(["line", "card", "editable-card", "attached"] as const).flatMap(variant =>
+  (["sm", "md", "lg"] as const).flatMap(size =>
+    (["top", "bottom", "start", "end"] as const).map(placement =>
+      <Tabs key={`${variant}-${size}-${placement}`} data-testid={`preset-${variant}-${size}-${placement}`}
+        label={`${variant} ${size} ${placement} preset`} variant={variant} size={size} placement={placement}
+        onEdit={() => {}} items={[
+          { value: "a", label: "First", icon: <FileText />, content: "First panel" },
+          { value: "b", label: "Second", content: "Second panel" },
+        ]} />
+    )
+  )
+)}
+<Tabs size="lg" label="Outer lg" items={[{value:"outer",label:"Outer lg tab",content:
+  <Tabs label="Inner default" items={[{value:"inner",label:"Inner default tab",content:"Nested"}]}/>
+}]}/>
+  </main></MtoneProvider>;
+}
+createRoot(document.getElementById("root")!).render(
+  new URLSearchParams(location.search).has("sizes") ? <SizeFixture /> : <App />,
+);

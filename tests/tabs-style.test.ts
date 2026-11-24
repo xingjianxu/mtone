@@ -13,10 +13,15 @@ function declarations(selector: string, media?: string) {
   });
   return values;
 }
-it("uses a single 32px border-box item height and preserves size typography", () => {
+it("uses one border-box height token for all presets and preserves legacy typography", () => {
   const item = declarations(".mt-tab-item");
   expect(item["box-sizing"]).toBe("border-box");
-  expect(item.height).toBe("32px");
+  expect(item.height).toBe("var(--_mt-tab-item-height)");
+  expect(declarations(".mt-tabs")["--_mt-tab-item-height"]).toBe("32px");
+  expect(declarations('.mt-tabs[data-size="sm"]')["--_mt-tab-item-height"]).toBe("28px");
+  expect(declarations('.mt-tabs[data-size="lg"]')["--_mt-tab-item-height"]).toBe("36px");
+  expect(declarations('.mt-tabs[data-variant="attached"] > .mt-tab-bar > .mt-tab-list')["min-block-size"])
+    .toBe("var(--_mt-tab-item-height)");
   expect(declarations(".mt-tab")["line-height"]).toBe("20px");
   expect(declarations(root)["--mt-tabs-card-height"]).toBeUndefined();
   expect(declarations(root)["--mt-tabs-card-font-size"]).toBe("14px");

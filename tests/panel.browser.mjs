@@ -43,13 +43,16 @@ try {
   await expect(standalone.getByRole("button", { name: "Collapse panel" })).toBeFocused();
 
   const ide = page.getByTestId("ide");
+  const dockControls = ide.getByRole("group", { name: "停靠位置" });
+  const placementControls = ide.getByRole("group", { name: "标签位置" });
+  const sizeControls = ide.getByRole("group", { name: "标签高度" });
   const splitter = ide.locator(".mt-splitter");
   const workbench = ide.getByLabel("工作面板", { exact: true });
   const editor = ide.getByLabel("代码编辑器", { exact: true });
   const sep = ide.getByRole("separator");
   const workbenchPanel = workbench.locator(".mt-ide-panel");
   const command = workbench.getByRole("textbox", { name: "输入命令" });
-  await expect(ide.getByRole("button", { name: "底部" })).toHaveAttribute("aria-pressed", "true");
+  await expect(dockControls.getByRole("button", { name: "底部" })).toHaveAttribute("aria-pressed", "true");
   await expect(splitter).toHaveAttribute("data-orientation", "vertical");
   const bottomBefore = await workbench.boundingBox();
   assert(bottomBefore.y > (await editor.boundingBox()).y);
@@ -82,7 +85,7 @@ try {
     ["左侧", "horizontal", true],
     ["右侧", "horizontal", false],
   ]) {
-    await ide.getByRole("button", { name: dock }).click();
+    await dockControls.getByRole("button", { name: dock }).click();
     await expect(splitter).toHaveAttribute("data-orientation", orientation);
     const axis = orientation === "vertical" ? "y" : "x";
     const dimension = orientation === "vertical" ? "height" : "width";
@@ -103,46 +106,56 @@ try {
   await workbench.getByRole("button", { name: "收起面板" }).click();
   await expect(workbench.getByRole("button", { name: "展开面板" })).toBeVisible();
   await expect(workbench.getByRole("tablist")).toBeVisible();
-  const placementDemo = page.getByTestId("placement");
-  const placement = placementDemo.locator(".mt-ide-panel");
-  const demoBar = placement.locator(".mt-tab-bar");
-  await placementDemo.getByRole("tab", { name: "终端" }).click();
-  const demoCommand = placementDemo.getByRole("textbox", { name: "面板命令" });
-  await demoCommand.fill("ls");
-  const directions = [
-    ["标签在顶部", "top"],
-    ["标签在底部", "bottom"],
-    ["标签在左侧", "left"],
-    ["标签在右侧", "right"],
-  ];
+  await workbench.getByRole("button", { name: "展开面板" }).click();
+  const demoBar = workbenchPanel.locator(".mt-tab-bar");
+  const barFrames = workbench.getByRole("tablist").locator(".mt-tab-item");
+  await expect(sizeControls.getByRole("button", {name: "md", exact: true})).toHaveAttribute("aria-pressed", "true");
+  const dockedWidth = (await workbench.boundingBox()).width;
+  const directions = [["顶部", "top"], ["底部", "bottom"], ["左侧", "left"], ["右侧", "right"]];
   for (const [label, direction] of directions) {
-    await placementDemo.getByRole("button", { name: label }).click();
-    await expect(placement).toHaveAttribute("data-panel-tab-placement", direction);
-    await expect(demoCommand).toHaveValue("ls");
+    await placementControls.getByRole("button", { name: label }).click();
+    await expect(workbenchPanel).toHaveAttribute("data-panel-tab-placement", direction);
+    await expect(command).toHaveValue("npm run dev");
     const side = direction === "left" || direction === "right";
+    for (const [preset, height] of [["sm", 28], ["md", 32], ["lg", 36]]) {
+      await sizeControls.getByRole("button", { name: preset, exact: true }).click();
+      expect(await barFrames.evaluateAll(frames => frames.map(frame => frame.getBoundingClientRect().height)))
+        .toEqual([height, height, height]);
+      assert(Math.abs((await workbench.boundingBox()).width - dockedWidth) < 1, "Changing tab size leaves the expanded Splitter width intact");
+      await expect(command).toHaveValue("npm run dev");
+    }
     const bar = await demoBar.boundingBox();
-    const content = await placementDemo.getByRole("tabpanel").boundingBox();
+    const content = await workbench.getByRole("tabpanel", { name: "终端" }).boundingBox();
     if (direction === "top") assert(bar.y + bar.height <= content.y + 1);
     if (direction === "bottom") assert(bar.y >= content.y + content.height - 1);
     if (direction === "left") assert(bar.x + bar.width <= content.x + 1);
     if (direction === "right") assert(bar.x >= content.x + content.width - 1);
     if (side) {
       assert.equal(bar.width, 44);
-      await expect(placementDemo.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical");
-      await expect(placementDemo.getByRole("tab", { name: "终端" })).toHaveAttribute("title", "终端");
-      await expect(placementDemo.getByRole("tab", { name: "终端" }).locator(".mt-tab-label")).toHaveCSS("clip-path", "inset(50%)");
-      await expect(placementDemo.getByRole("tab", { name: "终端" })).toHaveAttribute("aria-selected", "true");
+      await expect(workbench.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical");
+      await expect(workbench.getByRole("tab", { name: "终端" })).toHaveAttribute("title", "终端");
+      await expect(workbench.getByRole("tab", { name: "终端" }).locator(".mt-tab-label")).toHaveCSS("clip-path", "inset(50%)");
+      await expect(workbench.getByRole("tab", { name: "终端" })).toHaveAttribute("aria-selected", "true");
     }
-    await placementDemo.getByRole("button", { name: "收起面板" }).click();
-    await expect(placementDemo.getByRole("tabpanel")).toHaveCount(0);
-    await expect(placementDemo.getByRole("button", { name: "工作区信息" })).toBeVisible();
-    const toggle = placementDemo.getByRole("button", { name: "展开面板" });
+    await sep.dblclick();
+    await expect(workbench.getByRole("tabpanel")).toHaveCount(0);
+    await expect(workbench.getByRole("button", { name: "清空终端记录" })).toBeVisible();
+    const toggle = workbench.getByRole("button", { name: "展开面板" });
     await expect(toggle).toBeVisible();
-    assert(Math.abs((await placement.boundingBox())[side ? "width" : "height"] - (side ? 44 : 34)) < 1);
-    if (side) assert(Math.abs((await demoBar.boundingBox()).x - bar.x) < 1, "Collapsed rail stays on the selected physical edge");
+    await expect.poll(async () => (await workbenchPanel.boundingBox())[side ? "width" : "height"])
+      .toBeCloseTo(side ? 44 : (direction === "bottom" ? 37 : 38), 0);
     await toggle.press("Enter");
-    await expect(demoCommand).toHaveValue("ls");
+    await expect.poll(async () => (await workbench.boundingBox()).width).toBeCloseTo(dockedWidth, 0);
+    await expect(command).toHaveValue("npm run dev");
   }
+
+  // A vertical Splitter must not squash a side rail into a horizontal 34px slot.
+  await dockControls.getByRole("button", { name: "底部" }).click();
+  await sep.press("Enter");
+  await expect(workbench.getByRole("button", { name: "展开面板" })).toBeVisible();
+  await expect(workbench.getByRole("button", { name: "清空终端记录" })).toBeVisible();
+  await sep.press("Enter");
+  await expect(command).toHaveValue("npm run dev");
 
   const rtl = page.getByTestId("rtl-rail");
   const rtlBar = rtl.locator(".mt-tab-bar");

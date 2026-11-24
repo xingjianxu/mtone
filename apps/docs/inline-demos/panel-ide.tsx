@@ -1,6 +1,6 @@
 import React from "react";
-import { Trash2 } from "lucide-react";
-import { Button, ButtonGroup, Input, Panel, Splitter } from "../../../packages/mtone/src";
+import { CircleAlert, List, Terminal, Trash2 } from "lucide-react";
+import { Button, ButtonGroup, Input, Panel, Splitter, type TabsSize } from "../../../packages/mtone/src";
 
 const placements = [
   { value: "top", label: "顶部" },
@@ -8,10 +8,13 @@ const placements = [
   { value: "left", label: "左侧" },
   { value: "right", label: "右侧" },
 ] as const;
-type Dock = (typeof placements)[number]["value"];
+type Placement = (typeof placements)[number]["value"];
+const tabSizes = ["sm", "md", "lg"] as const;
 
 export default function Demo() {
-  const [dock, setDock] = React.useState<Dock>("bottom");
+  const [dock, setDock] = React.useState<Placement>("bottom");
+  const [tabPlacement, setTabPlacement] = React.useState<Placement>("top");
+  const [size, setSize] = React.useState<TabsSize>("md");
   const [collapsed, setCollapsed] = React.useState(false);
   const ignoreResizeUntilNextInteraction = React.useRef(false);
   const changeCollapsed = (next: boolean) => {
@@ -24,13 +27,17 @@ export default function Demo() {
   const [tab, setTab] = React.useState("terminal");
   const [log, setLog] = React.useState("VITE ready");
   const [terminal, setTerminal] = React.useState("");
-  const [remembered, setRemembered] = React.useState<Partial<Record<Dock, number>>>({});
+  const [remembered, setRemembered] = React.useState<Partial<Record<Placement, number>>>({});
   const [available, setAvailable] = React.useState(0);
   const frame = React.useRef<HTMLDivElement>(null);
   const vertical = dock === "top" || dock === "bottom";
   const first = dock === "top" || dock === "left";
-  const headerSize = vertical ? 34 : 144;
-  const expandedMinSize = vertical ? 80 : headerSize;
+  // The Splitter owns the outer extent. Reserve only what its pinned rail needs.
+  const sideRail = tabPlacement === "left" || tabPlacement === "right";
+  const headerSize = vertical
+    ? (sideRail ? 132 : size === "lg" ? (tabPlacement === "top" ? 38 : 37) : 34)
+    : (sideRail ? 44 : 144);
+  const expandedMinSize = vertical ? Math.max(80, headerSize) : 144;
   const defaultSize = vertical ? 142 : 224;
 
   React.useLayoutEffect(() => {
@@ -58,12 +65,12 @@ export default function Demo() {
   const workbench = <Splitter.Panel key="workbench" id="panel-demo-workbench"
     label="工作面板" min={headerSize} defaultSize={defaultSize}>
     <Panel label="工作区标签" collapsed={collapsed} onCollapsedChange={changeCollapsed}
-      value={tab} onValueChange={setTab}
+      value={tab} onValueChange={setTab} tabPlacement={tabPlacement} size={size}
       actions={<Button iconOnly size="sm" variant="ghost" aria-label="清空终端记录" onClick={() => setLog("")}><Trash2 size={14} /></Button>}
       items={[
-        { value: "problems", label: "问题", content: "没有发现问题。" },
-        { value: "output", label: "输出", content: <code>编译完成</code> },
-        { value: "terminal", label: "终端", content: <>
+        { value: "problems", label: "问题", icon: <CircleAlert />, content: "没有发现问题。" },
+        { value: "output", label: "输出", icon: <List />, content: <code>编译完成</code> },
+        { value: "terminal", label: "终端", icon: <Terminal />, content: <>
           {log && <pre style={{ margin: "0 0 8px" }}>{log}</pre>}
           <Input aria-label="输入命令" placeholder="输入命令" value={terminal} onChange={event => setTerminal(event.target.value)} />
         </> },
@@ -77,10 +84,29 @@ export default function Demo() {
     </pre>
   </Splitter.Panel>;
   return <div style={{ display: "grid", gap: 10, width: "100%", minWidth: 0 }}>
-    <ButtonGroup connected aria-label="停靠位置">
-      {placements.map(({ value, label }) => <Button key={value} size="sm" toggle
-        pressed={dock === value} onClick={() => setDock(value)}>{label}</Button>)}
-    </ButtonGroup>
+    <div style={{ display: "flex", alignItems: "center", gap: "8px 14px", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span aria-hidden="true">停靠</span>
+        <ButtonGroup connected aria-label="停靠位置">
+          {placements.map(({ value, label }) => <Button key={value} size="sm" toggle
+            pressed={dock === value} onClick={() => setDock(value)}>{label}</Button>)}
+        </ButtonGroup>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span aria-hidden="true">标签栏</span>
+        <ButtonGroup connected aria-label="标签位置">
+          {placements.map(({ value, label }) => <Button key={value} size="sm" toggle
+            pressed={tabPlacement === value} onClick={() => setTabPlacement(value)}>{label}</Button>)}
+        </ButtonGroup>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span aria-hidden="true">高度</span>
+        <ButtonGroup connected aria-label="标签高度">
+          {tabSizes.map(value => <Button key={value} size="sm" toggle
+            pressed={size === value} onClick={() => setSize(value)}>{value}</Button>)}
+        </ButtonGroup>
+      </div>
+    </div>
     <div ref={frame} style={{ height: 320, minWidth: 0, border: "1px solid var(--mt-border)", borderRadius: 6, overflow: "hidden" }}>
       <Splitter
         key={dock}

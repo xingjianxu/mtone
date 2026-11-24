@@ -2,7 +2,7 @@ import React from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { useDirection } from "@base-ui/react/direction-provider";
 import { Button, cn, useMtone } from "./basic";
-import { Tabs, TabsPanelContext, tabHint, type TabItem, type TabsProps } from "./tabs";
+import { Tabs, TabsPanelContext, tabHint, type TabItem, type TabsProps, type TabsSize } from "./tabs";
 
 type PanelTab = Pick<TabItem, "value" | "label" | "content" | "disabled" | "icon">;
 
@@ -12,6 +12,8 @@ export interface PanelProps extends Omit<
 >, Pick<TabsProps, "label" | "value" | "defaultValue" | "onValueChange"> {
   items: PanelTab[];
   actions?: React.ReactNode;
+  /** Tab item height, independent of external panel sizing. Defaults to md. */
+  size?: TabsSize;
   /** Physical edge of the tab bar, independent of the surrounding layout. */
   tabPlacement?: "top" | "bottom" | "left" | "right";
   collapsed?: boolean;
@@ -22,6 +24,7 @@ export interface PanelProps extends Omit<
 export function Panel({
   items,
   actions,
+  size = "md",
   tabPlacement = "top",
   collapsed,
   defaultCollapsed = false,
@@ -67,7 +70,7 @@ export function Panel({
         ref={root}
         items={items}
         placement={placement}
-        size="small"
+        size={size}
         indicatorColor="blue"
         destroyOnHidden={false}
         className={cn("mt-ide-panel", className)}

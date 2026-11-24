@@ -185,7 +185,7 @@ export function NumberInput({ label, className, ...props }: NumberInputProps) {
   );
 }
 export { Tabs } from "./tabs";
-export type { TabItem, TabsProps, TabsIndicatorColor } from "./tabs";
+export type { TabItem, TabsProps, TabsIndicatorColor, TabsSize } from "./tabs";
 export interface MenuItem {
   type?: "item";
   icon?: React.ReactNode;

@@ -1,3 +1,5 @@
+import TabsSize from "./secondary-demos/tabs-size";
+import TabsSizeSource from "./secondary-demos/tabs-size.tsx?raw";
 import NavSubmenuUsage from "./secondary-demos/nav-submenu-usage";
 import { colorPresetsHref } from "./color-presets";
 import NavSubmenuUsageSource from "./secondary-demos/nav-submenu-usage.tsx?raw";
@@ -1095,6 +1097,7 @@ export default function Demo() {
     { id: "rtl", title: "从右向左", Demo: Rate4, source: source(Rate4Source) },
   ],
   Tabs: [
+    { id: "size", title: "标签高度", Demo: TabsSize, source: source(TabsSizeSource) },
     {
       id: "usage",
       title: "基础与附加操作",
@@ -1123,7 +1126,7 @@ export default function Demo() {
     },
     {
       id: "placement",
-      title: "位置与尺寸",
+      title: "标签位置",
       Demo: Tabs2,
       source: source(Tabs2Source),
     },

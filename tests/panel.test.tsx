@@ -91,6 +91,14 @@ it("toggles the docked panel from its separator without losing the command", () 
   const input = screen.getByRole("textbox", { name: "输入命令" });
   fireEvent.change(input, { target: { value: "npm run dev" } });
 
+  const tabBar = screen.getByRole("tablist", { name: "工作区标签" });
+  expect(tabBar.closest(".mt-tabs")).toHaveAttribute("data-size", "md");
+  fireEvent.click(within(screen.getByRole("group", { name: "标签高度" })).getByRole("button", { name: "lg" }));
+  fireEvent.click(within(screen.getByRole("group", { name: "标签位置" })).getByRole("button", { name: "右侧" }));
+  expect(tabBar.closest(".mt-tabs")).toHaveAttribute("data-size", "lg");
+  expect(tabBar).toHaveAttribute("aria-orientation", "vertical");
+  expect(screen.getByRole("textbox", { name: "输入命令" })).toBe(input);
+
   fireEvent.doubleClick(separator);
   expect(screen.getByRole("button", { name: "展开面板" })).toBeVisible();
   expect(screen.queryByRole("textbox", { name: "输入命令" })).not.toBeInTheDocument();
