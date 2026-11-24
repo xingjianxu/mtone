@@ -427,18 +427,21 @@ function DocsBody() {
   const [query, setQuery] = useState("");
   const [mobile, setMobile] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarAlignmentHash = useRef<string | null>(window.location.hash);
   const results = searchDocs(query).filter((doc) => query.trim() || !doc.sidebarParent);
   useLayoutEffect(() => {
-    // Align only on a fresh document load, not on in-app hash navigation.
+    // Align on initial load or after Spotlight, not on ordinary sidebar navigation.
+    const align = sidebarAlignmentHash.current === window.location.hash;
+    sidebarAlignmentHash.current = null;
     const sidebar = sidebarRef.current;
-    if (route.kind !== "component" || !sidebar) return;
+    if (!align || route.kind !== "component" || !sidebar) return;
     const current = sidebar.querySelector('nav a[aria-current="page"]');
     if (!current) return;
     const row = current.getBoundingClientRect();
     const viewportTop = sidebar.getBoundingClientRect().top + sidebar.clientTop;
     // Move only this scrollport; scrollIntoView can also move the main page.
     sidebar.scrollTop += row.top + row.height / 2 - viewportTop - sidebar.clientHeight / 2;
-  }, []);
+  }, [route]);
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobile(false);
@@ -505,7 +508,13 @@ function DocsBody() {
                   group,
                   onSelect: () => {
                     setMobile(false);
-                    window.location.hash = componentDocHref(item.name);
+                    const href = componentDocHref(item.name);
+                    const nextRoute = parseRoute(href);
+                    if (nextRoute.kind === "component" &&
+                      (route.kind !== "component" || route.name !== nextRoute.name)) {
+                      sidebarAlignmentHash.current = href;
+                    }
+                    window.location.hash = href;
                   },
                 })),
               )}

@@ -205,6 +205,32 @@ try {
     assert.equal(await scrollTop(), 0, "the first component clamps to the top");
     assert.equal(await direct.evaluate(() => scrollY), 0);
     assert(await direct.evaluate(() => document.activeElement === document.body));
+    const searchComponent = async (name) => {
+      await direct.getByRole("button", { name: "搜索组件", exact: true }).click();
+      const search = direct.getByRole("dialog").getByRole("combobox");
+      await search.fill(name);
+      await search.press("Enter");
+      await direct.getByRole("dialog").waitFor({ state: "detached" });
+    };
+    await searchComponent("TreeSelect");
+    await currentLink("TreeSelect").waitFor();
+    await assertCentered("TreeSelect");
+    assert.equal(await direct.evaluate(() => scrollY), 0);
+
+    // Reselecting the same result is not a cross-component navigation.
+    await scrollport.evaluate((node) => { node.scrollTop -= 80; });
+    const beforeReselect = await scrollTop();
+    await searchComponent("TreeSelect");
+    assert.equal(await scrollTop(), beforeReselect, "same-component Spotlight selection does not recenter");
+
+    await searchComponent("CascaderPanel");
+    await direct.waitForURL("**/#/components/Cascader?section=panel");
+    await currentLink("Cascader").waitFor();
+    await assertCentered("Cascader");
+    await direct.waitForFunction(() => document.activeElement?.id === "panel");
+    const panelSection = await direct.locator("#panel").boundingBox();
+    assert(panelSection.y >= 60 && panelSection.y < 200, "the Spotlight result preserves its section anchor");
+
     await openDirect("#/components/MtoneScope", "MtoneScope");
     // scrollTop can be fractional even though scrollHeight/clientHeight are integers.
     const bottom = await scrollport.evaluate((node) => node.scrollHeight - node.clientHeight);

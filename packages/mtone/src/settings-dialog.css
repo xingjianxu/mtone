@@ -86,3 +86,51 @@
 .mt-settings-dialog-layout [hidden] {
   display: none;
 }
+
+.mt-settings-dialog-search-input {
+  width: 100%;
+  margin-block-end: 8px;
+}
+.mt-settings-dialog-results {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mt-settings-dialog-results [role="option"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 13px;
+  line-height: 1.35;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.mt-settings-dialog-results [role="option"] small,
+.mt-settings-dialog-no-results {
+  color: var(--mt-muted);
+  font-size: 12px;
+}
+.mt-settings-dialog-results [role="option"]:hover,
+.mt-settings-dialog-results [aria-selected="true"] {
+  background: var(--mt-hover);
+}
+.mt-settings-dialog-results [aria-selected="true"] {
+  box-shadow: inset 0 0 0 1px var(--mt-focus);
+}
+.mt-settings-dialog-no-results {
+  padding: 6px 8px;
+}
+.mt-settings-dialog-result-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
+.mt-settings-dialog-detail [data-mt-settings-highlight] {
+  background: color-mix(in srgb, var(--mt-accent-blue) 12%, transparent);
+  outline: 1px solid var(--mt-focus);
+  outline-offset: -1px;
+}

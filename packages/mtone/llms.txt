@@ -1620,53 +1620,135 @@ export default function Demo() {
 
 ### SettingsDialog
 
-- [SettingsDialog](https://xingjianxu.github.io/mtone/#/components/SettingsDialog): 带分类导航的设置对话框，设置项由调用方提供。
+- [SettingsDialog](https://xingjianxu.github.io/mtone/#/components/SettingsDialog): 带分类导航的设置对话框，可搜索并定位调用方提供的设置项。
 - Import: SettingsDialog, SettingRow, Button, Switch, NumberInput, Select from @bixlab/mtone
 - categories: readonly SettingsDialogCategory[]. 依次传入各分类的唯一 value、label、可选 icon 和 content。
 - value / defaultValue: string. 受控或非受控的当前分类；未提供或找不到对应分类时使用第一项。
 - onValueChange: (value: string) => void. 请求切换到另一分类时触发。
 - categoriesLabel: string. 为分类导航提供自定义的可访问名称。
-- search: ReactNode | (context: SettingsDialogSearchContext) => ReactNode. 可选的搜索入口；调用方自行实现输入和匹配，函数参数中的 selectCategory 可跳到目标分类。
+- searchIndex: readonly SettingsDialogSearchEntry[]. 启用内建搜索。每条由 category（分类 value）、id（分类内容中的元素 ID）、label（设置名称）和可选 keywords 组成。
+- search: ReactNode | (context: SettingsDialogSearchContext) => ReactNode. 自定义搜索入口，优先于 searchIndex；可以使用 selectCategory 切换分类。
 - Dialog 属性: Omit<DialogProps, 'children'>. 沿用 Dialog 的 title、description、trigger、open、defaultOpen、onOpenChange、footer、modal 和 className。
 - 宽屏分类与详情分别滚动；视口不宽于 600px 时先展示分类，打开详情时聚焦标题，返回时聚焦当前分类。
 - 弹窗保持打开时，访问过的分类切换后仍保留挂载，可暂存该分类中的界面状态。
-- 设置值、保存逻辑、权限和搜索均由调用方管理；可以用 SettingRow 组织各分类的控件。
+- 搜索匹配设置名、文本分类名和关键词；自定义分类标签为 React 节点时以分类 value 匹配。上下键选择，Enter 定位，Escape 清空。
+- 定位后恢复分类导航并在详情内部滚动及短暂高亮目标；请将 ID 放在可聚焦的行或标题（如 SettingRow 上设置 tabIndex={-1}）。设置值、保存逻辑和权限仍由调用方管理。
 
 ```tsx
 import React from "react";
-import { Button, NumberInput, Select, SettingRow, SettingsDialog, Switch } from "@bixlab/mtone";
+import {
+  Button,
+  NumberInput,
+  Select,
+  SettingRow,
+  SettingsDialog,
+  Switch,
+  type SettingsDialogSearchEntry,
+} from "@bixlab/mtone";
 import "@bixlab/mtone/styles.css";
 
+const searchIndex = [
+  {
+    category: "general",
+    id: "settings-auto-save",
+    label: "自动保存",
+    keywords: ["草稿", "autosave"],
+  },
+  {
+    category: "general",
+    id: "settings-notifications",
+    label: "通知",
+    keywords: ["提醒"],
+  },
+  {
+    category: "editor",
+    id: "settings-context",
+    label: "光标上下文行数",
+    keywords: ["光标", "cursor"],
+  },
+  {
+    category: "editor",
+    id: "settings-spaces",
+    label: "Tab 空格数",
+    keywords: ["缩进", "indent"],
+  },
+  {
+    category: "privacy",
+    id: "settings-analytics",
+    label: "使用情况统计",
+    keywords: ["匿名", "analytics"],
+  },
+] satisfies readonly SettingsDialogSearchEntry[];
+
 export default function Demo() {
-  return <SettingsDialog
-    title="应用设置"
-    trigger={<Button>打开设置</Button>}
-    categories={[
-      { value: "general", label: "常规", content: (
-        <SettingRow.Group aria-label="常规设置">
-          <SettingRow title="自动保存" description="编辑时自动保存草稿。"
-            control={props => <Switch {...props} defaultChecked />} />
-          <SettingRow title="通知" description="在任务完成时发送提醒。"
-            control={props => <Switch {...props} />} />
-        </SettingRow.Group>
-      ) },
-      { value: "editor", label: "编辑器", content: (
-        <SettingRow.Group aria-label="编辑器设置">
-          <SettingRow title="光标上下文行数" control={props => <NumberInput {...props} defaultValue={3} />} />
-          <SettingRow title="Tab 空格数" control={props => (
-            <Select {...props} defaultValue="4" options={[2, 4, 8].map(value => ({
-              value: String(value),
-              label: `${value} 个空格`,
-            }))} />
-          )} />
-        </SettingRow.Group>
-      ) },
-      { value: "privacy", label: "隐私", content: (
-        <SettingRow title="使用情况统计" description="发送匿名使用数据。"
-          control={props => <Switch {...props} />} />
-      ) },
-    ]}
-  />;
+  return (
+    <SettingsDialog
+      title="应用设置"
+      trigger={<Button>打开设置</Button>}
+      searchIndex={searchIndex}
+      categories={[
+        {
+          value: "general",
+          label: "常规",
+          content: (
+            <SettingRow.Group aria-label="常规设置">
+              <SettingRow
+                id="settings-auto-save"
+                title="自动保存"
+                description="编辑时自动保存草稿。"
+                control={(props) => <Switch {...props} defaultChecked />}
+              />
+              <SettingRow
+                id="settings-notifications"
+                title="通知"
+                description="在任务完成时发送提醒。"
+                control={(props) => <Switch {...props} />}
+              />
+            </SettingRow.Group>
+          ),
+        },
+        {
+          value: "editor",
+          label: "编辑器",
+          content: (
+            <SettingRow.Group aria-label="编辑器设置">
+              <SettingRow
+                id="settings-context"
+                title="光标上下文行数"
+                control={(props) => <NumberInput {...props} defaultValue={3} />}
+              />
+              <SettingRow
+                id="settings-spaces"
+                title="Tab 空格数"
+                control={(props) => (
+                  <Select
+                    {...props}
+                    defaultValue="4"
+                    options={[2, 4, 8].map((value) => ({
+                      value: String(value),
+                      label: `${value} 个空格`,
+                    }))}
+                  />
+                )}
+              />
+            </SettingRow.Group>
+          ),
+        },
+        {
+          value: "privacy",
+          label: "隐私",
+          content: (
+            <SettingRow
+              id="settings-analytics"
+              title="使用情况统计"
+              description="发送匿名使用数据。"
+              control={(props) => <Switch {...props} />}
+            />
+          ),
+        },
+      ]}
+    />
+  );
 }
 
 ```
