@@ -22,6 +22,7 @@ This file describes this package checkout, not necessarily the latest published 
 - Pair controlled values/open state with the documented change callbacks; defaultValue/defaultOpen are for uncontrolled initial state.
 - Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact. Focus uses --mt-focus (#93B4DC): existing input borders change color only; other controls use a single 1px inset edge without changing layout. Select option highlights remain background-only in all modes.
 - Shared theme accents: use --mt-accent-neutral/blue/green/orange/red/purple/teal/coral with CSS var() or override the matching keys via MtoneProvider tokens. Tabs indicatorColor accepts these preset names or a CSS color for the selected line only.
+- Selected surfaces: use --mt-select-surface for pale-blue selected items and located settings rows. It is #E9EEF4 in light and #293746 in dark mode, not an accent color or focus-border token.
 - Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.
 - Use Tag for content labels with optional removal, and Status for a state indicator. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.
 - Toast notifications need ToastProvider; useToast exposes add, success, error, info, update, promise and close (verify installed declarations before use).
@@ -1945,7 +1946,7 @@ export default function Demo() {
 - directory / expandAction: boolean / false | "click" | "doubleClick" (default: false / "click"). 设置 directory 开启目录模式；默认点击展开，false 禁用标题触发展开但保留箭头 / 方向键。
 - label / className / style: string / string / CSSProperties. 可访问名称、根类名与样式；支持其余不冲突的 div 属性。
 - ref: React.Ref<TreeRef>. 暴露 nativeElement、focus()、scrollTo({ key, align?, offset?, autoExpand? })；align 为 top / bottom / auto。autoExpand 只在非受控展开模式生效。
-- 文档的交互配置示例可即时切换连接线、节点图标、复选框、多选，并调整 itemHeight 和 gap；使用恢复默认可重置示例。
+- 文档的交互配置示例可切换连接线、节点图标、整行铺满、复选框、独立勾选、多选、选择、禁用与目录模式，调整目录标题展开方式、行高、间距、缩进和可视高度。恢复默认会还原展开状态并清除选择和勾选；异步加载、虚拟滚动、拖放和节点渲染见独立示例。
 - TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。
 - 勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。
 - 支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。
@@ -2861,7 +2862,7 @@ export default function Demo() {
 - [PropertyList](https://xingjianxu.github.io/mtone/#/components/PropertyList): 文档属性的定义列表容器。
 - Import: PropertyList, PropertyItem from @bixlab/mtone
 - children: ReactNode. 组件内容。
-- 使用 dl 语义，与 PropertyItem 搭配。
+- 使用 dl 语义，与本页 PropertyItem 小节中的属性行搭配。
 
 ```tsx
 import { PropertyList, PropertyItem } from "@bixlab/mtone";
@@ -2876,7 +2877,7 @@ export default function Demo() {
 
 ### PropertyItem
 
-- [PropertyItem](https://xingjianxu.github.io/mtone/#/components/PropertyItem): 展示一行属性名和值。
+- [PropertyItem](https://xingjianxu.github.io/mtone/#/components/PropertyList?section=property-item): 展示一行属性名和值。
 - Import: PropertyItem, PropertyList from @bixlab/mtone
 - label: ReactNode. 必填；属性名。
 - children: ReactNode. 组件内容。

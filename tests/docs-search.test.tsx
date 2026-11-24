@@ -96,3 +96,14 @@ test("Spotlight centers only a newly selected component in the left navigation",
   await waitFor(() => expect(cascader).toHaveAttribute("aria-current", "page"));
   expect(sidebar.scrollTop).toBe(900);
 });
+
+
+test("Spotlight still locates PropertyItem inside PropertyList instead of opening a second page", async () => {
+  render(<DocsApp />);
+  fireEvent.click(screen.getByRole("button", { name: "搜索组件" }));
+  const input = await screen.findByRole("combobox");
+  fireEvent.change(input, { target: { value: "PropertyItem" } });
+  fireEvent.keyDown(input, { key: "Enter" });
+  await waitFor(() => expect(window.location.hash).toBe("#/components/PropertyList?section=property-item"));
+  expect(await screen.findByRole("heading", { name: "PropertyItem", level: 2 })).toBeVisible();
+});

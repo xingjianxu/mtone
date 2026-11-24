@@ -2,17 +2,9 @@ import React from "react";
 import * as M from "../../../packages/mtone/src";
 
 export default function Demo() {
-  const properties = (
+  return (
     <M.PropertyList>
-      <M.PropertyItem label="类型">文档</M.PropertyItem>
-      <M.PropertyItem label="标签">
-        <M.Tag tone="green">研究</M.Tag>
-      </M.PropertyItem>
-      <M.PropertyItem label="负责人">
-        <M.Avatar name="林" />
-      </M.PropertyItem>
+      <M.PropertyItem label="负责人">张三</M.PropertyItem>
     </M.PropertyList>
   );
-
-  return properties;
 }

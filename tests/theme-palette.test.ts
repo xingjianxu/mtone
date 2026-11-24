@@ -25,3 +25,17 @@ test("defines the coral accent in the default, dark and system-dark palettes", (
   expect(css).toMatch(/\[data-mt-theme="dark"\]\s*\{[^}]*--mt-accent-coral:\s*#FD8C73\b/i);
   expect(css).toMatch(/@media \(prefers-color-scheme: dark\)\s*\{\s*\[data-mt-theme="system"\]\s*\{[^}]*--mt-accent-coral:\s*#FD8C73\b/i);
 });
+
+test("shares the pale blue selected surface without recoloring alerts or focus borders", () => {
+  const styles = (file: string) => readFileSync(`packages/mtone/src/${file}.css`, "utf8");
+  const surface = "var(--mt-select-surface, #e9eef4)";
+  for (const file of ["check-card", "data", "panel", "settings-dialog"]) {
+    expect(styles(file)).toContain(surface);
+  }
+  expect(styles("data")).toMatch(/--mt-table-selected:\s*var\(--mt-selected,\s*var\(--mt-select-surface, #e9eef4\)\)/);
+  expect(styles("settings-dialog")).toMatch(/\[data-mt-settings-highlight\]\s*\{[^}]*outline:\s*1px solid var\(--mt-focus\)/);
+  expect(styles("styles")).toContain("var(--mt-badge-blue-bg, #e7f0f9)");
+  expect(styles("data")).toContain("var(--mt-select-highlight, #edf3fa)");
+  expect(theme().match(/--mt-select-surface:\s*#e9eef4;/g)).toHaveLength(1);
+  expect(theme().match(/--mt-select-surface:\s*#293746;/g)).toHaveLength(2);
+});

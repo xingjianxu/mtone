@@ -45,3 +45,13 @@ test.each(["#/theme", "#/components/Tabs?section=indicator-color"])(
     expect(heading).toHaveFocus();
   },
 );
+
+test("lists the pale blue selection surface separately from the accent colors", () => {
+  window.location.hash = paletteRoute;
+  render(<DocsApp />);
+  const surfaces = within(screen.getByRole("region", { name: "语义背景" }));
+  expect(surfaces.getByText("浅蓝选中背景")).toBeVisible();
+  expect(surfaces.getByText("--mt-select-surface")).toBeVisible();
+  expect(surfaces.getByText("#E9EEF4")).toBeVisible();
+  expect(surfaces.getByText("#293746")).toBeVisible();
+});

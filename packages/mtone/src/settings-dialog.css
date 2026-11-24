@@ -131,7 +131,7 @@
   overflow: hidden;
 }
 .mt-settings-dialog-detail [data-mt-settings-highlight] {
-  background: color-mix(in srgb, var(--mt-accent-blue) 12%, transparent);
+  background: var(--mt-select-surface, #e9eef4);
   outline: 1px solid var(--mt-focus);
   outline-offset: -1px;
 }

@@ -39,6 +39,12 @@ describe("AI reference", () => {
     expect(readFileSync("packages/mtone/llms.txt", "utf8"))
       .toContain("- height / itemHeight / virtual: number / number / boolean (default: — / 32 / true).");
   });
+  it("links PropertyItem to its PropertyList section without dropping its reference", () => {
+    expect(readFileSync("packages/mtone/llms.txt", "utf8"))
+      .toContain("[PropertyItem](https://xingjianxu.github.io/mtone/#/components/PropertyList?section=property-item)");
+    expect(componentDocs.find(({ name }) => name === "PropertyItem")?.props.map(({ name }) => name))
+      .toEqual(["label", "children"]);
+  });
   it("includes and exposes the same file in npm", () => {
     const pkg = JSON.parse(readFileSync("packages/mtone/package.json", "utf8"));
     expect(pkg.files).toContain("llms.txt");

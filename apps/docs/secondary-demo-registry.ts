@@ -1141,7 +1141,7 @@ export default function Demo() {
     {
       id: "playground",
       title: "交互配置",
-      note: "切换连接线、节点图标、复选框与多选，或调整行高和间距，预览会即时更新。恢复默认也会清除当前选择和勾选。",
+      note: "切换外观、选择或目录交互，或调整行高、间距、缩进和可视高度，预览会即时更新。恢复默认会还原展开状态并清除选择和勾选。异步加载、虚拟滚动与拖放见下方独立示例。",
       Demo: TreePlayground,
       source: source(TreePlaygroundSource),
     },

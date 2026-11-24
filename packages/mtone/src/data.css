@@ -5,10 +5,7 @@
   --mt-table-cell-padding: 8px 12px;
 }
 .mt-table-wrap {
-  --mt-table-selected: var(
-    --mt-selected,
-    color-mix(in srgb, var(--mt-indicator, #5378aa) 10%, var(--mt-bg, #fff))
-  );
+  --mt-table-selected: var(--mt-selected, var(--mt-select-surface, #e9eef4));
   min-width: 0;
   border: 1px solid var(--mt-border, #e9e9e7);
   border-radius: var(--mt-radius, 4px);
