@@ -38,8 +38,8 @@ it("joins direct buttons across non-button siblings and preserves focus and logi
   expect(declarations(".mt-button-group-connected > .mt-btn:focus-visible")["z-index"]).toBe("2");
 });
 it("keeps solid danger hover red rather than neutral", () => {
-  expect(declarations(".mt-btn-solid.mt-danger").background).toBe("#b6403b");
-  expect(declarations(".mt-btn-solid.mt-danger:hover:not(:disabled)").background).toBe("#9e3632");
+  expect(declarations(".mt-btn-solid.mt-danger").background).toBe("var(--mt-action-danger-filled-bg, #b6403b)");
+  expect(declarations(".mt-btn-solid.mt-danger:hover:not(:disabled)").background).toBe("var(--mt-action-danger-filled-hover-bg, #9e3632)");
 });
 
 it("inherits canonical sizes through composed triggers and nested groups; explicit aliases override", () => {

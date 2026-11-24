@@ -85,11 +85,26 @@ Migration: remove the former `density` prop. Compact/comfortable modes are no lo
 
 Tokens: `--mt-fg` text, `--mt-text` alias, `--mt-muted`, `--mt-bg`, `--mt-subtle`, `--mt-border`, `--mt-primary`, `--mt-hover`, `--mt-height`, `--mt-radius`, `--mt-focus`. Prefer tokens to override the look; className/style are available on documented component types. Arbitrary Tailwind class precedence is not guaranteed. No global Preflight or host heading reset. Overlay z-index ranges are 1200–1300; integrate with host layers accordingly. This is not Shadow DOM isolation.
 
-### Shared theme accents
+### Shared theme accents (choose a color)
 
-Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-green`, `--mt-accent-orange`, `--mt-accent-red`, `--mt-accent-purple`, `--mt-accent-teal`, and `--mt-accent-coral` tokens in component styles (for example, `color: var(--mt-accent-teal)`). The optional `MtoneAccent` type enumerates their keys. The palette follows light, dark or system mode. Override values under an application scope, for example `<MtoneProvider tokens={{ "--mt-accent-teal": "#25686c" }}>`. Existing components keep their colors unless they explicitly use these tokens. Coral uses `#D1634B` in light mode and `#FD8C73` in dark mode (including system dark). Treat it as a decorative accent by default and check contrast before using it for text; it is not a new Tag tone or a replacement for danger. In preset-aware values such as Tabs `indicatorColor`, `"coral"` means the mtone preset; use `"#ff7f50"` for the CSS keyword’s standard color.
+Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-green`, `--mt-accent-orange`, `--mt-accent-red`, `--mt-accent-purple`, `--mt-accent-teal`, and `--mt-accent-coral` tokens in component styles (for example, `color: var(--mt-accent-teal)`). The optional `MtoneAccent` type enumerates their keys. The palette follows light, dark or system mode. Override values under an application scope, for example `<MtoneProvider tokens={{ "--mt-accent-teal": "#25686c" }}>`. Use palette keys where color is an explicit choice, not to name a fixed focus, selection, or feedback role. Coral uses `#D1634B` in light mode and `#FD8C73` in dark mode (including system dark). Treat it as a decorative accent by default and check contrast before using it for text; it is not a new Tag tone or a replacement for danger. In preset-aware values such as Tabs `indicatorColor`, `"coral"` means the mtone preset; use `"#ff7f50"` for the CSS keyword’s standard color.
+
+### Semantic color roles (choose a purpose)
 
 Use `--mt-select-surface` for the shared pale-blue selected background and located settings rows: `#E9EEF4` in light mode and `#293746` in dark mode, including system dark. Use it as a CSS background (for example, `background: var(--mt-select-surface)`), not as a new `MtoneAccent` value, focus border, or status color. The Tree, Panel side rail and DataTable retain the component-level `--mt-selected` override. See the [live selection swatches](https://xingjianxu.github.io/mtone/#/theme/color-presets).
+
+Other independent roles include `--mt-focus` for keyboard focus, `--mt-alert-info-bg` and `--mt-alert-warning-bg` for feedback surfaces, `--mt-nav-current-indicator` for the current navigation rail, `--mt-calendar-today-ink` for Calendar's current date, and `--mt-drop-target-edge` for drag targets. A semantic override applies only to that role. For example:
+
+```tsx
+<MtoneProvider tokens={{
+  "--mt-action-emphasis-bg": "#4a557d",
+  "--mt-action-emphasis-hover-bg": "#3d496c",
+}}>
+  <Button variant="blue">Continue</Button>
+</MtoneProvider>
+```
+
+The public `blue` variant and existing palette keys still work. Existing `--mt-blue`, `--mt-indicator`, `--mt-accent-blue`, and `--mt-blue-button-separator` overrides still apply where they applied before unless a new, more specific role override is present. Optional role overrides are inherited CSS properties, not a second palette with independent registered defaults. For a property that has not been overridden, its legacy value or literal fallback is resolved on the component. See the [role and fallback inventory](COLOR-TOKENS.md) for the mapping.
 
 ## Buttons and forms
 

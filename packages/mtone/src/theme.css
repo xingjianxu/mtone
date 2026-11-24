@@ -24,6 +24,11 @@
   --mt-accent-coral: #D1634B;
 }
 
+/* Fixed semantics and the configurable accent palette are separate layers.
+ * --mt-blue and --mt-indicator retain legacy defaults and remain fallbacks at
+ * the paint site. Optional role overrides resolve there, not at the theme
+ * root, so an override between a provider and a component still works. */
+
 /* Select colors at the scope boundary. WebKit can resolve light-dark()
  * through the document scheme after a live system preference change, even
  * for a nested light scope. Literal tokens keep opt-in scopes isolated. */

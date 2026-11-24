@@ -75,7 +75,7 @@
   grid-column: 1;
   grid-row: 1;
   align-self: center;
-  color: var(--mt-indicator, #5378aa);
+  color: var(--mt-toast-default-icon-ink, var(--mt-indicator, #5378aa));
 }
 .mt-toast-title,
 .mt-toast-description,

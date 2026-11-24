@@ -22,9 +22,10 @@ This file describes this package checkout, not necessarily the latest published 
 - Pair controlled values/open state with the documented change callbacks; defaultValue/defaultOpen are for uncontrolled initial state.
 - Give controls accessible labels and icon-only buttons aria-label. Keep keyboard/focus behavior intact. Focus uses --mt-focus (#93B4DC): existing input borders change color only; other controls use a single 1px inset edge without changing layout. Select option highlights remain background-only in all modes.
 - Shared theme accents: use --mt-accent-neutral/blue/green/orange/red/purple/teal/coral with CSS var() or override the matching keys via MtoneProvider tokens. Tabs indicatorColor accepts these preset names or a CSS color for the selected line only.
+- Semantic colors select a purpose, not a hue: --mt-select-surface for selected surfaces, --mt-focus for keyboard focus, --mt-alert-info-bg for an info surface. New role overrides limit changes to that purpose and preserve legacy CSS fallbacks when unset; existing hue presets remain public.
 - Selected surfaces: use --mt-select-surface for pale-blue selected items and located settings rows. It is #E9EEF4 in light and #293746 in dark mode, not an accent color or focus-border token.
 - Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.
-- Use Tag for content labels with optional removal, and Status for a state indicator. There is no block editor. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.
+- Use Tag for content labels with optional removal, and Status for a state indicator. BlockEditor is documented separately and belongs to the optional mtone-blocknote package, not this npm package. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.
 - Toast notifications need ToastProvider; useToast exposes add, success, error, info, update, promise and close (verify installed declarations before use).
 - Do not assume the live docs match an older npm package. Type-check generated code and run interaction tests.
 
@@ -32,12 +33,45 @@ This file describes this package checkout, not necessarily the latest published 
 
 - [Getting started](https://xingjianxu.github.io/mtone/#/start): installation and AI usage
 - [Theme and styling](https://xingjianxu.github.io/mtone/#/theme): color modes and tokens
-- [Shared color presets](https://xingjianxu.github.io/mtone/#/theme/color-presets): live palette, CSS reuse, and scoped overrides
+- [Shared color presets](https://xingjianxu.github.io/mtone/#/theme/color-presets): hue presets, semantic roles, and scoped overrides
 - [Component gallery](https://xingjianxu.github.io/mtone/#/gallery): independent component examples
 - [Application showcase](https://xingjianxu.github.io/mtone/showcase.html): interactive in-memory demo, not a backend
 - [Source repository](https://github.com/xingjianxu/mtone): current code and migration notes
 
 ## Components
+
+### BlockEditor
+
+- [BlockEditor](https://xingjianxu.github.io/mtone/#/components/BlockEditor): 可选的块编辑器：BlockNote 管理正文与选区，mtone 提供工具栏、菜单和主题。独立于主包。
+- Import: BlockEditor from mtone-blocknote
+- initialContent: readonly BlockEditorInput[]. 只在创建该文档时读取；支持正文、标题、项目/编号列表、待办项、引用和代码块。默认空段落。
+- documentKey: string | number. 换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。
+- onChange: (blocks: BlockEditorBlock[]) => void. 内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。
+- readOnly: boolean (default: false). 显示不可编辑正文与链接，不显示工具栏；不替代应用权限校验。
+- label / locale / className: string / 'zh' | 'en' / string. 正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。
+- npm 包名为 mtone-blocknote，尚未发布。发布后可执行 npm install @bixlab/mtone mtone-blocknote。主包不包含、也不依赖编辑器。
+- 导入两份 CSS；Next.js 使用客户端组件，推荐动态导入并设置 ssr: false。移动端 viewport 建议加 interactive-widget=resizes-content。
+- 键入 / 或点 + 添加块；选择文本后可设置格式与链接。当前块菜单支持下方插入、复制、上移、下移、删除。拖拽、附件与表格编辑尚未包含。
+- 原生 JSON 是主存储格式。只读只影响界面。外部内容仍需由应用验证来源、权限以及数据结构。
+
+```tsx
+import { BlockEditor, type BlockEditorBlock } from "mtone-blocknote";
+import "@bixlab/mtone/styles.css";
+import "mtone-blocknote/styles.css";
+
+export default function Demo() {
+  const save = (blocks: BlockEditorBlock[]) => {
+    localStorage.setItem("meeting-draft", JSON.stringify(blocks));
+  };
+
+  return <BlockEditor
+    documentKey="meeting-draft"
+    label="会议笔记"
+    initialContent={[{ type: "heading", props: { level: 1 }, content: "会议笔记" }]}
+    onChange={save}
+  />;
+}
+```
 
 ### CheckCard
 

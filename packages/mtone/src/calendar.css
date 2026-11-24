@@ -80,7 +80,7 @@
   font-weight: 600;
 }
 .mt-calendar-day[aria-current="date"] .mt-calendar-number {
-  color: var(--mt-blue, #2383e2);
+  color: var(--mt-calendar-today-ink, var(--mt-blue, #2383e2));
 }
 .mt-calendar-day[data-outside] {
   color: var(--mt-muted, #787774);

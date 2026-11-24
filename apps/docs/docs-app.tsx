@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import * as M from "../../packages/mtone/src";
 import { componentCategories, componentDocGroups, componentDocs, type ComponentDoc } from "./catalog";
+import { blockEditorDocSections } from "./block-editor-demos";
 import { ComponentExample } from "./examples";
 import { standaloneTypographySections, focusTypographySection, isTypographySection, typographySectionId, handleTypographyNavigation } from "./typography-navigation";
 import { componentSectionHref, focusDocSection, type DocSection, type OutlineEntry } from "./doc-section";
@@ -147,6 +148,7 @@ export const docSections: Record<string, readonly DocSection[]> = {
   Button: buttonDocSections,
   DataTable: dataTableDocSections,
   DataList: dataListDocSections,
+  BlockEditor: blockEditorDocSections,
 };
 
 const outlineOffset = () => (document.querySelector(".topbar")?.getBoundingClientRect().bottom ?? 68) + 32;
@@ -175,7 +177,7 @@ function ComponentPage({ doc, section }: { doc: ComponentDoc; section?: string }
       ? typographySectionId(section)
       : section;
   const reference = nestedComponentDoc(doc.name, section) ?? doc;
-  const importCode = `import { ${reference.importNames.join(", ")} } from "@bixlab/mtone";`;
+  const importCode = `import { ${reference.importNames.join(", ")} } from "${reference.packageName ?? "@bixlab/mtone"}";`;
   return (
     <>
       <h1>{doc.name}</h1>
@@ -384,7 +386,8 @@ function Theme() {
                 ["--mt-height", "控件高度"],
                 ["--mt-radius", "圆角"],
                 ["--mt-focus", "统一焦点色，独立于 --mt-primary"],
-                ["--mt-accent-*", "八种共享预设色，可通过 CSS 变量复用，在 MtoneProvider tokens 中覆盖。"],
+                ["--mt-select-surface", "浅蓝选中与设置定位底色，和焦点、提示色独立。"],
+                ["--mt-accent-*", "八种按色相命名的可选预设色，与组件语义颜色分开。"],
               ].map(([k, v]) => (
                 <tr key={k}>
                   <td>

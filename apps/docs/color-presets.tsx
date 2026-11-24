@@ -1,5 +1,5 @@
 import React from "react";
-import { MtoneProvider, type MtoneAccent } from "../../packages/mtone/src";
+import { Button, MtoneProvider, type MtoneAccent } from "../../packages/mtone/src";
 import { CodeBlock } from "./code-block";
 
 export const colorPresetsHref = "#/theme/color-presets";
@@ -16,7 +16,7 @@ const presetLabels: Record<MtoneAccent, string> = {
   coral: "珊瑚色",
 };
 
-const statusDotStyle = {
+const accentDotStyle = {
   display: "inline-block",
   inlineSize: 8,
   blockSize: 8,
@@ -26,7 +26,7 @@ const statusDotStyle = {
 };
 
 const override = { "--mt-accent-green": "#528a72" };
-const statusExample = `function StatusMark({ label }: { label: string }) {
+const accentExample = `function AccentMark({ label }: { label: string }) {
   return (
     <span>
       <span
@@ -45,10 +45,10 @@ const statusExample = `function StatusMark({ label }: { label: string }) {
   );
 }
 
-<StatusMark label="已同步" />`;
+<AccentMark label="绿色点缀" />`;
 
-function StatusMark({ label }: { label: string }) {
-  return <span><span aria-hidden="true" style={statusDotStyle} />{label}</span>;
+function AccentMark({ label }: { label: string }) {
+  return <span><span aria-hidden="true" style={accentDotStyle} />{label}</span>;
 }
 
 export function ColorPresets() {
@@ -57,11 +57,12 @@ export function ColorPresets() {
       <div className="eyebrow">THEME COLOR PRESETS</div>
       <h1 id={colorPresetsHeading} tabIndex={-1}>颜色预设</h1>
       <p className="lead">
-        这些共享颜色可用于 mtone 组件，也可用于自己的界面。色板直接读取当前主题的 CSS 变量；用顶部的主题开关比较浅色和深色。
+        这里分为两层：需要让使用者选颜色时，使用共享色板；组件的选中、焦点、提示和操作状态按实际用途引用语义颜色。用顶部的主题开关比较浅色和深色。
       </p>
 
       <section aria-labelledby="accent-palette-heading">
-        <h2 id="accent-palette-heading">共享色板</h2>
+        <h2 id="accent-palette-heading">按颜色命名的共享色板</h2>
+        <p>适用于 Tabs 指示线等可主动选色的场景。公开的色板名保持不变。</p>
         <ul className="accent-palette" role="list" aria-label="共享颜色预设">
           {Object.entries(presetLabels).map(([name, label]) => {
             const token = `--mt-accent-${name}`;
@@ -78,7 +79,23 @@ export function ColorPresets() {
       </section>
 
       <section aria-labelledby="selection-surfaces-heading">
-        <h2 id="selection-surfaces-heading">语义背景</h2>
+        <h2 id="selection-surfaces-heading">语义颜色</h2>
+        <p>根据用途而非颜色值使用这些变量。数字相同不代表用途相同：换选中背景，不应该连带改掉键盘焦点或信息提示。</p>
+        <div className="props-scroll">
+          <table className="props-table" aria-label="常用语义颜色">
+            <thead><tr><th scope="col">用途</th><th scope="col">变量</th></tr></thead>
+            <tbody>
+              <tr><td>键盘焦点</td><td><code>--mt-focus</code></td></tr>
+              <tr><td>信息提示底色</td><td><code>--mt-alert-info-bg</code></td></tr>
+              <tr><td>警告提示底色</td><td><code>--mt-alert-warning-bg</code></td></tr>
+              <tr><td>侧栏当前项标记</td><td><code>--mt-nav-current-indicator</code></td></tr>
+              <tr><td>日历当天文字</td><td><code>--mt-calendar-today-ink</code></td></tr>
+              <tr><td>拖放目标边缘</td><td><code>--mt-drop-target-edge</code></td></tr>
+              <tr><td>通知默认图标</td><td><code>--mt-toast-default-icon-ink</code></td></tr>
+              <tr><td>强调操作底色（Button 的 blue 变体）</td><td><code>--mt-action-emphasis-bg</code></td></tr>
+            </tbody>
+          </table>
+        </div>
         <h3>浅蓝选中背景</h3>
         <p>
           使用 <code>--mt-select-surface</code> 表示浅蓝选中状态或定位到的设置项。
@@ -101,10 +118,10 @@ export function ColorPresets() {
         <h2>在自己的界面中复用</h2>
         <p>
           导入 <code>@bixlab/mtone/styles.css</code> 后，在 CSS 或内联样式中写 <code>var(--mt-accent-green)</code> 即可。
-          例如用它绘制状态点，同时保留文字，避免仅靠颜色传达状态。
+          例如用它绘制绿色点缀。若要表达成功状态，应使用相应的语义颜色，并保留文字。
         </p>
-        <div className="theme-sample"><StatusMark label="已同步" /></div>
-        <CodeBlock code={statusExample} />
+        <div className="theme-sample"><AccentMark label="绿色点缀" /></div>
+        <CodeBlock code={accentExample} />
       </section>
 
       <section>
@@ -114,16 +131,36 @@ export function ColorPresets() {
           自定义值不会随浅色和深色自动换色；需要两套颜色时，请为不同主题分别提供值，并检查对比度。
         </p>
         <div className="theme-samples">
-          <div className="theme-sample"><StatusMark label="默认绿色" /></div>
+          <div className="theme-sample"><AccentMark label="默认绿色" /></div>
           <MtoneProvider tokens={override}>
-            <div className="theme-sample"><StatusMark label="局部覆盖" /></div>
+            <div className="theme-sample"><AccentMark label="局部覆盖" /></div>
           </MtoneProvider>
         </div>
         <CodeBlock code={`import { MtoneProvider } from "@bixlab/mtone";
 
-// 复用上面的 StatusMark
+// 复用上面的 AccentMark
 <MtoneProvider tokens={{ "--mt-accent-green": "${override["--mt-accent-green"]}" }}>
-  <StatusMark label="局部覆盖" />
+  <AccentMark label="局部覆盖" />
+</MtoneProvider>`} />
+      </section>
+
+      <section aria-labelledby="role-overrides-heading">
+        <h2 id="role-overrides-heading">只覆盖一个用途</h2>
+        <p>
+          这里仅覆盖强调按钮的底色，不改变共享的蓝色、键盘焦点和信息提示。用 <code>tokens</code> 可以让 mtone 的浮层也收到相同覆盖。
+          未设置新的角色变量时，组件仍按原先的方式读取 <code>--mt-blue</code>、<code>--mt-indicator</code> 等旧变量。
+        </p>
+        <div className="theme-samples">
+          <div className="theme-sample"><Button variant="blue">默认主操作</Button></div>
+          <MtoneProvider tokens={{ "--mt-action-emphasis-bg": "#4a557d", "--mt-action-emphasis-hover-bg": "#3d496c" }}>
+            <div className="theme-sample"><Button variant="blue">局部主操作</Button></div>
+          </MtoneProvider>
+        </div>
+        <CodeBlock code={`<MtoneProvider tokens={{
+  "--mt-action-emphasis-bg": "#4a557d",
+  "--mt-action-emphasis-hover-bg": "#3d496c",
+}}>
+  <Button variant="blue">局部主操作</Button>
 </MtoneProvider>`} />
       </section>
 

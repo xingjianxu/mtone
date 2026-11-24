@@ -1,6 +1,8 @@
 import { resolve } from "node:path";
 import { chromium, expect, firefox, webkit } from "@playwright/test";
 
+import { measureSemanticColors, semanticColorCases, semanticColorMarkup } from "./fixtures/theme-palette.mjs";
+
 const selectionSurfaces = `
   <div class="mt-tree-item" aria-selected="true" data-selection="tree">Tree</div>
   <div class="mt-table-wrap"><div class="mt-table"><table><tbody>
@@ -38,8 +40,16 @@ try {
     <div class="mt-scope" style="--mt-selected: #143556" id="selection-override">${selectionSurfaces}</div>
     <div class="mt-scope" style="--mt-select-surface: initial" id="selection-fallback">${selectionSurfaces}</div>
     <div class="mt-popup" id="global">Browser-level overlay</div>
+    ${semanticColorMarkup}
   `);
   await page.addStyleTag({ path: resolve(process.env.THEME_CSS_PATH ?? "packages/mtone/dist/styles.css") });
+  const expectSemanticColors = async (dark) => {
+    const paints = await page.evaluate(measureSemanticColors, semanticColorCases(dark));
+    for (const { selector, role, actual, expected } of paints) {
+      expect(actual, `${role}: ${selector}`).toBe(expected);
+    }
+  };
+  await expectSemanticColors(false);
   const expectCoral = async (selector, color) => {
     const swatch = await page.locator(selector).evaluate((root) => {
       const el = document.createElement("span");
@@ -96,6 +106,7 @@ try {
   await expect(page.locator("#dark .mt-tag")).toHaveCSS("background-color", "rgb(73, 47, 45)");
   await expect(page.locator("#dark .mt-tag")).toHaveCSS("color", "rgb(255, 170, 164)");
   await page.emulateMedia({ colorScheme: "dark" });
+  await expectSemanticColors(true);
   await expectSelection("#system", selectedDark);
   await expectCoral("#system", coralDark);
   await expectCoral("#nested", coralLight);

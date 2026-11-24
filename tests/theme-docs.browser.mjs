@@ -121,7 +121,7 @@ try {
   const readStatus = (name) => page.getByText(name, { exact: true })
     .evaluate((label) => getComputedStyle(label.firstElementChild).backgroundColor);
   expect(await readStatus("局部覆盖")).toBe("rgb(82, 138, 114)");
-  expect(await readStatus("已同步")).toBe(light[2].actual);
+  expect(await readStatus("绿色点缀")).toBe(light[2].actual);
   expect(await readStatus("默认绿色")).toBe(light[2].actual);
 
   await page.goto(base + "#/components/Tabs?section=indicator-color");
