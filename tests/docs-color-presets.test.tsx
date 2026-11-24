@@ -49,9 +49,21 @@ test.each(["#/theme", "#/components/Tabs?section=indicator-color"])(
 test("lists the pale blue selection surface separately from the accent colors", () => {
   window.location.hash = paletteRoute;
   render(<DocsApp />);
-  const surfaces = within(screen.getByRole("region", { name: "语义背景" }));
+  const surfaces = within(screen.getByRole("region", { name: "语义颜色" }));
   expect(surfaces.getByText("浅蓝选中背景")).toBeVisible();
   expect(surfaces.getByText("--mt-select-surface")).toBeVisible();
   expect(surfaces.getByText("#E9EEF4")).toBeVisible();
   expect(surfaces.getByText("#293746")).toBeVisible();
+});
+
+test("documents role overrides without treating them as public palette choices", () => {
+  window.location.hash = paletteRoute;
+  render(<DocsApp />);
+  const semantic = within(screen.getByRole("region", { name: "语义颜色" }));
+  expect(semantic.getByRole("table", { name: "常用语义颜色" })).toBeVisible();
+  expect(semantic.getByText("--mt-toast-default-icon-ink")).toBeVisible();
+  expect(semantic.getByText("--mt-focus")).toBeVisible();
+  const palette = within(screen.getByRole("list", { name: "共享颜色预设" }));
+  expect(palette.queryByText("--mt-toast-default-icon-ink")).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "局部主操作" })).toBeVisible();
 });

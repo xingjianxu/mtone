@@ -86,13 +86,18 @@ export function Progress({
     0,
     100,
   );
-  const fill = color ?? (status === "exception" ? "#b6403b" : "#7d9c84");
+  const fill =
+    color ??
+    (status === "exception"
+      ? "var(--mt-progress-failure-fill, #b6403b)"
+      : "var(--mt-progress-fill, #7d9c84)");
   const gradient = typeof fill !== "string";
   const paint = gradient ? `url(#mt-progress-${id})` : fill;
   const background = gradient
     ? `linear-gradient(to right, ${fill.from}, ${fill.to})`
     : fill;
-  const successColor = success?.color ?? "#548164";
+  const successColor =
+    success?.color ?? "var(--mt-progress-success-fill, #548164)";
   const info = format ? (
     format(n, completed)
   ) : status === "success" ? (

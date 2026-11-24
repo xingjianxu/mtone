@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.0
+
+### Added
+- Reuse the documented semantic theme colors for shared selected states, component actions, and feedback while retaining existing overrides.
+- Document the optional, independently published `@bixlab/mtone-blocknote` BlockEditor in the shared docs. The main package does not install or export the editor.
+
+### Fixed
+- Center the active docs sidebar item on navigation from Spotlight and retain the manual sidebar scroll position on clicks.
+- Keep SettingsDialog's active marker fully visible and support its built-in settings search.
+- Improve the Tree playground layout and group PropertyItem usage within PropertyList documentation.
+
 ## 0.14.0
 
 ### Added

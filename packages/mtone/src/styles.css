@@ -109,13 +109,13 @@
   background: var(--mt-solid-hover, #53514c);
 }
 .mt-btn-blue {
-  background: #2783de;
-  color: #f3f9fd;
+  background: var(--mt-action-emphasis-bg, #2783de);
+  color: var(--mt-action-emphasis-ink, #f3f9fd);
   border-color: transparent;
   transition: background-color 100ms ease-in-out;
 }
 .mt-btn-blue:hover:not(:disabled) {
-  background: #2276c9;
+  background: var(--mt-action-emphasis-hover-bg, #2276c9);
 }
 .mt-btn-soft {
   background: var(--mt-subtle, #f7f7f5);
@@ -133,12 +133,12 @@
 }
 .mt-btn-solid.mt-danger,
 .mt-btn-blue.mt-danger {
-  background: #b6403b;
-  color: white;
+  background: var(--mt-action-danger-filled-bg, #b6403b);
+  color: var(--mt-action-danger-filled-ink, white);
 }
 .mt-btn-solid.mt-danger:hover:not(:disabled),
 .mt-btn-blue.mt-danger:hover:not(:disabled) {
-  background: #9e3632;
+  background: var(--mt-action-danger-filled-hover-bg, #9e3632);
 }
 /* The unpressed variant and both states of icon mode keep their usual colors. */
 .mt-btn[data-toggle-mode="background"][aria-pressed="true"] {
@@ -148,10 +148,10 @@
   background: color-mix(in srgb, var(--mt-solid-hover, #53514c) 88%, var(--mt-on-primary, white));
 }
 .mt-btn.mt-btn-blue[data-toggle-mode="background"][aria-pressed="true"] {
-  background: #185c9f;
+  background: var(--mt-action-emphasis-pressed-bg, #185c9f);
 }
 .mt-btn:is(.mt-btn-solid, .mt-btn-blue).mt-danger[data-toggle-mode="background"][aria-pressed="true"] {
-  background: #872c28;
+  background: var(--mt-action-danger-filled-pressed-bg, #872c28);
 }
 @media (forced-colors: active) {
   .mt-btn:is(.mt-btn, .mt-btn-solid.mt-danger)[data-toggle-mode="background"][aria-pressed="true"] {
@@ -217,7 +217,7 @@
 }
 /* Filled buttons still need a visible, single separator. */
 .mt-button-group-connected > .mt-btn:is(.mt-btn-blue, .mt-danger) {
-  --mt-button-separator: var(--mt-blue-button-separator, rgb(255 255 255 / 30%));
+  --mt-button-separator: var(--mt-action-filled-separator, var(--mt-blue-button-separator, rgb(255 255 255 / 30%)));
 }
 .mt-button-group-connected > .mt-btn ~ .mt-btn:is(.mt-btn-solid, .mt-btn-blue) {
   border-inline-start-color: var(--mt-button-separator, rgb(255 255 255 / 30%));
@@ -385,7 +385,7 @@
 .mt-progress-circle .mt-progress-info, .mt-progress-dashboard .mt-progress-info { position: absolute; inset: 20%; overflow-wrap: anywhere; }
 .mt-progress[data-status="exception"] .mt-progress-info { color: var(--mt-danger-text, #b6403b); }
 .mt-progress[data-status="success"] .mt-progress-info { color: var(--mt-success-text, #548164); }
-.mt-progress-line[data-status="active"] .mt-progress-fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #ffffff70, transparent); animation: mt-progress-active 1.6s linear infinite; }
+.mt-progress-line[data-status="active"] .mt-progress-fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--mt-progress-active-glint, #ffffff70), transparent); animation: mt-progress-active 1.6s linear infinite; }
 @keyframes mt-progress-active { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .mt-progress-fill, .mt-progress-success { transition: none; } .mt-progress-line[data-status="active"] .mt-progress-fill::after { animation: none; } }
 .mt-divider {
@@ -485,13 +485,17 @@
   z-index: 2;
   background: var(--mt-bg, #fff);
   border-radius: 4px;
-  outline: 1px solid #a6a6a0;
-  outline-color: color-mix(in srgb, var(--mt-muted, #787774) 60%, var(--mt-border, #e9e9e7));
+  outline: 1px solid var(--mt-list-drag-outline, #a6a6a0);
   outline-offset: -1px;
   box-shadow:
     0 1px 2px var(--mt-handle-shadow, #0000001a),
     0 2px 3px var(--mt-shadow-light, #0002);
   transition: none;
+}
+@supports (outline-color: color-mix(in srgb, black, white)) {
+  .mt-list[data-list-sort-active] > [data-list-sort-moving] {
+    outline-color: var(--mt-list-drag-outline, color-mix(in srgb, var(--mt-muted, #787774) 60%, var(--mt-border, #e9e9e7)));
+  }
 }
 @media (forced-colors: active) {
   .mt-list[data-list-sort-active] > [data-list-sort-moving] {
@@ -664,7 +668,7 @@
   inset-inline-start: -5px;
   width: 3px;
   border-radius: 999px;
-  background: var(--mt-blue, #2383e2);
+  background: var(--mt-nav-current-indicator, var(--mt-blue, #2383e2));
   pointer-events: none;
 }
 @media (forced-colors: active) {

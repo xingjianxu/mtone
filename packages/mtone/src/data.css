@@ -258,7 +258,7 @@
   color: var(--mt-muted, #787774);
 }
 .mt-table [aria-sort] .mt-table-sort-icon {
-  color: var(--mt-indicator, #5378aa);
+  color: var(--mt-data-query-active-ink, var(--mt-indicator, #5378aa));
 }
 .mt-table-filter {
   display: block;
@@ -460,7 +460,7 @@
   background: var(--mt-hover, #f1f1ef);
 }
 .mt-table-filter-trigger.mt-table-filter-active {
-  color: var(--mt-indicator, #5378aa);
+  color: var(--mt-data-query-active-ink, var(--mt-indicator, #5378aa));
   background: var(--mt-table-selected, var(--mt-subtle, #f7f7f5));
 }
 .mt-table-filter-popup {
@@ -680,7 +680,7 @@
 }
 .mt-dropzone[data-dragging] {
   background: var(--mt-selected, var(--mt-select-highlight, #edf3fa));
-  border-color: var(--mt-indicator, #5378aa);
+  border-color: var(--mt-drop-target-edge, var(--mt-indicator, #5378aa));
 }
 .mt-dropzone input {
   max-width: 100%;

@@ -50,3 +50,10 @@ gh workflow run full-regression.yml --ref <已核对的分支或标签>
 CI 使用 Node 24（npm 要求至少 11.5.1 / Node 22.14）。发布任务不使用依赖缓存，只拥有读取仓库和签发 OIDC 的权限。
 
 参考：[npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)；[新包 staged publishing](https://github.blog/changelog/2026-10-02-npm-staged-publishing-now-supports-creating-new-packages/)；[npm trust 前提](https://docs.npmjs.com/cli/v11/commands/npm-trust/)；[scoped 包与网站审核步骤](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/)。
+
+
+## 发布可选编辑器 `@bixlab/mtone-blocknote`
+
+编辑器独立版本为 `0.1.0`。与主包一同发布时，先按上面的流程发布主包；编辑器不由主包的 `publish.yml` 发布，也不要为编辑器另建会触发主包流程的正式 GitHub Release。
+
+在已通过要求的回归并部署文档的同一提交上，执行 `npm ci`，先构建主包、再构建编辑器，然后执行 `npm pack -w @bixlab/mtone-blocknote`。检查 tarball 含 ESM、声明、样式、许可证和第三方告知，并在干净项目中与官方 npm 已发布的主包一起安装验证。首次发布由有 `@bixlab` 包创建权限的维护者在已登录并验证的 npm 会话使用 `npm stage publish <已核对的-tarball.tgz> --access public`，再在 npm 网站或 CLI 审核，以 2FA 确认。Staging 会公开创建占位版本，正式版本在审核后才可安装。确认 npm 的包名、版本和完整性后，再用官方 registry 进行一次干净安装。编辑器未来如需 OIDC，按包单独设置，并使用与主包区隔的发布工作流。

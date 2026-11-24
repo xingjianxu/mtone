@@ -104,7 +104,7 @@
   border: 0;
 }
 .mt-ide-panel[data-side-rail] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab[aria-selected="true"] {
-  color: var(--mt-accent-blue, #2383e2);
+  color: var(--mt-panel-current-ink, var(--mt-accent-blue, #2383e2));
   background: var(--mt-selected, var(--mt-select-surface, #e9eef4));
 }
 .mt-ide-panel[data-side-rail] > .mt-tab-bar > .mt-tab-list > .mt-tab-item > .mt-tab > .mt-tab-label {

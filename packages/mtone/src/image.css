@@ -67,8 +67,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0004;
-  color: white;
+  background: var(--mt-image-cover-bg, #0004);
+  color: var(--mt-image-cover-ink, white);
   opacity: 0;
   transition: opacity 0.1s;
   border-radius: inherit;
@@ -90,7 +90,7 @@
 .mt-image-backdrop {
   position: fixed;
   inset: 0;
-  background: #000b;
+  background: var(--mt-image-preview-backdrop, #000b);
   z-index: 1500;
 }
 .mt-image-preview {
@@ -101,7 +101,7 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 12px;
   outline: none;
-  color: #fff;
+  color: var(--mt-image-preview-ink, #fff);
   pointer-events: auto;
   max-width: 100%;
   min-width: 0;
@@ -112,7 +112,7 @@
   align-items: center;
   min-width: 0;
   padding: 4px 8px;
-  background: #202020;
+  background: var(--mt-image-preview-chrome, #202020);
   border-radius: 6px;
 }
 .mt-image-preview-header h2 {
@@ -142,7 +142,7 @@
   cursor: pointer;
 }
 .mt-image-preview button:hover:not(:disabled) {
-  background: #ffffff24;
+  background: var(--mt-image-preview-control-hover, #ffffff24);
 }
 .mt-image-preview button:focus-visible {
   outline: 1px solid var(--mt-focus, #93b4dc);
@@ -189,7 +189,7 @@
 .mt-image-canvas .mt-image-error,
 .mt-image-canvas .mt-image-placeholder {
   background: transparent;
-  color: #fff;
+  color: var(--mt-image-preview-ink, #fff);
 }
 .mt-image-toolbar {
   display: flex;
@@ -200,7 +200,7 @@
   padding: 6px;
   justify-self: center;
   border-radius: 6px;
-  background: #202020;
+  background: var(--mt-image-preview-chrome, #202020);
   max-width: 100%;
   font-size: 12px;
 }

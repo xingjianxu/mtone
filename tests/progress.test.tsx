@@ -148,3 +148,47 @@ describe("Progress", () => {
     );
   });
 });
+
+it("uses separate normal, exception and success paints for SVG while allowing explicit colors", () => {
+  const { container } = render(
+    <>
+      <Progress
+        label="Normal"
+        type="circle"
+        value={60}
+        success={{ value: 20 }}
+      />
+      <Progress label="Exception" type="circle" value={60} status="exception" />
+      <Progress
+        label="Custom"
+        type="circle"
+        value={60}
+        color="#121414"
+        success={{ value: 20, color: "#343636" }}
+      />
+    </>,
+  );
+  const normal = container.querySelector('[aria-label="Normal"]');
+  const exception = container.querySelector('[aria-label="Exception"]');
+  const custom = container.querySelector('[aria-label="Custom"]');
+  expect(normal?.querySelector(".mt-progress-arc-fill")).toHaveAttribute(
+    "stroke",
+    "var(--mt-progress-fill, #7d9c84)",
+  );
+  expect(normal?.querySelector(".mt-progress-arc-success")).toHaveAttribute(
+    "stroke",
+    "var(--mt-progress-success-fill, #548164)",
+  );
+  expect(exception?.querySelector(".mt-progress-arc-fill")).toHaveAttribute(
+    "stroke",
+    "var(--mt-progress-failure-fill, #b6403b)",
+  );
+  expect(custom?.querySelector(".mt-progress-arc-fill")).toHaveAttribute(
+    "stroke",
+    "#121414",
+  );
+  expect(custom?.querySelector(".mt-progress-arc-success")).toHaveAttribute(
+    "stroke",
+    "#343636",
+  );
+});

@@ -4,11 +4,15 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "paths": {
+      "@bixlab/mtone": ["./packages/mtone/src/index.ts"],
+      "@bixlab/mtone-blocknote": ["./packages/mtone-blocknote/src/index.ts"]
+    },
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["packages/mtone/src", "apps/docs", "tests"]
+  "include": ["packages/mtone/src", "packages/mtone-blocknote/src", "apps/docs", "tests"]
 }

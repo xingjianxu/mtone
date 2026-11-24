@@ -1,3 +1,7 @@
+# Color tokens on master
+
+No mandatory migration: keep existing `MtoneAccent` names, `Button variant="blue"`, and CSS overrides. If one old override accidentally affects several components, move it to the role you mean. For example, replace `--mt-blue` with `--mt-calendar-today-ink` when you only want to restyle Calendar's current date. The navigation rail can be overridden separately with `--mt-nav-current-indicator`. New role overrides win at their component's paint site; otherwise prior values still apply. If relying on nested custom CSS, inherit or reset an optional new role independently from the stock light/dark palette. See [color roles and fallbacks](COLOR-TOKENS.md). Check the installed version before adopting a new key.
+
 # Upgrade notes for 0.13.0
 
 Use this section when moving from 0.12.0 to 0.13.0. The live documentation follows master; consult the declarations bundled with your installed version.

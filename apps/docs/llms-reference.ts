@@ -8,7 +8,7 @@ export function componentLlmsLines(doc: ComponentDoc, documentationUrl: string) 
   const lines = [
     "",
     `- [${doc.name}](${documentationUrl}): ${doc.description}`,
-    `- Import: ${doc.importNames.join(", ")} from @bixlab/mtone`,
+    `- Import: ${doc.importNames.join(", ")} from ${doc.packageName ?? "@bixlab/mtone"}`,
   ];
   for (const prop of doc.props) {
     lines.push(`- ${prop.name}: ${prop.type}${prop.default === undefined ? "" : ` (default: ${prop.default})`}. ${prop.description}`);
@@ -21,7 +21,8 @@ export function formatComponentLlms(doc: ComponentDoc, documentationUrl: string,
   return [
     `# ${doc.name}`,
     "",
-    `> @bixlab/mtone ${version} documentation preview. Check your installed package's declarations for availability.`,
+    doc.packageName ? `> ${doc.packageName} documentation preview. This optional package is installed separately from @bixlab/mtone. Check the npm registry and the declarations bundled with your installed version.`
+      : `> @bixlab/mtone ${version} documentation preview. Check your installed package's declarations for availability.`,
     ...componentLlmsLines(doc, documentationUrl),
   ].join("\n");
 }
