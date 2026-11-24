@@ -10,6 +10,7 @@ export * from "./global-notice";
 export * from "./page-layout";
 export * from "./panel";
 export * from "./section-group";
+export * from "./setting-row";
 
 export * from "./spotlight";
 

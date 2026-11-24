@@ -1487,6 +1487,7 @@ export default function Demo() {
 - [NumberInput](https://xingjianxu.github.io/mtone/#/components/NumberInput): 带增减按钮的数字输入框。
 - Import: NumberInput from @bixlab/mtone
 - label: string. 提供可访问名称。
+- aria-labelledby / aria-describedby: string / string. 转发到实际数字输入框，可关联外部标题和说明。
 - disabled: boolean. 禁用交互。
 - name: string. 表单字段名称。
 - className: string. 附加样式类。
@@ -1576,6 +1577,45 @@ export default function Demo() {
     <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>
   );
 }
+```
+
+### SettingRow
+
+- [SettingRow](https://xingjianxu.github.io/mtone/#/components/SettingRow): 左侧呈现设置标题、快捷键和说明，右侧放置任意设置控件。
+- Import: SettingRow, Switch, NumberInput, Select from @bixlab/mtone
+- title: ReactNode. 设置标题，作为控件可访问名称的来源。
+- description: ReactNode. 标题下方的可选说明。
+- shortcut: ReactNode. 标题旁的可选快捷键提示，只展示、不注册快捷键。
+- control: ReactNode | (attributes: SettingRowControlProps) => ReactNode. 控件插槽；使用函数时将收到的 aria-labelledby 和 aria-describedby 展开到实际控件。
+- SettingRow.Group: HTMLAttributes<HTMLDivElement>. 默认 role=group，直接放入多行以共享底色和行间细线；可用 aria-label 或 aria-labelledby 命名。
+- 窄容器中控件可换到下一行，仍靠行尾对齐。组件不管理设置值；直接传入控件时由调用方提供可访问名称。
+
+```tsx
+import React from "react";
+import { NumberInput, Select, SettingRow, Switch } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  const title = React.useId();
+  return <div style={{ width: "100%", maxWidth: 640 }}>
+    <h3 id={title} style={{ margin: "0 0 12px" }}>编辑器设置</h3>
+    <SettingRow.Group aria-labelledby={title}>
+      <SettingRow title="只读模式" shortcut="Ctrl+Shift+G"
+        description="打开后锁定编辑器，仍可搜索内容。"
+        control={a11y => <Switch {...a11y} />} />
+      <SettingRow title="拼写检查" description="输入时标记可能的拼写错误。"
+        control={a11y => <Switch {...a11y} defaultChecked />} />
+      <SettingRow title="光标上下文行数" description="光标与编辑器边缘之间至少保留的行数。"
+        control={a11y => <NumberInput {...a11y} defaultValue={3} />} />
+      <SettingRow title="Tab 空格数" description="按下 Tab 时插入指定数量的空格。"
+        control={a11y => <Select {...a11y} defaultValue="4" options={[2, 4, 8].map(value => ({
+          value: String(value),
+          label: `${value} 个空格`,
+        }))} />} />
+    </SettingRow.Group>
+  </div>;
+}
+
 ```
 
 ### SectionGroup

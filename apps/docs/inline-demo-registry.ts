@@ -1,3 +1,5 @@
+import SettingRowUsage from "./inline-demos/setting-row-usage";
+import SettingRowUsageSource from "./inline-demos/setting-row-usage.tsx?raw";
 import PanelIde from "./inline-demos/panel-ide";
 import PanelIdeSource from "./inline-demos/panel-ide.tsx?raw";
 import PanelStandalone from "./inline-demos/panel-standalone";
@@ -442,6 +444,7 @@ export const inlineDocSections: Readonly<
       source: source(SidebarResizeDemoRaw),
     },
   ],
+  SettingRow: [{ id: "usage", title: "编辑器设置", Demo: SettingRowUsage, source: source(SettingRowUsageSource) }],
   SectionGroup: [
     {
       id: "usage",

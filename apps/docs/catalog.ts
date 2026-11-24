@@ -22,7 +22,7 @@ const taxonomy = {
     "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
-    "Form", "Fieldset", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
+    "Form", "Fieldset", "SettingRow", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
     "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker",
@@ -3180,6 +3180,11 @@ export default function Demo() {
         description: "提供可访问名称。",
       },
       {
+        name: "aria-labelledby / aria-describedby",
+        type: "string / string",
+        description: "转发到实际数字输入框，可关联外部标题和说明。",
+      },
+      {
         name: "disabled",
         type: "boolean",
         description: "禁用交互。",
@@ -3367,6 +3372,20 @@ export default function Demo() {
       "文档目录可把 Tree 直接放进 Sidebar；见 Tree 的「侧栏文档树」示例，当前文档和异步子节点由应用维护。",
       "独立侧栏调宽时把 Sidebar 放入 Splitter.Panel；Sidebar 本身不管理拖拽宽度。AdminLayout 与 PageLayout 则可选择启用 sidebarResize。",
     ],
+  },
+  {
+    name: "SettingRow",
+    description: "左侧呈现设置标题、快捷键和说明，右侧放置任意设置控件。",
+    importNames: ["SettingRow", "Switch", "NumberInput", "Select"],
+    code: "import React from \"react\";\nimport { NumberInput, Select, SettingRow, Switch } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const title = React.useId();\n  return <div style={{ width: \"100%\", maxWidth: 640 }}>\n    <h3 id={title} style={{ margin: \"0 0 12px\" }}>编辑器设置</h3>\n    <SettingRow.Group aria-labelledby={title}>\n      <SettingRow title=\"只读模式\" shortcut=\"Ctrl+Shift+G\"\n        description=\"打开后锁定编辑器，仍可搜索内容。\"\n        control={a11y => <Switch {...a11y} />} />\n      <SettingRow title=\"拼写检查\" description=\"输入时标记可能的拼写错误。\"\n        control={a11y => <Switch {...a11y} defaultChecked />} />\n      <SettingRow title=\"光标上下文行数\" description=\"光标与编辑器边缘之间至少保留的行数。\"\n        control={a11y => <NumberInput {...a11y} defaultValue={3} />} />\n      <SettingRow title=\"Tab 空格数\" description=\"按下 Tab 时插入指定数量的空格。\"\n        control={a11y => <Select {...a11y} defaultValue=\"4\" options={[2, 4, 8].map(value => ({\n          value: String(value),\n          label: `${value} 个空格`,\n        }))} />} />\n    </SettingRow.Group>\n  </div>;\n}\n",
+    props: [
+      { name: "title", type: "ReactNode", description: "设置标题，作为控件可访问名称的来源。" },
+      { name: "description", type: "ReactNode", description: "标题下方的可选说明。" },
+      { name: "shortcut", type: "ReactNode", description: "标题旁的可选快捷键提示，只展示、不注册快捷键。" },
+      { name: "control", type: "ReactNode | (attributes: SettingRowControlProps) => ReactNode", description: "控件插槽；使用函数时将收到的 aria-labelledby 和 aria-describedby 展开到实际控件。" },
+      { name: "SettingRow.Group", type: "HTMLAttributes<HTMLDivElement>", description: "默认 role=group，直接放入多行以共享底色和行间细线；可用 aria-label 或 aria-labelledby 命名。" },
+    ],
+    notes: ["窄容器中控件可换到下一行，仍靠行尾对齐。组件不管理设置值；直接传入控件时由调用方提供可访问名称。"],
   },
   {
     name: "SectionGroup",
