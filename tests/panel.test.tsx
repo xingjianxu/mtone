@@ -1,9 +1,10 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
 import { Panel } from "../packages/mtone/src";
+import PanelIde from "../apps/docs/inline-demos/panel-ide";
 
 const items = [
   { value: "problems", label: "Problems", content: <p>No problems</p> },
@@ -82,4 +83,18 @@ it("supports a physically left tab rail under RTL without remounting visited con
   expect(input).toHaveValue("npm run dev");
   expect(input).toBe(screen.getByRole("textbox", { name: "Command" }));
   expect(problems).not.toHaveAttribute("title");
+});
+
+it("toggles the docked panel from its separator without losing the command", () => {
+  render(<PanelIde />);
+  const separator = screen.getByRole("separator");
+  const input = screen.getByRole("textbox", { name: "输入命令" });
+  fireEvent.change(input, { target: { value: "npm run dev" } });
+
+  fireEvent.doubleClick(separator);
+  expect(screen.getByRole("button", { name: "展开面板" })).toBeVisible();
+  expect(screen.queryByRole("textbox", { name: "输入命令" })).not.toBeInTheDocument();
+
+  fireEvent.keyDown(separator, { key: "Enter" });
+  expect(screen.getByRole("textbox", { name: "输入命令" })).toHaveValue("npm run dev");
 });

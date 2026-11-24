@@ -246,7 +246,7 @@ export default function Demo() {
 - actions: ReactNode. 标签栏末端的附加操作，收起时仍可操作。
 - collapsed / defaultCollapsed / onCollapsedChange: boolean / boolean / (collapsed: boolean) => void (default: defaultCollapsed: false). 受控或非受控的收起状态，收起后只显示标签栏。
 - 原生属性: ComponentPropsWithRef<'div'>. 支持 className、style 和原生属性；ref 指向根 div。
-- Panel 不负责停靠和调整尺寸。与 Splitter 组合时，顶部和底部用纵向分栏，左右用横向分栏，停靠示例独立使用默认顶部标签栏，在展开后恢复此前的分栏尺寸。
+- Panel 不负责停靠和调整尺寸。与 Splitter 组合时，顶部和底部用纵向分栏，左右用横向分栏，停靠示例使用默认顶部标签栏；双击分隔条或聚焦后按 Enter 可收起或展开工作面板，展开后恢复此前的分栏尺寸。
 - 左右栏使用图标和文字提示；没有图标的标签仍显示文字。收起时操作和展开按钮保留在同一侧栏。
 - 标签栏沿用 Tabs 的键盘操作与窄宽度溢出菜单；收起会隐藏内容区并使其不可聚焦，但保留内部状态。
 

@@ -58,15 +58,26 @@ try {
   await page.keyboard.press("ArrowUp");
   await expect.poll(async () => (await workbench.boundingBox()).height).toBeGreaterThan(bottomBefore.height + 1);
   const restored = (await workbench.boundingBox()).height;
-  await workbench.getByRole("button", { name: "收起面板" }).click();
+  await sep.dblclick();
   await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(34, 0);
   await expect(workbenchPanel).toHaveAttribute("data-collapsed", "true");
+  await expect(sep).toBeEnabled();
+  await sep.press("ArrowUp");
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(34, 0);
   await expect(command).toHaveCount(0);
   await workbench.getByRole("button", { name: "清空终端记录" }).click();
-  await workbench.getByRole("button", { name: "展开面板" }).click();
+  await sep.dblclick();
   await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(restored, 0);
   await expect(command).toHaveValue("npm run dev");
   await expect(workbench.getByText("VITE ready")).toHaveCount(0);
+
+  await sep.press("ArrowUp");
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeGreaterThan(restored + 1);
+  const resizedAfterRestore = (await workbench.boundingBox()).height;
+  await sep.dblclick();
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(34, 0);
+  await sep.press("Enter");
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(resizedAfterRestore, 0);
 
   for (const [dock, orientation, first] of [
     ["顶部", "vertical", true],
@@ -81,13 +92,13 @@ try {
     const code = await editor.boundingBox();
     assert(first ? pane[axis] < code[axis] : pane[axis] > code[axis], dock);
     await expect(command).toHaveValue("npm run dev");
-    await workbench.getByRole("button", { name: "收起面板" }).click();
+    await sep.dblclick();
     await expect.poll(async () => (await workbench.boundingBox())[dimension]).toBeCloseTo(orientation === "vertical" ? 34 : 144, 0);
     const restoreControl = workbench.getByRole("button", { name: "展开面板" });
     const restoreBox = await restoreControl.boundingBox();
     const rail = await workbench.boundingBox();
     assert(restoreBox.x >= rail.x && restoreBox.x + restoreBox.width <= rail.x + rail.width + 1, dock);
-    await restoreControl.press("Enter");
+    await sep.press("Enter");
     await expect.poll(async () => (await workbench.boundingBox())[dimension]).toBeCloseTo(pane[dimension], 0);
   }
   await page.setViewportSize({ width: 320, height: 850 });
