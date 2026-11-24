@@ -25,6 +25,7 @@ jobs:
       - run: npm run test:package
       - run: cmp packages/mtone/llms.txt dist/docs/llms.txt
       - run: npx playwright install --with-deps chromium firefox webkit
+      - run: node tests/block-editor.browser.mjs
       - run: node tests/ai-elements.browser.mjs
       - name: Color theme browser regressions
         run: |

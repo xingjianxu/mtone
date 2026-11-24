@@ -69,7 +69,7 @@
   height: 14px;
   width: 14px;
   border-radius: 50%;
-  background: white;
+  background: var(--mt-switch-off-thumb, white);
   transition: transform 0.15s;
 }
 .mt-switch[data-checked] .mt-switch-thumb {
@@ -620,7 +620,7 @@
 .mt-backdrop {
   position: fixed;
   inset: 0;
-  background: #0005;
+  background: var(--mt-dialog-backdrop, #0005);
   z-index: 1200;
 }
 .mt-modal {
@@ -700,7 +700,7 @@
 }
 .mt-action-danger {
   background: var(--mt-action-danger-bg, #d44c47);
-  color: white;
+  color: var(--mt-action-danger-ink, white);
 }
 .mt-drawer-viewport {
   position: fixed;

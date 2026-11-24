@@ -16,11 +16,11 @@ it('uses neutral gray sidebar states while preserving focus indicators', () => {
 it('ships the requested blue button palette and transition', () => {
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const rule = css.slice(css.indexOf('.mt-btn-blue {')).split('}')[0];
-  expect(rule).toContain('background: #2783de');
-  expect(rule).toContain('color: #f3f9fd');
+  expect(rule).toContain('background: var(--mt-action-emphasis-bg, #2783de)');
+  expect(rule).toContain('color: var(--mt-action-emphasis-ink, #f3f9fd)');
   expect(rule).toContain('transition: background-color 100ms ease-in-out');
   expect(css).toContain('.mt-btn-blue:hover:not(:disabled)');
-  expect(css).toContain('background: #2276c9');
+  expect(css).toContain('background: var(--mt-action-emphasis-hover-bg, #2276c9)');
   expect(css).toContain('.mt-btn:focus-visible');
 });
 

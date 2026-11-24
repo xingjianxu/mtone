@@ -128,11 +128,11 @@ a.mt-ai-citation:hover {
 }
 .mt-ai-evidence-status[data-status="failed"],
 .mt-ai-evidence-status[data-status="error"] {
-  color: #b6403b;
+  color: var(--mt-ai-evidence-failure-ink, #b6403b);
 }
 .mt-ai-evidence-status[data-status="passed"],
 .mt-ai-evidence-status[data-status="success"] {
-  color: #548164;
+  color: var(--mt-ai-evidence-success-ink, #548164);
 }
 .mt-ai-test-counts {
   display: flex;

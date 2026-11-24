@@ -22,7 +22,7 @@ const taxonomy = {
     "TableOfContents", "Tabs", "Pagination",
   ],
   "表单输入": [
-    "Form", "Fieldset", "SettingRow", "SettingsDialog", "Input", "Mentions", "NumberInput", "AutoComplete", "Select",
+    "Form", "Fieldset", "SettingRow", "SettingsDialog", "Input", "BlockEditor", "Mentions", "NumberInput", "AutoComplete", "Select",
     "TreeSelect", "Cascader", "CascaderPanel", "Transfer",
     "Checkbox", "RadioGroup", "Switch", "TagSelect", "CheckCard",
     "Slider", "Rate", "DatePicker",
@@ -67,6 +67,7 @@ export type ComponentDoc = {
   category: ComponentCategory;
   description: string;
   importNames: string[];
+  packageName?: string;
   code: string;
   props: PropDoc[];
   notes: string[];
@@ -75,6 +76,41 @@ export type ComponentDoc = {
   demoLabel?: string;
 };
 const componentReferences: (Omit<ComponentDoc, "category"> & { name: DocumentedComponentName })[] = [
+  {
+    name: "BlockEditor",
+    packageName: "mtone-blocknote",
+    description: "可选的块编辑器：BlockNote 管理正文与选区，mtone 提供工具栏、菜单和主题。独立于主包。",
+    importNames: ["BlockEditor"],
+    code: `import { BlockEditor, type BlockEditorBlock } from "mtone-blocknote";
+import "@bixlab/mtone/styles.css";
+import "mtone-blocknote/styles.css";
+
+export default function Demo() {
+  const save = (blocks: BlockEditorBlock[]) => {
+    localStorage.setItem("meeting-draft", JSON.stringify(blocks));
+  };
+
+  return <BlockEditor
+    documentKey="meeting-draft"
+    label="会议笔记"
+    initialContent={[{ type: "heading", props: { level: 1 }, content: "会议笔记" }]}
+    onChange={save}
+  />;
+}`,
+    props: [
+      { name: "initialContent", type: "readonly BlockEditorInput[]", description: "只在创建该文档时读取；支持正文、标题、项目/编号列表、待办项、引用和代码块。默认空段落。" },
+      { name: "documentKey", type: "string | number", description: "换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。" },
+      { name: "onChange", type: "(blocks: BlockEditorBlock[]) => void", description: "内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。" },
+      { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文与链接，不显示工具栏；不替代应用权限校验。" },
+      { name: "label / locale / className", type: "string / 'zh' | 'en' / string", description: "正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。" },
+    ],
+    notes: [
+      "npm 包名为 mtone-blocknote，尚未发布。发布后可执行 npm install @bixlab/mtone mtone-blocknote。主包不包含、也不依赖编辑器。",
+      "导入两份 CSS；Next.js 使用客户端组件，推荐动态导入并设置 ssr: false。移动端 viewport 建议加 interactive-widget=resizes-content。",
+      "键入 / 或点 + 添加块；选择文本后可设置格式与链接。当前块菜单支持下方插入、复制、上移、下移、删除。拖拽、附件与表格编辑尚未包含。",
+      "原生 JSON 是主存储格式。只读只影响界面。外部内容仍需由应用验证来源、权限以及数据结构。",
+    ],
+  },
   {
     name: "CheckCard",
     description: "以卡片呈现可选项。独立使用可勾选，CheckCard.Group 管理单选或多选，CardGroup 负责响应式排列。",
