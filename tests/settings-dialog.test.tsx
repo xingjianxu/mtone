@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import React from "react";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
@@ -287,4 +288,10 @@ it("keeps the existing custom search slot when both options are passed", () => {
   );
   expect(screen.getByRole("textbox", { name: "Custom search" })).toBeVisible();
   expect(screen.queryByRole("combobox")).toBeNull();
+});
+
+it("reserves enough logical start padding for the selected navigation marker", () => {
+  const css = readFileSync("packages/mtone/src/settings-dialog.css", "utf8");
+  const nav = css.match(/^\.mt-settings-dialog-nav \{([^}]+)\}/m)?.[1];
+  expect(nav).toMatch(/padding-inline:\s*5px\s+10px;/);
 });

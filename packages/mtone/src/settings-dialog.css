@@ -40,7 +40,8 @@
   scrollbar-gutter: stable;
 }
 .mt-settings-dialog-nav {
-  padding: 10px 10px 12px 0;
+  padding-block: 10px 12px;
+  padding-inline: 5px 10px;
   border-inline-end: 1px solid var(--mt-border, #e9e9e7);
 }
 .mt-settings-dialog-detail {
