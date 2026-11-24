@@ -484,7 +484,7 @@ export default function Demo() {
       { name: "items", type: "Pick<TabItem, 'value' | 'label' | 'content' | 'disabled' | 'icon'>[]", description: "标签数据。已访问的标签内容在切换和收起后保持挂载。" },
       { name: "label", type: "string", description: "标签列表的无障碍名称。" },
       { name: "value / defaultValue / onValueChange", type: "string / string / (value: string) => void", description: "受控或非受控的选中标签。" },
-      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "标签项含边框的高度为 28px、32px 或 36px。不会修改外部分栏尺寸。" },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "标签项含边框的高度为 28px、32px 或 36px；横向标签栏随之调整。不会改变展开时的外部分栏尺寸。" },
       { name: "tabPlacement", type: '"top" | "bottom" | "left" | "right"', default: '"top"', description: "标签栏相对内容的物理方位，与 Panel 的外部停靠无关。左右为纵向标签栏。" },
       { name: "actions", type: "ReactNode", description: "标签栏末端的附加操作，收起时仍可操作。" },
       { name: "collapsed / defaultCollapsed / onCollapsedChange", type: "boolean / boolean / (collapsed: boolean) => void", default: "defaultCollapsed: false", description: "受控或非受控的收起状态，收起后只显示标签栏。" },
@@ -3865,7 +3865,7 @@ export default function Demo() {
         name: "size",
         type: '"sm" | "md" | "lg" | "small" | "medium" | "large"',
         default: '"md"',
-        description: "标签项外高（含边框）：sm 28px、md 32px、lg 36px，适用于全部变体和位置。旧值 small、medium、large 保留原字号和 32px 外高。",
+        description: "标签项外高（含边框）：sm 28px、md 32px、lg 36px，适用于全部变体和位置。旧值 small、medium、large 保留原字号和 32px 外高。尺寸可实时切换，不会重置选中项。",
       },
       {
         name: "indicatorColor",

@@ -176,12 +176,31 @@ try {
   assert.notEqual(...themeColors, "light and dark use different border tokens");
   await page.emulateMedia({ colorScheme: "light" });
   console.log("Panel divider: four editor-facing 1px edges in light and dark, hit geometry and three grips unchanged");
+  const demoBar = workbenchPanel.locator(".mt-tab-bar");
+  await dockControls.getByRole("button", { name: "底部" }).click();
+  for (const [label, direction] of [["顶部", "top"], ["底部", "bottom"]]) {
+    await placementControls.getByRole("button", { name: label }).click();
+    for (const [preset, height] of [["md", 32], ["sm", 28], ["lg", 36]]) {
+      await sizeControls.getByRole("button", { name: preset, exact: true }).click();
+      const geometry = await demoBar.evaluate(bar => {
+        const list = bar.querySelector('[role="tablist"]').getBoundingClientRect();
+        const rect = bar.getBoundingClientRect();
+        const action = bar.querySelector('.mt-tab-extra').getBoundingClientRect();
+        return { height: rect.height, below: rect.bottom - list.bottom, action: action.height };
+      });
+      assert.equal(geometry.height, height + 2, `${direction} ${preset}: the whole header follows the live tab height`);
+      assert.equal(geometry.action, 28, "Header actions retain their compact height");
+      if (direction === "top") assert.equal(geometry.below, 1, "The indicator meets the header hairline");
+    }
+  }
+  await sizeControls.getByRole("button", { name: "md", exact: true }).click();
+  await placementControls.getByRole("button", { name: "顶部" }).click();
+  await dockControls.getByRole("button", { name: "右侧" }).click();
   await page.setViewportSize({ width: 320, height: 850 });
   await workbench.getByRole("button", { name: "收起面板" }).click();
   await expect(workbench.getByRole("button", { name: "展开面板" })).toBeVisible();
   await expect(workbench.getByRole("tablist")).toBeVisible();
   await workbench.getByRole("button", { name: "展开面板" }).click();
-  const demoBar = workbenchPanel.locator(".mt-tab-bar");
   const barFrames = workbench.getByRole("tablist").locator(".mt-tab-item");
   await expect(sizeControls.getByRole("button", {name: "md", exact: true})).toHaveAttribute("aria-pressed", "true");
   const dockedWidth = (await workbench.boundingBox()).width;
@@ -191,7 +210,7 @@ try {
     await expect(workbenchPanel).toHaveAttribute("data-panel-tab-placement", direction);
     await expect(command).toHaveValue("npm run dev");
     const side = direction === "left" || direction === "right";
-    for (const [preset, height] of [["sm", 28], ["md", 32], ["lg", 36]]) {
+    for (const [preset, height] of [["md", 32], ["sm", 28], ["lg", 36]]) {
       await sizeControls.getByRole("button", { name: preset, exact: true }).click();
       expect(await barFrames.evaluateAll(frames => frames.map(frame => frame.getBoundingClientRect().height)))
         .toEqual([height, height, height]);
@@ -217,11 +236,25 @@ try {
     const toggle = workbench.getByRole("button", { name: "展开面板" });
     await expect(toggle).toBeVisible();
     await expect.poll(async () => (await workbenchPanel.boundingBox())[side ? "width" : "height"])
-      .toBeCloseTo(side ? 44 : (direction === "bottom" ? 37 : 38), 0);
+      .toBeCloseTo(side ? 44 : 38, 0);
     await toggle.press("Enter");
     await expect.poll(async () => (await workbench.boundingBox()).width).toBeCloseTo(dockedWidth, 0);
     await expect(command).toHaveValue("npm run dev");
   }
+
+  // Changing the size while vertically docked and collapsed must also shrink the slot.
+  await dockControls.getByRole("button", { name: "底部" }).click();
+  await placementControls.getByRole("button", { name: "顶部" }).click();
+  await sizeControls.getByRole("button", { name: "md", exact: true }).click();
+  await sep.press("Enter");
+  await expect(workbench.getByRole("tabpanel")).toHaveCount(0);
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(34, 0);
+  await sizeControls.getByRole("button", { name: "sm", exact: true }).click();
+  await expect.poll(async () => (await workbench.boundingBox()).height).toBeCloseTo(30, 0);
+  await expect(workbench.getByRole("button", { name: "展开面板" })).toBeVisible();
+  await sep.press("Enter");
+  await expect(command).toHaveValue("npm run dev");
+  await placementControls.getByRole("button", { name: "右侧" }).click();
 
   // A vertical Splitter must not squash a side rail into a horizontal 34px slot.
   await dockControls.getByRole("button", { name: "底部" }).click();

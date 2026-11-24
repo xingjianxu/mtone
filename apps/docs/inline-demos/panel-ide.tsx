@@ -9,6 +9,7 @@ const placements = [
   { value: "right", label: "右侧" },
 ] as const;
 type Placement = (typeof placements)[number]["value"];
+const tabHeights = { sm: 28, md: 32, lg: 36 } as const;
 const tabSizes = ["sm", "md", "lg"] as const;
 
 // Paint the editor-facing edge without affecting the separator's hit area.
@@ -51,8 +52,11 @@ export default function Demo() {
   // The Splitter owns the outer extent. Reserve only what its pinned rail needs.
   const sideRail = tabPlacement === "left" || tabPlacement === "right";
   const headerSize = vertical
-    ? (sideRail ? 132 : size === "lg" ? (tabPlacement === "top" ? 38 : 37) : 34)
+    ? (sideRail ? 132 : tabHeights[size] + 2)
     : (sideRail ? 44 : 144);
+  // Keep the splitter constraint stable when a collapsed horizontal header changes size.
+  // The controlled layout can then apply the new extent without clamping to the old preset.
+  const paneMinSize = vertical && !sideRail ? tabHeights.sm + 2 : headerSize;
   const expandedMinSize = vertical ? Math.max(80, headerSize) : 144;
   const defaultSize = vertical ? 142 : 224;
 
@@ -79,7 +83,7 @@ export default function Demo() {
   if (sizes && !first) sizes.reverse();
 
   const workbench = <Splitter.Panel key="workbench" id="panel-demo-workbench"
-    label="工作面板" min={headerSize} defaultSize={defaultSize}>
+    label="工作面板" min={paneMinSize} defaultSize={defaultSize}>
     <Panel label="工作区标签" collapsed={collapsed} onCollapsedChange={changeCollapsed}
       value={tab} onValueChange={setTab} tabPlacement={tabPlacement} size={size}
       actions={<Button iconOnly size="sm" variant="ghost" aria-label="清空终端记录" onClick={() => setLog("")}><Trash2 size={14} /></Button>}

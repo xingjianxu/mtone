@@ -1,5 +1,5 @@
-import React from "react";
-import { Tabs, type TabsSize } from "../../../packages/mtone/src";
+import React, { useState } from "react";
+import { Button, ButtonGroup, Tabs, type TabsSize } from "../../../packages/mtone/src";
 
 const sizes: readonly [TabsSize, number][] = [["sm", 28], ["md", 32], ["lg", 36]];
 const items = [
@@ -8,10 +8,12 @@ const items = [
 ];
 
 export default function Demo() {
-  return <div style={{ display: "grid", gap: 14 }}>
-    {sizes.map(([size, height]) => <div key={size}>
-      <div style={{ color: "var(--mt-muted)", fontSize: 12 }}>{size} · {height}px</div>
-      <Tabs size={size} label={`标签高度 ${height}px`} items={items} />
-    </div>)}
+  const [size, setSize] = useState<TabsSize>("md");
+  return <div style={{ display: "grid", gap: 14, justifyItems: "start" }}>
+    <ButtonGroup connected aria-label="标签高度">
+      {sizes.map(([preset, height]) => <Button key={preset} size="sm" toggle
+        pressed={size === preset} onClick={() => setSize(preset)}>{preset} · {height}px</Button>)}
+    </ButtonGroup>
+    <Tabs size={size} label="示例标签" items={items} style={{ width: "100%" }} />
   </div>;
 }
