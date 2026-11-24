@@ -135,13 +135,14 @@ try {
   for (const colorScheme of ["light", "dark"]) {
     await page.emulateMedia({ colorScheme });
     await expect(plainSeparator).toHaveCSS("box-shadow", "none");
-    for (const [dock, axis, x, y] of [
-      ["底部", "height", 0, 1],
-      ["顶部", "height", 0, -1],
-      ["左侧", "width", -1, 0],
-      ["右侧", "width", 1, 0],
+    for (const [dock, adjacentTab, axis, x, y] of [
+      ["底部", "顶部", "height", 0, 1],
+      ["顶部", "底部", "height", 0, -1],
+      ["左侧", "右侧", "width", -1, 0],
+      ["右侧", "左侧", "width", 1, 0],
     ]) {
       await dockControls.getByRole("button", { name: dock }).click();
+      await placementControls.getByRole("button", { name: adjacentTab }).click();
       await sep.scrollIntoViewIfNeeded();
       const paint = await sep.evaluate((element, axis) => {
         const style = getComputedStyle(element);
@@ -166,7 +167,11 @@ try {
             && getComputedStyle(grip, "::after").content === '""',
         };
       }, axis);
-      assert.equal(paint.boxShadow, `${paint.borderColor} ${x}px ${y}px 0px 0px inset`, `${colorScheme}: ${dock} 编辑区侧`);
+      const editorEdge = `${paint.borderColor} ${x}px ${y}px 0px 0px inset`;
+      const panelEdge = `${paint.borderColor} ${-x}px ${-y}px 0px 0px inset`;
+      assert.equal(paint.boxShadow, `${editorEdge}, ${panelEdge}`, `${colorScheme}: ${dock} 标签栏相邻时两侧各一条线`);
+      await placementControls.getByRole("button", { name: dock }).click();
+      await expect(sep).toHaveCSS("box-shadow", editorEdge);
       assert.equal(paint.thickness, 6, `${dock}: separator geometry`);
       assert(paint.sidesHitSeparator, `${dock}: the visual line does not shrink the hit target`);
       assert(paint.threeDots, `${dock}: retains all three grip dots`);
@@ -175,7 +180,7 @@ try {
   }
   assert.notEqual(...themeColors, "light and dark use different border tokens");
   await page.emulateMedia({ colorScheme: "light" });
-  console.log("Panel divider: four editor-facing 1px edges in light and dark, hit geometry and three grips unchanged");
+  console.log("Panel divider: both seams next to tabs, editor seam otherwise, four docks and two themes; hit geometry and grips unchanged");
   const demoBar = workbenchPanel.locator(".mt-tab-bar");
   await dockControls.getByRole("button", { name: "底部" }).click();
   for (const [label, direction] of [["顶部", "top"], ["底部", "bottom"]]) {

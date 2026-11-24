@@ -12,19 +12,23 @@ type Placement = (typeof placements)[number]["value"];
 const tabHeights = { sm: 28, md: 32, lg: 36 } as const;
 const tabSizes = ["sm", "md", "lg"] as const;
 
-// Paint the editor-facing edge without affecting the separator's hit area.
-const editorSeam = `
-  .panel-ide-splitter[data-dock="top"] > .mt-splitter-separator {
-    box-shadow: inset 0 -1px var(--mt-border);
+const facingPlacement: Record<Placement, Placement> = {
+  top: "bottom", bottom: "top", left: "right", right: "left",
+};
+
+// A tab bar shares the separator's surface color. Draw its edge only when
+// they touch; inset shadows leave the separator's hit area unchanged.
+const separatorSeams = `
+  .panel-ide-splitter[data-dock="top"] { --seam-x: 0px; --seam-y: -1px; }
+  .panel-ide-splitter[data-dock="bottom"] { --seam-x: 0px; --seam-y: 1px; }
+  .panel-ide-splitter[data-dock="left"] { --seam-x: -1px; --seam-y: 0px; }
+  .panel-ide-splitter[data-dock="right"] { --seam-x: 1px; --seam-y: 0px; }
+  .panel-ide-splitter > .mt-splitter-separator {
+    box-shadow: inset var(--seam-x) var(--seam-y) var(--mt-border);
   }
-  .panel-ide-splitter[data-dock="bottom"] > .mt-splitter-separator {
-    box-shadow: inset 0 1px var(--mt-border);
-  }
-  .panel-ide-splitter[data-dock="left"] > .mt-splitter-separator {
-    box-shadow: inset -1px 0 var(--mt-border);
-  }
-  .panel-ide-splitter[data-dock="right"] > .mt-splitter-separator {
-    box-shadow: inset 1px 0 var(--mt-border);
+  .panel-ide-splitter[data-tabs-touch-separator] > .mt-splitter-separator {
+    box-shadow: inset var(--seam-x) var(--seam-y) var(--mt-border),
+      inset calc(-1 * var(--seam-x)) calc(-1 * var(--seam-y)) var(--mt-border);
   }
 `;
 
@@ -104,7 +108,7 @@ export default function Demo() {
     </pre>
   </Splitter.Panel>;
   return <div style={{ display: "grid", gap: 10, width: "100%", minWidth: 0 }}>
-    <style>{editorSeam}</style>
+    <style>{separatorSeams}</style>
     <div style={{ display: "flex", alignItems: "center", gap: "8px 14px", flexWrap: "wrap" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <span aria-hidden="true">停靠</span>
@@ -133,6 +137,7 @@ export default function Demo() {
         key={dock}
         className="panel-ide-splitter"
         data-dock={dock}
+        data-tabs-touch-separator={tabPlacement === facingPlacement[dock] ? "" : undefined}
         orientation={vertical ? "vertical" : "horizontal"}
         sizes={sizes}
         onDraggerDoubleClick={toggleCollapsed}
