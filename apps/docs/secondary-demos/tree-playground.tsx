@@ -101,7 +101,7 @@ export default function Demo() {
       style={{
         display: "grid",
         gap: 12,
-        width: "min(100%, 34rem)",
+        width: "100%",
         minWidth: 0,
       }}
     >
@@ -129,7 +129,7 @@ export default function Demo() {
       </div>
       <div
         role="group"
-        aria-label="节点尺寸"
+        aria-label="节点尺寸与展开"
         style={{
           display: "flex",
           flexWrap: "wrap",
@@ -155,18 +155,7 @@ export default function Demo() {
             />
           </div>
         ))}
-      </div>
-      <div
-        role="group"
-        aria-label="展开配置"
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "8px 12px",
-          alignItems: "end",
-        }}
-      >
-        <div style={{ display: "grid", gap: 4 }}>
+        <div style={{ display: "grid", gap: 4, inlineSize: "max-content" }}>
           <Text muted>标题展开方式</Text>
           <Select
             label="标题展开方式"
@@ -187,6 +176,7 @@ export default function Demo() {
       <div
         style={{
           minWidth: 0,
+          inlineSize: "min(100%, 34rem)",
           border: "1px solid var(--mt-border)",
           borderRadius: 8,
           padding: 6,
