@@ -9,6 +9,7 @@ const placements = [
   { value: "right", label: "右侧" },
 ] as const;
 type Placement = (typeof placements)[number]["value"];
+const tabHeights = { sm: 28, md: 32, lg: 36 } as const;
 const tabSizes = ["sm", "md", "lg"] as const;
 
 // Paint the editor-facing edge without affecting the separator's hit area.
@@ -51,7 +52,7 @@ export default function Demo() {
   // The Splitter owns the outer extent. Reserve only what its pinned rail needs.
   const sideRail = tabPlacement === "left" || tabPlacement === "right";
   const headerSize = vertical
-    ? (sideRail ? 132 : size === "lg" ? (tabPlacement === "top" ? 38 : 37) : 34)
+    ? (sideRail ? 132 : tabHeights[size] + 2)
     : (sideRail ? 44 : 144);
   const expandedMinSize = vertical ? Math.max(80, headerSize) : 144;
   const defaultSize = vertical ? 142 : 224;

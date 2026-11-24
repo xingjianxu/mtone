@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { Tabs } from "../packages/mtone/src";
+import TabsSizeDemo from "../apps/docs/secondary-demos/tabs-size";
 const items = [
   {
     value: "a",
@@ -218,4 +219,19 @@ it("defaults to md and exposes the requested height preset without remounting ta
   rerender(<Tabs items={items} size="sm" />);
   expect(screen.getByRole("tablist").closest(".mt-tabs")).toHaveAttribute("data-size", "sm");
   expect(screen.getByRole("textbox", { name: "Draft" })).toBe(field);
+});
+
+it("changes the documented Tabs height without replacing the selected tab", async () => {
+  const user = userEvent.setup();
+  render(<TabsSizeDemo />);
+  const options = screen.getByRole("group", { name: "标签高度" });
+  expect(screen.getByRole("tablist")).toBeInTheDocument();
+  await user.click(screen.getByRole("tab", { name: "活动" }));
+  for (const preset of ["sm", "lg", "md"]) {
+    const button = within(options).getByRole("button", { name: new RegExp("^" + preset) });
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("tablist").closest(".mt-tabs")).toHaveAttribute("data-size", preset);
+    expect(screen.getByRole("tabpanel", { name: "活动" })).toHaveTextContent("最近活动");
+  }
 });
