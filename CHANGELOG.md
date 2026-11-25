@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.4
+
+- Add Container with shared 720 / 960 / 1200 / 1440px width presets, responsive centering, and configurable inline padding. PageLayout stays fluid by default.
+- Remove the stray connector on top-level Tree nodes and reveal overflowing custom JSX labels without duplicating their content.
+- Add the opt-in themed Splitter outer border without changing the divider or its defaults.
+
 ## 0.15.3
 
 ### Tree
