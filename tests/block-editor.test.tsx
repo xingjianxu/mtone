@@ -225,3 +225,30 @@ test("read-only renders foldable content, semantic callouts and safe image metad
   ).not.toBeInTheDocument();
   expect(container.querySelector("hr")).toBeInTheDocument();
 });
+
+test("the active code preview is toggled without replacing its source", async () => {
+  const { container } = render(
+    <BlockEditor
+      locale="en"
+      initialContent={[
+        {
+          id: "editable-code",
+          type: "codeBlock",
+          props: { language: "javascript" },
+          content: "const x = 1;",
+        },
+      ]}
+    />,
+  );
+  const preview = await screen.findByRole("button", {
+    name: "Highlight preview",
+  });
+  fireEvent.click(preview);
+  expect(preview).toHaveAttribute("aria-pressed", "true");
+  expect(container.querySelector(".mt-block-editor-code")).toHaveAttribute(
+    "data-preview",
+  );
+  expect(
+    container.querySelector(".mt-block-editor-code-source"),
+  ).toHaveTextContent("const x = 1;");
+});

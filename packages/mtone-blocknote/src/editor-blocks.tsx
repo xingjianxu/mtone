@@ -72,6 +72,28 @@ const image = createReactBlockSpec(
   },
 )();
 
+type CodePresentation = { id?: string; readOnly: boolean };
+const codePresentations = new WeakMap<
+  object,
+  {
+    state: CodePresentation;
+    listeners: Set<() => void>;
+  }
+>();
+function codePresentation(editor: object) {
+  let presentation = codePresentations.get(editor);
+  if (!presentation) {
+    presentation = { state: { readOnly: false }, listeners: new Set() };
+    codePresentations.set(editor, presentation);
+  }
+  return presentation;
+}
+export function setCodePresentation(editor: object, state: CodePresentation) {
+  const presentation = codePresentation(editor);
+  presentation.state = state;
+  for (const update of presentation.listeners) update();
+}
+
 function CodePreview({ text, language }: { text: string; language: string }) {
   return (
     <Typography.Code block language={language}>
@@ -100,8 +122,21 @@ codeBlock.implementation.render = function (block, editor) {
   const root = createRoot(preview);
   let text = block.content.map((item) => item.text).join("");
   let language = block.props.language;
-  const render = () =>
-    root.render(<CodePreview text={text} language={language} />);
+  const presentation = codePresentation(editor);
+  const render = () => {
+    const { id, readOnly } = presentation.state;
+    const currentId =
+      frame.closest<HTMLElement>("[data-node-type=blockContainer]")?.dataset
+        .id ?? block.id;
+    const selected = id === currentId;
+    frame.toggleAttribute("data-preview", selected);
+    root.render(
+      readOnly || selected ? (
+        <CodePreview text={text} language={language} />
+      ) : null,
+    );
+  };
+  presentation.listeners.add(render);
   render();
   return {
     ...original,
@@ -117,6 +152,7 @@ codeBlock.implementation.render = function (block, editor) {
       return true;
     },
     destroy() {
+      presentation.listeners.delete(render);
       original.destroy?.();
       // NodeViews may be destroyed during a parent React commit.
       queueMicrotask(() => root.unmount());

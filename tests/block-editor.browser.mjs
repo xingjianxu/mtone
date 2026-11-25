@@ -122,7 +122,18 @@ try {
   const preview = formats.locator(
     ".mt-block-editor-code-preview .mt-typography-code-block",
   );
-  await preview.waitFor({ state: "visible" });
+  assert.equal(
+    await formatDemo
+      .getByRole("button", { name: "高亮预览", exact: true })
+      .getAttribute("aria-pressed"),
+    "true",
+  );
+  assert.equal(
+    await formats.locator(".mt-block-editor-code[data-preview]").count(),
+    1,
+    "the selected code node retains its preview state",
+  );
+  await preview.waitFor({ state: "visible", timeout: 8_000 });
   assert.match(await preview.textContent(), /const release/);
   await preview.locator(".mt-code-token").first().waitFor();
   await formatDemo

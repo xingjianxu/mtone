@@ -13,7 +13,7 @@ import { useMtone } from "@bixlab/mtone";
 import { EditorControls } from "./editor-controls";
 import { safeLink } from "./editor-link";
 
-import { schema } from "./editor-blocks";
+import { schema, setCodePresentation } from "./editor-blocks";
 
 type TextSchema = typeof schema.blockSchema;
 export type BlockEditorBlock = Block<TextSchema>;
@@ -86,14 +86,7 @@ function EditorInstance({
   );
   const [previewCodeId, setPreviewCodeId] = React.useState<string>();
   React.useLayoutEffect(() => {
-    editor.domElement
-      ?.querySelectorAll<HTMLElement>(".mt-block-editor-code")
-      .forEach((code) => {
-        code.toggleAttribute(
-          "data-preview",
-          code.dataset.codeId === previewCodeId,
-        );
-      });
+    setCodePresentation(editor, { id: previewCodeId, readOnly });
   }, [editor, previewCodeId, readOnly]);
   const composing = React.useRef(false);
   React.useEffect(() => {
