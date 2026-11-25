@@ -81,7 +81,7 @@ export function EditorLinkForm({
   const input = React.useRef<HTMLInputElement>(null);
   const errorId = React.useId();
   React.useEffect(() => {
-    input.current?.focus();
+    input.current?.focus({ preventScroll: true });
   }, []);
   function apply(remove = false) {
     const href = remove ? undefined : safeLink(url);

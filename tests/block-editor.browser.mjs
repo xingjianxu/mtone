@@ -60,6 +60,62 @@ try {
   await editor.press("Control+Home");
   await formatting.waitFor({ state: "hidden", timeout: 3000 });
   const bodyBefore = await editor.boundingBox();
+  await editor.press("Shift+ArrowRight");
+  await formatting.waitFor({ state: "visible" });
+  async function toolbarRow(expected) {
+    const metrics = await formatting
+      .getByRole("button")
+      .evaluateAll((buttons) =>
+        buttons.map((button) => {
+          const rect = button.getBoundingClientRect();
+          return {
+            label: button.getAttribute("aria-label"),
+            x: rect.x,
+            y: rect.y,
+            right: rect.right,
+          };
+        }),
+      );
+    assert.deepEqual(
+      metrics.map(({ label }) => label),
+      expected,
+    );
+    assert(
+      metrics.every(({ y }) => Math.abs(y - metrics[0].y) < 1),
+      "format buttons must stay on a single row",
+    );
+    assert(
+      metrics.every(
+        ({ x, right }, i) =>
+          x >= 0 &&
+          right <= page.viewportSize().width &&
+          (i === 0 || x >= metrics[i - 1].right),
+      ),
+      "buttons remain inside the viewport and do not overlap",
+    );
+  }
+  await toolbarRow([
+    "粗体",
+    "斜体",
+    "下划线",
+    "删除线",
+    "行内代码",
+    "链接",
+    "更多格式",
+  ]);
+  await page.setViewportSize({ width: 360, height: 800 });
+  // The ResizeObserver can commit its React update after setViewportSize resolves.
+  await formatting
+    .getByRole("button", { name: "下划线", exact: true })
+    .waitFor({ state: "hidden" });
+  await toolbarRow(["粗体", "斜体", "链接", "更多格式"]);
+  await formatting.getByRole("button", { name: "更多格式" }).click();
+  await usageDemo
+    .getByRole("button", { name: "下划线", exact: true })
+    .waitFor();
+  await formatting.getByRole("button", { name: "更多格式" }).click();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await editor.press("Control+Home");
   await editor.press("Shift+End");
   await formatting.waitFor({ state: "visible" });
   const selection = await editor.evaluate((element) => {
@@ -148,7 +204,23 @@ try {
   const formatDemo = page.locator(".mt-block-editor").filter({ has: formats });
   await formats.waitFor();
   const table = formats.getByRole("table");
+  const tableTools = formatDemo.getByRole("group", { name: "表格操作" });
+  await tableTools.waitFor({ state: "hidden", timeout: 3000 });
+  assert.equal(
+    await formatDemo.locator(".mt-block-editor-insert").count(),
+    0,
+    "no persistent insert footer",
+  );
   await table.getByRole("cell", { name: "文档" }).click();
+  const tableBox = await table.boundingBox();
+  await tableTools.waitFor({ state: "visible" });
+  const toolsBox = await tableTools.boundingBox();
+  assert(
+    toolsBox &&
+      (Math.abs(toolsBox.y + toolsBox.height - tableBox.y) < 25 ||
+        Math.abs(toolsBox.y - (tableBox.y + tableBox.height)) < 25),
+    "table actions float next to the selected table",
+  );
   await formatDemo.getByRole("button", { name: "添加行", exact: true }).click();
   assert.equal(await table.getByRole("row").count(), 3);
   await formatDemo.getByRole("button", { name: "添加列", exact: true }).click();
@@ -224,6 +296,14 @@ try {
   await page.keyboard.press("Control+z");
   assert.equal(await codeSource.textContent(), previousCode);
   await keyword.waitFor({ state: "visible" });
+  const languageSelect = formatDemo.getByRole("combobox", { name: "代码语言" });
+  await languageSelect.click();
+  await page.getByRole("option", { name: "纯文本", exact: true }).click();
+  await keyword.waitFor({ state: "hidden" });
+  await codeSource.click();
+  await languageSelect.click();
+  await page.getByRole("option", { name: "JavaScript", exact: true }).click();
+  await keyword.waitFor({ state: "visible" });
   await formatDemo
     .getByRole("button", { name: "高亮预览", exact: true })
     .click();
@@ -255,10 +335,19 @@ try {
   await formats
     .getByText("文档与构建产物已经核对。")
     .waitFor({ state: "visible" });
-  await formats
-    .getByRole("img", { name: "草稿、审核、发布的流程图" })
-    .waitFor();
-  await formats.press("Control+Home");
+  const image = formats.getByRole("img", { name: "草稿、审核、发布的流程图" });
+  await image.waitFor();
+  await image.click();
+  const editImage = formatDemo.getByRole("button", {
+    name: "编辑图片",
+    exact: true,
+  });
+  await editImage.waitFor({ state: "visible", timeout: 3000 });
+  await editImage.click();
+  await formatDemo.getByRole("textbox", { name: "图片说明" }).waitFor();
+  await formatDemo.getByRole("button", { name: "取消", exact: true }).click();
+  const heading = formats.getByRole("heading", { name: "提交前检查" });
+  await heading.hover();
   await formatDemo.getByRole("button", { name: "添加块", exact: true }).click();
   await page.getByRole("option", { name: "图片", exact: true }).click();
   await formatDemo

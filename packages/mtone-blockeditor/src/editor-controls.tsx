@@ -1,12 +1,16 @@
 import * as React from "react";
+import { flip, offset, shift } from "@floating-ui/react";
 import {
   filterSuggestionItems,
+  FormattingToolbarExtension,
   insertOrUpdateBlockForSlashMenu,
   SideMenuExtension,
   SuggestionMenu,
 } from "@blocknote/core/extensions";
 import {
+  BlockPopover,
   FormattingToolbarController,
+  PositionPopover,
   SideMenuController,
   SuggestionMenuController,
   useEditorState,
@@ -17,7 +21,6 @@ import {
   Button,
   Popover,
   Select,
-  Toolbar,
   Tooltip,
   TooltipProvider,
   type MenuEntry,
@@ -42,10 +45,8 @@ import {
   Pilcrow,
   Plus,
   Quote,
-  Redo2,
   Strikethrough,
   Underline,
-  Undo2,
 } from "lucide-react";
 import type {
   BlockEditorBlock,
@@ -68,6 +69,7 @@ type Suggestion = {
   group: string;
   icon: React.ReactNode;
   run: () => void;
+  opensForm?: boolean;
 };
 const blockKinds = [
   ["正文", "Paragraph", Pilcrow, { type: "paragraph" }],
@@ -258,6 +260,37 @@ function blockActions(
 
 const keepSelection = (event: React.MouseEvent) => event.preventDefault();
 
+const blockFloatingMiddleware = [
+  offset(8),
+  flip({ padding: 8 }),
+  shift({ padding: 8 }),
+];
+const blockFloatingProps = {
+  placement: "top-start" as const,
+  middleware: blockFloatingMiddleware,
+};
+const blockFloatingElement = { style: { zIndex: 40 } };
+const noFocusTrap = { disabled: true };
+
+function useCompactToolbar(editor: Editor) {
+  const [compact, setCompact] = React.useState(false);
+  React.useLayoutEffect(() => {
+    const frame = editor.domElement?.closest(".mt-block-editor");
+    if (!frame) return;
+    const sync = () =>
+      setCompact(Math.min(frame.clientWidth, window.innerWidth) < 360);
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(frame);
+    window.addEventListener("resize", sync);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", sync);
+    };
+  }, [editor]);
+  return compact;
+}
+
 function SelectionToolbar({
   editor,
   zh,
@@ -282,93 +315,94 @@ function SelectionToolbar({
     ["strike", "删除线", "Strikethrough", Strikethrough],
     ["code", "行内代码", "Inline code", Code],
   ] as const;
+  const compact = useCompactToolbar(editor);
+  const applyStyle = (style: (typeof formatButtons)[number][0]) => {
+    editor.toggleStyles({ [style]: true });
+    editor.focus();
+  };
   return (
     <TooltipProvider delay={420}>
       <div className="mt-block-editor-toolbar-panel">
-        <Toolbar
+        <div
           className="mt-block-editor-toolbar"
-          background="white"
+          role="group"
           aria-label={zh ? "编辑工具" : "Editor formatting"}
-          start={
-            <>
-              {formatButtons.map(([style, chinese, english, Icon]) => (
-                <Tooltip key={style} content={zh ? chinese : english}>
-                  <Button
-                    type="button"
-                    size="small"
-                    iconOnly
-                    aria-label={zh ? chinese : english}
-                    aria-pressed={Boolean(styles?.[style])}
-                    onMouseDown={keepSelection}
-                    onClick={() => {
-                      editor.toggleStyles({ [style]: true });
-                      editor.focus();
-                    }}
-                  >
-                    <Icon size={15} aria-hidden />
-                  </Button>
-                </Tooltip>
-              ))}
-              <Button
-                type="button"
-                size="small"
-                iconOnly
-                aria-label={zh ? "链接" : "Link"}
-                onMouseDown={keepSelection}
-                onClick={openLink}
-              >
-                <Link2 size={16} aria-hidden />
-              </Button>
-            </>
-          }
-          end={
-            <>
-              <Button
-                type="button"
-                size="small"
-                iconOnly
-                aria-label={zh ? "撤销" : "Undo"}
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  editor.undo();
-                  editor.focus();
-                }}
-              >
-                <Undo2 size={16} aria-hidden />
-              </Button>
-              <Button
-                type="button"
-                size="small"
-                iconOnly
-                aria-label={zh ? "重做" : "Redo"}
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  editor.redo();
-                  editor.focus();
-                }}
-              >
-                <Redo2 size={16} aria-hidden />
-              </Button>
-              <Button
-                type="button"
-                size="small"
-                iconOnly
-                aria-label={zh ? "更多格式" : "More formatting"}
-                aria-expanded={moreOpen}
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  setMoreOpen((open) => !open);
-                  setGroupKey(undefined);
-                }}
-              >
-                <Ellipsis size={16} aria-hidden />
-              </Button>
-            </>
-          }
-        />
+        >
+          {formatButtons
+            .slice(0, compact ? 2 : undefined)
+            .map(([style, chinese, english, Icon]) => (
+              <Tooltip key={style} content={zh ? chinese : english}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="small"
+                  iconOnly
+                  aria-label={zh ? chinese : english}
+                  aria-pressed={Boolean(styles?.[style])}
+                  onMouseDown={keepSelection}
+                  onClick={() => applyStyle(style)}
+                >
+                  <Icon size={15} aria-hidden />
+                </Button>
+              </Tooltip>
+            ))}
+          {!compact && (
+            <span
+              className="mt-block-editor-toolbar-divider"
+              aria-hidden="true"
+            />
+          )}
+          <Button
+            type="button"
+            size="small"
+            variant="ghost"
+            iconOnly
+            aria-label={zh ? "链接" : "Link"}
+            onMouseDown={keepSelection}
+            onClick={openLink}
+          >
+            <Link2 size={16} aria-hidden />
+          </Button>
+          <span
+            className="mt-block-editor-toolbar-divider"
+            aria-hidden="true"
+          />
+          <Button
+            type="button"
+            size="small"
+            variant="ghost"
+            iconOnly
+            aria-label={zh ? "更多格式" : "More formatting"}
+            aria-expanded={moreOpen}
+            onMouseDown={keepSelection}
+            onClick={() => {
+              setMoreOpen((open) => !open);
+              setGroupKey(undefined);
+            }}
+          >
+            <Ellipsis size={16} aria-hidden />
+          </Button>
+        </div>
         {moreOpen && (
           <div className="mt-block-editor-toolbar-options">
             <div role="group" aria-label={zh ? "更多格式" : "More formatting"}>
+              {compact &&
+                formatButtons.slice(2).map(([style, chinese, english]) => (
+                  <Button
+                    key={style}
+                    type="button"
+                    size="small"
+                    variant="ghost"
+                    aria-pressed={Boolean(styles?.[style])}
+                    onMouseDown={keepSelection}
+                    onClick={() => {
+                      applyStyle(style);
+                      setMoreOpen(false);
+                    }}
+                  >
+                    {zh ? chinese : english}
+                  </Button>
+                ))}
               {groups.map((group) => (
                 <Button
                   key={group.key}
@@ -384,6 +418,32 @@ function SelectionToolbar({
                   {group.label}
                 </Button>
               ))}
+              <Button
+                type="button"
+                size="small"
+                variant="ghost"
+                onMouseDown={keepSelection}
+                onClick={() => {
+                  editor.undo();
+                  editor.focus();
+                  setMoreOpen(false);
+                }}
+              >
+                {zh ? "撤销" : "Undo"}
+              </Button>
+              <Button
+                type="button"
+                size="small"
+                variant="ghost"
+                onMouseDown={keepSelection}
+                onClick={() => {
+                  editor.redo();
+                  editor.focus();
+                  setMoreOpen(false);
+                }}
+              >
+                {zh ? "重做" : "Redo"}
+              </Button>
             </div>
             {activeGroup && (
               <div
@@ -440,6 +500,33 @@ export function EditorControls({
       stateEditor.getTextCursorPosition().block as BlockEditorBlock,
   });
   const [link, setLink] = React.useState<ReturnType<typeof linkTarget>>();
+  const [focused, setFocused] = React.useState(() =>
+    editor.isFocused({ includeEditorUI: true }),
+  );
+  const [codeSelectOpen, setCodeSelectOpen] = React.useState(false);
+  const [dismissedId, setDismissedId] = React.useState<string>();
+  const hasTextToolbar = useExtensionState(FormattingToolbarExtension, {
+    editor,
+  });
+  React.useEffect(
+    () =>
+      editor.onFocusChange((_editor, state) => setFocused(state.focused), {
+        includeEditorUI: true,
+      }),
+    [editor],
+  );
+  React.useEffect(() => {
+    const dom = editor.domElement;
+    if (!dom) return;
+    const reset = () => setDismissedId(undefined);
+    dom.addEventListener("pointerdown", reset);
+    const unsubscribe = editor.onSelectionChange(reset);
+    return () => {
+      dom.removeEventListener("pointerdown", reset);
+      unsubscribe();
+    };
+  }, [editor]);
+
   const closeLink = () => {
     setLink(undefined);
     editor.focus();
@@ -455,13 +542,26 @@ export function EditorControls({
       },
     [editor, zh, openLink],
   );
-  const openInsert = () => {
-    editor.focus();
-    editor.getExtension(SuggestionMenu)?.openSuggestionMenu("/", {
-      deleteTriggerCharacter: false,
-      ignoreQueryLength: true,
-    });
-  };
+  const openInsert = React.useCallback(
+    (block: BlockEditorBlock) => {
+      editor.setTextCursorPosition(block.id, "end");
+      const active = editor.getTextCursorPosition().block;
+      if (active.type === "codeBlock") {
+        const [next] = editor.insertBlocks(
+          [{ type: "paragraph" }],
+          active.id,
+          "after",
+        );
+        editor.setTextCursorPosition(next.id);
+      }
+      editor.focus();
+      editor.getExtension(SuggestionMenu)?.openSuggestionMenu("/", {
+        deleteTriggerCharacter: false,
+        ignoreQueryLength: true,
+      });
+    },
+    [editor],
+  );
   const getItems = React.useCallback(
     async (query: string) =>
       filterSuggestionItems(
@@ -491,6 +591,7 @@ export function EditorControls({
             aliases: ["图片", "Image", "photo"],
             group: zh ? "其他" : "More",
             icon: <ImageIcon size={16} aria-hidden />,
+            opensForm: true,
             run: () => {
               setLink(undefined);
               setImage({ anchor: editor.getTextCursorPosition().block.id });
@@ -518,118 +619,175 @@ export function EditorControls({
         const extension = editor.getExtension(SideMenuExtension);
         if (!block) return null;
         return (
-          <Popover.Menu
-            trigger={
-              <Button
-                type="button"
-                variant="ghost"
-                size="small"
-                iconOnly
-                aria-label={zh ? "此块的操作" : "Actions for this block"}
-              >
-                <Ellipsis size={16} aria-hidden />
-              </Button>
-            }
-            onOpenChange={(open) => {
-              if (open) extension?.freezeMenu();
-              else extension?.unfreezeMenu();
-            }}
-            items={blockActions(editor, locale, () => block)}
-          />
+          <div className="mt-block-editor-side-actions">
+            <Button
+              type="button"
+              variant="ghost"
+              size="small"
+              iconOnly
+              aria-label={zh ? "添加块" : "Add block"}
+              onMouseDown={keepSelection}
+              onClick={() => openInsert(block)}
+            >
+              <Plus size={16} aria-hidden />
+            </Button>
+            <Popover.Menu
+              trigger={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="small"
+                  iconOnly
+                  aria-label={zh ? "此块的操作" : "Actions for this block"}
+                >
+                  <Ellipsis size={16} aria-hidden />
+                </Button>
+              }
+              onOpenChange={(open) => {
+                if (open) extension?.freezeMenu();
+                else extension?.unfreezeMenu();
+              }}
+              items={blockActions(editor, locale, () => block)}
+            />
+          </div>
         );
       },
-    [editor, locale, zh],
+    [editor, locale, zh, openInsert],
   );
+  const blockToolsOpen =
+    activeBlock &&
+    (activeBlock.type === "table" ||
+      activeBlock.type === "image" ||
+      activeBlock.type === "codeBlock" ||
+      activeBlock.type === "callout") &&
+    (focused || codeSelectOpen) &&
+    dismissedId !== activeBlock.id &&
+    (!hasTextToolbar || activeBlock.type === "image") &&
+    !image &&
+    !link;
   return (
     <>
-      <FormattingToolbarController formattingToolbar={SelectedTextToolbar} />
-      <div className="mt-block-editor-insert">
-        <Button
-          type="button"
-          iconOnly
-          size="small"
-          variant="ghost"
-          aria-label={zh ? "添加块" : "Add block"}
-          onMouseDown={keepSelection}
-          onClick={openInsert}
+      {!image && !link && activeBlock?.type !== "image" && (
+        <FormattingToolbarController formattingToolbar={SelectedTextToolbar} />
+      )}
+      {blockToolsOpen && (
+        <BlockPopover
+          blockId={activeBlock.id}
+          useFloatingOptions={{
+            ...blockFloatingProps,
+            open: true,
+            onOpenChange: (open, _event, reason) => {
+              if (!open) setDismissedId(activeBlock.id);
+              if (reason === "escape-key") editor.focus();
+            },
+          }}
+          useDismissProps={{ enabled: !codeSelectOpen }}
+          focusManagerProps={noFocusTrap}
+          elementProps={blockFloatingElement}
         >
-          <Plus size={16} aria-hidden />
-        </Button>
-      </div>
-      {activeBlock?.type === "table" && (
-        <TableControls editor={editor} block={activeBlock} zh={zh} />
-      )}
-      {activeBlock?.type === "codeBlock" && (
-        <CodeControls
-          editor={editor}
-          block={activeBlock}
-          zh={zh}
-          showPreview={previewCodeId === activeBlock.id}
-          setShowPreview={(open) =>
-            setPreviewCodeId(open ? activeBlock.id : undefined)
-          }
-        />
-      )}
-      {activeBlock?.type === "callout" && (
-        <div className="mt-block-editor-format-controls">
-          <Select
-            label={zh ? "提示类型" : "Callout tone"}
-            value={activeBlock.props.tone}
-            options={[
-              { value: "info", label: zh ? "信息" : "Info" },
-              { value: "tip", label: zh ? "提示" : "Tip" },
-              { value: "warning", label: zh ? "警告" : "Warning" },
-            ]}
-            onValueChange={(tone) => {
-              if (tone === "info" || tone === "tip" || tone === "warning")
-                editor.updateBlock(activeBlock, { props: { tone } });
-            }}
-          />
-        </div>
-      )}
-      {activeBlock?.type === "image" && !image && (
-        <div className="mt-block-editor-format-controls">
-          <Button
-            size="small"
-            onClick={() => {
-              setLink(undefined);
-              setImage({ anchor: activeBlock.id, image: activeBlock });
-            }}
-          >
-            {zh ? "编辑图片" : "Edit image"}
-          </Button>
-        </div>
+          <div className="mt-block-editor-toolbar-panel">
+            {activeBlock?.type === "table" && (
+              <TableControls editor={editor} block={activeBlock} zh={zh} />
+            )}
+            {activeBlock?.type === "codeBlock" && (
+              <CodeControls
+                editor={editor}
+                block={activeBlock}
+                zh={zh}
+                onLanguageOpenChange={setCodeSelectOpen}
+                showPreview={previewCodeId === activeBlock.id}
+                setShowPreview={(open) =>
+                  setPreviewCodeId(open ? activeBlock.id : undefined)
+                }
+              />
+            )}
+            {activeBlock?.type === "callout" && (
+              <div className="mt-block-editor-format-controls">
+                <Select
+                  label={zh ? "提示类型" : "Callout tone"}
+                  onOpenChange={setCodeSelectOpen}
+                  value={activeBlock.props.tone}
+                  options={[
+                    { value: "info", label: zh ? "信息" : "Info" },
+                    { value: "tip", label: zh ? "提示" : "Tip" },
+                    { value: "warning", label: zh ? "警告" : "Warning" },
+                  ]}
+                  onValueChange={(tone) => {
+                    if (tone === "info" || tone === "tip" || tone === "warning")
+                      editor.updateBlock(activeBlock, { props: { tone } });
+                  }}
+                />
+              </div>
+            )}
+            {activeBlock?.type === "image" && !image && (
+              <div className="mt-block-editor-format-controls">
+                <Button
+                  size="small"
+                  onMouseDown={keepSelection}
+                  onClick={() => {
+                    setLink(undefined);
+                    setImage({ anchor: activeBlock.id, image: activeBlock });
+                  }}
+                >
+                  {zh ? "编辑图片" : "Edit image"}
+                </Button>
+              </div>
+            )}
+          </div>
+        </BlockPopover>
       )}
       {image && (
-        <ImageForm
-          key={image.anchor}
-          editor={editor}
-          target={image}
-          zh={zh}
-          uploadImage={uploadImage}
-          onClose={() => {
-            setImage(undefined);
-            editor.focus();
+        <BlockPopover
+          blockId={image.anchor}
+          useFloatingOptions={{ ...blockFloatingProps, open: true }}
+          useDismissProps={{ enabled: false }}
+          focusManagerProps={noFocusTrap}
+          elementProps={blockFloatingElement}
+        >
+          <div className="mt-block-editor-toolbar-panel">
+            <ImageForm
+              key={image.anchor}
+              editor={editor}
+              target={image}
+              zh={zh}
+              uploadImage={uploadImage}
+              onClose={() => {
+                setImage(undefined);
+                editor.focus();
+              }}
+            />
+          </div>
+        </BlockPopover>
+      )}
+      {link && (
+        <PositionPopover
+          position={{ from: link.from, to: link.to }}
+          useFloatingOptions={{ ...blockFloatingProps, open: true }}
+          useDismissProps={{ enabled: false }}
+          focusManagerProps={noFocusTrap}
+          elementProps={blockFloatingElement}
+        >
+          <div className="mt-block-editor-toolbar-panel">
+            <EditorLinkForm
+              target={link}
+              editor={editor}
+              zh={zh}
+              onClose={closeLink}
+            />
+          </div>
+        </PositionPopover>
+      )}
+      {!image && !link && (
+        <SuggestionMenuController
+          triggerCharacter="/"
+          getItems={getItems}
+          suggestionMenuComponent={SuggestionList}
+          onItemClick={(item) => {
+            item.run();
+            if (!item.opensForm) editor.focus();
           }}
         />
       )}
-      {link && (
-        <EditorLinkForm
-          target={link}
-          editor={editor}
-          zh={zh}
-          onClose={closeLink}
-        />
-      )}
-      <SuggestionMenuController
-        triggerCharacter="/"
-        getItems={getItems}
-        suggestionMenuComponent={SuggestionList}
-        onItemClick={(item) => {
-          item.run();
-          editor.focus();
-        }}
-      />
       <SideMenuController sideMenu={SideActions} />
     </>
   );
