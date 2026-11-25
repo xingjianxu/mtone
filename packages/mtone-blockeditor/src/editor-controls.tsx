@@ -64,19 +64,10 @@ import type {
 import { EditorLinkForm, linkTarget } from "./editor-link";
 import { EditorColorMenu } from "./editor-color-menu";
 import { EditorToolbarMenu } from "./editor-toolbar-menu";
-import {
-  isMediaBlock,
-  MediaForm,
-  mediaKinds,
-  type MediaTarget,
-} from "./editor-media";
-import {
-  CodeControls,
-  ImageForm,
-  TableControls,
-  formatActions,
-  type ImageTarget,
-} from "./editor-formats";
+import { isMediaBlock, mediaKinds, type MediaTarget } from "./editor-media";
+import { CodeControls, TableControls, formatActions } from "./editor-formats";
+import { MediaForm, type ImageTarget } from "./editor-media-form";
+
 type Language = "en" | "zh";
 type Suggestion = {
   title: string;
@@ -466,12 +457,14 @@ export function EditorControls({
   editor,
   locale,
   uploadImage,
+  uploadFile,
   previewCodeId,
   setPreviewCodeId,
 }: {
   editor: Editor;
   locale: Language;
   uploadImage?: BlockEditorProps["uploadImage"];
+  uploadFile?: BlockEditorProps["uploadFile"];
   previewCodeId?: string;
   setPreviewCodeId: (id: string | undefined) => void;
 }) {
@@ -756,12 +749,12 @@ export function EditorControls({
           elementProps={blockFloatingElement}
         >
           <div className="mt-block-editor-toolbar-panel">
-            <ImageForm
+            <MediaForm
               key={image.anchor}
               editor={editor}
-              target={image}
+              target={{ ...image, kind: "image" }}
               zh={zh}
-              uploadImage={uploadImage}
+              upload={uploadFile ?? uploadImage}
               onClose={() => {
                 setImage(undefined);
                 editor.focus();
@@ -783,6 +776,7 @@ export function EditorControls({
               key={media.anchor}
               editor={editor}
               target={media}
+              upload={uploadFile}
               zh={zh}
               onClose={() => {
                 setMedia(undefined);

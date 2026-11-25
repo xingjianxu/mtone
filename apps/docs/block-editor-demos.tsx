@@ -20,6 +20,12 @@ const MediaExample = lazy(() =>
   })),
 );
 
+const UploadExample = lazy(() =>
+  import("./block-editor-example").then(({ BlockEditorUploadExample }) => ({
+    default: BlockEditorUploadExample,
+  })),
+);
+
 export const blockEditorDocSections: readonly DocSection[] = [
   {
     id: "usage",
@@ -57,6 +63,16 @@ export const blockEditorDocSections: readonly DocSection[] = [
     Demo: () => (
       <Suspense fallback={<p role="status">正在加载编辑器…</p>}>
         <MediaExample />
+      </Suspense>
+    ),
+    source: editorSource,
+  },
+  {
+    id: "upload",
+    title: "上传与嵌入链接",
+    Demo: () => (
+      <Suspense fallback={<p role="status">正在加载编辑器…</p>}>
+        <UploadExample />
       </Suspense>
     ),
     source: editorSource,

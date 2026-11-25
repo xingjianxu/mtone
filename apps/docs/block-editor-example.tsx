@@ -216,3 +216,36 @@ export function BlockEditorMediaExample() {
     </div>
   );
 }
+
+export function BlockEditorUploadExample() {
+  const uploadFile = async (file: File) => {
+    // Demonstrates the host callback without sending the local file anywhere.
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    const asset = file.type.startsWith("image/")
+      ? flowImage
+      : `${import.meta.env.BASE_URL}block-editor-media/${
+          file.type.startsWith("video/")
+            ? "sample.webm"
+            : file.type.startsWith("audio/")
+              ? "chime.mp3"
+              : "release-notes.txt"
+        }`;
+    return new URL(asset, window.location.href).href;
+  };
+
+  return (
+    <div style={{ inlineSize: "100%", display: "grid", gap: 10 }}>
+      <p>此示例不会上传你的文件，而是用本站示例资源演示上传结果。</p>
+      <BlockEditor
+        label="上传示例正文"
+        initialContent={[
+          {
+            type: "paragraph",
+            content: "在本行下方输入 /，选择图片、视频、音频或附件。",
+          },
+        ]}
+        uploadFile={uploadFile}
+      />
+    </div>
+  );
+}

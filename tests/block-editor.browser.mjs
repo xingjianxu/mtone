@@ -48,6 +48,32 @@ try {
   const editor = page.getByRole("textbox", { name: "发布周记正文" });
   await editor.waitFor();
   const usageDemo = page.locator(".mt-block-editor").filter({ has: editor });
+  const frameCorner = await editor.evaluate((node) => {
+    const frame = node.closest(".mt-block-editor");
+    const root = node.closest(".bn-container");
+    return {
+      inner: getComputedStyle(node).backgroundColor,
+      wrapper: getComputedStyle(root).backgroundColor,
+      radius: getComputedStyle(node).borderTopRightRadius,
+      overflow: getComputedStyle(frame).overflow,
+    };
+  });
+  assert.equal(
+    frameCorner.inner,
+    "rgba(0, 0, 0, 0)",
+    "the inner rectangle cannot paint over the outer radius",
+  );
+  assert.equal(frameCorner.wrapper, "rgba(0, 0, 0, 0)");
+  assert.equal(
+    frameCorner.radius,
+    "7px",
+    "the inset focus outline follows the outer curve",
+  );
+  assert.equal(
+    frameCorner.overflow,
+    "visible",
+    "menus can still extend beyond the frame",
+  );
   const borderless = page.getByRole("switch", { name: "无边框", exact: true });
   const frameWidth = () =>
     usageDemo.evaluate((node) => getComputedStyle(node).borderTopWidth);
@@ -148,9 +174,16 @@ try {
   await usageDemo
     .getByRole("menuitem", { name: "一级标题", exact: true })
     .click();
-  await editor
-    .getByRole("heading", { level: 1, name: "产品发布周记" })
-    .waitFor();
+  const firstHeading = editor.getByRole("heading", {
+    level: 1,
+    name: "产品发布周记",
+  });
+  await firstHeading.waitFor();
+  // Changing the heading can make the browser auto-scroll its selection under
+  // the docs' sticky header. Give the anchored toolbar room before selecting.
+  await firstHeading.evaluate((node) =>
+    node.scrollIntoView({ block: "center", behavior: "instant" }),
+  );
   await editor.press("Control+Home");
   await editor.press("Shift+ArrowRight");
   const center = formatting.getByRole("button", { name: "居中" });
@@ -813,6 +846,43 @@ try {
     grown.frame > grown.host + 50 && grown.body > grown.host + 50,
     "long content grows instead of being clipped",
   );
+  await page.goto(base + "#/components/BlockEditor?section=upload");
+  const uploadBody = page.getByRole("textbox", { name: "上传示例正文" });
+  const uploadEditor = page
+    .locator(".mt-block-editor")
+    .filter({ has: uploadBody });
+  await uploadBody.press("End");
+  await uploadBody.press("Enter");
+  await uploadBody.press("/");
+  await page.getByRole("option", { name: "附件", exact: true }).click();
+  const fileSettings = uploadEditor.getByRole("group", { name: "附件设置" });
+  await fileSettings.getByRole("tab", { name: "嵌入链接" }).click();
+  await fileSettings.getByRole("textbox", { name: "附件地址" }).waitFor();
+  await fileSettings.getByRole("tab", { name: "上传" }).click();
+  await fileSettings
+    .getByRole("tab", { name: "上传", selected: true })
+    .waitFor();
+  // Use the same path as a real user. The underlying file input is hidden
+  // and conditional tab panels can remain mounted during their animations.
+  const [chooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    fileSettings.getByRole("button", { name: "选择文件", exact: true }).click(),
+  ]);
+  await chooser.setFiles({
+    name: "changelog.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("Browser smoke test"),
+  });
+  await fileSettings.getByText("changelog.txt", { exact: true }).waitFor();
+  await fileSettings.getByRole("button", { name: "应用附件" }).click();
+  await fileSettings.getByRole("status").getByText("正在上传…").waitFor();
+  const attachment = uploadBody.getByRole("link", { name: "changelog.txt" });
+  await attachment.waitFor();
+  assert.equal(
+    await attachment.getAttribute("href"),
+    base + "block-editor-media/release-notes.txt",
+  );
+  await fileSettings.waitFor({ state: "hidden" });
   assert.deepEqual(botLogs, []);
   console.log(`Passed BlockEditor targeted browser demo on ${engine}`);
 } finally {
