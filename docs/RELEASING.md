@@ -51,9 +51,11 @@ CI 使用 Node 24（npm 要求至少 11.5.1 / Node 22.14）。发布任务不使
 
 参考：[npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)；[新包 staged publishing](https://github.blog/changelog/2026-10-02-npm-staged-publishing-now-supports-creating-new-packages/)；[npm trust 前提](https://docs.npmjs.com/cli/v11/commands/npm-trust/)；[scoped 包与网站审核步骤](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/)。
 
-
 ## 发布可选编辑器 `@bixlab/mtone-blockeditor`
 
-编辑器独立版本为 `0.1.0`。首次发布走新包流程，正式上架后同步更新文档里的安装提示。与主包一同发布时，先按上面的流程发布主包；编辑器不由主包的 `publish.yml` 发布，也不要为编辑器另建会触发主包流程的正式 GitHub Release。
+编辑器与主包独立编号，分别配置 npm Trusted Publisher。两个包共用仓库、`publish.yml` 和 GitHub Environment `npm`，但发布事件由标签明确区分：
 
-在已通过要求的回归并部署文档的同一提交上，执行 `npm ci`，先构建主包、再构建编辑器，然后执行 `npm pack -w @bixlab/mtone-blockeditor`。检查 tarball 含 ESM、声明、样式、许可证和第三方告知，并在干净项目中与官方 npm 已发布的主包一起安装验证。首次发布由有 `@bixlab` 包创建权限的维护者在已登录并验证的 npm 会话使用 `npm stage publish <已核对的-tarball.tgz> --access public`，再在 npm 网站或 CLI 审核，以 2FA 确认。Staging 会公开创建占位版本，正式版本在审核后才可安装。确认 npm 的包名、版本和完整性后，再用官方 registry 进行一次干净安装。编辑器未来如需 OIDC，按包单独设置，并使用与主包区隔的发布工作流。
+- `v<主包版本>`：只发布 `@bixlab/mtone`。
+- `v<编辑器版本>-blockeditor`：只发布 `@bixlab/mtone-blockeditor`。例如编辑器 `0.2.1` 对应 `v0.2.1-blockeditor`。
+
+合并已验证的编辑器及版本改动后，从该提交创建正式 GitHub Release；如果主包已发，不要改动原 Release 或重发主包。编辑器 Release 不勾选预发布；在 GitHub 中选择不设为 latest，保留主包 Release 的 latest 标记。工作流校验精确提交、编辑器包名、版本、仓库和许可证后，构建两个 workspace、检查编辑器 tarball 内容，并通过 OIDC 直接发布已检查的 tarball。不会重跑全量回归，也不会发布主包。最后从 npm 官方 registry 全新安装两个包并核对版本。
