@@ -24,7 +24,7 @@ export default function Notes() {
 
 Use a new `documentKey` to load a different `initialContent`; do not feed the change event back as a controlled value. Persist and validate the returned BlockNote JSON in your app. Set `readOnly` for view-only presentation, not for access control.
 
-For Next.js, dynamically load the editor in a client component with `ssr: false`. To support on-screen keyboard layout in Chromium, add `interactive-widget=resizes-content` to the viewport settings. No uploads, collaboration, AI, or advanced editor blocks are provided in this package. See the [shared documentation](https://xingjianxu.github.io/mtone/#/components/BlockEditor).
+For Next.js, dynamically load the editor in a client component with `ssr: false`. To support on-screen keyboard layout in Chromium, add `interactive-widget=resizes-content` to the viewport settings. The editor supports basic tables, collapsible blocks, semantic callouts, and images by HTTP(S) URL. Pass `uploadImage(file)` to connect your own image storage; the package supplies neither storage nor a backend. Code stays editable in BlockNote, with mtone Typography.Code used for highlighted preview and read-only display. Cell merging, collaboration, and AI are not included. See the [shared documentation](https://xingjianxu.github.io/mtone/#/components/BlockEditor).
 
 ## Development
 

@@ -105,6 +105,53 @@ try {
   assert(await dialog.isVisible(), "Escape closes suggestions first");
   await draft.press("Escape");
   await dialog.waitFor({ state: "hidden" });
+  const formats = page.getByRole("textbox", { name: "格式示例正文" });
+  const formatDemo = page.locator(".mt-block-editor").filter({ has: formats });
+  await formats.waitFor();
+  const table = formats.getByRole("table");
+  await table.getByRole("cell", { name: "文档" }).click();
+  await formatDemo.getByRole("button", { name: "添加行", exact: true }).click();
+  assert.equal(await table.getByRole("row").count(), 3);
+  await formatDemo.getByRole("button", { name: "添加列", exact: true }).click();
+  assert.equal(await table.getByRole("row").first().locator("th").count(), 3);
+  await formats.locator(".mt-block-editor-code-source code").click();
+  await formatDemo
+    .getByRole("button", { name: "高亮预览", exact: true })
+    .click();
+  const preview = formats.locator(
+    ".mt-block-editor-code-preview .mt-typography-code-block",
+  );
+  await preview.waitFor({ state: "visible" });
+  assert.match(await preview.textContent(), /const release/);
+  await preview.locator(".mt-code-token").first().waitFor();
+  await formatDemo
+    .getByRole("button", { name: "高亮预览", exact: true })
+    .click();
+  await preview.waitFor({ state: "hidden" });
+  const fold = formats.locator(".bn-toggle-button");
+  assert.equal(await fold.getAttribute("aria-expanded"), "false");
+  await fold.click();
+  assert.equal(await fold.getAttribute("aria-expanded"), "true");
+  await formats
+    .getByText("文档与构建产物已经核对。")
+    .waitFor({ state: "visible" });
+  await formats
+    .getByRole("img", { name: "草稿、审核、发布的流程图" })
+    .waitFor();
+  await formats.press("Control+Home");
+  await formatDemo.getByRole("button", { name: "添加块", exact: true }).click();
+  await page.getByRole("option", { name: "图片", exact: true }).click();
+  await formatDemo
+    .getByRole("textbox", { name: "图片地址" })
+    .fill("javascript:alert(1)");
+  await formatDemo.getByRole("button", { name: "应用图片" }).click();
+  await formatDemo.getByRole("alert").getByText(/HTTP/).waitFor();
+  await formatDemo.getByRole("button", { name: "取消", exact: true }).click();
+  await page.getByRole("switch", { name: "仅阅读" }).click();
+  await preview.waitFor({ state: "visible" });
+  await formats
+    .locator(".mt-block-editor-code-source")
+    .waitFor({ state: "hidden" });
   assert.deepEqual(botLogs, []);
   console.log(`Passed BlockEditor targeted browser demo on ${engine}`);
 } finally {

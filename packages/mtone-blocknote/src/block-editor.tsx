@@ -3,10 +3,7 @@
 import * as React from "react";
 import {
   BlockNoteEditor,
-  BlockNoteSchema,
-  defaultBlockSpecs,
   type Block,
-  type DefaultBlockSchema,
   type PartialBlock,
 } from "@blocknote/core";
 import { SuggestionMenu } from "@blocknote/core/extensions";
@@ -16,27 +13,9 @@ import { useMtone } from "@bixlab/mtone";
 import { EditorControls } from "./editor-controls";
 import { safeLink } from "./editor-link";
 
-const {
-  paragraph,
-  heading,
-  bulletListItem,
-  numberedListItem,
-  checkListItem,
-  quote,
-  codeBlock,
-} = defaultBlockSpecs;
-const schema = BlockNoteSchema.create({
-  blockSpecs: {
-    paragraph,
-    heading,
-    bulletListItem,
-    numberedListItem,
-    checkListItem,
-    quote,
-    codeBlock,
-  },
-});
-type TextSchema = Pick<DefaultBlockSchema, keyof typeof schema.blockSchema>;
+import { schema } from "./editor-blocks";
+
+type TextSchema = typeof schema.blockSchema;
 export type BlockEditorBlock = Block<TextSchema>;
 export type BlockEditorInput = PartialBlock<TextSchema>;
 export type Editor = BlockNoteEditor<TextSchema>;
@@ -51,6 +30,8 @@ export interface BlockEditorProps {
   label?: string;
   locale?: "zh" | "en";
   className?: string;
+  /** Optional host upload; return an HTTP(S) URL for the stored file. */
+  uploadImage?: (file: File) => Promise<string>;
 }
 
 export function BlockEditor({ documentKey, ...props }: BlockEditorProps) {
@@ -77,6 +58,7 @@ function EditorInstance({
   locale: explicitLocale,
   label,
   className,
+  uploadImage,
 }: BlockEditorProps) {
   const { locale: inheritedLocale, theme } = useMtone();
   const locale = explicitLocale ?? inheritedLocale;
@@ -84,6 +66,7 @@ function EditorInstance({
   const [editor] = React.useState<Editor>(() =>
     BlockNoteEditor.create({
       schema,
+      tables: { headers: true },
       links: {
         isValidLink: (href) => Boolean(safeLink(href)),
         HTMLAttributes: { rel: "noopener noreferrer", target: "_blank" },
@@ -101,6 +84,17 @@ function EditorInstance({
       },
     }),
   );
+  const [previewCodeId, setPreviewCodeId] = React.useState<string>();
+  React.useLayoutEffect(() => {
+    editor.domElement
+      ?.querySelectorAll<HTMLElement>(".mt-block-editor-code")
+      .forEach((code) => {
+        code.toggleAttribute(
+          "data-preview",
+          code.dataset.codeId === previewCodeId,
+        );
+      });
+  }, [editor, previewCodeId, readOnly]);
   const composing = React.useRef(false);
   React.useEffect(() => {
     editor.domElement?.setAttribute("aria-label", name);
@@ -110,6 +104,7 @@ function EditorInstance({
   return (
     <div
       className={["mt-block-editor", className].filter(Boolean).join(" ")}
+      data-read-only={readOnly ? "" : undefined}
       onCompositionStartCapture={() => {
         composing.current = true;
       }}
@@ -152,7 +147,15 @@ function EditorInstance({
           readOnly || !onChange ? undefined : () => onChange(editor.document)
         }
       >
-        {!readOnly && <EditorControls editor={editor} locale={locale} />}
+        {!readOnly && (
+          <EditorControls
+            editor={editor}
+            locale={locale}
+            uploadImage={uploadImage}
+            previewCodeId={previewCodeId}
+            setPreviewCodeId={setPreviewCodeId}
+          />
+        )}
         <BlockNoteViewEditor />
       </BlockNoteViewRaw>
     </div>

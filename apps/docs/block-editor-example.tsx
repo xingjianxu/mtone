@@ -6,6 +6,7 @@ import {
   type BlockEditorInput,
 } from "@bixlab/mtone-blocknote";
 import "@bixlab/mtone-blocknote/styles.css";
+import flowImage from "./block-editor-image.svg?no-inline";
 
 const initialContent: readonly BlockEditorInput[] = [
   { type: "heading", props: { level: 1 }, content: "产品发布周记" },
@@ -39,7 +40,11 @@ export default function BlockEditorExample() {
           gap: 8,
         }}
       >
-        <Switch label="只读预览" checked={readOnly} onCheckedChange={setReadOnly} />
+        <Switch
+          label="只读预览"
+          checked={readOnly}
+          onCheckedChange={setReadOnly}
+        />
         <Button
           type="button"
           onClick={() => {
@@ -64,6 +69,74 @@ export default function BlockEditorExample() {
         label="发布周记正文"
         initialContent={initialContent}
         onChange={update}
+        readOnly={readOnly}
+      />
+    </div>
+  );
+}
+
+const richerContent: readonly BlockEditorInput[] = [
+  {
+    type: "heading",
+    props: { level: 3 },
+    content: "提交前检查",
+  },
+  {
+    type: "paragraph",
+    content: [
+      { type: "text", text: "运行 ", styles: {} },
+      { type: "text", text: "npm run build", styles: { code: true } },
+      {
+        type: "text",
+        text: "，并核对发布清单。",
+        styles: { textColor: "blue", backgroundColor: "teal" },
+      },
+    ],
+  },
+  {
+    type: "table",
+    content: {
+      type: "tableContent",
+      headerRows: 1,
+      rows: [{ cells: ["检查项", "状态"] }, { cells: ["文档", "已更新"] }],
+    },
+  },
+  {
+    type: "codeBlock",
+    props: { language: "typescript" },
+    content: "const release = { ready: true };\nconsole.log(release);",
+  },
+  { type: "divider" },
+  {
+    type: "toggleListItem",
+    content: "展开发布记录",
+    children: [{ type: "paragraph", content: "文档与构建产物已经核对。" }],
+  },
+  {
+    type: "callout",
+    props: { tone: "tip" },
+    content: "正式发布前，从干净项目安装一次。",
+  },
+];
+
+export function BlockEditorFormatsExample() {
+  const [readOnly, setReadOnly] = React.useState(false);
+  return (
+    <div style={{ inlineSize: "100%", display: "grid", gap: 10 }}>
+      <Switch label="仅阅读" checked={readOnly} onCheckedChange={setReadOnly} />
+      <BlockEditor
+        label="格式示例正文"
+        initialContent={[
+          ...richerContent,
+          {
+            type: "image",
+            props: {
+              url: new URL(flowImage, window.location.href).href,
+              alt: "草稿、审核、发布的流程图",
+              caption: "发布流程",
+            },
+          },
+        ]}
         readOnly={readOnly}
       />
     </div>

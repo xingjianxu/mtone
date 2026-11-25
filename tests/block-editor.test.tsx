@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeAll, expect, test, vi } from "vitest";
 import { BlockEditor } from "../packages/mtone-blocknote/src";
 
@@ -8,6 +8,10 @@ beforeAll(() => {
   viewport.content =
     "width=device-width, initial-scale=1, interactive-widget=resizes-content";
   document.head.append(viewport);
+  for (const target of [HTMLElement.prototype, Range.prototype]) {
+    const rect = () => new DOMRect(0, 0, 0, 0);
+    target.getBoundingClientRect = rect;
+  }
 });
 
 test("loads native blocks once per key and switches to read-only without replacing text", () => {
@@ -121,4 +125,103 @@ test("readonly preserves an inline origin link and checked task state", () => {
   expect(screen.getByText("Reference").closest("strong")).not.toBeNull();
   expect(screen.getByRole("checkbox")).toBeChecked();
   expect(screen.getByRole("checkbox")).toBeDisabled();
+});
+
+test("opens a basic table and persists row, column and header edits", async () => {
+  const onChange = vi.fn();
+  render(
+    <BlockEditor
+      label="Notes"
+      locale="en"
+      onChange={onChange}
+      initialContent={[
+        {
+          type: "table",
+          content: {
+            type: "tableContent",
+            rows: [{ cells: ["A", "B"] }, { cells: ["C", "D"] }],
+          },
+        },
+      ]}
+    />,
+  );
+  expect(await screen.findByRole("table")).toBeInTheDocument();
+  fireEvent.click(await screen.findByRole("button", { name: "Add row" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add column" }));
+  fireEvent.click(screen.getByRole("button", { name: "Header row" }));
+  const table = onChange.mock.lastCall?.[0].find(
+    (block: { type: string }) => block.type === "table",
+  );
+  expect(table.content.rows).toHaveLength(3);
+  expect(table.content.rows[0].cells).toHaveLength(3);
+  expect(table.content.headerRows).toBe(1);
+});
+
+test("read-only code is rendered with mtone Typography.Code", async () => {
+  const { container } = render(
+    <BlockEditor
+      readOnly
+      initialContent={[
+        {
+          type: "codeBlock",
+          props: { language: "javascript" },
+          content: "const answer = 42;",
+        },
+      ]}
+    />,
+  );
+  await waitFor(() =>
+    expect(
+      container.querySelector(".mt-typography-code-block"),
+    ).toHaveTextContent("const answer = 42;"),
+  );
+});
+
+test("read-only renders foldable content, semantic callouts and safe image metadata", async () => {
+  const { container } = render(
+    <BlockEditor
+      locale="en"
+      readOnly
+      initialContent={[
+        {
+          type: "toggleListItem",
+          content: "Details",
+          children: [{ type: "paragraph", content: "Nested detail" }],
+        },
+        {
+          type: "callout",
+          props: { tone: "warning" },
+          content: "Review before publishing",
+        },
+        {
+          type: "image",
+          props: {
+            url: "https://example.com/photo.png",
+            alt: "Example photo",
+            caption: "Figure one",
+          },
+        },
+        {
+          type: "image",
+          props: { url: "javascript:alert(1)", alt: "Blocked image" },
+        },
+        { type: "divider" },
+      ]}
+    />,
+  );
+  expect(screen.getByText("Nested detail")).toBeInTheDocument();
+  await waitFor(() =>
+    expect(
+      screen.getByText("Review before publishing").closest("aside"),
+    ).toHaveAttribute("data-tone", "warning"),
+  );
+  expect(screen.getByRole("img", { name: "Example photo" })).toHaveAttribute(
+    "src",
+    "https://example.com/photo.png",
+  );
+  expect(screen.getByText("Figure one")).toBeInTheDocument();
+  expect(
+    screen.queryByRole("img", { name: "Blocked image" }),
+  ).not.toBeInTheDocument();
+  expect(container.querySelector("hr")).toBeInTheDocument();
 });

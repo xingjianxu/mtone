@@ -98,16 +98,17 @@ export default function Demo() {
   />;
 }`,
     props: [
-      { name: "initialContent", type: "readonly BlockEditorInput[]", description: "只在创建该文档时读取；支持正文、标题、项目/编号列表、待办项、引用和代码块。默认空段落。" },
+      { name: "initialContent", type: "readonly BlockEditorInput[]", description: "仅在创建该文档时读取。支持正文、标题、列表、待办、引用、分割线、代码、表格、折叠、提示块和 URL 图片。默认空段落。" },
       { name: "documentKey", type: "string | number", description: "换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。" },
       { name: "onChange", type: "(blocks: BlockEditorBlock[]) => void", description: "内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。" },
-      { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文与链接，不显示工具栏；不替代应用权限校验。" },
+      { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。" },
+      { name: "uploadImage", type: "(file: File) => Promise<string>", description: "可选。由宿主上传图片并返回 HTTP(S) 地址；未传时仍可通过 URL 插入图片。" },
       { name: "label / locale / className", type: "string / 'zh' | 'en' / string", description: "正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。" },
     ],
     notes: [
       "编辑器单独安装：npm install @bixlab/mtone @bixlab/mtone-blocknote。请以 npm 可用版本为准。主包不包含、也不依赖编辑器。",
       "导入两份 CSS；Next.js 使用客户端组件，推荐动态导入并设置 ssr: false。移动端 viewport 建议加 interactive-widget=resizes-content。",
-      "键入 / 或点 + 添加块；选择文本后可设置格式与链接。当前块菜单支持下方插入、复制、上移、下移、删除。拖拽、附件与表格编辑尚未包含。",
+      "键入 / 或点 + 添加块。更多格式提供对齐、文字色和高亮。将光标放进表格单元格即可增删行列、切换表头；不支持合并单元格。代码语言可切换，可选高亮预览；图片可编辑替代文本和说明。",
       "原生 JSON 是主存储格式。只读只影响界面。外部内容仍需由应用验证来源、权限以及数据结构。",
     ],
   },

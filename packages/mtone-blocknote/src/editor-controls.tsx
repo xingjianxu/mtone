@@ -15,6 +15,7 @@ import {
 import {
   Button,
   Popover,
+  Select,
   Toolbar,
   Tooltip,
   TooltipProvider,
@@ -26,6 +27,12 @@ import {
   Ellipsis,
   Heading1,
   Heading2,
+  Heading3,
+  ImageIcon,
+  Info,
+  Minus,
+  ChevronRight,
+  Table2,
   Italic,
   Link2,
   List,
@@ -42,9 +49,17 @@ import {
 import type {
   BlockEditorBlock,
   BlockEditorInput,
+  BlockEditorProps,
   Editor,
 } from "./block-editor";
 import { EditorLinkForm, linkTarget } from "./editor-link";
+import {
+  CodeControls,
+  ImageForm,
+  TableControls,
+  formatActions,
+  type ImageTarget,
+} from "./editor-formats";
 type Language = "en" | "zh";
 type Suggestion = {
   title: string;
@@ -57,11 +72,27 @@ const blockKinds = [
   ["正文", "Paragraph", Pilcrow, { type: "paragraph" }],
   ["一级标题", "Heading 1", Heading1, { type: "heading", props: { level: 1 } }],
   ["二级标题", "Heading 2", Heading2, { type: "heading", props: { level: 2 } }],
+  ["三级标题", "Heading 3", Heading3, { type: "heading", props: { level: 3 } }],
   ["项目列表", "Bullet list", List, { type: "bulletListItem" }],
   ["编号列表", "Numbered list", ListOrdered, { type: "numberedListItem" }],
   ["待办项", "Checklist", ListChecks, { type: "checkListItem" }],
   ["引用", "Quote", Quote, { type: "quote" }],
   ["代码块", "Code block", Code, { type: "codeBlock" }],
+  ["分割线", "Divider", Minus, { type: "divider" }],
+  [
+    "表格",
+    "Table",
+    Table2,
+    {
+      type: "table",
+      content: {
+        type: "tableContent",
+        rows: [{ cells: [[], []] }, { cells: [[], []] }],
+      },
+    },
+  ],
+  ["折叠块", "Toggle", ChevronRight, { type: "toggleListItem" }],
+  ["提示块", "Callout", Info, { type: "callout" }],
 ] as const satisfies readonly (readonly [
   string,
   string,
@@ -227,11 +258,23 @@ function blockActions(
 export function EditorControls({
   editor,
   locale,
+  uploadImage,
+  previewCodeId,
+  setPreviewCodeId,
 }: {
   editor: Editor;
   locale: Language;
+  uploadImage?: BlockEditorProps["uploadImage"];
+  previewCodeId?: string;
+  setPreviewCodeId: (id: string | undefined) => void;
 }) {
   const zh = locale === "zh";
+  const [image, setImage] = React.useState<ImageTarget>();
+  const activeBlock = useEditorState({
+    editor,
+    selector: ({ editor: stateEditor }) =>
+      stateEditor.getTextCursorPosition().block as BlockEditorBlock,
+  });
   const [link, setLink] = React.useState<ReturnType<typeof linkTarget>>();
   const styles = useEditorState({
     editor,
@@ -251,36 +294,46 @@ export function EditorControls({
   };
   const openInsert = () => {
     editor.focus();
-    editor
-      .getExtension(SuggestionMenu)
-      ?.openSuggestionMenu("/", {
-        deleteTriggerCharacter: false,
-        ignoreQueryLength: true,
-      });
+    editor.getExtension(SuggestionMenu)?.openSuggestionMenu("/", {
+      deleteTriggerCharacter: false,
+      ignoreQueryLength: true,
+    });
   };
   const getItems = React.useCallback(
     async (query: string) =>
       filterSuggestionItems(
-        blockKinds.map(
-          ([chinese, english, Icon, block], index): Suggestion => ({
-            title: zh ? chinese : english,
-            aliases: [chinese, english],
-            group:
-              index < 3
-                ? zh
-                  ? "基本"
-                  : "Basic"
-                : index < 6
+        [
+          ...blockKinds.map(
+            ([chinese, english, Icon, block], index): Suggestion => ({
+              title: zh ? chinese : english,
+              aliases: [chinese, english],
+              group:
+                index < 4
                   ? zh
-                    ? "列表"
-                    : "Lists"
-                  : zh
-                    ? "其他"
-                    : "More",
-            icon: <Icon size={16} aria-hidden />,
-            run: () => insertOrUpdateBlockForSlashMenu(editor, block),
-          }),
-        ),
+                    ? "基本"
+                    : "Basic"
+                  : index < 7
+                    ? zh
+                      ? "列表"
+                      : "Lists"
+                    : zh
+                      ? "其他"
+                      : "More",
+              icon: <Icon size={16} aria-hidden />,
+              run: () => insertOrUpdateBlockForSlashMenu(editor, block),
+            }),
+          ),
+          {
+            title: zh ? "图片" : "Image",
+            aliases: ["图片", "Image", "photo"],
+            group: zh ? "其他" : "More",
+            icon: <ImageIcon size={16} aria-hidden />,
+            run: () => {
+              setLink(undefined);
+              setImage({ anchor: editor.getTextCursorPosition().block.id });
+            },
+          },
+        ],
         query,
       ),
     [editor, zh],
@@ -367,9 +420,11 @@ export function EditorControls({
                 aria-label={zh ? "链接" : "Link"}
                 aria-expanded={Boolean(link)}
                 onMouseDown={keepSelection}
-                onClick={() =>
-                  link ? closeLink() : setLink(linkTarget(editor))
-                }
+                onClick={() => {
+                  setImage(undefined);
+                  if (link) closeLink();
+                  else setLink(linkTarget(editor));
+                }}
               >
                 <Link2 size={16} aria-hidden />
               </Button>
@@ -409,6 +464,20 @@ export function EditorControls({
                     type="button"
                     size="small"
                     iconOnly
+                    aria-label={zh ? "更多格式" : "More formatting"}
+                    onMouseDown={keepSelection}
+                  >
+                    <Ellipsis size={16} aria-hidden />
+                  </Button>
+                }
+                items={formatActions(editor, zh)}
+              />
+              <Popover.Menu
+                trigger={
+                  <Button
+                    type="button"
+                    size="small"
+                    iconOnly
                     aria-label={zh ? "当前块操作" : "Current block actions"}
                   >
                     <Ellipsis size={16} aria-hidden />
@@ -424,6 +493,63 @@ export function EditorControls({
           }
         />
       </TooltipProvider>
+      {activeBlock?.type === "table" && (
+        <TableControls editor={editor} block={activeBlock} zh={zh} />
+      )}
+      {activeBlock?.type === "codeBlock" && (
+        <CodeControls
+          editor={editor}
+          block={activeBlock}
+          zh={zh}
+          showPreview={previewCodeId === activeBlock.id}
+          setShowPreview={(open) =>
+            setPreviewCodeId(open ? activeBlock.id : undefined)
+          }
+        />
+      )}
+      {activeBlock?.type === "callout" && (
+        <div className="mt-block-editor-format-controls">
+          <Select
+            label={zh ? "提示类型" : "Callout tone"}
+            value={activeBlock.props.tone}
+            options={[
+              { value: "info", label: zh ? "信息" : "Info" },
+              { value: "tip", label: zh ? "提示" : "Tip" },
+              { value: "warning", label: zh ? "警告" : "Warning" },
+            ]}
+            onValueChange={(tone) => {
+              if (tone === "info" || tone === "tip" || tone === "warning")
+                editor.updateBlock(activeBlock, { props: { tone } });
+            }}
+          />
+        </div>
+      )}
+      {activeBlock?.type === "image" && !image && (
+        <div className="mt-block-editor-format-controls">
+          <Button
+            size="small"
+            onClick={() => {
+              setLink(undefined);
+              setImage({ anchor: activeBlock.id, image: activeBlock });
+            }}
+          >
+            {zh ? "编辑图片" : "Edit image"}
+          </Button>
+        </div>
+      )}
+      {image && (
+        <ImageForm
+          key={image.anchor}
+          editor={editor}
+          target={image}
+          zh={zh}
+          uploadImage={uploadImage}
+          onClose={() => {
+            setImage(undefined);
+            editor.focus();
+          }}
+        />
+      )}
       {link && (
         <EditorLinkForm
           target={link}
