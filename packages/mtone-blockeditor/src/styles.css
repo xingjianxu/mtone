@@ -15,6 +15,20 @@
   border: 0;
   border-radius: 0;
 }
+.mt-block-editor[data-fill-height] {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100%;
+}
+.mt-block-editor[data-fill-height] > .bn-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+.mt-block-editor[data-fill-height] > .bn-container > .bn-editor {
+  flex: 1 0 auto;
+}
 .mt-block-editor .bn-root,
 .mt-block-editor .bn-editor {
   --bn-colors-editor-background: var(--mt-bg, white);

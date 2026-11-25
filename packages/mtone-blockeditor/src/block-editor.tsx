@@ -32,6 +32,8 @@ export interface BlockEditorProps {
   readOnly?: boolean;
   /** Hide the outer frame without changing editor content or controls. */
   borderless?: boolean;
+  /** Fill a parent with a definite height; content may still grow beyond it. */
+  fillHeight?: boolean;
   label?: string;
   locale?: "zh" | "en";
   className?: string;
@@ -61,6 +63,7 @@ function EditorInstance({
   onChange,
   readOnly = false,
   borderless = false,
+  fillHeight = false,
   locale: explicitLocale,
   label,
   className,
@@ -106,6 +109,7 @@ function EditorInstance({
       className={["mt-block-editor", className].filter(Boolean).join(" ")}
       data-read-only={readOnly ? "" : undefined}
       data-borderless={borderless ? "" : undefined}
+      data-fill-height={fillHeight ? "" : undefined}
       onCompositionStartCapture={() => {
         composing.current = true;
       }}

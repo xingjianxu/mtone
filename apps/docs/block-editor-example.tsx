@@ -82,6 +82,28 @@ export default function BlockEditorExample() {
   );
 }
 
+export function BlockEditorFillHeightExample() {
+  const [fillHeight, setFillHeight] = React.useState(true);
+  return (
+    <div style={{ display: "grid", gap: 10, inlineSize: "100%" }}>
+      <Switch
+        label="填满父容器"
+        checked={fillHeight}
+        onCheckedChange={setFillHeight}
+      />
+      <div style={{ blockSize: "22rem" }} data-block-editor-fill-demo>
+        <BlockEditor
+          fillHeight={fillHeight}
+          label="高度示例正文"
+          initialContent={[
+            { type: "paragraph", content: "父容器高 22rem。继续输入时，正文可向下撑开。" },
+          ]}
+        />
+      </div>
+    </div>
+  );
+}
+
 const richerContent: readonly BlockEditorInput[] = [
   {
     type: "heading",

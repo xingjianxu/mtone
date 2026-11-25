@@ -103,6 +103,7 @@ export default function Demo() {
       { name: "onChange", type: "(blocks: BlockEditorBlock[]) => void", description: "内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。" },
       { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。" },
       { name: "borderless", type: "boolean", default: "false", description: "只移除编辑器外框，保留内部样式和键盘焦点提示。" },
+      { name: "fillHeight", type: "boolean", default: "false", description: "开启后填满具有明确高度的父容器；内容超出则自然撑开。父容器高度未确定时仍使用正文 15rem 最小高度。" },
       { name: "uploadImage", type: "(file: File) => Promise<string>", description: "可选。由宿主上传图片并返回 HTTP(S) 地址；未传时仍可通过 URL 插入图片。" },
       { name: "label / locale / className", type: "string / 'zh' | 'en' / string", description: "正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。" },
     ],

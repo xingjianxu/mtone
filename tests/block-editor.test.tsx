@@ -74,6 +74,22 @@ test("can remove just the frame without remounting the editor", () => {
   expect(onChange).not.toHaveBeenCalled();
 });
 
+test("opts into filling the host without replacing the document", () => {
+  const { rerender } = render(
+    <BlockEditor
+      label="Fill example"
+      initialContent={[{ type: "paragraph", content: "Original" }]}
+    />,
+  );
+  const editor = screen.getByRole("textbox", { name: "Fill example" });
+  const frame = editor.closest(".mt-block-editor");
+  expect(frame).not.toHaveAttribute("data-fill-height");
+  rerender(<BlockEditor label="Fill example" fillHeight />);
+  expect(frame).toHaveAttribute("data-fill-height");
+  expect(screen.getByRole("textbox", { name: "Fill example" })).toBe(editor);
+  expect(editor).toHaveTextContent("Original");
+});
+
 test("a keyboard form submission can't reach editor controls during composition", () => {
   render(<BlockEditor label="Notes" />);
   const editor = screen.getByRole("textbox", { name: "Notes" });

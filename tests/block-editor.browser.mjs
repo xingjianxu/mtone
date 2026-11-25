@@ -770,6 +770,49 @@ try {
   await player.evaluate((el) => {
     el.style.inlineSize = "";
   });
+  await page.goto(base + "#/components/BlockEditor?section=fill-height");
+  const fillBody = page.getByRole("textbox", { name: "高度示例正文" });
+  const fillToggle = page.getByRole("switch", { name: "填满父容器" });
+  const fillHost = page.locator("[data-block-editor-fill-demo]");
+  await fillBody.waitFor();
+  const editorHeights = () =>
+    fillBody.evaluate((node) => ({
+      body: node.getBoundingClientRect().height,
+      frame: node.closest(".mt-block-editor").getBoundingClientRect().height,
+      host: node
+        .closest("[data-block-editor-fill-demo]")
+        .getBoundingClientRect().height,
+    }));
+  const filled = await editorHeights();
+  assert(
+    Math.abs(filled.body + 2 - filled.host) < 1,
+    "the editable body fills the fixed parent",
+  );
+  assert(Math.abs(filled.frame - filled.host) < 1);
+  await fillToggle.click();
+  const normal = await editorHeights();
+  assert(normal.body < normal.host);
+  await fillToggle.click();
+  await fillHost.evaluate((node) => {
+    node.style.blockSize = "auto";
+  });
+  assert(
+    Math.abs((await editorHeights()).body - normal.body) < 1,
+    "an auto-height parent keeps the normal content minimum",
+  );
+  await fillHost.evaluate((node) => {
+    node.style.blockSize = "22rem";
+  });
+  await fillBody.press("Control+End");
+  for (let index = 0; index < 20; index++) {
+    await fillBody.press("Enter");
+    await page.keyboard.insertText("新增内容");
+  }
+  const grown = await editorHeights();
+  assert(
+    grown.frame > grown.host + 50 && grown.body > grown.host + 50,
+    "long content grows instead of being clipped",
+  );
   assert.deepEqual(botLogs, []);
   console.log(`Passed BlockEditor targeted browser demo on ${engine}`);
 } finally {
