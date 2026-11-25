@@ -142,3 +142,48 @@ export function BlockEditorFormatsExample() {
     </div>
   );
 }
+
+export function BlockEditorMediaExample() {
+  const [readOnly, setReadOnly] = React.useState(false);
+  const asset = (filename: string) =>
+    new URL(
+      `${import.meta.env.BASE_URL}block-editor-media/${filename}`,
+      window.location.href,
+    ).href;
+  return (
+    <div style={{ inlineSize: "100%", display: "grid", gap: 10 }}>
+      <Switch
+        label="媒体只读预览"
+        checked={readOnly}
+        onCheckedChange={setReadOnly}
+      />
+      <BlockEditor
+        label="媒体块示例正文"
+        initialContent={[
+          {
+            type: "video",
+            props: {
+              url: asset("sample.webm"),
+              caption: "两秒测试画面",
+              width: 75,
+            },
+          },
+          {
+            type: "audio",
+            props: { url: asset("chime.mp3"), caption: "发布提示音" },
+          },
+          {
+            type: "file",
+            props: {
+              url: asset("release-notes.txt"),
+              name: "发布清单.txt",
+              caption: "文本附件",
+            },
+          },
+          { type: "paragraph", content: "在此输入 / 插入更多内容。" },
+        ]}
+        readOnly={readOnly}
+      />
+    </div>
+  );
+}

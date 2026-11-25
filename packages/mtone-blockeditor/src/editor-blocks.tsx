@@ -9,6 +9,7 @@ import { createReactBlockSpec } from "@blocknote/react";
 import { Image, Typography } from "@bixlab/mtone";
 import { Info, Lightbulb, TriangleAlert } from "lucide-react";
 import { safeLink } from "./editor-link";
+import { audio, file, video } from "./editor-media";
 
 export function safeImageUrl(raw: string) {
   return /^https?:\/\//i.test(raw.trim()) ? safeLink(raw) : undefined;
@@ -212,5 +213,8 @@ export const schema = BlockNoteSchema.create({
     toggleListItem,
     callout,
     image,
+    video,
+    audio,
+    file,
   },
 });

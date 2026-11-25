@@ -1,0 +1,4 @@
+mtone BlockEditor
+
+This is a local sample for the File block.
+文件块示例：发布之前请核对变更记录、文档与构建产物。

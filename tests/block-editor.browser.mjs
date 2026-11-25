@@ -13,13 +13,14 @@ const editorAssets = (
 ).filter((name) => name.startsWith("block-editor-example-"));
 assert(editorAssets.some((name) => name.endsWith(".js")));
 assert(editorAssets.some((name) => name.endsWith(".css")));
-const base = "http://127.0.0.1:5247/mtone/";
+const port = Number(process.env.BLOCK_EDITOR_TEST_PORT || 5247);
+const base = `http://127.0.0.1:${port}/mtone/`;
 const server = await preview({
   root,
   configFile: false,
   base: "/mtone/",
   build: { outDir: docs },
-  preview: { host: "127.0.0.1", port: 5247, strictPort: true },
+  preview: { host: "127.0.0.1", port, strictPort: true },
   logLevel: "error",
 });
 let browser;
@@ -95,14 +96,50 @@ try {
     );
   }
   await toolbarRow([
+    "块类型",
     "粗体",
     "斜体",
     "下划线",
     "删除线",
     "行内代码",
+    "左对齐",
+    "居中",
+    "右对齐",
+    "颜色",
+    "增加缩进",
+    "减少缩进",
     "链接",
     "更多格式",
   ]);
+  const typeButton = formatting.getByRole("button", { name: "块类型" });
+  assert.match(await typeButton.textContent(), /一级标题/);
+  await typeButton.click();
+  await usageDemo
+    .getByRole("button", { name: "二级标题", exact: true })
+    .click();
+  await editor
+    .getByRole("heading", { level: 2, name: "产品发布周记" })
+    .waitFor();
+  await editor.press("Control+Home");
+  await editor.press("Shift+ArrowRight");
+  await typeButton.click();
+  await usageDemo
+    .getByRole("button", { name: "一级标题", exact: true })
+    .click();
+  await editor
+    .getByRole("heading", { level: 1, name: "产品发布周记" })
+    .waitFor();
+  await editor.press("Control+Home");
+  await editor.press("Shift+ArrowRight");
+  const center = formatting.getByRole("button", { name: "居中" });
+  await center.click();
+  assert.equal(await center.getAttribute("aria-pressed"), "true");
+  await formatting.getByRole("button", { name: "左对齐" }).click();
+  await formatting.getByRole("button", { name: "颜色", exact: true }).click();
+  await usageDemo
+    .getByRole("button", { name: "文字色", exact: true })
+    .waitFor();
+  await formatting.getByRole("button", { name: "颜色", exact: true }).click();
   await page.setViewportSize({ width: 360, height: 800 });
   // The ResizeObserver can commit its React update after setViewportSize resolves.
   await formatting
@@ -153,9 +190,11 @@ try {
     "nested formatting menu preserves the selected range",
   );
   await usageDemo.getByRole("button", { name: "链接", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "链接地址" })
-    .fill("https://example.com");
+  const linkAddress = page.getByRole("textbox", { name: "链接地址" });
+  await linkAddress.fill("javascript:alert(1)");
+  await page.getByRole("button", { name: "应用链接" }).click();
+  await usageDemo.getByRole("alert").getByText(/https/).waitFor();
+  await linkAddress.fill("https://example.com");
   await page.getByRole("button", { name: "应用链接" }).click();
   assert.equal(
     await editor
@@ -171,7 +210,7 @@ try {
   await editor.press("ArrowRight");
   await formatting.waitFor({ state: "hidden", timeout: 3000 });
   await page.getByRole("button", { name: "保留当前草稿" }).click();
-  await page.getByRole("switch", { name: "只读预览" }).click();
+  await page.getByRole("switch", { name: "只读预览", exact: true }).click();
   assert.equal(await editor.getAttribute("contenteditable"), "false");
   assert.equal(
     await usageDemo.getByRole("button", { name: "粗体", exact: true }).count(),
@@ -217,14 +256,98 @@ try {
   const toolsBox = await tableTools.boundingBox();
   assert(
     toolsBox &&
-      (Math.abs(toolsBox.y + toolsBox.height - tableBox.y) < 25 ||
-        Math.abs(toolsBox.y - (tableBox.y + tableBox.height)) < 25),
+      (Math.abs(toolsBox.y + toolsBox.height - tableBox.y) < 36 ||
+        Math.abs(toolsBox.y - (tableBox.y + tableBox.height)) < 36),
     "table actions float next to the selected table",
   );
   await formatDemo.getByRole("button", { name: "添加行", exact: true }).click();
   assert.equal(await table.getByRole("row").count(), 3);
   await formatDemo.getByRole("button", { name: "添加列", exact: true }).click();
   assert.equal(await table.getByRole("row").first().locator("th").count(), 3);
+  await tableTools.getByRole("button", { name: "表头行", exact: true }).click();
+  assert.equal(await table.getByRole("row").first().locator("th").count(), 0);
+  await tableTools.getByRole("button", { name: "表头行", exact: true }).click();
+  assert.equal(await table.getByRole("row").first().locator("th").count(), 3);
+  await table.getByRole("cell", { name: "文档" }).hover();
+  const columnHandle = formatDemo.getByRole("button", {
+    name: "列操作",
+    exact: true,
+  });
+  const rowHandle = formatDemo.getByRole("button", {
+    name: "行操作",
+    exact: true,
+  });
+  await columnHandle.waitFor({ state: "visible", timeout: 3000 });
+  assert.equal(await columnHandle.getAttribute("draggable"), "true");
+  assert.equal(await rowHandle.getAttribute("draggable"), "true");
+  const columnBox = await columnHandle.boundingBox();
+  const rowBox = await rowHandle.boundingBox();
+  const gripTableBox = await table.boundingBox();
+  assert(
+    columnBox.y < gripTableBox.y && rowBox.x < gripTableBox.x,
+    "column grip sits above the table and row grip sits to its left",
+  );
+  await columnHandle.click();
+  await page.getByRole("menuitem", { name: "向左添加列" }).click();
+  assert.equal(await table.getByRole("row").first().locator("th").count(), 4);
+  await table.getByRole("cell", { name: "文档" }).hover();
+  await rowHandle.click();
+  await page.getByRole("menuitem", { name: "删除行", exact: true }).click();
+  assert.equal(await table.getByRole("row").count(), 2);
+
+  const bottomRight = table.getByRole("row").last().getByRole("cell").last();
+  await bottomRight.hover();
+  const appendRow = formatDemo.getByRole("button", {
+    name: "在表格底部添加行",
+  });
+  const appendColumn = formatDemo.getByRole("button", {
+    name: "在表格右侧添加列",
+  });
+  const currentTableBox = await table.boundingBox();
+  const bottomStripBox = await appendRow.boundingBox();
+  const rightStripBox = await appendColumn.boundingBox();
+  assert(bottomStripBox && bottomStripBox.width >= currentTableBox.width - 2);
+  assert(rightStripBox && rightStripBox.height >= currentTableBox.height - 2);
+  await appendRow.click();
+  assert.equal(await table.getByRole("row").count(), 3);
+  await bottomRight.hover();
+  await appendColumn.click();
+  assert.equal(await table.getByRole("row").first().locator("th").count(), 5);
+
+  const firstHeader = table.getByRole("columnheader", { name: "检查项" });
+  await firstHeader.hover();
+  const source = await columnHandle.boundingBox();
+  const destination = await table
+    .getByRole("row")
+    .first()
+    .getByRole("columnheader")
+    .last()
+    .boundingBox();
+  await page.mouse.move(
+    source.x + source.width / 2,
+    source.y + source.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    destination.x + destination.width / 2,
+    destination.y + destination.height / 2,
+    { steps: 10 },
+  );
+  await page.mouse.move(
+    destination.x + destination.width / 2 + 2,
+    destination.y + destination.height / 2,
+  );
+  await page.mouse.up();
+  assert.equal(
+    await table
+      .getByRole("row")
+      .first()
+      .getByRole("columnheader")
+      .last()
+      .innerText(),
+    "检查项",
+  );
+
   const codeSource = formats.locator(".mt-block-editor-code-source code");
   const keyword = codeSource.locator(".shiki").filter({ hasText: /^const$/ });
   await keyword.waitFor({ state: "visible", timeout: 5000 });
@@ -361,6 +484,52 @@ try {
   await formats
     .locator(".mt-block-editor-code-source")
     .waitFor({ state: "hidden" });
+  const media = page.getByRole("textbox", { name: "媒体块示例正文" });
+  const mediaDemo = page.locator(".mt-block-editor").filter({ has: media });
+  const video = media.locator("video");
+  const audio = media.locator("audio");
+  const sampleFile = media.getByRole("link", { name: "发布清单.txt" });
+  await video.waitFor();
+  assert.equal(await video.getAttribute("controls"), "");
+  assert.equal(await audio.getAttribute("preload"), "none");
+  for (const url of [
+    await video.getAttribute("src"),
+    await audio.getAttribute("src"),
+    await sampleFile.getAttribute("href"),
+  ]) {
+    assert(url?.startsWith(base + "block-editor-media/"));
+    assert((await page.request.get(url)).ok());
+  }
+  await media.getByText("两秒测试画面", { exact: true }).click();
+  await mediaDemo.getByRole("button", { name: "编辑媒体" }).click();
+  await mediaDemo.getByRole("spinbutton", { name: "视频宽度（%）" }).fill("50");
+  await mediaDemo.getByRole("button", { name: "应用视频" }).click();
+  assert.equal(
+    await video.evaluate((node) => node.closest("figure").style.width),
+    "50%",
+  );
+
+  await media.getByText("在此输入 / 插入更多内容。", { exact: true }).click();
+  await media.press("End");
+  await media.press("Enter");
+  await media.press("/");
+  await page.getByRole("option", { name: "附件", exact: true }).click();
+  const fileURL = mediaDemo.getByRole("textbox", { name: "附件地址" });
+  await fileURL.fill("data:text/html,invalid");
+  await fileURL.press("Enter");
+  await mediaDemo.getByRole("alert").getByText(/HTTP/).waitFor();
+  await fileURL.fill(base + "block-editor-media/release-notes.txt");
+  await mediaDemo.getByRole("textbox", { name: "附件名称" }).fill("新增附件");
+  await mediaDemo.getByRole("button", { name: "应用附件" }).click();
+  const insertedFile = media.getByRole("link", { name: "新增附件" });
+  await insertedFile.waitFor();
+  await page.getByRole("switch", { name: "媒体只读预览" }).click();
+  assert.equal(await media.getAttribute("contenteditable"), "false");
+  await insertedFile.waitFor();
+  assert.equal(
+    await mediaDemo.getByRole("button", { name: "编辑媒体" }).count(),
+    0,
+  );
   assert.deepEqual(botLogs, []);
   console.log(`Passed BlockEditor targeted browser demo on ${engine}`);
 } finally {

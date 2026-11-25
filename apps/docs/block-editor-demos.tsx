@@ -9,6 +9,12 @@ const FormatsExample = lazy(() =>
   })),
 );
 
+const MediaExample = lazy(() =>
+  import("./block-editor-example").then(({ BlockEditorMediaExample }) => ({
+    default: BlockEditorMediaExample,
+  })),
+);
+
 export const blockEditorDocSections: readonly DocSection[] = [
   {
     id: "usage",
@@ -26,6 +32,16 @@ export const blockEditorDocSections: readonly DocSection[] = [
     Demo: () => (
       <Suspense fallback={<p role="status">正在加载编辑器…</p>}>
         <FormatsExample />
+      </Suspense>
+    ),
+    source: editorSource,
+  },
+  {
+    id: "media",
+    title: "视频、音频与附件",
+    Demo: () => (
+      <Suspense fallback={<p role="status">正在加载编辑器…</p>}>
+        <MediaExample />
       </Suspense>
     ),
     source: editorSource,

@@ -44,7 +44,7 @@ This file describes this package checkout, not necessarily the latest published 
 
 - [BlockEditor](https://xingjianxu.github.io/mtone/#/components/BlockEditor): 可选的块编辑器：BlockNote 管理正文与选区，mtone 提供工具栏、菜单和主题。独立于主包。
 - Import: BlockEditor from @bixlab/mtone-blockeditor
-- initialContent: readonly BlockEditorInput[]. 仅在创建该文档时读取。支持正文、标题、列表、待办、引用、分割线、代码、表格、折叠、提示块和 URL 图片。默认空段落。
+- initialContent: readonly BlockEditorInput[]. 仅在创建该文档时读取。支持正文、标题、列表、待办、引用、分割线、代码、表格、折叠、提示块、图片、视频、音频和附件。默认空段落。
 - documentKey: string | number. 换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。
 - onChange: (blocks: BlockEditorBlock[]) => void. 内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。
 - readOnly: boolean (default: false). 显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。
@@ -52,7 +52,9 @@ This file describes this package checkout, not necessarily the latest published 
 - label / locale / className: string / 'zh' | 'en' / string. 正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。
 - 单独安装：npm install @bixlab/mtone @bixlab/mtone-blockeditor。主包不包含、也不依赖编辑器。
 - 导入两份 CSS；Next.js 使用客户端组件，推荐动态导入并设置 ssr: false。移动端 viewport 建议加 interactive-widget=resizes-content。
-- 选中文字时浮出单行工具栏，窄宽度下次要操作收进更多。键入 / 或点块旁的 + 添加块。选中表格或图片时显示对应的浮动操作；表格支持增删行列和切换表头，不支持合并单元格。代码可切换语言，编辑时即有 Shiki 高亮和等宽字体，也可单独预览；图片可编辑替代文本和说明。
+- 选中文字时浮出单行工具栏，包含块类型、格式、对齐、颜色、缩进和链接；窄宽度下次要操作收进更多。键入 / 或点块旁的 + 添加块。选中表格、图片或媒体块时显示对应的浮动操作；表格支持增删行列和切换表头，不支持合并单元格。代码可切换语言，编辑时即有 Shiki 高亮和等宽字体，也可单独预览；图片可编辑替代文本和说明。
+- 悬停表格时，行列六点手柄可拖动排序，也可点开菜单前后插入或删除；右侧和底部加号分别追加列与行。只读模式不显示这些控件。
+- 视频、音频和附件使用直接 HTTP(S) 地址，均支持说明。视频支持设置宽度百分比；音视频使用浏览器播放控件且不自动播放。附件支持自定义显示名称并在新标签页打开；视频、音频和附件不内置文件上传。
 - 原生 JSON 是主存储格式。只读只影响界面。外部内容仍需由应用验证来源、权限以及数据结构。
 
 ```tsx

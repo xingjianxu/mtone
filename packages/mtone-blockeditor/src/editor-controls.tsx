@@ -26,7 +26,14 @@ import {
   type MenuEntry,
 } from "@bixlab/mtone";
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
+  ChevronDown,
+  IndentDecrease,
+  IndentIncrease,
+  Type,
   Code,
   Ellipsis,
   Heading1,
@@ -55,6 +62,12 @@ import type {
   Editor,
 } from "./block-editor";
 import { EditorLinkForm, linkTarget } from "./editor-link";
+import {
+  isMediaBlock,
+  MediaForm,
+  mediaKinds,
+  type MediaTarget,
+} from "./editor-media";
 import {
   CodeControls,
   ImageForm,
@@ -278,7 +291,7 @@ function useCompactToolbar(editor: Editor) {
     const frame = editor.domElement?.closest(".mt-block-editor");
     if (!frame) return;
     const sync = () =>
-      setCompact(Math.min(frame.clientWidth, window.innerWidth) < 360);
+      setCompact(Math.min(frame.clientWidth, window.innerWidth) < 520);
     sync();
     const observer = new ResizeObserver(sync);
     observer.observe(frame);
@@ -290,6 +303,23 @@ function useCompactToolbar(editor: Editor) {
   }, [editor]);
   return compact;
 }
+
+const textBlockChoices = blockKinds.filter(([, , , block]) =>
+  [
+    "paragraph",
+    "heading",
+    "bulletListItem",
+    "numberedListItem",
+    "checkListItem",
+    "quote",
+    "toggleListItem",
+  ].includes(block.type),
+);
+const alignmentActions = [
+  ["left", "左对齐", "Align left", AlignLeft],
+  ["center", "居中", "Align center", AlignCenter],
+  ["right", "右对齐", "Align right", AlignRight],
+] as const;
 
 function SelectionToolbar({
   editor,
@@ -304,10 +334,42 @@ function SelectionToolbar({
     editor,
     selector: ({ editor: stateEditor }) => stateEditor.getActiveStyles(),
   });
-  const [moreOpen, setMoreOpen] = React.useState(false);
+  const { block, canNest, canOutdent } = useEditorState({
+    editor,
+    selector: ({ editor: current }) => ({
+      block: current.getTextCursorPosition().block as BlockEditorBlock,
+      canNest: current.canNestBlock(),
+      canOutdent: current.canUnnestBlock(),
+    }),
+  });
+  const alignment =
+    "textAlignment" in block.props ? block.props.textAlignment : undefined;
+  const blockChoice = textBlockChoices.find(
+    ([, , , choice]) =>
+      choice.type === block.type &&
+      (choice.type !== "heading" ||
+        !("level" in block.props) ||
+        choice.props.level === block.props.level),
+  );
+  const [panel, setPanel] = React.useState<"more" | "block" | "color">();
+  const moreOpen = panel === "more";
   const [groupKey, setGroupKey] = React.useState<string>();
   const groups = formatActions(editor, zh);
   const activeGroup = groups.find((group) => group.key === groupKey);
+  const switchPanel = (next: "more" | "block" | "color") => {
+    setPanel(panel === next ? undefined : next);
+    setGroupKey(undefined);
+  };
+  const closePanel = () => {
+    setPanel(undefined);
+    setGroupKey(undefined);
+  };
+  const nest = (unindent: boolean) => {
+    if (unindent && editor.canUnnestBlock()) editor.unnestBlock();
+    if (!unindent && editor.canNestBlock()) editor.nestBlock();
+    editor.focus();
+    closePanel();
+  };
   const formatButtons = [
     ["bold", "粗体", "Bold", Bold],
     ["italic", "斜体", "Italic", Italic],
@@ -322,12 +384,33 @@ function SelectionToolbar({
   };
   return (
     <TooltipProvider delay={420}>
-      <div className="mt-block-editor-toolbar-panel">
+      <div className="mt-block-editor-toolbar-panel mt-block-editor-selection-panel">
         <div
           className="mt-block-editor-toolbar"
           role="group"
           aria-label={zh ? "编辑工具" : "Editor formatting"}
         >
+          {!compact && (
+            <Button
+              type="button"
+              size="small"
+              variant="ghost"
+              className="mt-block-editor-block-type"
+              aria-label={zh ? "块类型" : "Block type"}
+              aria-expanded={panel === "block"}
+              disabled={!blockChoice}
+              leftSection={<Type size={15} aria-hidden />}
+              rightSection={<ChevronDown size={13} aria-hidden />}
+              onMouseDown={keepSelection}
+              onClick={() => switchPanel("block")}
+            >
+              {blockChoice
+                ? blockChoice[zh ? 0 : 1]
+                : zh
+                  ? "块类型"
+                  : "Block type"}
+            </Button>
+          )}
           {formatButtons
             .slice(0, compact ? 2 : undefined)
             .map(([style, chinese, english, Icon]) => (
@@ -352,6 +435,71 @@ function SelectionToolbar({
               aria-hidden="true"
             />
           )}
+          {!compact && (
+            <>
+              {alignmentActions.map(([key, chinese, english, Icon]) => (
+                <Button
+                  key={key}
+                  type="button"
+                  size="small"
+                  variant="ghost"
+                  iconOnly
+                  className="mt-block-editor-align-button"
+                  aria-pressed={alignment === key}
+                  aria-label={zh ? chinese : english}
+                  disabled={!alignment}
+                  onMouseDown={keepSelection}
+                  onClick={() => {
+                    groups
+                      .find((group) => group.key === "alignment")
+                      ?.children.find((action) => action.key === key)
+                      ?.onSelect();
+                    closePanel();
+                  }}
+                >
+                  <Icon size={16} aria-hidden />
+                </Button>
+              ))}
+              <Button
+                type="button"
+                size="small"
+                variant="ghost"
+                iconOnly
+                aria-label={zh ? "颜色" : "Color"}
+                aria-expanded={panel === "color"}
+                onMouseDown={keepSelection}
+                onClick={() => switchPanel("color")}
+              >
+                <span className="mt-block-editor-color-icon" aria-hidden="true">
+                  A
+                </span>
+              </Button>
+              <Button
+                type="button"
+                size="small"
+                variant="ghost"
+                iconOnly
+                aria-label={zh ? "增加缩进" : "Increase indent"}
+                disabled={!canNest}
+                onMouseDown={keepSelection}
+                onClick={() => nest(false)}
+              >
+                <IndentIncrease size={16} aria-hidden />
+              </Button>
+              <Button
+                type="button"
+                size="small"
+                variant="ghost"
+                iconOnly
+                aria-label={zh ? "减少缩进" : "Decrease indent"}
+                disabled={!canOutdent}
+                onMouseDown={keepSelection}
+                onClick={() => nest(true)}
+              >
+                <IndentDecrease size={16} aria-hidden />
+              </Button>
+            </>
+          )}
           <Button
             type="button"
             size="small"
@@ -375,18 +523,53 @@ function SelectionToolbar({
             aria-label={zh ? "更多格式" : "More formatting"}
             aria-expanded={moreOpen}
             onMouseDown={keepSelection}
-            onClick={() => {
-              setMoreOpen((open) => !open);
-              setGroupKey(undefined);
-            }}
+            onClick={() => switchPanel("more")}
           >
             <Ellipsis size={16} aria-hidden />
           </Button>
         </div>
-        {moreOpen && (
+        {panel === "block" && blockChoice && (
+          <div className="mt-block-editor-toolbar-options">
+            <div role="group" aria-label={zh ? "转换块类型" : "Turn into"}>
+              {textBlockChoices.map(([chinese, english, Icon, choice]) => (
+                <Button
+                  key={english}
+                  type="button"
+                  size="small"
+                  variant="ghost"
+                  aria-pressed={blockChoice[1] === english}
+                  leftSection={<Icon size={15} aria-hidden />}
+                  onMouseDown={keepSelection}
+                  onClick={() => {
+                    const active = editor.getBlock(block.id);
+                    if (!active || !Array.isArray(active.content)) return;
+                    editor.updateBlock(active, choice);
+                    editor.focus();
+                    closePanel();
+                  }}
+                >
+                  {zh ? chinese : english}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+        {(panel === "more" || panel === "color") && (
           <div className="mt-block-editor-toolbar-options">
             <div role="group" aria-label={zh ? "更多格式" : "More formatting"}>
+              {compact && moreOpen && blockChoice && (
+                <Button
+                  type="button"
+                  size="small"
+                  variant="ghost"
+                  onMouseDown={keepSelection}
+                  onClick={() => switchPanel("block")}
+                >
+                  {zh ? "转换块类型" : "Turn into"}
+                </Button>
+              )}
               {compact &&
+                moreOpen &&
                 formatButtons.slice(2).map(([style, chinese, english]) => (
                   <Button
                     key={style}
@@ -397,53 +580,87 @@ function SelectionToolbar({
                     onMouseDown={keepSelection}
                     onClick={() => {
                       applyStyle(style);
-                      setMoreOpen(false);
+                      closePanel();
                     }}
                   >
                     {zh ? chinese : english}
                   </Button>
                 ))}
-              {groups.map((group) => (
-                <Button
-                  key={group.key}
-                  type="button"
-                  size="small"
-                  variant="ghost"
-                  aria-expanded={groupKey === group.key}
-                  onMouseDown={keepSelection}
-                  onClick={() =>
-                    setGroupKey(groupKey === group.key ? undefined : group.key)
-                  }
-                >
-                  {group.label}
-                </Button>
-              ))}
-              <Button
-                type="button"
-                size="small"
-                variant="ghost"
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  editor.undo();
-                  editor.focus();
-                  setMoreOpen(false);
-                }}
-              >
-                {zh ? "撤销" : "Undo"}
-              </Button>
-              <Button
-                type="button"
-                size="small"
-                variant="ghost"
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  editor.redo();
-                  editor.focus();
-                  setMoreOpen(false);
-                }}
-              >
-                {zh ? "重做" : "Redo"}
-              </Button>
+              {groups
+                .filter(
+                  (group) => panel !== "color" || group.key !== "alignment",
+                )
+                .map((group) => (
+                  <Button
+                    key={group.key}
+                    type="button"
+                    size="small"
+                    variant="ghost"
+                    aria-expanded={groupKey === group.key}
+                    onMouseDown={keepSelection}
+                    onClick={() =>
+                      setGroupKey(
+                        groupKey === group.key ? undefined : group.key,
+                      )
+                    }
+                  >
+                    {group.label}
+                  </Button>
+                ))}
+              {compact && moreOpen && (
+                <>
+                  <Button
+                    type="button"
+                    size="small"
+                    variant="ghost"
+                    disabled={!canNest}
+                    onMouseDown={keepSelection}
+                    onClick={() => nest(false)}
+                  >
+                    {zh ? "增加缩进" : "Increase indent"}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="small"
+                    variant="ghost"
+                    disabled={!canOutdent}
+                    onMouseDown={keepSelection}
+                    onClick={() => nest(true)}
+                  >
+                    {zh ? "减少缩进" : "Decrease indent"}
+                  </Button>
+                </>
+              )}
+              {moreOpen && (
+                <>
+                  <Button
+                    type="button"
+                    size="small"
+                    variant="ghost"
+                    onMouseDown={keepSelection}
+                    onClick={() => {
+                      editor.undo();
+                      editor.focus();
+                      closePanel();
+                    }}
+                  >
+                    {zh ? "撤销" : "Undo"}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="small"
+                    variant="ghost"
+                    onMouseDown={keepSelection}
+                    onClick={() => {
+                      editor.redo();
+                      editor.focus();
+                      closePanel();
+                    }}
+                  >
+                    {zh ? "重做" : "Redo"}
+                  </Button>
+                </>
+              )}
             </div>
             {activeGroup && (
               <div
@@ -463,7 +680,7 @@ function SelectionToolbar({
                     onMouseDown={keepSelection}
                     onClick={() => {
                       item.onSelect?.();
-                      setMoreOpen(false);
+                      closePanel();
                       setGroupKey(undefined);
                     }}
                   >
@@ -494,6 +711,7 @@ export function EditorControls({
 }) {
   const zh = locale === "zh";
   const [image, setImage] = React.useState<ImageTarget>();
+  const [media, setMedia] = React.useState<MediaTarget>();
   const activeBlock = useEditorState({
     editor,
     selector: ({ editor: stateEditor }) =>
@@ -533,6 +751,7 @@ export function EditorControls({
   };
   const openLink = React.useCallback(() => {
     setImage(undefined);
+    setMedia(undefined);
     setLink(linkTarget(editor));
   }, [editor]);
   const SelectedTextToolbar = React.useMemo(
@@ -597,6 +816,20 @@ export function EditorControls({
               setImage({ anchor: editor.getTextCursorPosition().block.id });
             },
           },
+          ...mediaKinds.map(([kind, chinese, english, Icon]): Suggestion => ({
+            title: zh ? chinese : english,
+            aliases: [chinese, english, kind],
+            group: zh ? "其他" : "More",
+            icon: <Icon size={16} aria-hidden />,
+            opensForm: true,
+            run: () => {
+              setLink(undefined);
+              setMedia({
+                kind,
+                anchor: editor.getTextCursorPosition().block.id,
+              });
+            },
+          })),
         ],
         query,
       ),
@@ -658,18 +891,26 @@ export function EditorControls({
     activeBlock &&
     (activeBlock.type === "table" ||
       activeBlock.type === "image" ||
+      isMediaBlock(activeBlock) ||
       activeBlock.type === "codeBlock" ||
       activeBlock.type === "callout") &&
     (focused || codeSelectOpen) &&
     dismissedId !== activeBlock.id &&
-    (!hasTextToolbar || activeBlock.type === "image") &&
+    (!hasTextToolbar ||
+      activeBlock.type === "image" ||
+      isMediaBlock(activeBlock)) &&
     !image &&
+    !media &&
     !link;
   return (
     <>
-      {!image && !link && activeBlock?.type !== "image" && (
-        <FormattingToolbarController formattingToolbar={SelectedTextToolbar} />
-      )}
+      {!image &&
+        !media &&
+        !link &&
+        activeBlock?.type !== "image" &&
+        !isMediaBlock(activeBlock) && (
+          <FormattingToolbarController formattingToolbar={SelectedTextToolbar} />
+        )}
       {blockToolsOpen && (
         <BlockPopover
           blockId={activeBlock.id}
@@ -719,6 +960,23 @@ export function EditorControls({
                 />
               </div>
             )}
+            {isMediaBlock(activeBlock) && (
+              <div className="mt-block-editor-format-controls">
+                <Button
+                  size="small"
+                  onMouseDown={keepSelection}
+                  onClick={() =>
+                    setMedia({
+                      kind: activeBlock.type,
+                      anchor: activeBlock.id,
+                      media: activeBlock,
+                    })
+                  }
+                >
+                  {zh ? "编辑媒体" : "Edit media"}
+                </Button>
+              </div>
+            )}
             {activeBlock?.type === "image" && !image && (
               <div className="mt-block-editor-format-controls">
                 <Button
@@ -759,6 +1017,28 @@ export function EditorControls({
           </div>
         </BlockPopover>
       )}
+      {media && (
+        <BlockPopover
+          blockId={media.anchor}
+          useFloatingOptions={{ ...blockFloatingProps, open: true }}
+          useDismissProps={{ enabled: false }}
+          focusManagerProps={noFocusTrap}
+          elementProps={blockFloatingElement}
+        >
+          <div className="mt-block-editor-toolbar-panel">
+            <MediaForm
+              key={media.anchor}
+              editor={editor}
+              target={media}
+              zh={zh}
+              onClose={() => {
+                setMedia(undefined);
+                editor.focus();
+              }}
+            />
+          </div>
+        </BlockPopover>
+      )}
       {link && (
         <PositionPopover
           position={{ from: link.from, to: link.to }}
@@ -777,7 +1057,7 @@ export function EditorControls({
           </div>
         </PositionPopover>
       )}
-      {!image && !link && (
+      {!image && !media && !link && (
         <SuggestionMenuController
           triggerCharacter="/"
           getItems={getItems}

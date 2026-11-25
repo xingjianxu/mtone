@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Button, Input, Select } from "@bixlab/mtone";
+import { ArrowDownToLine, ArrowRightToLine, PanelTop, Rows2, Columns2 } from "lucide-react";
 import type {
   BlockEditorBlock,
   BlockEditorProps,
@@ -117,7 +118,7 @@ export function CodeControls({
     options.push({ value: block.props.language, label: block.props.language });
   return (
     <div
-      className="mt-block-editor-format-controls"
+      className="mt-block-editor-format-controls mt-block-editor-table-actions"
       role="group"
       aria-label={zh ? "代码块设置" : "Code block settings"}
     >
@@ -250,32 +251,38 @@ export function TableControls({
   const rectangular = canResize(block.content);
   return (
     <div
-      className="mt-block-editor-format-controls"
+      className="mt-block-editor-format-controls mt-block-editor-table-actions"
       role="group"
       aria-label={zh ? "表格操作" : "Table actions"}
     >
       {(
         [
-          ["add-row", "添加行", "Add row", !rectangular],
+          ["add-row", "添加行", "Add row", ArrowDownToLine, !rectangular],
           [
             "remove-row",
             "删除行",
             "Delete row",
+            Rows2,
             !rectangular || block.content.rows.length <= 1,
           ],
-          ["add-column", "添加列", "Add column", !rectangular],
+          ["add-column", "添加列", "Add column", ArrowRightToLine, !rectangular],
           [
             "remove-column",
             "删除列",
             "Delete column",
+            Columns2,
             !rectangular || (block.content.rows[0]?.cells.length ?? 0) <= 1,
           ],
-          ["header", "表头行", "Header row", false],
+          ["header", "表头行", "Header row", PanelTop, false],
         ] as const
-      ).map(([action, chinese, english, disabled]) => (
+      ).map(([action, chinese, english, Icon, disabled]) => (
         <Button
           key={action}
           size="small"
+          variant="ghost"
+          iconOnly
+          title={zh ? chinese : english}
+          aria-label={zh ? chinese : english}
           disabled={disabled}
           onMouseDown={(event) => event.preventDefault()}
           aria-pressed={
@@ -283,7 +290,7 @@ export function TableControls({
           }
           onClick={() => operate(action)}
         >
-          {zh ? chinese : english}
+          <Icon size={15} aria-hidden />
         </Button>
       ))}
     </div>

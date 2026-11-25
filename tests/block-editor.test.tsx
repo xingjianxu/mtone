@@ -72,24 +72,17 @@ test("a keyboard form submission can't reach editor controls during composition"
   }
 });
 
-test("uses named controls and completely removes editing controls in read only mode", () => {
+test("does not render persistent editing controls in empty or read-only mode", () => {
   const { rerender } = render(<BlockEditor label="Notes" locale="en" />);
-  expect(screen.getByRole("button", { name: "Bold" })).toHaveAttribute(
-    "aria-pressed",
-    "false",
-  );
-  expect(screen.getByRole("button", { name: "Add block" })).toBeEnabled();
-  fireEvent.click(screen.getByRole("button", { name: "Link" }));
-  expect(screen.getByRole("textbox", { name: "Link URL" })).toHaveFocus();
-  fireEvent.change(screen.getByRole("textbox", { name: "Link URL" }), {
-    target: { value: "javascript:alert(1)" },
-  });
-  fireEvent.click(screen.getByRole("button", { name: "Apply link" }));
-  expect(screen.getByRole("alert")).toHaveTextContent("https");
+  const editor = screen.getByRole("textbox", { name: "Notes" });
+  for (const name of ["Bold", "Add block", "Link"]) {
+    expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
+  }
   rerender(<BlockEditor label="Notes" locale="en" readOnly />);
-  expect(
-    screen.queryByRole("button", { name: "Bold" }),
-  ).not.toBeInTheDocument();
+  expect(editor).toHaveAttribute("aria-readonly", "true");
+  for (const name of ["Bold", "Add block", "Link"]) {
+    expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
+  }
 });
 
 test("readonly preserves an inline origin link and checked task state", () => {
@@ -127,13 +120,11 @@ test("readonly preserves an inline origin link and checked task state", () => {
   expect(screen.getByRole("checkbox")).toBeDisabled();
 });
 
-test("opens a basic table and persists row, column and header edits", async () => {
-  const onChange = vi.fn();
+test("renders an editable table without persistent table controls", async () => {
   render(
     <BlockEditor
       label="Notes"
       locale="en"
-      onChange={onChange}
       initialContent={[
         {
           type: "table",
@@ -146,15 +137,11 @@ test("opens a basic table and persists row, column and header edits", async () =
     />,
   );
   expect(await screen.findByRole("table")).toBeInTheDocument();
-  fireEvent.click(await screen.findByRole("button", { name: "Add row" }));
-  fireEvent.click(screen.getByRole("button", { name: "Add column" }));
-  fireEvent.click(screen.getByRole("button", { name: "Header row" }));
-  const table = onChange.mock.lastCall?.[0].find(
-    (block: { type: string }) => block.type === "table",
-  );
-  expect(table.content.rows).toHaveLength(3);
-  expect(table.content.rows[0].cells).toHaveLength(3);
-  expect(table.content.headerRows).toBe(1);
+  expect(screen.getAllByRole("row")).toHaveLength(2);
+  expect(screen.getAllByRole("cell")).toHaveLength(4);
+  expect(
+    screen.queryByRole("button", { name: "Add row" }),
+  ).not.toBeInTheDocument();
 });
 
 test("read-only code is rendered with mtone Typography.Code", async () => {
@@ -226,7 +213,7 @@ test("read-only renders foldable content, semantic callouts and safe image metad
   expect(container.querySelector("hr")).toBeInTheDocument();
 });
 
-test("the active code preview is toggled without replacing its source", async () => {
+test("editable code keeps its source without an idle floating preview", () => {
   const { container } = render(
     <BlockEditor
       locale="en"
@@ -240,15 +227,75 @@ test("the active code preview is toggled without replacing its source", async ()
       ]}
     />,
   );
-  const preview = await screen.findByRole("button", {
-    name: "Highlight preview",
-  });
-  fireEvent.click(preview);
-  expect(preview).toHaveAttribute("aria-pressed", "true");
-  expect(container.querySelector(".mt-block-editor-code")).toHaveAttribute(
-    "data-preview",
-  );
   expect(
     container.querySelector(".mt-block-editor-code-source"),
   ).toHaveTextContent("const x = 1;");
+  expect(container.querySelector(".mt-block-editor-code")).not.toHaveAttribute(
+    "data-preview",
+  );
+  expect(
+    screen.queryByRole("button", { name: "Highlight preview" }),
+  ).not.toBeInTheDocument();
+});
+
+test("renders media captions and controls without creating unsafe resource URLs", async () => {
+  const { container } = render(
+    <BlockEditor
+      locale="en"
+      readOnly
+      initialContent={[
+        {
+          type: "video",
+          props: {
+            url: "https://example.com/clip.mp4",
+            caption: "Product tour",
+            width: 75,
+          },
+        },
+        {
+          type: "audio",
+          props: { url: "https://example.com/clip.mp3", caption: "Chime" },
+        },
+        {
+          type: "file",
+          props: {
+            url: "https://example.com/notes.txt",
+            name: "Notes",
+            caption: "Release agenda",
+          },
+        },
+        {
+          type: "video",
+          props: { url: "javascript:alert(1)", caption: "Unsafe video" },
+        },
+        { type: "audio", props: { url: "data:audio/mp3;base64,aaaa" } },
+        {
+          type: "file",
+          props: { url: "//example.com/external.txt", name: "Unsafe file" },
+        },
+      ]}
+    />,
+  );
+  await screen.findByText("Unsafe file");
+  expect(container.querySelectorAll("video")).toHaveLength(1);
+  expect(container.querySelectorAll("audio")).toHaveLength(1);
+  expect(container.querySelector("video")).toHaveAttribute("controls");
+  expect(container.querySelector("video")).toHaveAttribute("preload", "none");
+  expect(container.querySelector("video")?.closest("figure")).toHaveStyle({
+    width: "75%",
+  });
+  expect(container.querySelector("audio")).toHaveAttribute("controls");
+  expect(screen.getByRole("link", { name: "Notes" })).toHaveAttribute(
+    "href",
+    "https://example.com/notes.txt",
+  );
+  expect(screen.getByRole("link", { name: "Notes" })).toHaveAttribute(
+    "rel",
+    "noopener noreferrer",
+  );
+  expect(
+    screen.queryByRole("link", { name: "Unsafe file" }),
+  ).not.toBeInTheDocument();
+  for (const caption of ["Product tour", "Chime", "Release agenda"])
+    expect(screen.getByText(caption).tagName).toBe("FIGCAPTION");
 });
