@@ -48,6 +48,32 @@ try {
   const editor = page.getByRole("textbox", { name: "发布周记正文" });
   await editor.waitFor();
   const usageDemo = page.locator(".mt-block-editor").filter({ has: editor });
+  const frameCorner = await editor.evaluate((node) => {
+    const frame = node.closest(".mt-block-editor");
+    const root = node.closest(".bn-container");
+    return {
+      inner: getComputedStyle(node).backgroundColor,
+      wrapper: getComputedStyle(root).backgroundColor,
+      radius: getComputedStyle(node).borderTopRightRadius,
+      overflow: getComputedStyle(frame).overflow,
+    };
+  });
+  assert.equal(
+    frameCorner.inner,
+    "rgba(0, 0, 0, 0)",
+    "the inner rectangle cannot paint over the outer radius",
+  );
+  assert.equal(frameCorner.wrapper, "rgba(0, 0, 0, 0)");
+  assert.equal(
+    frameCorner.radius,
+    "7px",
+    "the inset focus outline follows the outer curve",
+  );
+  assert.equal(
+    frameCorner.overflow,
+    "visible",
+    "menus can still extend beyond the frame",
+  );
   const borderless = page.getByRole("switch", { name: "无边框", exact: true });
   const frameWidth = () =>
     usageDemo.evaluate((node) => getComputedStyle(node).borderTopWidth);
