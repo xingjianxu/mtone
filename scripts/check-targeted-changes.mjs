@@ -37,6 +37,7 @@ const aliases = {
   "confirm-transaction": ["interactive", "popconfirm", "avatar-popconfirm", "modal-layout"],
   data: ["list", "data-list", "table-advanced"],
   "data-table": ["table"],
+  "layout-widths": ["container", "page-layout"],
   "fieldset-context": ["fieldset", "form"],
   "floating-owner": ["hover-card-portals", "dropdown", "menu", "select-layout"],
   "form-store": ["form"],

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Sidebar, type SidebarProps } from "./navigation";
 import { SidebarResize, type SidebarResizeOptions } from "./sidebar-resize";
 
-const pageLayoutWidths = { sm: 720, md: 960, lg: 1200 } as const;
+import { layoutWidths, type LayoutWidthPreset } from "./layout-widths";
 
 export interface PageLayoutProps
   extends Omit<React.ComponentPropsWithRef<"div">, "title"> {
@@ -23,7 +23,7 @@ export interface PageLayoutProps
   headerSpan?: "full" | "header" | "main";
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   /** Center the entire layout in its parent, with a preset or maximum pixel width. */
-  maxWidth?: keyof typeof pageLayoutWidths | number;
+  maxWidth?: LayoutWidthPreset | number;
 }
 
 function hasContent(node: React.ReactNode): boolean {
@@ -46,7 +46,7 @@ export function PageLayout({
   const showSidebar = hasContent(sidebar);
   const width = typeof maxWidth === "number"
     ? maxWidth
-    : maxWidth && pageLayoutWidths[maxWidth];
+    : maxWidth && layoutWidths[maxWidth];
   const constrained = width !== undefined && Number.isFinite(width) && width > 0;
   const rootClassName = [
     "mt-page-layout",

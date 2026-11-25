@@ -1,6 +1,7 @@
 import NavGroupExample from "./inline-demos/nav-group-usage";
 import HoverMarqueeExample from "./inline-demos/hover-marquee-usage";
 import NavSubmenuExample from "./secondary-demos/nav-submenu-usage";
+import ContainerExample from "./secondary-demos/container-usage";
 import PageLayoutExample from "./secondary-demos/page-layout-usage";
 import CheckCardExample from "./secondary-demos/check-card-usage";
 import { CardGroupExample } from "./card-group-example";
@@ -160,6 +161,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <SplitterExample />;
     case "Spotlight":
       return <SpotlightExample />;
+    case "Container":
+      return <ContainerExample />;
     case "PageLayout":
       return <PageLayoutExample />;
     case "Toolbar":

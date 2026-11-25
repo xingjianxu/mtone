@@ -11,7 +11,7 @@ export type PropDoc = {
  */
 const taxonomy = {
   "布局容器": [
-    "AdminLayout", "PageLayout", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
+    "AdminLayout", "PageLayout", "Container", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
@@ -2269,7 +2269,7 @@ export default function Demo() {
       { name: "sidebarPosition", type: '"left" | "right"', default: '"left"', description: "侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。" },
       { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。" },
       { name: "headerSpan", type: '"full" | "header" | "main"', default: '"full"', description: "full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。" },
-      { name: "maxWidth", type: '"sm" | "md" | "lg" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
+      { name: "maxWidth", type: '"sm" | "md" | "lg" | "xl" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
       { name: "children", type: "ReactNode", description: "正文。" },
       { name: "HTML div 属性", type: 'Omit<ComponentPropsWithRef<"div">, "title">', description: "className、style、ref 等传给根元素。" },
     ],
@@ -2278,6 +2278,21 @@ export default function Demo() {
       "当 PageLayout 是有可用高度的 AdminLayout.Content 中唯一的直接子元素时，默认至少撑满主内容区的内边距以内；宽屏的页面侧栏同步延伸到底部。长页仍由 AdminLayout.Content 滚动。独立使用、有额外包裹或与其他区块一起使用时，按内容高度布局。",
       "PageLayout 本身的可用宽度达到 640px 时左右分栏；未启用拖拽时侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 和 header 模式的页头始终在最上方。",
       "只负责单页布局，不管理侧栏折叠、独立滚动、标签状态、路由或应用导航。",
+    ],
+  },
+  {
+    name: "Container",
+    description: "在父容器内居中并限制内容宽度，窄屏下自动收缩。",
+    importNames: ["Container"],
+    code: 'import { Container } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Container maxWidth="md" paddingInline={24}>项目详情</Container>;\n}',
+    props: [
+      { name: "maxWidth", type: '"sm" | "md" | "lg" | "xl" | "none" | number | string', default: '"md"', description: "最大宽度：sm 720px、md 960px、lg 1200px、xl 1440px。也接受正数像素、CSS 尺寸（如 65ch）或 none（不限宽）。" },
+      { name: "paddingInline", type: "number | string", default: "16", description: "行内方向每侧的内边距；数字为像素，也可传 CSS 长度或 0。" },
+      { name: "HTML div 属性", type: 'ComponentPropsWithRef<"div">', description: "children、className、style、ref 等均传给根元素。" },
+    ],
+    notes: [
+      "宽度上限包含内边距，不是视口断点。父容器比上限窄时，Container 随父容器收缩。",
+      "仅处理限宽、居中和左右留白。需要页头、操作区、标签页或侧栏时使用 PageLayout；PageLayout 默认仍然全宽。",
     ],
   },
   {

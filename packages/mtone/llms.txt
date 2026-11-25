@@ -1002,7 +1002,7 @@ export default function Demo() {
 - sidebarPosition: "left" | "right" (default: "left"). 侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。
 - sidebarResize: boolean | SidebarResizeOptions (default: false). 可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。
 - headerSpan: "full" | "header" | "main" (default: "full"). full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。
-- maxWidth: "sm" | "md" | "lg" | number. 可选。sm 为 720px、md 为 960px、lg 为 1200px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。
+- maxWidth: "sm" | "md" | "lg" | "xl" | number. 可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。
 - children: ReactNode. 正文。
 - HTML div 属性: Omit<ComponentPropsWithRef<"div">, "title">. className、style、ref 等传给根元素。
 - maxWidth 同时约束页头、标签页、侧栏和正文，不影响外层 AdminLayout 的侧栏或顶栏。
@@ -1016,6 +1016,25 @@ import "@bixlab/mtone/styles.css";
 
 export default function Demo() {
   return <PageLayout title="项目总览" maxWidth="md">本周有 3 项任务待处理。</PageLayout>;
+}
+```
+
+### Container
+
+- [Container](https://xingjianxu.github.io/mtone/#/components/Container): 在父容器内居中并限制内容宽度，窄屏下自动收缩。
+- Import: Container from @bixlab/mtone
+- maxWidth: "sm" | "md" | "lg" | "xl" | "none" | number | string (default: "md"). 最大宽度：sm 720px、md 960px、lg 1200px、xl 1440px。也接受正数像素、CSS 尺寸（如 65ch）或 none（不限宽）。
+- paddingInline: number | string (default: 16). 行内方向每侧的内边距；数字为像素，也可传 CSS 长度或 0。
+- HTML div 属性: ComponentPropsWithRef<"div">. children、className、style、ref 等均传给根元素。
+- 宽度上限包含内边距，不是视口断点。父容器比上限窄时，Container 随父容器收缩。
+- 仅处理限宽、居中和左右留白。需要页头、操作区、标签页或侧栏时使用 PageLayout；PageLayout 默认仍然全宽。
+
+```tsx
+import { Container } from "@bixlab/mtone";
+import "@bixlab/mtone/styles.css";
+
+export default function Demo() {
+  return <Container maxWidth="md" paddingInline={24}>项目详情</Container>;
 }
 ```
 

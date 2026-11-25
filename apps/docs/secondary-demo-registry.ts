@@ -5,6 +5,10 @@ import { colorPresetsHref } from "./color-presets";
 import NavSubmenuUsageSource from "./secondary-demos/nav-submenu-usage.tsx?raw";
 import NavSubmenuRail from "./secondary-demos/nav-submenu-rail";
 import NavSubmenuRailSource from "./secondary-demos/nav-submenu-rail.tsx?raw";
+import ContainerUsage from "./secondary-demos/container-usage";
+import ContainerUsageSource from "./secondary-demos/container-usage.tsx?raw";
+import ContainerPresets from "./secondary-demos/container-presets";
+import ContainerPresetsSource from "./secondary-demos/container-presets.tsx?raw";
 import PageLayoutUsage from "./secondary-demos/page-layout-usage";
 import PageLayoutUsageSource from "./secondary-demos/page-layout-usage.tsx?raw";
 import PageLayoutComposed from "./secondary-demos/page-layout-composed";
@@ -406,6 +410,10 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       Demo: Card2,
       source: source(Card2Source),
     },
+  ],
+  Container: [
+    { id: "usage", title: "居中限宽", Demo: ContainerUsage, source: source(ContainerUsageSource) },
+    { id: "width-presets", title: "宽度预设", Demo: ContainerPresets, source: source(ContainerPresetsSource) },
   ],
   PageLayout: [
     { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },

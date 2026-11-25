@@ -7,7 +7,7 @@ import { componentDocHref, DocsApp, parseRoute, searchDocs } from "../apps/docs/
 // Independent expected taxonomy. Within each group names are in reading order.
 const expected: Record<string, string[]> = {
   "布局容器": [
-    "AdminLayout", "PageLayout", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
+    "AdminLayout", "PageLayout", "Container", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",

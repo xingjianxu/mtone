@@ -1,0 +1,8 @@
+.mt-container {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: var(--mt-container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--mt-container-padding-inline);
+}
