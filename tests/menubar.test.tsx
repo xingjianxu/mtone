@@ -57,7 +57,11 @@ describe("Menubar", () => {
       select = vi.fn();
     render(<Menubar menus={menus} onSelect={select} />);
     await user.tab();
-    await user.keyboard("{ArrowDown}{ArrowDown}{ArrowRight}");
+    await user.keyboard("{ArrowDown}");
+    await waitFor(() => expect(screen.getByRole("menuitem", { name: "New" })).toHaveFocus());
+    await user.keyboard("{ArrowDown}");
+    await waitFor(() => expect(screen.getByRole("menuitem", { name: "Recent" })).toHaveFocus());
+    await user.keyboard("{ArrowRight}");
     await waitFor(() =>
       expect(screen.getByRole("menuitem", { name: "Project" })).toHaveFocus(),
     );
@@ -68,7 +72,11 @@ describe("Menubar", () => {
     const user = userEvent.setup();
     render(<><Menubar menus={menus} /><button>Outside</button></>);
     await user.tab();
-    await user.keyboard("{ArrowDown}{ArrowDown}{ArrowRight}");
+    await user.keyboard("{ArrowDown}");
+    await waitFor(() => expect(screen.getByRole("menuitem", { name: "New" })).toHaveFocus());
+    await user.keyboard("{ArrowDown}");
+    await waitFor(() => expect(screen.getByRole("menuitem", { name: "Recent" })).toHaveFocus());
+    await user.keyboard("{ArrowRight}");
     const project = await screen.findByRole("menuitem", { name: "Project" });
     await waitFor(() => expect(project).toHaveFocus());
     // Replay the root trigger's delayed blur after focus crossed the portal.
