@@ -471,7 +471,18 @@ try {
   await formatDemo.getByRole("button", { name: "取消", exact: true }).click();
   const heading = formats.getByRole("heading", { name: "提交前检查" });
   await heading.hover();
-  await formatDemo.getByRole("button", { name: "添加块", exact: true }).click();
+  await formatDemo
+    .getByRole("button", { name: "此块的操作", exact: true })
+    .waitFor({ state: "visible" });
+  assert.equal(
+    await formatDemo.getByRole("button", { name: "添加块", exact: true }).count(),
+    0,
+    "hovering a block must not show a left-side add button",
+  );
+  await heading.click();
+  await page.keyboard.press("End");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("/");
   await page.getByRole("option", { name: "图片", exact: true }).click();
   await formatDemo
     .getByRole("textbox", { name: "图片地址" })

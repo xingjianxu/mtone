@@ -5,7 +5,6 @@ import {
   FormattingToolbarExtension,
   insertOrUpdateBlockForSlashMenu,
   SideMenuExtension,
-  SuggestionMenu,
 } from "@blocknote/core/extensions";
 import {
   BlockPopover,
@@ -50,7 +49,6 @@ import {
   ListChecks,
   ListOrdered,
   Pilcrow,
-  Plus,
   Quote,
   Strikethrough,
   Underline,
@@ -761,26 +759,6 @@ export function EditorControls({
       },
     [editor, zh, openLink],
   );
-  const openInsert = React.useCallback(
-    (block: BlockEditorBlock) => {
-      editor.setTextCursorPosition(block.id, "end");
-      const active = editor.getTextCursorPosition().block;
-      if (active.type === "codeBlock") {
-        const [next] = editor.insertBlocks(
-          [{ type: "paragraph" }],
-          active.id,
-          "after",
-        );
-        editor.setTextCursorPosition(next.id);
-      }
-      editor.focus();
-      editor.getExtension(SuggestionMenu)?.openSuggestionMenu("/", {
-        deleteTriggerCharacter: false,
-        ignoreQueryLength: true,
-      });
-    },
-    [editor],
-  );
   const getItems = React.useCallback(
     async (query: string) =>
       filterSuggestionItems(
@@ -852,40 +830,27 @@ export function EditorControls({
         const extension = editor.getExtension(SideMenuExtension);
         if (!block) return null;
         return (
-          <div className="mt-block-editor-side-actions">
-            <Button
-              type="button"
-              variant="ghost"
-              size="small"
-              iconOnly
-              aria-label={zh ? "添加块" : "Add block"}
-              onMouseDown={keepSelection}
-              onClick={() => openInsert(block)}
-            >
-              <Plus size={16} aria-hidden />
-            </Button>
-            <Popover.Menu
-              trigger={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="small"
-                  iconOnly
-                  aria-label={zh ? "此块的操作" : "Actions for this block"}
-                >
-                  <Ellipsis size={16} aria-hidden />
-                </Button>
-              }
-              onOpenChange={(open) => {
-                if (open) extension?.freezeMenu();
-                else extension?.unfreezeMenu();
-              }}
-              items={blockActions(editor, locale, () => block)}
-            />
-          </div>
+          <Popover.Menu
+            trigger={
+              <Button
+                type="button"
+                variant="ghost"
+                size="small"
+                iconOnly
+                aria-label={zh ? "此块的操作" : "Actions for this block"}
+              >
+                <Ellipsis size={16} aria-hidden />
+              </Button>
+            }
+            onOpenChange={(open) => {
+              if (open) extension?.freezeMenu();
+              else extension?.unfreezeMenu();
+            }}
+            items={blockActions(editor, locale, () => block)}
+          />
         );
       },
-    [editor, locale, zh, openInsert],
+    [editor, locale, zh],
   );
   const blockToolsOpen =
     activeBlock &&
