@@ -46,6 +46,7 @@ try {
   await page.goto(base + "#/components/BlockEditor");
   const editor = page.getByRole("textbox", { name: "发布周记正文" });
   await editor.waitFor();
+  const usageDemo = page.locator(".mt-block-editor").filter({ has: editor });
   assert.match(
     await page.locator(".component-import code").textContent(),
     /from "@bixlab\/mtone-blocknote"/,
@@ -57,9 +58,9 @@ try {
     );
   await editor.press("Control+Home");
   await editor.press("Shift+End");
-  await page.getByRole("button", { name: "粗体", exact: true }).click();
+  await usageDemo.getByRole("button", { name: "粗体", exact: true }).click();
   assert.equal(await editor.locator("h1 strong").textContent(), "产品发布周记");
-  await page.getByRole("button", { name: "链接", exact: true }).click();
+  await usageDemo.getByRole("button", { name: "链接", exact: true }).click();
   await page
     .getByRole("textbox", { name: "链接地址" })
     .fill("https://example.com");
@@ -79,7 +80,7 @@ try {
   await page.getByRole("switch", { name: "只读预览" }).click();
   assert.equal(await editor.getAttribute("contenteditable"), "false");
   assert.equal(
-    await page.getByRole("button", { name: "粗体", exact: true }).count(),
+    await usageDemo.getByRole("button", { name: "粗体", exact: true }).count(),
     0,
   );
   await page.getByRole("button", { name: "打开草稿快照" }).click();
