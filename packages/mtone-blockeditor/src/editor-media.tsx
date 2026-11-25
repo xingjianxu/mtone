@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createReactBlockSpec } from "@blocknote/react";
-import { Button, Input } from "@bixlab/mtone";
+import { Button, Input, Tooltip } from "@bixlab/mtone";
 import { AudioLines, FileText, Film } from "lucide-react";
 import type { BlockEditorBlock, Editor } from "./block-editor";
 import { safeLink } from "./editor-link";
@@ -51,17 +51,47 @@ function MediaFigure({
   onSelect?: () => void;
 }) {
   const url = safeMediaUrl(rawUrl);
-  const label =
-    caption || name || mediaKinds.find(([key]) => key === kind)?.[2];
-  return (
+  const label = name || mediaKinds.find(([key]) => key === kind)?.[2];
+  const fileName =
+    url && kind === "file"
+      ? name?.trim() ||
+        new URL(url).pathname.split("/").pop() ||
+        new URL(url).hostname
+      : undefined;
+  const fileLink = fileName && (
+    <a href={url} target="_blank" rel="noopener noreferrer">
+      <FileText size={16} aria-hidden />
+      <span>{fileName}</span>
+    </a>
+  );
+  const figureNote = !fileLink && caption.trim();
+  const figure = (
     <figure
+      tabIndex={figureNote ? 0 : onSelect ? -1 : undefined}
+      onKeyDown={
+        onSelect &&
+        ((event) => {
+          if (
+            event.target !== event.currentTarget ||
+            event.key !== "Enter" ||
+            event.nativeEvent.isComposing
+          )
+            return;
+          event.preventDefault();
+          event.stopPropagation();
+          onSelect();
+        })
+      }
       className="mt-block-editor-media"
       data-kind={kind}
       onClick={
         onSelect &&
         ((event) => {
           const target = event.target as Element;
-          if (event.currentTarget.contains(target) && !target.closest("a, video, [data-mt-audio-control]"))
+          if (
+            event.currentTarget.contains(target) &&
+            !target.closest("a, video, [data-mt-audio-control]")
+          )
             onSelect();
         })
       }
@@ -78,20 +108,19 @@ function MediaFigure({
           aria-label={label}
         />
       )}
-      {url && kind === "audio" && (
-        <AudioPlayer key={url} url={url} label={caption || undefined} />
+      {url && kind === "audio" && <AudioPlayer key={url} url={url} />}
+      {fileLink &&
+        (caption.trim() ? (
+          <Tooltip content={caption}>{fileLink}</Tooltip>
+        ) : (
+          fileLink
+        ))}
+      {!url && (
+        <span>{name || mediaKinds.find(([key]) => key === kind)?.[2]}</span>
       )}
-      {url && kind === "file" && (
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          <FileText size={16} aria-hidden />
-          {name?.trim() ||
-            new URL(url).pathname.split("/").pop() ||
-            new URL(url).hostname}
-        </a>
-      )}
-      {(caption || !url) && <figcaption>{caption || label}</figcaption>}
     </figure>
   );
+  return figureNote ? <Tooltip content={caption}>{figure}</Tooltip> : figure;
 }
 
 export const video = createReactBlockSpec(

@@ -846,7 +846,27 @@ export function EditorControls({
               if (open) extension?.freezeMenu();
               else extension?.unfreezeMenu();
             }}
-            items={blockActions(editor, locale, () => block)}
+            items={[
+              ...(isMediaBlock(block) || block.type === "image"
+                ? [{
+                    key: "editMedia",
+                    label: zh ? "编辑媒体" : "Edit media",
+                    onSelect: () => {
+                      const current = editor.getBlock(block.id);
+                      if (!current) return;
+                      setLink(undefined);
+                      if (isMediaBlock(current)) {
+                        setImage(undefined);
+                        setMedia({ kind: current.type, anchor: current.id, media: current });
+                      } else if (current.type === "image") {
+                        setMedia(undefined);
+                        setImage({ anchor: current.id, image: current });
+                      }
+                    },
+                  }]
+                : []),
+              ...blockActions(editor, locale, () => block),
+            ]}
           />
         );
       },

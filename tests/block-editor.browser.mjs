@@ -60,7 +60,13 @@ try {
   const formatting = usageDemo.locator(".mt-block-editor-toolbar");
   await editor.press("Control+Home");
   await formatting.waitFor({ state: "hidden", timeout: 3000 });
-  const bodyBefore = await editor.boundingBox();
+  // Viewport resizing can move the document scroll position without moving the
+  // editor within its demo. Measure layout relative to the demo frame instead.
+  const bodyOffset = () => editor.evaluate((node) =>
+    node.getBoundingClientRect().top -
+    node.closest(".mt-block-editor").getBoundingClientRect().top
+  );
+  const bodyBefore = await bodyOffset();
   await editor.press("Shift+ArrowRight");
   await formatting.waitFor({ state: "visible" });
   async function toolbarRow(expected) {
@@ -161,7 +167,7 @@ try {
     return { x, y, width, height };
   });
   const toolbar = await formatting.boundingBox();
-  const bodyAfter = await editor.boundingBox();
+  const bodyAfter = await bodyOffset();
   assert(
     selection.width > 0 &&
       toolbar.x < selection.x + selection.width &&
@@ -171,8 +177,8 @@ try {
     "toolbar floats next to the selected text",
   );
   assert.equal(
-    bodyAfter.y,
-    bodyBefore.y,
+    bodyAfter,
+    bodyBefore,
     "selection does not shift editor content",
   );
   await formatting.getByRole("button", { name: "粗体", exact: true }).click();
@@ -460,6 +466,10 @@ try {
     .waitFor({ state: "visible" });
   const image = formats.getByRole("img", { name: "草稿、审核、发布的流程图" });
   await image.waitFor();
+  const imageFigure = image.locator("xpath=ancestor::figure[1]");
+  assert.equal(await imageFigure.locator("figcaption").count(), 0);
+  await image.hover();
+  await page.getByRole("tooltip").filter({ hasText: "发布流程" }).waitFor();
   await image.click();
   const editImage = formatDemo.getByRole("button", {
     name: "编辑图片",
@@ -512,7 +522,72 @@ try {
     assert(url?.startsWith(base + "block-editor-media/"));
     assert((await page.request.get(url)).ok());
   }
-  await media.getByText("两秒测试画面", { exact: true }).click();
+  const fileRow = await sampleFile.evaluate((node) => {
+    const style = getComputedStyle(node);
+    const block = node.closest(".bn-block-content");
+    return {
+      width: node.getBoundingClientRect().width,
+      blockWidth: block.getBoundingClientRect().width,
+      minHeight: style.minHeight,
+      background: style.backgroundColor,
+      display: style.display,
+      name: node.querySelector("span")?.textContent,
+    };
+  });
+  assert(
+    Math.abs(fileRow.blockWidth - fileRow.width) <= 2,
+    "attachment uses the available width",
+  );
+  assert.equal(fileRow.minHeight, "32px");
+  assert.notEqual(fileRow.background, "rgba(0, 0, 0, 0)");
+  assert.equal(fileRow.display, "flex");
+  assert.equal(fileRow.name, "发布清单.txt");
+  assert.equal(await media.locator("figcaption").count(), 0);
+  const fileFigure = media.locator('figure[data-kind="file"]').first();
+  await sampleFile.hover();
+  await page.getByRole("tooltip").filter({ hasText: "文本附件" }).waitFor();
+  await fileFigure.press("Enter");
+  const selectedFile = media
+    .locator(".ProseMirror-selectednode")
+    .locator('figure[data-kind="file"]');
+  await selectedFile.waitFor({ timeout: 3000 });
+  const selectionRing = await selectedFile.evaluate((node) => {
+    const style = getComputedStyle(node, "::after");
+    const probe = document.createElement("span");
+    probe.style.color = style.getPropertyValue("--mt-focus");
+    document.body.append(probe);
+    const token = getComputedStyle(probe).color;
+    probe.remove();
+    return {
+      outline: style.outlineWidth,
+      outlineStyle: style.outlineStyle,
+      outlineColor: style.outlineColor,
+      token,
+      shadow: style.boxShadow,
+    };
+  });
+  assert.equal(selectionRing.shadow, "none", "no thick BlockNote focus shadow");
+  assert.equal(selectionRing.outline, "1px");
+  assert.equal(selectionRing.outlineStyle, "solid");
+  assert.equal(selectionRing.outlineColor, selectionRing.token);
+  await sampleFile.focus();
+  await sampleFile.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  assert(await sampleFile.evaluate((node) => node.matches(":focus-visible")));
+  await page.getByRole("tooltip").filter({ hasText: "文本附件" }).waitFor();
+  const linkRing = await sampleFile.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return [style.outlineWidth, style.outlineStyle];
+  });
+  assert.deepEqual(
+    linkRing,
+    ["1px", "solid"],
+    "the focused file link remains visible",
+  );
+  const videoFigure = media.locator('figure[data-kind="video"]').first();
+  await videoFigure.hover();
+  await page.getByRole("tooltip").filter({ hasText: "两秒测试画面" }).waitFor();
+  await videoFigure.press("Enter");
   await mediaDemo.getByRole("button", { name: "编辑媒体" }).click();
   await mediaDemo.getByRole("spinbutton", { name: "视频宽度（%）" }).fill("50");
   await mediaDemo.getByRole("button", { name: "应用视频" }).click();
@@ -542,6 +617,8 @@ try {
     await mediaDemo.getByRole("button", { name: "编辑媒体" }).count(),
     0,
   );
+  await media.locator('figure[data-kind="audio"]').first().hover();
+  await page.getByRole("tooltip").filter({ hasText: "发布提示音" }).waitFor();
   const play = media.getByRole("button", { name: "播放音频", exact: true });
   await play.waitFor({ timeout: 3000 });
   assert.equal(await audio.getAttribute("controls"), null);
@@ -558,9 +635,19 @@ try {
   assert(timeline && timeline.width > 100);
   await page.mouse.move(timeline.x + 6, timeline.y + timeline.height / 2);
   await page.mouse.down();
-  await page.mouse.move(timeline.x + timeline.width / 2, timeline.y + timeline.height / 2, { steps: 8 });
+  await page.mouse.move(
+    timeline.x + timeline.width / 2,
+    timeline.y + timeline.height / 2,
+    { steps: 8 },
+  );
   await page.mouse.up();
-  assert(await audio.evaluate((el) => el.currentTime > el.duration * 0.35 && el.currentTime < el.duration * 0.65));
+  assert(
+    await audio.evaluate(
+      (el) =>
+        el.currentTime > el.duration * 0.35 &&
+        el.currentTime < el.duration * 0.65,
+    ),
+  );
   await seek.press("Home");
   await play.click();
   const pause = media.getByRole("button", { name: "暂停音频", exact: true });
@@ -577,7 +664,10 @@ try {
   const volume = page.getByRole("slider", { name: "音量", exact: true });
   await volume.and(page.locator('[aria-valuetext="0%"]')).waitFor();
   await volume.press("End");
-  assert.deepEqual(await audio.evaluate((el) => [el.volume, el.muted]), [1, false]);
+  assert.deepEqual(await audio.evaluate((el) => [el.volume, el.muted]), [
+    1,
+    false,
+  ]);
   await page.keyboard.press("Escape");
   await player.evaluate((el) => {
     el.style.inlineSize = "";

@@ -430,15 +430,49 @@
   max-block-size: 24rem;
   background: #151515;
 }
-.mt-block-editor-media a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  overflow-wrap: anywhere;
+.mt-block-editor-media[data-kind="file"] {
+  inline-size: 100%;
+  min-inline-size: 0;
 }
-.mt-block-editor-media figcaption {
-  color: var(--mt-muted, #787774);
-  font-size: 0.875em;
+.mt-block-editor .bn-editor .mt-block-editor-media[data-kind="file"] > a {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  inline-size: 100%;
+  min-block-size: 32px;
+  padding-inline: 8px;
+  border-radius: 5px;
+  background: var(--mt-subtle);
+  color: var(--mt-fg);
+  text-decoration: none;
+}
+.mt-block-editor .bn-editor .mt-block-editor-media[data-kind="file"] > a:hover {
+  background: var(--mt-hover);
+  text-decoration: none;
+}
+.mt-block-editor-media[data-kind="file"] > a > svg { flex: none; }
+.mt-block-editor-media[data-kind="file"] > a > span {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-block-editor :is(.mt-block-editor-media, .mt-block-editor-image):focus-visible,
+.mt-block-editor .mt-block-editor-media[data-kind="file"] > a:focus-visible {
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
+}
+
+/* BlockNote normally paints media node selections with a 4px inset shadow. */
+.mt-block-editor :is(.bn-block-content.ProseMirror-selectednode, .ProseMirror-selectednode > .bn-block-content) > .mt-block-editor-media::after {
+  background: transparent;
+  box-shadow: none;
+  outline: 1px solid var(--mt-focus, #93b4dc);
+  outline-offset: -1px;
+}
+.mt-block-editor :is(.bn-block-content.ProseMirror-selectednode, .ProseMirror-selectednode > .bn-block-content) > .mt-block-editor-media:has(> a:focus-visible)::after {
+  outline: none;
 }
 
 .mt-block-editor-media[data-kind="audio"] { inline-size: 100%; }
@@ -535,7 +569,6 @@
 .mt-block-editor-audio-volume { inline-size: 110px; accent-color: var(--mt-accent-blue); }
 .mt-block-editor-audio-rates .mt-btn[aria-pressed="true"] { background: var(--mt-select-surface); }
 .mt-block-editor-audio-error { margin-block-start: 4px; color: var(--mt-muted); font-size: 12px; }
-.mt-block-editor-media[data-kind="audio"] figcaption { margin-block-start: 6px; }
 
 @container mt-audio (max-width: 380px) {
   .mt-block-editor-audio-wide { display: none; }

@@ -206,7 +206,7 @@ test("read-only renders foldable content, semantic callouts and safe image metad
     "src",
     "https://example.com/photo.png",
   );
-  expect(screen.getByText("Figure one")).toBeInTheDocument();
+  expect(screen.queryByText("Figure one")).not.toBeInTheDocument();
   expect(
     screen.queryByRole("img", { name: "Blocked image" }),
   ).not.toBeInTheDocument();
@@ -297,5 +297,5 @@ test("renders media captions and controls without creating unsafe resource URLs"
     screen.queryByRole("link", { name: "Unsafe file" }),
   ).not.toBeInTheDocument();
   for (const caption of ["Product tour", "Chime", "Release agenda"])
-    expect(screen.getByText(caption).tagName).toBe("FIGCAPTION");
+    expect(screen.queryByText(caption)).not.toBeInTheDocument();
 });

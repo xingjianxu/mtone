@@ -6,7 +6,7 @@ import {
   defaultBlockSpecs,
 } from "@blocknote/core";
 import { createReactBlockSpec } from "@blocknote/react";
-import { Image, Typography } from "@bixlab/mtone";
+import { Image, Tooltip, Typography } from "@bixlab/mtone";
 import { Info, Lightbulb, TriangleAlert } from "lucide-react";
 import { safeLink } from "./editor-link";
 import { audio, file, video } from "./editor-media";
@@ -68,9 +68,10 @@ const image = createReactBlockSpec(
         () => false,
       );
       const url = safeImageUrl(block.props.url);
-      return (
+      const figure = (
         <figure
           className="mt-block-editor-image"
+          tabIndex={block.props.caption.trim() ? 0 : undefined}
           onClick={
             readOnly
               ? undefined
@@ -91,11 +92,11 @@ const image = createReactBlockSpec(
               referrerPolicy="no-referrer"
             />
           )}
-          {block.props.caption && (
-            <figcaption>{block.props.caption}</figcaption>
-          )}
         </figure>
       );
+      return block.props.caption.trim() ? (
+        <Tooltip content={block.props.caption}>{figure}</Tooltip>
+      ) : figure;
     },
   },
 )();
