@@ -1,15 +1,15 @@
-# @bixlab/mtone-blocknote
+# @bixlab/mtone-blockeditor
 
 An optional React block editor using mtone controls and the BlockNote editing engine. The package is not part of, installed by, or exported by `@bixlab/mtone`.
 
-Check the available release on npm, then install `npm install @bixlab/mtone @bixlab/mtone-blocknote` and import both stylesheets:
+The new name `@bixlab/mtone-blockeditor` is not yet published to npm. For the previous public release, use `@bixlab/mtone-blocknote@0.1.0` and its own README; some features below are newer. Once the new package is published, install `npm install @bixlab/mtone @bixlab/mtone-blockeditor` and import both stylesheets:
 
 ```tsx
 "use client";
 
-import { BlockEditor } from "@bixlab/mtone-blocknote";
+import { BlockEditor } from "@bixlab/mtone-blockeditor";
 import "@bixlab/mtone/styles.css";
-import "@bixlab/mtone-blocknote/styles.css";
+import "@bixlab/mtone-blockeditor/styles.css";
 
 export default function Notes() {
   return <BlockEditor
@@ -28,4 +28,4 @@ For Next.js, dynamically load the editor in a client component with `ssr: false`
 
 ## Development
 
-From the repository root, use `npm run build:docs` to build both workspace packages and the shared site. `npm run build -w @bixlab/mtone-blocknote` builds the editor package alone after its mtone peer is built.
+From the repository root, use `npm run build:docs` to build both workspace packages and the shared site. `npm run build -w @bixlab/mtone-blockeditor` builds the editor package alone after its mtone peer is built.

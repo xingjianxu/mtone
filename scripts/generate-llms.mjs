@@ -38,7 +38,7 @@ const lines = [
 "- Semantic colors select a purpose, not a hue: --mt-select-surface for selected surfaces, --mt-focus for keyboard focus, --mt-alert-info-bg for an info surface. New role overrides limit changes to that purpose and preserve legacy CSS fallbacks when unset; existing hue presets remain public.",
 "- Selected surfaces: use --mt-select-surface for pale-blue selected items and located settings rows. It is #E9EEF4 in light and #293746 in dark mode, not an accent color or focus-border token.",
 "- Dialog modal defaults true: outside clicks do not close; false allows outside dismissal. Both retain focus trapping, backdrop and scroll lock. Escape and close button remain available.",
-"- Use Tag for content labels with optional removal, and Status for a state indicator. BlockEditor is documented separately and belongs to the optional @bixlab/mtone-blocknote package, not this npm package. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.",
+"- Use Tag for content labels with optional removal, and Status for a state indicator. BlockEditor is documented separately and belongs to the optional @bixlab/mtone-blockeditor package, not this npm package. Upload requires an application service; examples are not backend persistence. DatePicker uses native browser date UI.",
 "- Toast notifications need ToastProvider; useToast exposes add, success, error, info, update, promise and close (verify installed declarations before use).",
 "- Do not assume the live docs match an older npm package. Type-check generated code and run interaction tests.",
 "",

@@ -1,5 +1,5 @@
 {
-  "name": "@bixlab/mtone-blocknote",
+  "name": "@bixlab/mtone-blockeditor",
   "version": "0.1.0",
   "type": "module",
   "description": "Optional BlockNote editor styled with mtone",
@@ -38,7 +38,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xingjianxu/mtone.git",
-    "directory": "packages/mtone-blocknote"
+    "directory": "packages/mtone-blockeditor"
   },
   "publishConfig": {
     "access": "public",

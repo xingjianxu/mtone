@@ -19,8 +19,8 @@ const componentReferences = new Map(componentDocs.map((doc) => [
 export default defineConfig({
   resolve: { alias: [
     { find: /^@bixlab\/mtone$/, replacement: fileURLToPath(new URL("../../packages/mtone/src/index.ts", import.meta.url)) },
-    { find: /^@bixlab\/mtone-blocknote$/, replacement: fileURLToPath(new URL("../../packages/mtone-blocknote/src/index.ts", import.meta.url)) },
-    { find: /^@bixlab\/mtone-blocknote\/styles\.css$/, replacement: fileURLToPath(new URL("../../packages/mtone-blocknote/src/styles.css", import.meta.url)) },
+    { find: /^@bixlab\/mtone-blockeditor$/, replacement: fileURLToPath(new URL("../../packages/mtone-blockeditor/src/index.ts", import.meta.url)) },
+    { find: /^@bixlab\/mtone-blockeditor\/styles\.css$/, replacement: fileURLToPath(new URL("../../packages/mtone-blockeditor/src/styles.css", import.meta.url)) },
   ] },
   plugins: [{
     name: "mtone-typography-syntax-sample",

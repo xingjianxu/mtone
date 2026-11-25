@@ -4,8 +4,8 @@ import {
   BlockEditor,
   type BlockEditorBlock,
   type BlockEditorInput,
-} from "@bixlab/mtone-blocknote";
-import "@bixlab/mtone-blocknote/styles.css";
+} from "@bixlab/mtone-blockeditor";
+import "@bixlab/mtone-blockeditor/styles.css";
 import flowImage from "./block-editor-image.svg?no-inline";
 
 const initialContent: readonly BlockEditorInput[] = [

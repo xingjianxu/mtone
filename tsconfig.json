@@ -6,7 +6,7 @@
     "moduleResolution": "Bundler",
     "paths": {
       "@bixlab/mtone": ["./packages/mtone/src/index.ts"],
-      "@bixlab/mtone-blocknote": ["./packages/mtone-blocknote/src/index.ts"]
+      "@bixlab/mtone-blockeditor": ["./packages/mtone-blockeditor/src/index.ts"]
     },
     "jsx": "react-jsx",
     "strict": true,
@@ -14,5 +14,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["packages/mtone/src", "packages/mtone-blocknote/src", "apps/docs", "tests"]
+  "include": ["packages/mtone/src", "packages/mtone-blockeditor/src", "apps/docs", "tests"]
 }

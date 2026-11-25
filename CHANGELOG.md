@@ -4,7 +4,7 @@
 
 ### Added
 - Reuse the documented semantic theme colors for shared selected states, component actions, and feedback while retaining existing overrides.
-- Document the optional, independently published `@bixlab/mtone-blocknote` BlockEditor in the shared docs. The main package does not install or export the editor.
+- Rename the standalone BlockEditor package to `@bixlab/mtone-blockeditor` and update the shared docs. The new name is not yet published; the main package still does not install or export the editor.
 
 ### Fixed
 - Center the active docs sidebar item on navigation from Spotlight and retain the manual sidebar scroll position on clicks.

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeAll, expect, test, vi } from "vitest";
-import { BlockEditor } from "../packages/mtone-blocknote/src";
+import { BlockEditor } from "../packages/mtone-blockeditor/src";
 
 beforeAll(() => {
   const viewport = document.createElement("meta");

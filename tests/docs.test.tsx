@@ -17,9 +17,12 @@ describe("documentation", () => {
       (k) => !nonStandaloneExports.includes(k),
     );
     expect(componentDocs.filter((d) => !d.packageName).map((d) => d.name).sort()).toEqual(names.sort());
-    expect(componentDocs.filter((d) => d.packageName).map((d) => [d.name,d.packageName])).toEqual([["BlockEditor","@bixlab/mtone-blocknote"]]);
+    expect(componentDocs.filter((d) => d.packageName).map((d) => [d.name,d.packageName])).toEqual([["BlockEditor","@bixlab/mtone-blockeditor"]]);
     expect(M).not.toHaveProperty("BlockEditor");
-    expect(docSections.BlockEditor.find((d) => d.id === "usage")?.source).toContain('from "@bixlab/mtone-blocknote"');
+    expect(docSections.BlockEditor.find((d) => d.id === "usage")?.source).toContain('from "@bixlab/mtone-blockeditor"');
+    const blockEditorDoc = componentDocs.find(({ name }) => name === "BlockEditor")!;
+    expect(blockEditorDoc.code).toContain('import "@bixlab/mtone-blockeditor/styles.css"');
+    expect(blockEditorDoc.notes.join(" ")).toContain("尚未发布到 npm");
     expect(new Set(componentDocs.map((d) => d.name)).size).toBe(
       componentDocs.length,
     );

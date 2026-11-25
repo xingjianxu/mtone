@@ -49,7 +49,7 @@ try {
   const usageDemo = page.locator(".mt-block-editor").filter({ has: editor });
   assert.match(
     await page.locator(".component-import code").textContent(),
-    /from "@bixlab\/mtone-blocknote"/,
+    /from "@bixlab\/mtone-blockeditor"/,
   );
   for (const asset of editorAssets)
     assert(
