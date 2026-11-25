@@ -114,6 +114,13 @@
 .mt-block-editor-code-preview .mt-typography-code-block {
   margin: 0;
 }
+/* BlockNote's editable frame assumes a permanently dark code surface. */
+.mt-block-editor:not([data-read-only])
+  .mt-block-editor-code-source
+  [data-content-type="codeBlock"] {
+  color: var(--mt-fg, #37352f);
+  background-color: transparent;
+}
 .mt-block-editor-code-source pre {
   padding: 8px;
   border-radius: 6px;

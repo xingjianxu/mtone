@@ -115,7 +115,52 @@ try {
   assert.equal(await table.getByRole("row").count(), 3);
   await formatDemo.getByRole("button", { name: "添加列", exact: true }).click();
   assert.equal(await table.getByRole("row").first().locator("th").count(), 3);
-  await formats.locator(".mt-block-editor-code-source code").click();
+  const codeSource = formats.locator(".mt-block-editor-code-source code");
+  const sourceSurfaces = [];
+  for (const colorScheme of ["light", "dark"]) {
+    await page.emulateMedia({ colorScheme });
+    const colors = await codeSource.evaluate((code) => {
+      const pre = code.closest("pre");
+      const frame = code.closest('[data-content-type="codeBlock"]');
+      const luminance = (color) => {
+        const channels = color
+          .match(/\d+(?:\.\d+)?/g)
+          .slice(0, 3)
+          .map((value) => {
+            const s = Number(value) / 255;
+            return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+          });
+        return (
+          channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+        );
+      };
+      const text = getComputedStyle(code).color;
+      const surface = getComputedStyle(pre).backgroundColor;
+      const frameSurface = getComputedStyle(frame).backgroundColor;
+      const levels = [luminance(text), luminance(surface)].sort(
+        (a, b) => b - a,
+      );
+      return {
+        text,
+        surface,
+        frameSurface,
+        contrast: (levels[0] + 0.05) / (levels[1] + 0.05),
+      };
+    });
+    assert(
+      colors.contrast >= 4.5,
+      `${colorScheme} editable code needs readable text: ${JSON.stringify(colors)}`,
+    );
+    assert.equal(
+      colors.frameSurface,
+      "rgba(0, 0, 0, 0)",
+      `${colorScheme} editable code must not show BlockNote's outer dark bands`,
+    );
+    sourceSurfaces.push(colors.surface);
+  }
+  assert.notEqual(...sourceSurfaces, "editable code follows the current theme");
+  await page.emulateMedia({ colorScheme: "light" });
+  await codeSource.click();
   await formatDemo
     .getByRole("button", { name: "高亮预览", exact: true })
     .click();
