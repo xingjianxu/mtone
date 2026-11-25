@@ -3784,7 +3784,7 @@ export default function Demo() {
       {
         name: "blockNode / showLine",
         type: "boolean",
-        description: "整行占宽或仅内容占宽；showLine 显示层级线条。",
+        description: "整行占宽或仅内容占宽；showLine 显示子节点的层级连线，顶层节点左侧不绘制独立短线。",
         default: "true / false",
       },
       {

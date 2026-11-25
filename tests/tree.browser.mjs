@@ -124,9 +124,15 @@ try {
           assert(Math.abs(line.y) < 0.6, "The horizontal connector is on the row center");
           if (line.isLast) assert(Math.abs(line.trunkEndY) < 0.6, "The last child's trunk also ends on center");
         }
-        const rootLeaf = tree.getByRole("treeitem", { name: "Guide root leaf" });
-        assert(await rootLeaf.locator(".mt-tree-toggle").evaluate(toggle => getComputedStyle(toggle, "::before").content !== "none"),
-          "A root leaf retains its standalone guide dash");
+        for (const name of ["Guide root", "Guide root leaf"]) {
+          const row = tree.getByRole("treeitem", { name, exact: true });
+          await expect(row).toHaveAttribute("aria-level", "1");
+          await expect(row.locator(".mt-tree-guide")).toHaveCount(0);
+          const toggle = row.locator(".mt-tree-toggle");
+          assert.equal(await toggle.evaluate((el) => getComputedStyle(el, "::before").content), "none",
+            `A top-level item does not paint an orphan dash: ${label} ${name}`);
+          if (name === "Guide root") await expect(toggle.locator("svg")).toBeVisible();
+        }
       }
       const tight = page.getByRole("tree", { name: "Tight gap", exact: true });
       const zeroGap = await tight.getByRole("treeitem").evaluateAll(([a, b]) =>

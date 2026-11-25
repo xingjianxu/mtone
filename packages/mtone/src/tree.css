@@ -101,11 +101,6 @@
 .mt-tree-loading svg {
   animation: mt-tree-spin 1s linear infinite;
 }
-.mt-tree-lines > .mt-tree-item[aria-level="1"] > .mt-tree-toggle:empty::before {
-  content: "";
-  width: 7px;
-  border-bottom: 1px solid var(--mt-border, #ddd);
-}
 .mt-tree-item.mt-tree-drop-0 {
   box-shadow: inset 0 0 0 1px var(--mt-drop-target-edge, var(--mt-indicator, #5378aa));
 }

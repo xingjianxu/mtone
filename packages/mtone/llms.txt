@@ -1983,7 +1983,7 @@ export default function Demo() {
 - defaultCheckedKeys: TreeKey[] (default: []). 非受控初始勾选列表。
 - onCheck: (keys: TreeCheckedKeys, info) => void. 严格模式返回 { checked, halfChecked }，否则返回全选键数组。info 含 checked、node、checkedNodes、halfCheckedKeys、event。
 - disabled: boolean (default: false). 禁用整棵树的选择、勾选、展开及拖放交互。
-- blockNode / showLine: boolean (default: true / false). 整行占宽或仅内容占宽；showLine 显示层级线条。
+- blockNode / showLine: boolean (default: true / false). 整行占宽或仅内容占宽；showLine 显示子节点的层级连线，顶层节点左侧不绘制独立短线。
 - showIcon: boolean. 控制节点图标。默认保留原有节点 icon；目录模式默认显示文件夹 / 文件图标。根 icon 需配合 showIcon。
 - icon / switcherIcon: ReactNode | (info: TreeNodeInfo) => ReactNode. 根级节点图标或展开图标；info 含 node、expanded、selected、checked、loading。节点自身 icon 优先，节点 icon 函数接收 TreeItem。
 - switcherLoadingIcon: ReactNode. 自定义加载图标。
