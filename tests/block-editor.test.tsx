@@ -284,7 +284,7 @@ test("renders media captions and controls without creating unsafe resource URLs"
   expect(container.querySelector("video")?.closest("figure")).toHaveStyle({
     width: "75%",
   });
-  expect(container.querySelector("audio")).toHaveAttribute("controls");
+  expect(container.querySelector("audio")).not.toHaveAttribute("controls");
   expect(screen.getByRole("link", { name: "Notes" })).toHaveAttribute(
     "href",
     "https://example.com/notes.txt",

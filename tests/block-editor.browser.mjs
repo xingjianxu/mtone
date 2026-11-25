@@ -475,7 +475,9 @@ try {
     .getByRole("button", { name: "此块的操作", exact: true })
     .waitFor({ state: "visible" });
   assert.equal(
-    await formatDemo.getByRole("button", { name: "添加块", exact: true }).count(),
+    await formatDemo
+      .getByRole("button", { name: "添加块", exact: true })
+      .count(),
     0,
     "hovering a block must not show a left-side add button",
   );
@@ -502,7 +504,6 @@ try {
   const sampleFile = media.getByRole("link", { name: "发布清单.txt" });
   await video.waitFor();
   assert.equal(await video.getAttribute("controls"), "");
-  assert.equal(await audio.getAttribute("preload"), "none");
   for (const url of [
     await video.getAttribute("src"),
     await audio.getAttribute("src"),
@@ -541,6 +542,46 @@ try {
     await mediaDemo.getByRole("button", { name: "编辑媒体" }).count(),
     0,
   );
+  const play = media.getByRole("button", { name: "播放音频", exact: true });
+  await play.waitFor({ timeout: 3000 });
+  assert.equal(await audio.getAttribute("controls"), null);
+  const seek = media.getByRole("slider", { name: "播放进度", exact: true });
+  await seek.waitFor();
+  await media.getByRole("button", { name: "播放倍速", exact: true }).click();
+  await page.getByRole("button", { name: "0.5×", exact: true }).click();
+  assert.equal(await audio.evaluate((el) => el.playbackRate), 0.5);
+  await page.keyboard.press("Escape");
+  await seek.press("End");
+  assert(await audio.evaluate((el) => el.currentTime > el.duration * 0.9));
+  await seek.press("Home");
+  const timeline = await seek.boundingBox();
+  assert(timeline && timeline.width > 100);
+  await page.mouse.move(timeline.x + 6, timeline.y + timeline.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(timeline.x + timeline.width / 2, timeline.y + timeline.height / 2, { steps: 8 });
+  await page.mouse.up();
+  assert(await audio.evaluate((el) => el.currentTime > el.duration * 0.35 && el.currentTime < el.duration * 0.65));
+  await seek.press("Home");
+  await play.click();
+  const pause = media.getByRole("button", { name: "暂停音频", exact: true });
+  await pause.waitFor();
+  await pause.click();
+  assert(await audio.evaluate((el) => el.paused));
+  const player = media.locator(".mt-block-editor-audio");
+  await player.evaluate((el) => {
+    el.style.inlineSize = "300px";
+  });
+  await media.getByRole("button", { name: "更多音频选项" }).click();
+  await page.getByRole("button", { name: "静音", exact: true }).click();
+  assert(await audio.evaluate((el) => el.muted));
+  const volume = page.getByRole("slider", { name: "音量", exact: true });
+  await volume.and(page.locator('[aria-valuetext="0%"]')).waitFor();
+  await volume.press("End");
+  assert.deepEqual(await audio.evaluate((el) => [el.volume, el.muted]), [1, false]);
+  await page.keyboard.press("Escape");
+  await player.evaluate((el) => {
+    el.style.inlineSize = "";
+  });
   assert.deepEqual(botLogs, []);
   console.log(`Passed BlockEditor targeted browser demo on ${engine}`);
 } finally {

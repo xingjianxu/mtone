@@ -4,6 +4,7 @@ import { Button, Input } from "@bixlab/mtone";
 import { AudioLines, FileText, Film } from "lucide-react";
 import type { BlockEditorBlock, Editor } from "./block-editor";
 import { safeLink } from "./editor-link";
+import { AudioPlayer } from "./editor-audio-player";
 
 export const mediaKinds = [
   ["video", "视频", "Video", Film],
@@ -59,7 +60,9 @@ function MediaFigure({
       onClick={
         onSelect &&
         ((event) => {
-          if (!(event.target as Element).closest("a, video, audio")) onSelect();
+          const target = event.target as Element;
+          if (event.currentTarget.contains(target) && !target.closest("a, video, [data-mt-audio-control]"))
+            onSelect();
         })
       }
       style={
@@ -76,7 +79,7 @@ function MediaFigure({
         />
       )}
       {url && kind === "audio" && (
-        <audio src={url} controls preload="none" aria-label={label} />
+        <AudioPlayer key={url} url={url} label={caption || undefined} />
       )}
       {url && kind === "file" && (
         <a href={url} target="_blank" rel="noopener noreferrer">

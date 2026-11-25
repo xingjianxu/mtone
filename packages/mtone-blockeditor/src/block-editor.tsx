@@ -14,6 +14,7 @@ import { EditorTableHandles } from "./editor-table-handles";
 import { EditorControls } from "./editor-controls";
 import { editorCodeHighlight } from "./editor-code-highlight";
 import { safeLink } from "./editor-link";
+import { AudioLocale } from "./editor-audio-player";
 
 import { schema, setCodePresentation } from "./editor-blocks";
 
@@ -143,7 +144,9 @@ function EditorInstance({
           readOnly || !onChange ? undefined : () => onChange(editor.document)
         }
       >
-        <BlockNoteViewEditor />
+        <AudioLocale.Provider value={locale}>
+          <BlockNoteViewEditor />
+        </AudioLocale.Provider>
         {!readOnly && <EditorTableHandles zh={locale === "zh"} />}
         {!readOnly && (
           <EditorControls
