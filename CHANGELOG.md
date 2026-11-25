@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.2
+
+### Documentation
+- Refresh the bundled AI reference for BlockEditor 0.2.0.
+
+### BlockEditor 0.2.0 (separate package)
+- Add video, audio, and file blocks with editable URLs and captions.
+- Add Shiki highlighting and monospace typography while editing code blocks.
+- Show contextual floating toolbars for text, tables, images, and media.
+- Add table row and column handles for moving, inserting, and deleting rows and columns.
+
 ## 0.15.1
 
 ### Documentation
