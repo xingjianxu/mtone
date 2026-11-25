@@ -41,6 +41,11 @@ const initialNodes: TreeItem[] = [
     icon: <FileText size={15} />,
     isLeaf: true,
   },
+  {
+    id: "formatted",
+    label: "项目发布记录与团队交接清单",
+    isLeaf: true,
+  },
 ];
 
 const compact = { "--mt-height": "24px" } as CSSProperties;
@@ -79,6 +84,16 @@ export default function Demo() {
       <Tree
         label="文档节点操作"
         items={items}
+        titleRender={(node) =>
+          node.id === "formatted" ? (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <FileText size={14} aria-hidden />
+              <span>{node.label}</span>
+              <Text muted style={{ fontSize: 11 }}>已更新</Text>
+              <a href="#/components/Tree?section=document-navigation">示例</a>
+            </span>
+          ) : node.label
+        }
         directory
         expandAction="click"
         defaultSelectedKeys={["manual"]}

@@ -15,6 +15,7 @@ function App() {
     { id: "async", label: "Async", isLeaf: false },
   ]);
   const [drop, setDrop] = React.useState("");
+  const [guideOpened, setGuideOpened] = React.useState(false);
   const ref = React.useRef<TreeRef>(null);
   const basic = [
     {
@@ -120,6 +121,28 @@ function App() {
         <Tree label="Guide zero" indent={0} gap={0} itemHeight={24} items={guides} defaultExpandAll showLine />
         <DocumentNavigationDemo />
         <NodeActionsDemo />
+        <div style={{ inlineSize: "min(100%, 240px)" }}>
+          <Tree
+            label="Rich titles"
+            items={[
+              { id: "rich", label: "Rich document" },
+              { id: "short-rich", label: "Short document" },
+            ]}
+            titleRender={(node) => node.id === "rich" ? (
+              <span id="rich-title-inner" style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                <span aria-hidden="true">◆</span>
+                <span>Complete project documentation, review notes, and release checklist</span>
+                <span>New</span>
+                <a href="#rich-title-destination" onClick={(event) => {
+                  event.preventDefault();
+                  setGuideOpened(true);
+                }}>Guide</a>
+              </span>
+            ) : <em>Short</em>}
+            actions={() => ({ content: <Button size="sm">More</Button>, visibility: "always" })}
+          />
+          <span id="rich-title-destination" data-testid="rich-title-destination">{guideOpened ? "Opened" : ""}</span>
+        </div>
       </main>
     </MtoneProvider>
   );

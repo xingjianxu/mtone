@@ -213,6 +213,7 @@ try {
       const longDoc = docs.getByRole("treeitem", { name: "如何在狭窄侧边栏中整理、维护和查阅标题很长的组件文档", exact: true });
       const archive = docs.getByRole("treeitem", { name: "归档文档", exact: true });
       await expect(startDoc).toHaveAttribute("aria-selected", "true");
+      await expect(longDoc.locator(".mt-tree-title")).toHaveAttribute("data-overflow", "");
       const layout = await docs.evaluate((tree) => {
         const [first, second, long] = tree.querySelectorAll("[role=treeitem]");
         const numbers = [second, long].map((row) => row.querySelector(".mt-tree-end").getBoundingClientRect().right);
@@ -220,7 +221,8 @@ try {
         const indentation = (row) => row.querySelector(".mt-tree-toggle").getBoundingClientRect().left;
         return {
           sameCounterEnd: Math.abs(numbers[0] - numbers[1]) < 0.1,
-          ellipsized: title.scrollWidth > title.clientWidth && getComputedStyle(title).textOverflow === "ellipsis",
+          ellipsized: title.querySelector(".mt-hover-marquee-original").scrollWidth > title.clientWidth &&
+            getComputedStyle(title.querySelector(".mt-hover-marquee-original")).textOverflow === "ellipsis",
           indent: indentation(second) - indentation(first),
           elbow: Number.parseFloat(getComputedStyle(second.querySelector(".mt-tree-guide-direct"), "::after").inlineSize),
         };
@@ -372,6 +374,64 @@ try {
           fullPage: true,
         });
       }
+      const richTree = page.getByRole("tree", { name: "Rich titles", exact: true });
+      const richRow = richTree.getByRole("treeitem", { name: "Rich document", exact: true });
+      const richViewport = richRow.locator(".mt-tree-title");
+      const richTrack = richViewport.locator(".mt-hover-marquee-text");
+      const richGuide = richRow.getByRole("link", { name: "Guide", exact: true });
+      const action = richRow.getByRole("button", { name: "More", exact: true });
+      await expect(richViewport).toHaveAttribute("data-overflow", "");
+      await expect(richViewport).toHaveAttribute("data-motion", "single");
+      await expect(richViewport.locator(".mt-hover-marquee-copy")).toHaveCount(0);
+      await expect(page.locator("#rich-title-inner")).toHaveCount(1);
+      await expect(richGuide).toHaveCount(1);
+      await expect(richTree.getByRole("treeitem", { name: "Short document" }).locator(".mt-tree-title"))
+        .not.toHaveAttribute("data-overflow", "");
+      await richViewport.hover({ position: { x: 8, y: 8 } });
+      await expect(richTrack).toHaveCSS("animation-name", "mt-hover-marquee-pan");
+      const actionBox = await action.boundingBox();
+      const translation = await richTrack.evaluate((node) => {
+        const animation = node.getAnimations()[0];
+        const span = Number(animation.effect.getTiming().duration);
+        const style = getComputedStyle(node);
+        const arrive = parseFloat(style.getPropertyValue("--mt-marquee-tail-start")) / 100;
+        const leave = parseFloat(style.getPropertyValue("--mt-marquee-tail-end")) / 100;
+        const distance = parseFloat(style.getPropertyValue("--mt-marquee-distance"));
+        animation.pause();
+        const at = (fraction) => {
+          animation.currentTime = span * fraction;
+          return new DOMMatrix(getComputedStyle(node).transform).m41;
+        };
+        return { distance, end: at((arrive + leave) / 2), returning: at((leave + 1) / 2) };
+      });
+      assert(Math.abs(translation.end + translation.distance) < 0.6);
+      assert(Math.abs(translation.returning * 2 - translation.end) < 1);
+      assert.deepEqual(await action.boundingBox(), actionBox, "trailing actions do not move with rich labels");
+      await expect(richViewport.locator(".mt-hover-marquee-copy")).toHaveCount(0);
+      await action.hover();
+      await expect(richTrack).toHaveCSS("animation-name", "none");
+
+      await richRow.focus();
+      await page.keyboard.press("Tab");
+      await expect(richGuide).toBeFocused();
+      await expect(richTrack).toHaveCSS("animation-name", "none");
+      assert(await richGuide.evaluate((element) => {
+        const b = element.getBoundingClientRect();
+        const frame = element.closest(".mt-hover-marquee").getBoundingClientRect();
+        return b.left >= frame.left - 1 && b.right <= frame.right + 1;
+      }), "the clipped link is scrolled into view for keyboard focus");
+      await page.keyboard.press("Enter");
+      await expect(page.getByTestId("rich-title-destination")).toHaveText("Opened");
+      await expect(richRow).toHaveAttribute("aria-selected", "false");
+      await page.keyboard.press("Tab");
+      await expect(action).toBeFocused();
+
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await richViewport.hover({ position: { x: 8, y: 8 } });
+      await expect(richTrack).toHaveCSS("animation-name", "none");
+      await expect(richViewport).toHaveCSS("overflow-x", "auto");
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+
       assert.deepEqual(errors, []);
       console.log(`${name}: Tree passed`);
     } catch (e) {

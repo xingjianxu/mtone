@@ -393,7 +393,7 @@ test("Tree actions don't rename nodes or show actions for disabled nodes", () =>
   expect(screen.queryByRole("button", { name: "disabled command" })).not.toBeInTheDocument();
 });
 
-test("uses HoverMarquee for plain labels by default with tree and node overrides", () => {
+test("uses loop mode for plain labels and a single track for JSX, respecting tree and node overrides", () => {
   const data = [
     { id: "a", label: "Alpha" },
     { id: "b", label: "Beta", labelMarquee: false },
@@ -404,8 +404,35 @@ test("uses HoverMarquee for plain labels by default with tree and node overrides
   const marquee = (name: string) => row(name).querySelector(".mt-hover-marquee");
   expect(marquee("Alpha")).toBeInTheDocument();
   expect(marquee("Beta")).not.toBeInTheDocument();
-  expect(marquee("Custom title")).not.toBeInTheDocument();
+  expect(marquee("Alpha")).not.toHaveAttribute("data-motion", "single");
+  expect(marquee("Custom title")).toHaveAttribute("data-motion", "single");
   rerender(<Tree items={data} labelMarquee={false} />);
   expect(marquee("Alpha")).not.toBeInTheDocument();
   expect(marquee("Gamma")).toBeInTheDocument();
+  expect(marquee("Custom title")).not.toBeInTheDocument();
+});
+
+test("keeps controls in a custom rendered title distinct from row selection", () => {
+  const select = vi.fn();
+  const open = vi.fn();
+  render(
+    <Tree
+      items={[{ id: "doc", label: "Document" }]}
+      onSelect={select}
+      titleRender={() => (
+        <span>
+          Manual <button id="tree-title-open" onClick={open}>Open guide</button>
+        </span>
+      )}
+      actions={() => ({ content: <button>More actions</button>, visibility: "always" })}
+    />,
+  );
+  const title = row("Document").querySelector(".mt-tree-title");
+  expect(title).toHaveAttribute("data-motion", "single");
+  expect(document.querySelectorAll("#tree-title-open")).toHaveLength(1);
+  fireEvent.click(screen.getByRole("button", { name: "Open guide" }));
+  expect(open).toHaveBeenCalledOnce();
+  expect(select).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByText("Manual"));
+  expect(select).toHaveBeenCalledOnce();
 });

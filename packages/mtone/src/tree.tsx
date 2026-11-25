@@ -128,7 +128,7 @@ export interface TreeProps extends Omit<
   switcherIcon?: React.ReactNode | ((info: TreeNodeInfo) => React.ReactNode);
   switcherLoadingIcon?: React.ReactNode;
   titleRender?: (node: TreeItem) => React.ReactNode;
-  /** Use HoverMarquee for plain node labels, unless a node opts out. Defaults to true. */
+  /** Reveal overflowing text and custom node labels unless a node opts out. Defaults to true. */
   labelMarquee?: boolean;
   /** Pixels of indentation per level; defaults to 20. */
   indent?: number;
@@ -663,9 +663,18 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               ? [renderedActions]
               : renderedActions;
           const title = titleRender ? titleRender(node) : node.label;
-          const marquee =
-            (node.labelMarquee ?? labelMarquee) &&
-            (typeof title === "string" || typeof title === "number");
+          const marquee = node.labelMarquee ?? labelMarquee;
+          const plainTitle = typeof title === "string" || typeof title === "number";
+          const titleControl = (event: React.SyntheticEvent<HTMLDivElement>) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return false;
+            const label = target.closest(".mt-tree-title");
+            if (!label || label.parentElement !== event.currentTarget) return false;
+            const control = target.closest(
+              "a[href],button,input,select,textarea,summary,[role=button],[role=link],[tabindex]:not(.mt-tree-title),[contenteditable]:not([contenteditable=false])",
+            );
+            return !!control && label.contains(control);
+          };
           // Controls must not become part of the row's accessible name.
           const titleId = rowActions.length && typeof node.label !== "string"
             ? `${treeId}-title-${start + rowIndex}`
@@ -712,20 +721,20 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               }}
               onFocus={() => setActive(node.id)}
               onClick={(e) => {
-                if (isDisabled) return;
+                if (isDisabled || titleControl(e)) return;
                 focus(node.id);
                 choose(node, e);
                 if (directory && expandAction === "click")
                   expand(node, !isOpen);
               }}
               onDoubleClick={(e) => {
-                if (isDisabled) return;
+                if (isDisabled || titleControl(e)) return;
                 onDoubleClick?.(e, node);
                 if (directory && expandAction === "doubleClick")
                   expand(node, !isOpen);
               }}
               onContextMenu={(e) => {
-                if (!isDisabled) onRightClick?.({ event: e, node });
+                if (!isDisabled && !titleControl(e)) onRightClick?.({ event: e, node });
               }}
               onKeyDown={(e) => {
                 if (
@@ -804,7 +813,9 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                 !isDisabled &&
                 (typeof draggable === "function" ? draggable(node) : draggable)
               }
-              onPointerDownCapture={() => { pressedActionRow.current = undefined; }}
+              onPointerDownCapture={(e) => {
+                pressedActionRow.current = titleControl(e) ? node.id : undefined;
+              }}
               onPointerUpCapture={() => { pressedActionRow.current = undefined; }}
               onPointerCancelCapture={() => { pressedActionRow.current = undefined; }}
               onDragStart={(e) => {
@@ -960,7 +971,12 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                 </span>
               )}
               {marquee ? (
-                <HoverMarquee className="mt-tree-title" id={titleId} tabIndex={-1}>
+                <HoverMarquee
+                  className="mt-tree-title"
+                  id={titleId}
+                  tabIndex={-1}
+                  mode={plainTitle ? "loop" : "single"}
+                >
                   {title}
                 </HoverMarquee>
               ) : (

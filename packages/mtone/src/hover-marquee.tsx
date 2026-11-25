@@ -35,13 +35,16 @@ function syncVisualCopy(original: HTMLElement, copy: HTMLElement) {
 }
 
 export interface HoverMarqueeProps extends React.ComponentPropsWithRef<"span"> {
-  /** Short text or non-interactive inline content on a single line. */
+  /** Inline content on a single line. */
   children: React.ReactNode;
+  /** Use "single" for interactive JSX: pan out and back without a visual copy. */
+  mode?: "loop" | "single";
 }
 
 /** Reveal clipped text without changing the space allotted by the surrounding layout. */
 export function HoverMarquee({
   children,
+  mode = "loop",
   className,
   tabIndex,
   ref,
@@ -58,6 +61,7 @@ export function HoverMarquee({
     advance: 0,
   });
   const overflowing = distance > 0;
+  const single = mode === "single";
 
   const measure = React.useCallback(() => {
     const frame = viewport.current;
@@ -117,8 +121,9 @@ export function HoverMarquee({
     };
   }, [measure, updateCopy]);
 
-  // Both moving segments have the same pace. Only the head and tail hold still.
-  const duration = HEAD_PAUSE + TAIL_PAUSE + advance / PIXELS_PER_SECOND;
+  // Loop mode continues to the copy; single mode returns the same track.
+  const duration =
+    HEAD_PAUSE + TAIL_PAUSE + (single ? 2 * distance : advance) / PIXELS_PER_SECOND;
   const tailStart = HEAD_PAUSE + distance / PIXELS_PER_SECOND;
   const percent = (seconds: number) => `${(100 * seconds) / duration}%`;
 
@@ -129,10 +134,13 @@ export function HoverMarquee({
       className={cn("mt-hover-marquee", className)}
       tabIndex={tabIndex ?? (overflowing ? 0 : undefined)}
       data-overflow={overflowing ? "" : undefined}
+      data-motion={single ? "single" : undefined}
       onBlur={(event) => {
         const frame = event.currentTarget;
-        if (!frame.matches(":hover") && !frame.contains(event.relatedTarget))
-          frame.scrollLeft = 0;
+        if (
+          (single || !frame.matches(":hover")) &&
+          !frame.contains(event.relatedTarget)
+        ) frame.scrollLeft = 0;
         onBlur?.(event);
       }}
       onPointerLeave={(event) => {
@@ -152,6 +160,7 @@ export function HoverMarquee({
                 "--mt-marquee-tail-start": percent(tailStart),
                 "--mt-marquee-tail-end": percent(tailStart + TAIL_PAUSE),
                 "--mt-marquee-tail-progress": distance / advance,
+                "--mt-marquee-distance": `${distance}px`,
               } as React.CSSProperties)
             : undefined
         }
@@ -159,7 +168,7 @@ export function HoverMarquee({
         <span ref={text} className="mt-hover-marquee-original">
           {children}
         </span>
-        {overflowing && (
+        {overflowing && !single && (
           <span
             ref={repeat}
             className="mt-hover-marquee-copy"

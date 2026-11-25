@@ -26,7 +26,7 @@
 /* One full stride aligns the hidden repetition exactly with the start of the
    original so a new animation iteration does not visibly jump. */
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
-  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within)
+  .mt-hover-marquee[data-overflow]:not([data-motion="single"]):is(:hover, :focus-within)
     > .mt-hover-marquee-text {
     inline-size: max-content;
     overflow: visible;
@@ -40,7 +40,7 @@
       )
       infinite;
   }
-  .mt-hover-marquee[data-overflow]:dir(rtl):is(:hover, :focus-within)
+  .mt-hover-marquee[data-overflow]:not([data-motion="single"]):dir(rtl):is(:hover, :focus-within)
     > .mt-hover-marquee-text {
     --mt-marquee-offset: calc(100% + var(--mt-marquee-gap));
   }
@@ -54,6 +54,36 @@
     pointer-events: none;
     user-select: none;
   }
+  /* A single track moves back to its origin without clipping off its tail
+     or creating a second copy of any inline component. */
+  .mt-hover-marquee[data-motion="single"][data-overflow]:hover:not(:focus-visible, :has(:focus-visible))
+    > .mt-hover-marquee-text {
+    inline-size: max-content;
+    overflow: visible;
+    --mt-marquee-offset: calc(-1 * var(--mt-marquee-distance));
+    animation: mt-hover-marquee-pan var(--mt-marquee-duration)
+      linear(
+        0 0% var(--mt-marquee-head-end),
+        1 var(--mt-marquee-tail-start) var(--mt-marquee-tail-end),
+        0 100%
+      )
+      infinite;
+  }
+  .mt-hover-marquee[data-motion="single"][data-overflow]:dir(rtl):hover:not(:focus-visible, :has(:focus-visible))
+    > .mt-hover-marquee-text {
+    --mt-marquee-offset: var(--mt-marquee-distance);
+  }
+}
+
+/* Keep keyboard-focused rich controls stationary and natively scrollable. */
+.mt-hover-marquee[data-motion="single"][data-overflow]:is(:focus-visible, :has(:focus-visible)) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.mt-hover-marquee[data-motion="single"][data-overflow]:is(:focus-visible, :has(:focus-visible))
+  > .mt-hover-marquee-text {
+  inline-size: max-content;
 }
 
 /* A native scroll viewport preserves the full text without autoplay. */

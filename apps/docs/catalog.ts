@@ -542,17 +542,18 @@ export default function Demo() {
   },
   {
     name: "HoverMarquee",
-    description: "单行文字溢出时显示省略号，悬停或聚焦时滚动查看全文。",
+    description: "在宽度受限时滚动查看溢出的单行文本或自定义行内内容。",
     importNames: ["HoverMarquee"],
     code: 'import { HoverMarquee } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <div style={{ inlineSize: "100%", maxInlineSize: "15rem", minInlineSize: 0 }}>\n      <HoverMarquee>面向多模态教学数据的人工智能实验记录、阶段性研究报告与后续模型评估计划及数据整理说明</HoverMarquee>\n    </div>\n  );\n}',
     props: [
-      { name: "children", type: "ReactNode", description: "单行文本或非交互行内内容。" },
-      { name: "tabIndex", type: "number", description: "默认仅文字溢出时可通过 Tab 聚焦；可覆盖。" },
+      { name: "children", type: "ReactNode", description: "单行文本或 JSX 行内内容；含交互控件时使用 single 模式。" },
+      { name: "mode", type: '"loop" | "single"', default: '"loop"', description: "loop 使用不可交互的副本无缝循环，适用于文本或非交互行内内容；single 只保留一份原内容，悬停后到达末尾短暂停顿再返回，不克隆元素或控件，键盘聚焦时停止动画。" },
+      { name: "tabIndex", type: "number", description: "默认仅内容溢出时可通过 Tab 聚焦；可覆盖。" },
       { name: "原生属性", type: "ComponentPropsWithRef<'span'>", description: "支持 className、style、ARIA 属性，ref 指向外层 span。" },
     ],
     notes: [
       "在宽度受限的容器中使用。仅溢出时滚动；到达行尾短暂停留，再平滑经过一小段留白，连续接到下一轮。悬停与焦点都离开时恢复省略状态。RTL 反向滚动。",
-      "启用减少动态效果或设备不支持悬停时不自动滚动：聚焦后可用方向键横向滚动，触屏可横向滑动。原文始终保留在同一个可访问文本节点中。",
+      "启用减少动态效果或设备不支持悬停时不自动滚动：聚焦后可用方向键横向滚动，触屏可横向滑动。原内容始终保留在同一份可访问的 DOM 中。",
     ],
   },
   {
@@ -3807,13 +3808,13 @@ export default function Demo() {
       {
         name: "titleRender",
         type: "(node: TreeItem) => ReactNode",
-        description: "自定义标题内容；节点 label 仍提供默认可访问名称。",
+        description: "自定义行内标题内容，支持图标、徽标和链接；节点字符串 label 仍提供默认可访问名称。",
       },
       {
         name: "labelMarquee",
         type: "boolean",
         default: "true",
-        description: "纯文本节点标题默认复用 HoverMarquee，溢出时省略，仅悬停文字才滚动；可在 Tree 或单个节点关闭。自定义 JSX 不自动滚动。",
+        description: "普通文本和 JSX 自定义标题都默认在标题区域溢出时支持悬停滚动。文字无缝循环，JSX 保留单个原节点，到达末尾停顿再返回；标题内控件保持可访问，行尾 actions 不移动。可在 Tree 或单个节点关闭。",
       },
       {
         name: "indent",

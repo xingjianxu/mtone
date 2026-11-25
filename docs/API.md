@@ -297,8 +297,11 @@ or focused, then pans to the logical end, pauses, and glides across a short gap
 into the next repetition without jumping. The visual repetition is inert and
 hidden from assistive technology. Leaving hover and focus restores the ellipsis.
 
-Reduced-motion and no-hover devices instead support manual horizontal scrolling.
-The component accepts native span attributes and a ref to its outer span.
+For interactive inline JSX, set `mode="single"`. The original track pans to
+the end, pauses and glides back; no copy is made. Keyboard-focused controls
+stay stationary and can scroll into view. Reduced-motion and no-hover devices
+support manual horizontal scrolling. The component accepts native span
+attributes and a ref to its outer span.
 
 ## Typography.Code
 
@@ -356,11 +359,16 @@ the switcher or the Right Arrow key to expand, and Left Arrow to collapse.
   row, separately from the ellipsized title.
 - `actions(info)` renders a `TreeAction`, an array, or no actions for an
   enabled node. Set each action's `content` to a compact, accessibly named
-  button or menu trigger and use `visibility: "always"` (default), `"hover"`
-  (row hover or keyboard focus; always available on touch-only devices), or
-  `"active"` (selected rows). Controls reserve space after passive
-  `endContent` even when hidden, and do not select, expand or drag the node.
+  button or menu trigger and use `visibility: "hover"` (default; row hover or
+  keyboard focus, always available on touch-only devices), `"always"`, or
+  `"active"` (selected rows). Visible actions follow passive `endContent`;
+  hidden hover actions take no width. Actions do not select, expand or drag the node.
   See the [node actions example](https://xingjianxu.github.io/mtone/#/components/Tree?section=node-actions).
+- `labelMarquee` defaults to true for both text and inline JSX from `label` or
+  `titleRender` and can be disabled on the tree or an individual node. A fitting
+  title stays still. Overflowing text loops seamlessly on hover. Overflowing
+  JSX uses one track that returns after reaching the end, and the trailing
+  actions stay fixed. Embedded links and buttons remain independently usable.
 - `gap` sets the space between adjacent rows in pixels (default 2). Use
   `gap={0}` to remove that space or a finite, nonnegative decimal for a custom
   gap. Invalid values fall back to 2. Normal and virtual rows share this
