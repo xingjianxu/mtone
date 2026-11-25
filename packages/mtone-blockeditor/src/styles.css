@@ -652,6 +652,13 @@
 .mt-block-editor-media-form .mt-tab-panel {
   padding: 8px 0 0;
 }
+.mt-block-editor-media-field {
+  display: grid;
+  gap: 4px;
+  min-inline-size: 0;
+  font-size: 0.8125rem;
+  color: var(--mt-fg);
+}
 .mt-block-editor-media-form-actions {
   display: flex;
   gap: 6px;

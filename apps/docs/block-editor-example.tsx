@@ -96,7 +96,10 @@ export function BlockEditorFillHeightExample() {
           fillHeight={fillHeight}
           label="高度示例正文"
           initialContent={[
-            { type: "paragraph", content: "父容器高 22rem。继续输入时，正文可向下撑开。" },
+            {
+              type: "paragraph",
+              content: "父容器高 22rem。继续输入时，正文可向下撑开。",
+            },
           ]}
         />
       </div>
@@ -172,6 +175,21 @@ export function BlockEditorFormatsExample() {
   );
 }
 
+async function demoUploadFile(file: File) {
+  // Demonstrates the host callback without sending the local file anywhere.
+  await new Promise((resolve) => setTimeout(resolve, 600));
+  const asset = file.type.startsWith("image/")
+    ? flowImage
+    : `${import.meta.env.BASE_URL}block-editor-media/${
+        file.type.startsWith("video/")
+          ? "sample.webm"
+          : file.type.startsWith("audio/")
+            ? "chime.mp3"
+            : "release-notes.txt"
+      }`;
+  return new URL(asset, window.location.href).href;
+}
+
 export function BlockEditorMediaExample() {
   const [readOnly, setReadOnly] = React.useState(false);
   const asset = (filename: string) =>
@@ -186,8 +204,10 @@ export function BlockEditorMediaExample() {
         checked={readOnly}
         onCheckedChange={setReadOnly}
       />
+      <p>选择本地文件只会预览本站示例资源，不会上传你的文件。</p>
       <BlockEditor
         label="媒体块示例正文"
+        uploadFile={demoUploadFile}
         initialContent={[
           {
             type: "video",
@@ -218,21 +238,6 @@ export function BlockEditorMediaExample() {
 }
 
 export function BlockEditorUploadExample() {
-  const uploadFile = async (file: File) => {
-    // Demonstrates the host callback without sending the local file anywhere.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    const asset = file.type.startsWith("image/")
-      ? flowImage
-      : `${import.meta.env.BASE_URL}block-editor-media/${
-          file.type.startsWith("video/")
-            ? "sample.webm"
-            : file.type.startsWith("audio/")
-              ? "chime.mp3"
-              : "release-notes.txt"
-        }`;
-    return new URL(asset, window.location.href).href;
-  };
-
   return (
     <div style={{ inlineSize: "100%", display: "grid", gap: 10 }}>
       <p>此示例不会上传你的文件，而是用本站示例资源演示上传结果。</p>
@@ -244,7 +249,7 @@ export function BlockEditorUploadExample() {
             content: "在本行下方输入 /，选择图片、视频、音频或附件。",
           },
         ]}
-        uploadFile={uploadFile}
+        uploadFile={demoUploadFile}
       />
     </div>
   );

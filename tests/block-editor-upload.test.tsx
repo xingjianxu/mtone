@@ -48,7 +48,7 @@ test("a host upload can fail and retry without losing the file or metadata", asy
   fireEvent.change(screen.getByRole("textbox", { name: "Caption" }), {
     target: { value: "Demo track" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Apply audio" }));
+  fireEvent.click(screen.getByRole("button", { name: "Upload and apply" }));
   await screen.findByRole("alert");
   expect(updateBlock).not.toHaveBeenCalled();
   expect(screen.getByText("track.mp3")).toBeInTheDocument();
@@ -126,7 +126,7 @@ test("drop supports file names but never saves unsafe or late-resolved results",
   expect(screen.getByRole("textbox", { name: "File name" })).toHaveValue(
     "notes.txt",
   );
-  fireEvent.click(screen.getByRole("button", { name: "Apply file" }));
+  fireEvent.click(screen.getByRole("button", { name: "Upload and apply" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("HTTP(S)");
   expect(updateBlock).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Retry upload" }));

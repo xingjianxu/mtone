@@ -19,6 +19,21 @@ export type ImageTarget = {
 };
 type Target = MediaTarget | ({ kind: "image" } & ImageTarget);
 
+function MediaField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="mt-block-editor-media-field">
+      <span>{label}</span>
+      {children}
+    </label>
+  );
+}
+
 export function MediaForm({
   editor,
   target,
@@ -177,16 +192,17 @@ export function MediaForm({
   }
 
   const embed = (
-    <Input
-      ref={input}
-      aria-label={zh ? `${chinese}地址` : `${english} URL`}
-      placeholder="https://"
-      value={url}
-      onChange={(event) => {
-        setUrl(event.target.value);
-        setError("");
-      }}
-    />
+    <MediaField label={zh ? `${chinese}地址` : `${english} URL`}>
+      <Input
+        ref={input}
+        placeholder="https://"
+        value={url}
+        onChange={(event) => {
+          setUrl(event.target.value);
+          setError("");
+        }}
+      />
+    </MediaField>
   );
   const uploadArea = (
     <div
@@ -298,37 +314,41 @@ export function MediaForm({
         embed
       )}
       {kind === "file" && (
-        <Input
-          disabled={busy}
-          aria-label={zh ? "附件名称" : "File name"}
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
+        <MediaField label={zh ? "附件名称" : "File name"}>
+          <Input
+            disabled={busy}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </MediaField>
       )}
       {kind === "image" && (
-        <Input
-          disabled={busy}
-          aria-label={zh ? "替代文本" : "Alternative text"}
-          value={alt}
-          onChange={(event) => setAlt(event.target.value)}
-        />
+        <MediaField label={zh ? "替代文本" : "Alternative text"}>
+          <Input
+            disabled={busy}
+            value={alt}
+            onChange={(event) => setAlt(event.target.value)}
+          />
+        </MediaField>
       )}
-      <Input
-        disabled={busy}
-        aria-label={zh ? `${chinese}说明` : "Caption"}
-        value={caption}
-        onChange={(event) => setCaption(event.target.value)}
-      />
-      {kind === "video" && (
+      <MediaField label={zh ? `${chinese}说明` : "Caption"}>
         <Input
           disabled={busy}
-          type="number"
-          min={25}
-          max={100}
-          aria-label={zh ? "视频宽度（%）" : "Video width (%)"}
-          value={width}
-          onChange={(event) => setWidth(event.target.value)}
+          value={caption}
+          onChange={(event) => setCaption(event.target.value)}
         />
+      </MediaField>
+      {kind === "video" && (
+        <MediaField label={zh ? "视频宽度（%）" : "Video width (%)"}>
+          <Input
+            disabled={busy}
+            type="number"
+            min={25}
+            max={100}
+            value={width}
+            onChange={(event) => setWidth(event.target.value)}
+          />
+        </MediaField>
       )}
       <div className="mt-block-editor-media-form-actions">
         <Button
@@ -337,10 +357,14 @@ export function MediaForm({
           disabled={busy || (uploading && !file)}
           onClick={save}
         >
-          {uploading && uploadFailed
-            ? zh
-              ? "重试上传"
-              : "Retry upload"
+          {uploading
+            ? uploadFailed
+              ? zh
+                ? "重试上传"
+                : "Retry upload"
+              : zh
+                ? "上传并应用"
+                : "Upload and apply"
             : zh
               ? `应用${chinese}`
               : `Apply ${english.toLowerCase()}`}

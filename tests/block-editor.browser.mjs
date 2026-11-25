@@ -720,6 +720,15 @@ try {
   await page.getByRole("tooltip").filter({ hasText: "两秒测试画面" }).waitFor();
   await videoFigure.press("Enter");
   await mediaDemo.getByRole("button", { name: "编辑媒体" }).click();
+  await mediaDemo.getByRole("tab", { name: "上传", exact: true }).waitFor();
+  await mediaDemo
+    .locator("label")
+    .getByText("视频地址", { exact: true })
+    .waitFor();
+  await mediaDemo
+    .locator("label")
+    .getByText("视频宽度（%）", { exact: true })
+    .waitFor();
   await mediaDemo.getByRole("spinbutton", { name: "视频宽度（%）" }).fill("50");
   await mediaDemo.getByRole("button", { name: "应用视频" }).click();
   assert.equal(
@@ -732,6 +741,18 @@ try {
   await media.press("Enter");
   await media.press("/");
   await page.getByRole("option", { name: "附件", exact: true }).click();
+  await mediaDemo
+    .getByRole("button", { name: "选择文件", exact: true })
+    .waitFor();
+  await mediaDemo.getByRole("tab", { name: "嵌入链接" }).click();
+  await mediaDemo
+    .locator("label")
+    .getByText("附件名称", { exact: true })
+    .waitFor();
+  await mediaDemo
+    .locator("label")
+    .getByText("附件说明", { exact: true })
+    .waitFor();
   const fileURL = mediaDemo.getByRole("textbox", { name: "附件地址" });
   await fileURL.fill("data:text/html,invalid");
   await fileURL.press("Enter");
@@ -874,7 +895,9 @@ try {
     buffer: Buffer.from("Browser smoke test"),
   });
   await fileSettings.getByText("changelog.txt", { exact: true }).waitFor();
-  await fileSettings.getByRole("button", { name: "应用附件" }).click();
+  await fileSettings
+    .getByRole("button", { name: "上传并应用", exact: true })
+    .click();
   await fileSettings.getByRole("status").getByText("正在上传…").waitFor();
   const attachment = uploadBody.getByRole("link", { name: "changelog.txt" });
   await attachment.waitFor();

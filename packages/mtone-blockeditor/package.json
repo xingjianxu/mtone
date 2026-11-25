@@ -1,6 +1,6 @@
 {
   "name": "@bixlab/mtone-blockeditor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "Optional BlockNote editor styled with mtone",
   "license": "MIT",
