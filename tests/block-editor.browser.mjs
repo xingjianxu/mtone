@@ -48,6 +48,20 @@ try {
   const editor = page.getByRole("textbox", { name: "发布周记正文" });
   await editor.waitFor();
   const usageDemo = page.locator(".mt-block-editor").filter({ has: editor });
+  const borderless = page.getByRole("switch", { name: "无边框", exact: true });
+  const frameWidth = () =>
+    usageDemo.evaluate((node) => getComputedStyle(node).borderTopWidth);
+  assert.equal(await frameWidth(), "1px");
+  await borderless.click();
+  assert.equal(await frameWidth(), "0px");
+  assert.equal(await editor.getAttribute("contenteditable"), "true");
+  await editor.press("Control+Home");
+  assert.equal(
+    await editor.evaluate((node) => getComputedStyle(node).outlineWidth),
+    "1px",
+  );
+  await borderless.click();
+  assert.equal(await frameWidth(), "1px");
   assert.match(
     await page.locator(".component-import code").textContent(),
     /from "@bixlab\/mtone-blockeditor"/,

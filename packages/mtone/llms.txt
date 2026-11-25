@@ -48,6 +48,7 @@ This file describes this package checkout, not necessarily the latest published 
 - documentKey: string | number. 换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。
 - onChange: (blocks: BlockEditorBlock[]) => void. 内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。
 - readOnly: boolean (default: false). 显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。
+- borderless: boolean (default: false). 只移除编辑器外框，保留内部样式和键盘焦点提示。
 - uploadImage: (file: File) => Promise<string>. 可选。由宿主上传图片并返回 HTTP(S) 地址；未传时仍可通过 URL 插入图片。
 - label / locale / className: string / 'zh' | 'en' / string. 正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。
 - 单独安装：npm install @bixlab/mtone @bixlab/mtone-blockeditor。主包不包含、也不依赖编辑器。

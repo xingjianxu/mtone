@@ -11,6 +11,10 @@
   background: var(--bn-colors-editor-background);
   color: var(--bn-colors-editor-text);
 }
+.mt-block-editor[data-borderless] {
+  border: 0;
+  border-radius: 0;
+}
 .mt-block-editor .bn-root,
 .mt-block-editor .bn-editor {
   --bn-colors-editor-background: var(--mt-bg, white);

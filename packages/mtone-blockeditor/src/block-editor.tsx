@@ -30,6 +30,8 @@ export interface BlockEditorProps {
   initialContent?: readonly BlockEditorInput[];
   onChange?: (blocks: BlockEditorBlock[]) => void;
   readOnly?: boolean;
+  /** Hide the outer frame without changing editor content or controls. */
+  borderless?: boolean;
   label?: string;
   locale?: "zh" | "en";
   className?: string;
@@ -58,6 +60,7 @@ function EditorInstance({
   initialContent,
   onChange,
   readOnly = false,
+  borderless = false,
   locale: explicitLocale,
   label,
   className,
@@ -102,6 +105,7 @@ function EditorInstance({
     <div
       className={["mt-block-editor", className].filter(Boolean).join(" ")}
       data-read-only={readOnly ? "" : undefined}
+      data-borderless={borderless ? "" : undefined}
       onCompositionStartCapture={() => {
         composing.current = true;
       }}

@@ -52,6 +52,28 @@ test("loads native blocks once per key and switches to read-only without replaci
   expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
 });
 
+test("can remove just the frame without remounting the editor", () => {
+  const onChange = vi.fn();
+  const { rerender } = render(
+    <BlockEditor
+      label="Notes"
+      initialContent={[{ type: "paragraph", content: "Alpha" }]}
+      onChange={onChange}
+    />,
+  );
+  const editor = screen.getByRole("textbox", { name: "Notes" });
+  const frame = editor.closest(".mt-block-editor");
+  expect(frame).not.toHaveAttribute("data-borderless");
+  rerender(
+    <BlockEditor label="Notes" borderless readOnly onChange={onChange} />,
+  );
+  expect(frame).toHaveAttribute("data-borderless");
+  expect(screen.getByRole("textbox", { name: "Notes" })).toBe(editor);
+  expect(editor).toHaveTextContent("Alpha");
+  expect(editor).toHaveAttribute("contenteditable", "false");
+  expect(onChange).not.toHaveBeenCalled();
+});
+
 test("a keyboard form submission can't reach editor controls during composition", () => {
   render(<BlockEditor label="Notes" />);
   const editor = screen.getByRole("textbox", { name: "Notes" });

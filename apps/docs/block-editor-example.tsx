@@ -23,6 +23,7 @@ const initialContent: readonly BlockEditorInput[] = [
 
 export default function BlockEditorExample() {
   const [readOnly, setReadOnly] = React.useState(false);
+  const [borderless, setBorderless] = React.useState(false);
   const [saved, setSaved] =
     React.useState<readonly BlockEditorInput[]>(initialContent);
   const [copy, setCopy] = React.useState(0);
@@ -44,6 +45,11 @@ export default function BlockEditorExample() {
           label="只读预览"
           checked={readOnly}
           onCheckedChange={setReadOnly}
+        />
+        <Switch
+          label="无边框"
+          checked={borderless}
+          onCheckedChange={setBorderless}
         />
         <Button
           type="button"
@@ -70,6 +76,7 @@ export default function BlockEditorExample() {
         initialContent={initialContent}
         onChange={update}
         readOnly={readOnly}
+        borderless={borderless}
       />
     </div>
   );
