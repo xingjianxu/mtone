@@ -104,7 +104,7 @@ export default function Demo() {
       { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。" },
       { name: "borderless", type: "boolean", default: "false", description: "只移除编辑器外框，保留内部样式和键盘焦点提示。" },
       { name: "fillHeight", type: "boolean", default: "false", description: "开启后填满具有明确高度的父容器；内容超出则自然撑开。父容器高度未确定时仍使用正文 15rem 最小高度。" },
-      { name: "uploadFile", type: "(file: File) => Promise<string>", description: "可选。由宿主上传图片、视频、音频或附件，返回可持久访问的直接 HTTP(S) 地址。未提供回调时只显示嵌入链接。" },
+      { name: "uploadFile", type: "(file: File) => Promise<string>", description: "可选。由宿主上传图片、视频、音频或附件，返回可持久访问的直接 HTTP(S) 地址。提供回调后显示「上传」和「嵌入链接」；未提供时只显示带标签的链接字段。" },
       { name: "uploadImage", type: "(file: File) => Promise<string>", description: "可选。未提供 uploadFile 时仅为图片启用上传；两者同时提供时优先使用 uploadFile。" },
       { name: "label / locale / className", type: "string / 'zh' | 'en' / string", description: "正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。" },
     ],

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.3
+
+### Tree
+- Hide hover-only node actions without reserving label width, and reveal them on row hover or keyboard focus.
+- Enable HoverMarquee by default for overflowing plain-text node labels. Set `labelMarquee={false}` for a tree or for an individual node to opt out.
+
+### BlockEditor 0.2.1 (separate package)
+- Show labeled media fields and upload/link choices using the host's `uploadFile` callback; both documentation demos expose the upload flow.
+- Add optional borderless and fill-height layouts, and keep rounded editor corners intact.
+- Refine the audio player, attachment appearance and caption tooltips, and consolidate floating toolbar actions.
+
 ## 0.15.2
 
 ### Documentation
