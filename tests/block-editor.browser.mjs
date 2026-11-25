@@ -154,6 +154,14 @@ try {
   await formatDemo.getByRole("button", { name: "添加列", exact: true }).click();
   assert.equal(await table.getByRole("row").first().locator("th").count(), 3);
   const codeSource = formats.locator(".mt-block-editor-code-source code");
+  const keyword = codeSource.locator(".shiki").filter({ hasText: /^const$/ });
+  await keyword.waitFor({ state: "visible", timeout: 5000 });
+  assert.match(
+    await codeSource.evaluate((code) => getComputedStyle(code).fontFamily),
+    /monospace/,
+    "editable source uses the same monospace family as the code preview",
+  );
+  const keywordColors = [];
   const sourceSurfaces = [];
   for (const colorScheme of ["light", "dark"]) {
     await page.emulateMedia({ colorScheme });
@@ -195,10 +203,27 @@ try {
       `${colorScheme} editable code must not show BlockNote's outer dark bands`,
     );
     sourceSurfaces.push(colors.surface);
+    const tokenColor = await keyword.evaluate(
+      (token) => getComputedStyle(token).color,
+    );
+    assert.notEqual(
+      tokenColor,
+      colors.text,
+      `${colorScheme} keywords have distinct syntax color`,
+    );
+    keywordColors.push(tokenColor);
   }
   assert.notEqual(...sourceSurfaces, "editable code follows the current theme");
+  assert.notEqual(...keywordColors, "syntax color follows the current theme");
   await page.emulateMedia({ colorScheme: "light" });
+  const previousCode = await codeSource.textContent();
   await codeSource.click();
+  await page.keyboard.press("End");
+  await page.keyboard.insertText(" // test edit");
+  assert.match(await codeSource.textContent(), /test edit/);
+  await page.keyboard.press("Control+z");
+  assert.equal(await codeSource.textContent(), previousCode);
+  await keyword.waitFor({ state: "visible" });
   await formatDemo
     .getByRole("button", { name: "高亮预览", exact: true })
     .click();

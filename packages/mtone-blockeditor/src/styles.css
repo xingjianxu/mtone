@@ -145,6 +145,22 @@
   padding: 8px;
   border-radius: 6px;
   background: var(--mt-subtle, #f7f7f5);
+  font: 13px/1.6 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  white-space: pre;
+  overflow-wrap: normal;
+  tab-size: 2;
+}
+.mt-block-editor-code-source pre > code {
+  font: inherit;
+}
+.mt-block-editor-code-source .shiki {
+  color: var(--shiki-light, inherit);
+  color: light-dark(var(--shiki-light, currentColor), var(--shiki-dark, currentColor));
+}
+@media (forced-colors: active) {
+  .mt-block-editor-code-source .shiki {
+    color: inherit;
+  }
 }
 .mt-block-editor:not([data-read-only])
   .mt-block-editor-code:not([data-preview])

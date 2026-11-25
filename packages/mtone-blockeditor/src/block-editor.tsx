@@ -11,6 +11,7 @@ import { en, zh } from "@blocknote/core/locales";
 import { BlockNoteViewEditor, BlockNoteViewRaw } from "@blocknote/react";
 import { useMtone } from "@bixlab/mtone";
 import { EditorControls } from "./editor-controls";
+import { editorCodeHighlight } from "./editor-code-highlight";
 import { safeLink } from "./editor-link";
 
 import { schema, setCodePresentation } from "./editor-blocks";
@@ -66,6 +67,7 @@ function EditorInstance({
   const [editor] = React.useState<Editor>(() =>
     BlockNoteEditor.create({
       schema,
+      extensions: [editorCodeHighlight],
       tables: { headers: true },
       links: {
         isValidLink: (href) => Boolean(safeLink(href)),
