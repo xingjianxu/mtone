@@ -62,10 +62,12 @@ try {
   await formatting.waitFor({ state: "hidden", timeout: 3000 });
   // Viewport resizing can move the document scroll position without moving the
   // editor within its demo. Measure layout relative to the demo frame instead.
-  const bodyOffset = () => editor.evaluate((node) =>
-    node.getBoundingClientRect().top -
-    node.closest(".mt-block-editor").getBoundingClientRect().top
-  );
+  const bodyOffset = () =>
+    editor.evaluate(
+      (node) =>
+        node.getBoundingClientRect().top -
+        node.closest(".mt-block-editor").getBoundingClientRect().top,
+    );
   const bodyBefore = await bodyOffset();
   await editor.press("Shift+ArrowRight");
   await formatting.waitFor({ state: "visible" });
@@ -121,7 +123,7 @@ try {
   assert.match(await typeButton.textContent(), /一级标题/);
   await typeButton.click();
   await usageDemo
-    .getByRole("button", { name: "二级标题", exact: true })
+    .getByRole("menuitem", { name: "二级标题", exact: true })
     .click();
   await editor
     .getByRole("heading", { level: 2, name: "产品发布周记" })
@@ -130,7 +132,7 @@ try {
   await editor.press("Shift+ArrowRight");
   await typeButton.click();
   await usageDemo
-    .getByRole("button", { name: "一级标题", exact: true })
+    .getByRole("menuitem", { name: "一级标题", exact: true })
     .click();
   await editor
     .getByRole("heading", { level: 1, name: "产品发布周记" })
@@ -142,21 +144,62 @@ try {
   assert.equal(await center.getAttribute("aria-pressed"), "true");
   await formatting.getByRole("button", { name: "左对齐" }).click();
   await formatting.getByRole("button", { name: "颜色", exact: true }).click();
-  await usageDemo
-    .getByRole("button", { name: "文字色", exact: true })
-    .waitFor();
+  const palette = usageDemo.getByRole("menu", { name: "文字色和背景色" });
+  await palette.waitFor({ timeout: 3000 });
+  const textColors = palette.getByRole("group", {
+    name: "文字色",
+    exact: true,
+  });
+  const backgroundColors = palette.getByRole("group", {
+    name: "背景色",
+    exact: true,
+  });
+  assert.equal(
+    await textColors
+      .getByRole("menuitemradio", { name: "默认", exact: true })
+      .getAttribute("aria-checked"),
+    "true",
+  );
+  assert.equal(
+    await backgroundColors
+      .getByRole("menuitemradio", { name: "默认", exact: true })
+      .getAttribute("aria-checked"),
+    "true",
+  );
   await formatting.getByRole("button", { name: "颜色", exact: true }).click();
   await page.setViewportSize({ width: 360, height: 800 });
-  // The ResizeObserver can commit its React update after setViewportSize resolves.
-  await formatting
-    .getByRole("button", { name: "下划线", exact: true })
-    .waitFor({ state: "hidden" });
-  await toolbarRow(["粗体", "斜体", "链接", "更多格式"]);
-  await formatting.getByRole("button", { name: "更多格式" }).click();
-  await usageDemo
-    .getByRole("button", { name: "下划线", exact: true })
-    .waitFor();
-  await formatting.getByRole("button", { name: "更多格式" }).click();
+  const historyButton = formatting.getByRole("button", {
+    name: "更多格式",
+    exact: true,
+  });
+  const history = usageDemo.getByRole("menu", { name: "编辑历史" });
+  const track = formatting.locator(".mt-block-editor-toolbar-track");
+  assert(await track.evaluate((node) => node.scrollWidth > node.clientWidth));
+  await historyButton.click();
+  assert.deepEqual(await history.getByRole("menuitem").allTextContents(), [
+    "撤销",
+    "重做",
+  ]);
+  assert.equal(
+    await usageDemo.locator(".mt-block-editor-toolbar-options").count(),
+    0,
+  );
+  await historyButton.click();
+  await history.waitFor({ state: "hidden" });
+  const colorButton = formatting.getByRole("button", {
+    name: "颜色",
+    exact: true,
+  });
+  await colorButton.click();
+  await palette.waitFor();
+  const menuFrame = palette.locator("..");
+  const colorBounds = await menuFrame.boundingBox();
+  assert(colorBounds.x >= 0 && colorBounds.x + colorBounds.width <= 360);
+  assert(
+    await menuFrame.evaluate((node) => node.scrollHeight > node.clientHeight),
+  );
+  await palette.press("Escape");
+  await palette.waitFor({ state: "hidden" });
   await page.setViewportSize({ width: 1280, height: 800 });
   await editor.press("Control+Home");
   await editor.press("Shift+End");
@@ -183,18 +226,59 @@ try {
   );
   await formatting.getByRole("button", { name: "粗体", exact: true }).click();
   assert.equal(await editor.locator("h1 strong").textContent(), "产品发布周记");
-  await formatting
-    .getByRole("button", { name: "更多格式", exact: true })
+  await colorButton.click();
+  await textColors
+    .getByRole("menuitemradio", { name: "蓝色", exact: true })
     .click();
-  await page.getByRole("button", { name: "文字色", exact: true }).click();
-  await page.getByRole("button", { name: "蓝色", exact: true }).click();
-  assert.equal(
-    await editor
-      .locator('h1 [data-style-type="textColor"][data-value="blue"]')
-      .textContent(),
-    "产品发布周记",
-    "nested formatting menu preserves the selected range",
+  const blueText = editor.locator(
+    'h1 [data-style-type="textColor"][data-value="blue"]',
   );
+  assert.equal(
+    await blueText.textContent(),
+    "产品发布周记",
+    "choosing a color preserves the selected range",
+  );
+  await colorButton.press("ArrowDown");
+  await palette.waitFor();
+  assert.equal(
+    await textColors
+      .getByRole("menuitemradio", { name: "蓝色", exact: true })
+      .getAttribute("aria-checked"),
+    "true",
+  );
+  await palette.press("ArrowDown");
+  assert(
+    await palette.evaluate((node) =>
+      node.contains(node.ownerDocument.activeElement),
+    ),
+  );
+  await backgroundColors
+    .getByRole("menuitemradio", { name: "橙色", exact: true })
+    .click();
+  const orangeText = editor.locator(
+    'h1 [data-style-type="backgroundColor"][data-value="orange"]',
+  );
+  assert.equal(await orangeText.textContent(), "产品发布周记");
+  await colorButton.click();
+  await backgroundColors
+    .getByRole("menuitemradio", { name: "默认", exact: true })
+    .click();
+  assert.equal(await orangeText.count(), 0);
+  assert.equal(
+    await blueText.textContent(),
+    "产品发布周记",
+    "clearing background leaves text color",
+  );
+  await historyButton.click();
+  await history.getByRole("menuitem", { name: "撤销", exact: true }).click();
+  assert.equal(await orangeText.textContent(), "产品发布周记");
+  await editor.press("Control+Home");
+  await editor.press("Shift+End");
+  await historyButton.click();
+  await history.getByRole("menuitem", { name: "重做", exact: true }).click();
+  assert.equal(await orangeText.count(), 0);
+  await editor.press("Control+Home");
+  await editor.press("Shift+End");
   await usageDemo.getByRole("button", { name: "链接", exact: true }).click();
   const linkAddress = page.getByRole("textbox", { name: "链接地址" });
   await linkAddress.fill("javascript:alert(1)");

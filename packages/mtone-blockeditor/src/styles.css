@@ -54,15 +54,23 @@
   inline-size: 18px;
   line-height: 16px;
 }
-.mt-block-editor-toolbar {
+.mt-block-editor-toolbar,
+.mt-block-editor-toolbar-track {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
   gap: 2px;
-  padding: 3px 4px;
-  overflow-x: auto;
 }
-.mt-block-editor-toolbar > * {
+.mt-block-editor-toolbar { padding: 3px 4px; }
+.mt-block-editor-toolbar-track {
+  min-inline-size: 0;
+  padding: 1px;
+  margin: -1px;
+  overflow: auto hidden;
+  scrollbar-width: thin;
+}
+.mt-block-editor-toolbar > :not(.mt-block-editor-toolbar-track),
+.mt-block-editor-toolbar-track > * {
   flex: none;
 }
 .mt-block-editor-toolbar-divider {
@@ -70,17 +78,6 @@
   block-size: 20px;
   margin-inline: 3px;
   background: var(--mt-border, #e9e9e7);
-}
-.mt-block-editor-toolbar-options {
-  display: grid;
-  gap: 4px;
-  border-block-start: 1px solid var(--mt-border, #e9e9e7);
-  padding: 4px;
-}
-.mt-block-editor-toolbar-options > div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
 }
 .mt-block-editor-toolbar .mt-btn[aria-pressed="true"] {
   background: var(--mt-select-surface, #e9eef4);
@@ -574,4 +571,48 @@
   .mt-block-editor-audio-wide { display: none; }
   .mt-block-editor-audio-narrow { display: flex; }
   .mt-block-editor-audio-row { gap: 8px; padding-inline: 8px; }
+}
+
+.mt-block-editor-toolbar-menu {
+  z-index: 2;
+  box-sizing: border-box;
+  inline-size: min(9rem, calc(100vw - 16px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  border: 1px solid var(--mt-border);
+  border-radius: 8px;
+  background: var(--mt-bg);
+  box-shadow: var(--mt-shadow-popover, 0 5px 16px rgb(0 0 0 / 0.12));
+}
+.mt-block-editor-color-panel { inline-size: min(11.5rem, calc(100vw - 16px)); }
+.mt-block-editor-color-panel .mt-menu-group + .mt-menu-group {
+  margin-block-start: 6px;
+  padding-block-start: 5px;
+  border-block-start: 1px solid var(--mt-border);
+}
+.mt-block-editor-toolbar-menu .mt-inline-menu-item {
+  inline-size: 100%;
+}
+.mt-block-editor-color-chip {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 1px solid var(--mt-border);
+  border-radius: 4px;
+  color: var(--mt-swatch-ink);
+  font-size: 12px;
+  line-height: 1;
+}
+.mt-block-editor-color-chip[data-background] {
+  background: color-mix(in srgb, var(--mt-swatch) 22%, transparent);
+}
+.mt-block-editor-color-panel [aria-checked="true"] > span:last-child {
+  font-size: 0;
+}
+.mt-block-editor-color-panel [aria-checked="true"] > span:last-child::after {
+  content: "✓";
+  color: var(--mt-fg);
+  font-size: 13px;
 }

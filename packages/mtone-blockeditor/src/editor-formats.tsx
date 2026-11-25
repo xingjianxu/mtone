@@ -17,34 +17,7 @@ export function formatActions(editor: Editor, zh: boolean) {
     apply();
     editor.focus();
   };
-  const accents = [
-    ["default", "默认", "Default"],
-    ["neutral", "中性", "Neutral"],
-    ["blue", "蓝色", "Blue"],
-    ["green", "绿色", "Green"],
-    ["orange", "橙色", "Orange"],
-    ["red", "红色", "Red"],
-    ["purple", "紫色", "Purple"],
-    ["teal", "青色", "Teal"],
-    ["coral", "珊瑚色", "Coral"],
-  ] as const;
   return [
-    ...(["textColor", "backgroundColor"] as const).map((style) => ({
-      key: style,
-      label:
-        style === "textColor"
-          ? zh
-            ? "文字色"
-            : "Text color"
-          : zh
-            ? "高亮色"
-            : "Highlight color",
-      children: accents.map(([value, chinese, english]) => ({
-        key: value,
-        label: zh ? chinese : english,
-        onSelect: focus(() => editor.addStyles({ [style]: value })),
-      })),
-    })),
     {
       key: "alignment",
       label: zh ? "对齐方式" : "Alignment",
