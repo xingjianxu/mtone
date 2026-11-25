@@ -6,6 +6,8 @@ export type TreeItem = {
   id: TreeKey;
   label: React.ReactNode;
   children?: TreeItem[];
+  /** Override the Tree labelMarquee setting for this node. */
+  labelMarquee?: boolean;
   disabled?: boolean;
   disableCheckbox?: boolean;
   checkable?: boolean;
@@ -19,6 +21,8 @@ export type TreeNode = {
   key: TreeKey;
   title?: React.ReactNode;
   children?: TreeNode[];
+  /** Override the Tree labelMarquee setting for this node. */
+  labelMarquee?: boolean;
   disabled?: boolean;
   disableCheckbox?: boolean;
   checkable?: boolean;

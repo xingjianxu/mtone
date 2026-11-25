@@ -358,6 +358,7 @@ test("independent node actions do not select, expand, open a row context action 
       } : null} />,
   );
   const actionButton = screen.getByRole("button", { name: "Add child" });
+  expect(actionButton.parentElement).toHaveAttribute("data-visibility", "hover");
   fireEvent.click(actionButton);
   fireEvent.doubleClick(actionButton);
   fireEvent.contextMenu(actionButton);
@@ -390,4 +391,21 @@ test("Tree actions don't rename nodes or show actions for disabled nodes", () =>
   expect(row("Custom node")).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "custom command" })).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "disabled command" })).not.toBeInTheDocument();
+});
+
+test("uses HoverMarquee for plain labels by default with tree and node overrides", () => {
+  const data = [
+    { id: "a", label: "Alpha" },
+    { id: "b", label: "Beta", labelMarquee: false },
+    { id: "c", label: "Gamma", labelMarquee: true },
+    { id: "d", label: <em>Custom title</em> },
+  ];
+  const { rerender } = render(<Tree items={data} />);
+  const marquee = (name: string) => row(name).querySelector(".mt-hover-marquee");
+  expect(marquee("Alpha")).toBeInTheDocument();
+  expect(marquee("Beta")).not.toBeInTheDocument();
+  expect(marquee("Custom title")).not.toBeInTheDocument();
+  rerender(<Tree items={data} labelMarquee={false} />);
+  expect(marquee("Alpha")).not.toBeInTheDocument();
+  expect(marquee("Gamma")).toBeInTheDocument();
 });

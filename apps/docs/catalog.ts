@@ -3795,6 +3795,12 @@ export default function Demo() {
         description: "自定义标题内容；节点 label 仍提供默认可访问名称。",
       },
       {
+        name: "labelMarquee",
+        type: "boolean",
+        default: "true",
+        description: "纯文本节点标题默认复用 HoverMarquee，溢出时省略，仅悬停文字才滚动；可在 Tree 或单个节点关闭。自定义 JSX 不自动滚动。",
+      },
+      {
         name: "indent",
         type: "number",
         default: "20",
@@ -3814,7 +3820,7 @@ export default function Demo() {
       {
         name: "actions",
         type: "(info: TreeNodeInfo) => TreeAction | readonly TreeAction[] | null | undefined",
-        description: "为可用节点渲染独立的末端按钮或菜单。TreeAction 含 content 和可选 visibility：always（默认）、hover（行悬停、进入键盘焦点时显示，无悬停设备也可用）、active（节点已选中时显示）。隐藏仍占位，操作不选择、展开或拖动节点；请为纯图标按钮提供可访问名称。",
+        description: "为可用节点渲染独立的末端按钮或菜单。TreeAction 含 content 和可选 visibility：hover（默认，行悬停或进入键盘焦点时显示，无悬停设备也可用）、always（常显）、active（节点已选中时显示）。隐藏不占位，显示时标题按剩余宽度省略，操作不选择、展开或拖动节点；请为纯图标按钮提供可访问名称。",
       },
       {
         name: "filterTreeNode",

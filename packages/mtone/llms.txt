@@ -1969,10 +1969,11 @@ export default function Demo() {
 - icon / switcherIcon: ReactNode | (info: TreeNodeInfo) => ReactNode. 根级节点图标或展开图标；info 含 node、expanded、selected、checked、loading。节点自身 icon 优先，节点 icon 函数接收 TreeItem。
 - switcherLoadingIcon: ReactNode. 自定义加载图标。
 - titleRender: (node: TreeItem) => ReactNode. 自定义标题内容；节点 label 仍提供默认可访问名称。
+- labelMarquee: boolean (default: true). 纯文本节点标题默认复用 HoverMarquee，溢出时省略，仅悬停文字才滚动；可在 Tree 或单个节点关闭。自定义 JSX 不自动滚动。
 - indent: number (default: 20). 每层新增的逻辑缩进（px），同时调整节点、引导线和连接线；负值按 0，无效值回退到 20。
 - gap: number (default: 2). 相邻行间距（px）。接受有限非负数（可含小数）；设为 0 取消间距，无效值回退到 2。普通和虚拟列表一致，不改变单行的高度或命中区域。
 - endContent: (info: TreeNodeInfo) => ReactNode. 在行的逻辑末端独立显示计数或简短状态；标题省略不会压缩此区域。info 含 node、expanded、selected、checked、loading。
-- actions: (info: TreeNodeInfo) => TreeAction | readonly TreeAction[] | null | undefined. 为可用节点渲染独立的末端按钮或菜单。TreeAction 含 content 和可选 visibility：always（默认）、hover（行悬停、进入键盘焦点时显示，无悬停设备也可用）、active（节点已选中时显示）。隐藏仍占位，操作不选择、展开或拖动节点；请为纯图标按钮提供可访问名称。
+- actions: (info: TreeNodeInfo) => TreeAction | readonly TreeAction[] | null | undefined. 为可用节点渲染独立的末端按钮或菜单。TreeAction 含 content 和可选 visibility：hover（默认，行悬停或进入键盘焦点时显示，无悬停设备也可用）、always（常显）、active（节点已选中时显示）。隐藏不占位，显示时标题按剩余宽度省略，操作不选择、展开或拖动节点；请为纯图标按钮提供可访问名称。
 - filterTreeNode: (node: TreeItem) => boolean. 高亮返回 true 的节点，不删除其他节点或自动展开祖先。
 - loadData: (node: TreeItem) => Promise<unknown>. 展开未加载分支时调用，同一节点并发去重。Promise 返回值不直接作为 children，应用必须不可变更新 items / treeData。叶节点应设置 isLeaf=true。
 - loadedKeys / defaultLoadedKeys: TreeKey[]. 受控或初始加载成功键；提供 loadedKeys 后需在 onLoad 中更新以防后续重复加载。
