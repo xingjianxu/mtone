@@ -117,6 +117,16 @@ try {
   const focusRow = semantic.getByRole("row").filter({ hasText: "键盘焦点" });
   await expect(focusRow.getByRole("cell", { name: "#93B4DC" })).toBeVisible();
   await expect(focusRow.getByRole("cell", { name: "#86B5ED" })).toBeVisible();
+  for (const modeName of ["浅色", "深色"]) {
+    await mode(page, modeName).click();
+    const inks = await focusRow.locator("code").evaluateAll((codes) =>
+      codes.map((code) => getComputedStyle(code).color),
+    );
+    expect(inks).toHaveLength(3);
+    expect(inks[1]).toBe(inks[0]);
+    expect(inks[2]).toBe(inks[0]);
+  }
+  await mode(page, "跟随系统").click();
   const emphasisRow = semantic.getByRole("row").filter({ hasText: "强调操作底色" });
   await expect(emphasisRow.getByRole("cell", { name: "#2783DE" })).toHaveCount(2);
 

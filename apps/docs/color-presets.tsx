@@ -29,7 +29,13 @@ const semanticColors = [
   ["强调操作底色（Button 的 blue 变体）", "--mt-action-emphasis-bg", "#2783de"],
 ] as const;
 
-function SemanticSwatch({ paint }: { paint: string }) {
+function SemanticSwatch({
+  paint,
+  theme,
+}: {
+  paint: string;
+  theme: "light" | "dark";
+}) {
   const chip = React.useRef<HTMLSpanElement>(null);
   const [value, setValue] = React.useState("");
   React.useLayoutEffect(() => {
@@ -41,11 +47,16 @@ function SemanticSwatch({ paint }: { paint: string }) {
         ? `#${rgb.slice(1).map((channel) => Number(channel).toString(16).padStart(2, "0")).join("").toUpperCase()}`
         : color,
     );
-  }, [paint]);
+  }, [paint, theme]);
 
   return (
     <span className="semantic-swatch">
-      <span ref={chip} aria-hidden="true" style={{ backgroundColor: paint }} />
+      <span
+        ref={chip}
+        data-mt-theme={theme}
+        aria-hidden="true"
+        style={{ backgroundColor: paint }}
+      />
       <code>{value}</code>
     </span>
   );
@@ -132,9 +143,7 @@ export function ColorPresets() {
                     <td>{label}</td><td><code>{token}</code></td>
                     {(["light", "dark"] as const).map((theme) => (
                       <td key={theme}>
-                        <MtoneProvider theme={theme}>
-                          <SemanticSwatch paint={paint} />
-                        </MtoneProvider>
+                        <SemanticSwatch paint={paint} theme={theme} />
                       </td>
                     ))}
                   </tr>
