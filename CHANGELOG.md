@@ -1,10 +1,15 @@
 # Changelog
 
+## 0.15.1
+
+### Documentation
+- Update the bundled AI reference for the standalone `@bixlab/mtone-blockeditor` package and its expanded block and text formatting. The core library does not install or export the editor.
+
 ## 0.15.0
 
 ### Added
 - Reuse the documented semantic theme colors for shared selected states, component actions, and feedback while retaining existing overrides.
-- Rename the standalone BlockEditor package to `@bixlab/mtone-blockeditor` and update the shared docs. The new name is not yet published; the main package still does not install or export the editor.
+- Document the standalone BlockEditor in the shared docs. The main package does not install or export the editor.
 
 ### Fixed
 - Center the active docs sidebar item on navigation from Spotlight and retain the manual sidebar scroll position on clicks.
