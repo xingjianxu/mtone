@@ -10,7 +10,7 @@ concurrency:
 jobs:
   verify:
     name: Verify release package
-    if: github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft
+    if: github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft && !endsWith(github.event.release.tag_name, '-blockeditor')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -41,7 +41,7 @@ jobs:
         run: git diff --exit-code HEAD --
       - run: npm pack -w @bixlab/mtone --dry-run
   publish:
-    if: github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft
+    if: github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft && !endsWith(github.event.release.tag_name, '-blockeditor')
     needs: verify
     runs-on: ubuntu-latest
     environment: npm
@@ -72,3 +72,60 @@ jobs:
       - run: npm run build -w @bixlab/mtone
       - name: Publish using npm trusted publishing (OIDC)
         run: npm publish -w @bixlab/mtone --access public --provenance
+  publish-blockeditor:
+    name: Verify and publish BlockEditor
+    if: github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft && endsWith(github.event.release.tag_name, '-blockeditor')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Validate exact BlockEditor release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          test "$GITHUB_REF" = "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node --input-type=commonjs <<'NODE'
+          const assert = require("node:assert/strict");
+          const pkg = require("./packages/mtone-blockeditor/package.json");
+          assert.equal(pkg.name, "@bixlab/mtone-blockeditor");
+          assert.equal(pkg.repository.url, "git+https://github.com/xingjianxu/mtone.git");
+          assert.equal(pkg.license, "MIT");
+          assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
+          assert.equal(process.env.RELEASE_TAG, `v${pkg.version}-blockeditor`);
+          NODE
+      - run: npm ci
+      - run: npm run build -w @bixlab/mtone
+      - run: npm run build -w @bixlab/mtone-blockeditor
+      - name: Verify packed editor files
+        run: |
+          npm pack -w @bixlab/mtone-blockeditor --json --pack-destination "$RUNNER_TEMP" > "$RUNNER_TEMP/blockeditor-pack.json"
+          node --input-type=commonjs <<'NODE'
+          const assert = require("node:assert/strict");
+          const path = require("node:path");
+          const [pack] = require(path.join(process.env.RUNNER_TEMP, "blockeditor-pack.json"));
+          const pkg = require("./packages/mtone-blockeditor/package.json");
+          assert.equal(pack.name, pkg.name);
+          assert.equal(pack.version, pkg.version);
+          for (const file of ["dist/index.js", "dist/index.d.ts", "dist/styles.css", "LICENSE", "THIRD_PARTY_NOTICES.md"]) {
+            assert.ok(pack.files.some(entry => entry.path === file), `Missing ${file}`);
+          }
+          assert.equal(pack.filename, `bixlab-mtone-blockeditor-${pkg.version}.tgz`);
+          NODE
+          git diff --exit-code HEAD --
+      - name: Publish verified BlockEditor tarball using npm OIDC
+        run: |
+          version="$(node -p "require('./packages/mtone-blockeditor/package.json').version")"
+          npm publish "$RUNNER_TEMP/bixlab-mtone-blockeditor-$version.tgz" --access public --provenance
