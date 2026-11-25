@@ -37,7 +37,12 @@ export interface BlockEditorProps {
   label?: string;
   locale?: "zh" | "en";
   className?: string;
-  /** Optional host upload; return an HTTP(S) URL for the stored file. */
+  /**
+   * Upload images, video, audio, or attachments through the host application.
+   * Return a durable HTTP(S) URL. Takes precedence over uploadImage.
+   */
+  uploadFile?: (file: File) => Promise<string>;
+  /** Legacy image-only upload fallback when uploadFile is not provided. */
   uploadImage?: (file: File) => Promise<string>;
 }
 
@@ -68,6 +73,7 @@ function EditorInstance({
   label,
   className,
   uploadImage,
+  uploadFile,
 }: BlockEditorProps) {
   const { locale: inheritedLocale, theme } = useMtone();
   const locale = explicitLocale ?? inheritedLocale;
@@ -161,6 +167,7 @@ function EditorInstance({
             editor={editor}
             locale={locale}
             uploadImage={uploadImage}
+            uploadFile={uploadFile}
             previewCodeId={previewCodeId}
             setPreviewCodeId={setPreviewCodeId}
           />

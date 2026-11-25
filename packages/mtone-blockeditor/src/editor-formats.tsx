@@ -1,16 +1,12 @@
 import * as React from "react";
-import { Button, Input, Select } from "@bixlab/mtone";
+import { Button, Select } from "@bixlab/mtone";
 import { ArrowDownToLine, ArrowRightToLine, PanelTop, Rows2, Columns2 } from "lucide-react";
 import type {
   BlockEditorBlock,
-  BlockEditorProps,
   Editor,
 } from "./block-editor";
-import { safeImageUrl } from "./editor-blocks";
 
 type TableBlock = Extract<BlockEditorBlock, { type: "table" }>;
-export type ImageBlock = Extract<BlockEditorBlock, { type: "image" }>;
-export type ImageTarget = { anchor: string; image?: ImageBlock };
 
 export function formatActions(editor: Editor, zh: boolean) {
   const focus = (apply: () => void) => () => {
@@ -266,134 +262,6 @@ export function TableControls({
           <Icon size={15} aria-hidden />
         </Button>
       ))}
-    </div>
-  );
-}
-
-export function ImageForm({
-  editor,
-  target,
-  zh,
-  onClose,
-  uploadImage,
-}: {
-  editor: Editor;
-  target: ImageTarget;
-  zh: boolean;
-  onClose: () => void;
-  uploadImage?: BlockEditorProps["uploadImage"];
-}) {
-  const [url, setUrl] = React.useState(target.image?.props.url ?? "");
-  const [alt, setAlt] = React.useState(target.image?.props.alt ?? "");
-  const [caption, setCaption] = React.useState(
-    target.image?.props.caption ?? "",
-  );
-  const [busy, setBusy] = React.useState(false);
-  const [error, setError] = React.useState("");
-  const ref = React.useRef<HTMLInputElement>(null);
-  React.useEffect(() => {
-    ref.current?.focus({ preventScroll: true });
-  }, []);
-  function save() {
-    const safe = safeImageUrl(url);
-    if (!safe) {
-      setError(
-        zh
-          ? "请输入有效的 HTTP(S) 图片地址。"
-          : "Enter a valid HTTP(S) image URL.",
-      );
-      return;
-    }
-    const anchor = editor.getBlock(target.anchor);
-    if (!anchor) {
-      setError(
-        zh
-          ? "原位置已变更，请重新选择。"
-          : "The original block is no longer available.",
-      );
-      return;
-    }
-    const props = { url: safe, alt, caption };
-    if (target.image && anchor.type === "image")
-      editor.updateBlock(anchor, { props });
-    else if (anchor.type === "paragraph" && !anchor.content.length)
-      editor.updateBlock(anchor, { type: "image", props });
-    else editor.insertBlocks([{ type: "image", props }], anchor, "after");
-    onClose();
-  }
-  return (
-    <div
-      className="mt-block-editor-link"
-      role="group"
-      aria-label={zh ? "图片设置" : "Image settings"}
-      onKeyDown={(event) => {
-        if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229)
-          return;
-        if (event.key === "Escape") {
-          event.stopPropagation();
-          onClose();
-        }
-        if (
-          event.key === "Enter" &&
-          (event.target as HTMLElement).tagName === "INPUT" &&
-          (event.target as HTMLInputElement).type !== "file"
-        ) {
-          event.preventDefault();
-          if (!busy) save();
-        }
-      }}
-    >
-      <Input
-        ref={ref}
-        aria-label={zh ? "图片地址" : "Image URL"}
-        value={url}
-        onChange={(event) => setUrl(event.target.value)}
-      />
-      <Input
-        aria-label={zh ? "替代文本" : "Alternative text"}
-        value={alt}
-        onChange={(event) => setAlt(event.target.value)}
-      />
-      <Input
-        aria-label={zh ? "图片说明" : "Caption"}
-        value={caption}
-        onChange={(event) => setCaption(event.target.value)}
-      />
-      {uploadImage && (
-        <Input
-          type="file"
-          accept="image/*"
-          aria-label={zh ? "上传图片" : "Upload image"}
-          disabled={busy}
-          onChange={async (event) => {
-            const file = event.target.files?.[0];
-            if (!file) return;
-            event.target.value = "";
-            setBusy(true);
-            setError("");
-            try {
-              const uploaded = safeImageUrl(await uploadImage(file));
-              if (!uploaded) throw new Error();
-              setUrl(uploaded);
-            } catch {
-              setError(
-                zh
-                  ? "上传失败或未返回有效的图片地址。"
-                  : "Upload failed or did not return a valid image URL.",
-              );
-            } finally {
-              setBusy(false);
-            }
-          }}
-        />
-      )}
-      <Button size="small" disabled={busy} onClick={save}>
-        {zh ? "应用图片" : "Apply image"}
-      </Button>
-      <Button size="small" variant="ghost" onClick={onClose}>
-        {zh ? "取消" : "Cancel"}
-      </Button>
-      {error && <small role="alert">{error}</small>}
     </div>
   );
 }
