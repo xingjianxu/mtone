@@ -2,7 +2,7 @@
 
 An optional React block editor using mtone controls and the BlockNote editing engine. The package is not part of, installed by, or exported by `@bixlab/mtone`.
 
-The new name `@bixlab/mtone-blockeditor` is not yet published to npm. For the previous public release, use `@bixlab/mtone-blocknote@0.1.0` and its own README; some features below are newer. Once the new package is published, install `npm install @bixlab/mtone @bixlab/mtone-blockeditor` and import both stylesheets:
+The new name `@bixlab/mtone-blockeditor` is not yet published to npm. Once the new package is published, install `npm install @bixlab/mtone @bixlab/mtone-blockeditor` and import both stylesheets:
 
 ```tsx
 "use client";

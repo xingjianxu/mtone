@@ -106,7 +106,7 @@ export default function Demo() {
       { name: "label / locale / className", type: "string / 'zh' | 'en' / string", description: "正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。" },
     ],
     notes: [
-      "新包名 @bixlab/mtone-blockeditor 尚未发布到 npm；下方代码使用新包名。现在可安装旧包 @bixlab/mtone-blocknote@0.1.0（该版本不含本页部分新功能）。主包不包含、也不依赖编辑器。",
+      "新包名 @bixlab/mtone-blockeditor 尚未发布到 npm；下方代码使用新包名。主包不包含、也不依赖编辑器。",
       "导入两份 CSS；Next.js 使用客户端组件，推荐动态导入并设置 ssr: false。移动端 viewport 建议加 interactive-widget=resizes-content。",
       "键入 / 或点 + 添加块。更多格式提供对齐、文字色和高亮。将光标放进表格单元格即可增删行列、切换表头；不支持合并单元格。代码语言可切换，可选高亮预览；图片可编辑替代文本和说明。",
       "原生 JSON 是主存储格式。只读只影响界面。外部内容仍需由应用验证来源、权限以及数据结构。",
