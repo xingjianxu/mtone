@@ -16,6 +16,41 @@ const presetLabels: Record<MtoneAccent, string> = {
   coral: "珊瑚色",
 };
 
+// Some role-specific variables are optional overrides. Match the component
+// paint expressions so the samples also show their effective defaults.
+const semanticColors = [
+  ["键盘焦点", "--mt-focus"],
+  ["信息提示底色", "--mt-alert-info-bg"],
+  ["警告提示底色", "--mt-alert-warning-bg"],
+  ["侧栏当前项标记", "--mt-nav-current-indicator", "var(--mt-blue, #2383e2)"],
+  ["日历当天文字", "--mt-calendar-today-ink", "var(--mt-blue, #2383e2)"],
+  ["拖放目标边缘", "--mt-drop-target-edge", "var(--mt-indicator, #5378aa)"],
+  ["通知默认图标", "--mt-toast-default-icon-ink", "var(--mt-indicator, #5378aa)"],
+  ["强调操作底色（Button 的 blue 变体）", "--mt-action-emphasis-bg", "#2783de"],
+] as const;
+
+function SemanticSwatch({ paint }: { paint: string }) {
+  const chip = React.useRef<HTMLSpanElement>(null);
+  const [value, setValue] = React.useState("");
+  React.useLayoutEffect(() => {
+    if (!chip.current) return;
+    const color = getComputedStyle(chip.current).backgroundColor;
+    const rgb = /^rgb\((\d+), (\d+), (\d+)\)$/.exec(color);
+    setValue(
+      rgb
+        ? `#${rgb.slice(1).map((channel) => Number(channel).toString(16).padStart(2, "0")).join("").toUpperCase()}`
+        : color,
+    );
+  }, [paint]);
+
+  return (
+    <span className="semantic-swatch">
+      <span ref={chip} aria-hidden="true" style={{ backgroundColor: paint }} />
+      <code>{value}</code>
+    </span>
+  );
+}
+
 const accentDotStyle = {
   display: "inline-block",
   inlineSize: 8,
@@ -83,16 +118,28 @@ export function ColorPresets() {
         <p>根据用途而非颜色值使用这些变量。数字相同不代表用途相同：换选中背景，不应该连带改掉键盘焦点或信息提示。</p>
         <div className="props-scroll">
           <table className="props-table" aria-label="常用语义颜色">
-            <thead><tr><th scope="col">用途</th><th scope="col">变量</th></tr></thead>
+            <thead>
+              <tr>
+                <th scope="col">用途</th><th scope="col">变量</th>
+                <th scope="col">浅色</th><th scope="col">深色</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>键盘焦点</td><td><code>--mt-focus</code></td></tr>
-              <tr><td>信息提示底色</td><td><code>--mt-alert-info-bg</code></td></tr>
-              <tr><td>警告提示底色</td><td><code>--mt-alert-warning-bg</code></td></tr>
-              <tr><td>侧栏当前项标记</td><td><code>--mt-nav-current-indicator</code></td></tr>
-              <tr><td>日历当天文字</td><td><code>--mt-calendar-today-ink</code></td></tr>
-              <tr><td>拖放目标边缘</td><td><code>--mt-drop-target-edge</code></td></tr>
-              <tr><td>通知默认图标</td><td><code>--mt-toast-default-icon-ink</code></td></tr>
-              <tr><td>强调操作底色（Button 的 blue 变体）</td><td><code>--mt-action-emphasis-bg</code></td></tr>
+              {semanticColors.map(([label, token, fallback]) => {
+                const paint = fallback ? `var(${token}, ${fallback})` : `var(${token})`;
+                return (
+                  <tr key={token}>
+                    <td>{label}</td><td><code>{token}</code></td>
+                    {(["light", "dark"] as const).map((theme) => (
+                      <td key={theme}>
+                        <MtoneProvider theme={theme}>
+                          <SemanticSwatch paint={paint} />
+                        </MtoneProvider>
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

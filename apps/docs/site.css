@@ -746,6 +746,22 @@ section:not(:where(.example-stage *)) > p {
   text-underline-offset: 0.16em;
 }
 
+.semantic-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.semantic-swatch > span {
+  inline-size: 18px;
+  block-size: 18px;
+  border: 1px solid var(--docs-border);
+  border-radius: 4px;
+  flex: none;
+  forced-color-adjust: none;
+}
+
 .accent-palette {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));

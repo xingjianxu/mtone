@@ -92,6 +92,34 @@ try {
   await expect(page.getByRole("button", { name: "打开导航" })).toHaveAttribute("aria-expanded", "false");
   expect(await page.locator("html").evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
 
+  const semantic = page.getByRole("table", { name: "常用语义颜色" });
+  await expect(semantic.getByRole("columnheader", { name: "浅色" })).toBeVisible({ timeout: 3000 });
+  await expect(semantic.getByRole("columnheader", { name: "深色" })).toBeVisible();
+  const semanticRows = semantic.locator("tbody tr");
+  await expect(semanticRows).toHaveCount(8);
+  for (const row of await semanticRows.all()) {
+    const colors = await row.locator(".semantic-swatch").evaluateAll((samples) =>
+      samples.map((sample) => {
+        const color = getComputedStyle(sample.firstElementChild).backgroundColor;
+        const hex = "#" + color.match(/\d+/g).slice(0, 3)
+          .map((channel) => Number(channel).toString(16).padStart(2, "0"))
+          .join("").toUpperCase();
+        return { color, hex, label: sample.querySelector("code").textContent };
+      }),
+    );
+    expect(colors).toHaveLength(2);
+    for (const { color, hex, label } of colors) {
+      expect(color).toMatch(/^rgb\(/);
+      expect(label).toBe(hex);
+    }
+  }
+
+  const focusRow = semantic.getByRole("row").filter({ hasText: "键盘焦点" });
+  await expect(focusRow.getByRole("cell", { name: "#93B4DC" })).toBeVisible();
+  await expect(focusRow.getByRole("cell", { name: "#86B5ED" })).toBeVisible();
+  const emphasisRow = semantic.getByRole("row").filter({ hasText: "强调操作底色" });
+  await expect(emphasisRow.getByRole("cell", { name: "#2783DE" })).toHaveCount(2);
+
   const palette = page.getByRole("list", { name: "共享颜色预设" });
   const readPalette = () => palette.getByRole("listitem").evaluateAll((items) => items.map((item) => {
     const swatch = item.firstElementChild;
