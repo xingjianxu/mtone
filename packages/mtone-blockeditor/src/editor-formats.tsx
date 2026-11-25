@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Input, Select, type MenuEntry } from "@bixlab/mtone";
+import { Button, Input, Select } from "@bixlab/mtone";
 import type {
   BlockEditorBlock,
   BlockEditorProps,
@@ -11,7 +11,7 @@ type TableBlock = Extract<BlockEditorBlock, { type: "table" }>;
 export type ImageBlock = Extract<BlockEditorBlock, { type: "image" }>;
 export type ImageTarget = { anchor: string; image?: ImageBlock };
 
-export function formatActions(editor: Editor, zh: boolean): MenuEntry[] {
+export function formatActions(editor: Editor, zh: boolean) {
   const focus = (apply: () => void) => () => {
     apply();
     editor.focus();

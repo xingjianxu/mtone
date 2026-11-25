@@ -140,6 +140,7 @@ function EditorInstance({
           readOnly || !onChange ? undefined : () => onChange(editor.document)
         }
       >
+        <BlockNoteViewEditor />
         {!readOnly && (
           <EditorControls
             editor={editor}
@@ -149,7 +150,6 @@ function EditorInstance({
             setPreviewCodeId={setPreviewCodeId}
           />
         )}
-        <BlockNoteViewEditor />
       </BlockNoteViewRaw>
     </div>
   );

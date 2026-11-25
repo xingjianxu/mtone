@@ -34,10 +34,30 @@
 .mt-block-editor .bn-editor pre {
   overflow-x: auto;
 }
+.mt-block-editor-toolbar-panel {
+  max-inline-size: calc(100vw - 24px);
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: 8px;
+  background: var(--mt-bg, white);
+  box-shadow: var(--mt-shadow-popover, 0 5px 16px rgb(0 0 0 / 0.12));
+}
 .mt-block-editor .mt-block-editor-toolbar {
   border: 0;
-  border-block-end: 1px solid var(--mt-border, #e9e9e7);
-  border-radius: 8px 8px 0 0;
+  padding: 4px;
+}
+.mt-block-editor-toolbar-options {
+  display: grid;
+  gap: 4px;
+  border-block-start: 1px solid var(--mt-border, #e9e9e7);
+  padding: 4px;
+}
+.mt-block-editor-toolbar-options > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.mt-block-editor-insert {
+  padding: 0 0.5rem 0.5rem;
 }
 .mt-block-editor-toolbar .mt-btn[aria-pressed="true"] {
   background: var(--mt-select-surface, #e9eef4);

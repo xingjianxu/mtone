@@ -56,10 +56,46 @@ try {
       requested.some((url) => url.endsWith(asset)),
       asset,
     );
+  const formatting = usageDemo.locator(".mt-block-editor-toolbar");
   await editor.press("Control+Home");
+  await formatting.waitFor({ state: "hidden", timeout: 3000 });
+  const bodyBefore = await editor.boundingBox();
   await editor.press("Shift+End");
-  await usageDemo.getByRole("button", { name: "粗体", exact: true }).click();
+  await formatting.waitFor({ state: "visible" });
+  const selection = await editor.evaluate((element) => {
+    const range = element.ownerDocument.getSelection().getRangeAt(0);
+    const { x, y, width, height } = range.getBoundingClientRect();
+    return { x, y, width, height };
+  });
+  const toolbar = await formatting.boundingBox();
+  const bodyAfter = await editor.boundingBox();
+  assert(
+    selection.width > 0 &&
+      toolbar.x < selection.x + selection.width &&
+      toolbar.x + toolbar.width > selection.x &&
+      (Math.abs(toolbar.y + toolbar.height - selection.y) < 28 ||
+        Math.abs(toolbar.y - (selection.y + selection.height)) < 28),
+    "toolbar floats next to the selected text",
+  );
+  assert.equal(
+    bodyAfter.y,
+    bodyBefore.y,
+    "selection does not shift editor content",
+  );
+  await formatting.getByRole("button", { name: "粗体", exact: true }).click();
   assert.equal(await editor.locator("h1 strong").textContent(), "产品发布周记");
+  await formatting
+    .getByRole("button", { name: "更多格式", exact: true })
+    .click();
+  await page.getByRole("button", { name: "文字色", exact: true }).click();
+  await page.getByRole("button", { name: "蓝色", exact: true }).click();
+  assert.equal(
+    await editor
+      .locator('h1 [data-style-type="textColor"][data-value="blue"]')
+      .textContent(),
+    "产品发布周记",
+    "nested formatting menu preserves the selected range",
+  );
   await usageDemo.getByRole("button", { name: "链接", exact: true }).click();
   await page
     .getByRole("textbox", { name: "链接地址" })
@@ -76,6 +112,8 @@ try {
     "产品发布周记",
     "link preserves prior inline formatting",
   );
+  await editor.press("ArrowRight");
+  await formatting.waitFor({ state: "hidden", timeout: 3000 });
   await page.getByRole("button", { name: "保留当前草稿" }).click();
   await page.getByRole("switch", { name: "只读预览" }).click();
   assert.equal(await editor.getAttribute("contenteditable"), "false");

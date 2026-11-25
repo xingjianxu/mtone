@@ -6,6 +6,7 @@ import {
   SuggestionMenu,
 } from "@blocknote/core/extensions";
 import {
+  FormattingToolbarController,
   SideMenuController,
   SuggestionMenuController,
   useEditorState,
@@ -255,6 +256,169 @@ function blockActions(
   ];
 }
 
+const keepSelection = (event: React.MouseEvent) => event.preventDefault();
+
+function SelectionToolbar({
+  editor,
+  zh,
+  openLink,
+}: {
+  editor: Editor;
+  zh: boolean;
+  openLink: () => void;
+}) {
+  const styles = useEditorState({
+    editor,
+    selector: ({ editor: stateEditor }) => stateEditor.getActiveStyles(),
+  });
+  const [moreOpen, setMoreOpen] = React.useState(false);
+  const [groupKey, setGroupKey] = React.useState<string>();
+  const groups = formatActions(editor, zh);
+  const activeGroup = groups.find((group) => group.key === groupKey);
+  const formatButtons = [
+    ["bold", "粗体", "Bold", Bold],
+    ["italic", "斜体", "Italic", Italic],
+    ["underline", "下划线", "Underline", Underline],
+    ["strike", "删除线", "Strikethrough", Strikethrough],
+    ["code", "行内代码", "Inline code", Code],
+  ] as const;
+  return (
+    <TooltipProvider delay={420}>
+      <div className="mt-block-editor-toolbar-panel">
+        <Toolbar
+          className="mt-block-editor-toolbar"
+          background="white"
+          aria-label={zh ? "编辑工具" : "Editor formatting"}
+          start={
+            <>
+              {formatButtons.map(([style, chinese, english, Icon]) => (
+                <Tooltip key={style} content={zh ? chinese : english}>
+                  <Button
+                    type="button"
+                    size="small"
+                    iconOnly
+                    aria-label={zh ? chinese : english}
+                    aria-pressed={Boolean(styles?.[style])}
+                    onMouseDown={keepSelection}
+                    onClick={() => {
+                      editor.toggleStyles({ [style]: true });
+                      editor.focus();
+                    }}
+                  >
+                    <Icon size={15} aria-hidden />
+                  </Button>
+                </Tooltip>
+              ))}
+              <Button
+                type="button"
+                size="small"
+                iconOnly
+                aria-label={zh ? "链接" : "Link"}
+                onMouseDown={keepSelection}
+                onClick={openLink}
+              >
+                <Link2 size={16} aria-hidden />
+              </Button>
+            </>
+          }
+          end={
+            <>
+              <Button
+                type="button"
+                size="small"
+                iconOnly
+                aria-label={zh ? "撤销" : "Undo"}
+                onMouseDown={keepSelection}
+                onClick={() => {
+                  editor.undo();
+                  editor.focus();
+                }}
+              >
+                <Undo2 size={16} aria-hidden />
+              </Button>
+              <Button
+                type="button"
+                size="small"
+                iconOnly
+                aria-label={zh ? "重做" : "Redo"}
+                onMouseDown={keepSelection}
+                onClick={() => {
+                  editor.redo();
+                  editor.focus();
+                }}
+              >
+                <Redo2 size={16} aria-hidden />
+              </Button>
+              <Button
+                type="button"
+                size="small"
+                iconOnly
+                aria-label={zh ? "更多格式" : "More formatting"}
+                aria-expanded={moreOpen}
+                onMouseDown={keepSelection}
+                onClick={() => {
+                  setMoreOpen((open) => !open);
+                  setGroupKey(undefined);
+                }}
+              >
+                <Ellipsis size={16} aria-hidden />
+              </Button>
+            </>
+          }
+        />
+        {moreOpen && (
+          <div className="mt-block-editor-toolbar-options">
+            <div role="group" aria-label={zh ? "更多格式" : "More formatting"}>
+              {groups.map((group) => (
+                <Button
+                  key={group.key}
+                  type="button"
+                  size="small"
+                  variant="ghost"
+                  aria-expanded={groupKey === group.key}
+                  onMouseDown={keepSelection}
+                  onClick={() =>
+                    setGroupKey(groupKey === group.key ? undefined : group.key)
+                  }
+                >
+                  {group.label}
+                </Button>
+              ))}
+            </div>
+            {activeGroup && (
+              <div
+                role="group"
+                aria-label={
+                  typeof activeGroup.label === "string"
+                    ? activeGroup.label
+                    : undefined
+                }
+              >
+                {activeGroup.children?.map((item) => (
+                  <Button
+                    key={item.key}
+                    type="button"
+                    size="small"
+                    variant="ghost"
+                    onMouseDown={keepSelection}
+                    onClick={() => {
+                      item.onSelect?.();
+                      setMoreOpen(false);
+                      setGroupKey(undefined);
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
+  );
+}
+
 export function EditorControls({
   editor,
   locale,
@@ -276,22 +440,21 @@ export function EditorControls({
       stateEditor.getTextCursorPosition().block as BlockEditorBlock,
   });
   const [link, setLink] = React.useState<ReturnType<typeof linkTarget>>();
-  const styles = useEditorState({
-    editor,
-    selector: ({ editor: stateEditor }) => stateEditor.getActiveStyles(),
-  });
-  const formatButtons = [
-    ["bold", "粗体", "Bold", Bold],
-    ["italic", "斜体", "Italic", Italic],
-    ["underline", "下划线", "Underline", Underline],
-    ["strike", "删除线", "Strikethrough", Strikethrough],
-    ["code", "行内代码", "Inline code", Code],
-  ] as const;
-  const keepSelection = (event: React.MouseEvent) => event.preventDefault();
   const closeLink = () => {
     setLink(undefined);
     editor.focus();
   };
+  const openLink = React.useCallback(() => {
+    setImage(undefined);
+    setLink(linkTarget(editor));
+  }, [editor]);
+  const SelectedTextToolbar = React.useMemo(
+    () =>
+      function SelectedTextToolbar() {
+        return <SelectionToolbar editor={editor} zh={zh} openLink={openLink} />;
+      },
+    [editor, zh, openLink],
+  );
   const openInsert = () => {
     editor.focus();
     editor.getExtension(SuggestionMenu)?.openSuggestionMenu("/", {
@@ -379,120 +542,20 @@ export function EditorControls({
   );
   return (
     <>
-      <TooltipProvider delay={420}>
-        <Toolbar
-          className="mt-block-editor-toolbar"
-          aria-label={zh ? "编辑工具" : "Editor formatting"}
-          start={
-            <>
-              <Button
-                type="button"
-                iconOnly
-                size="small"
-                aria-label={zh ? "添加块" : "Add block"}
-                onMouseDown={keepSelection}
-                onClick={openInsert}
-              >
-                <Plus size={16} aria-hidden />
-              </Button>
-              {formatButtons.map(([style, chinese, english, Icon]) => (
-                <Tooltip key={style} content={zh ? chinese : english}>
-                  <Button
-                    type="button"
-                    size="small"
-                    iconOnly
-                    aria-label={zh ? chinese : english}
-                    aria-pressed={Boolean(styles?.[style])}
-                    onMouseDown={keepSelection}
-                    onClick={() => {
-                      editor.toggleStyles({ [style]: true });
-                      editor.focus();
-                    }}
-                  >
-                    <Icon size={15} aria-hidden />
-                  </Button>
-                </Tooltip>
-              ))}
-              <Button
-                type="button"
-                size="small"
-                iconOnly
-                aria-label={zh ? "链接" : "Link"}
-                aria-expanded={Boolean(link)}
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  setImage(undefined);
-                  if (link) closeLink();
-                  else setLink(linkTarget(editor));
-                }}
-              >
-                <Link2 size={16} aria-hidden />
-              </Button>
-            </>
-          }
-          end={
-            <>
-              <Button
-                type="button"
-                size="small"
-                iconOnly
-                aria-label={zh ? "撤销" : "Undo"}
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  editor.undo();
-                  editor.focus();
-                }}
-              >
-                <Undo2 size={16} aria-hidden />
-              </Button>
-              <Button
-                type="button"
-                size="small"
-                iconOnly
-                aria-label={zh ? "重做" : "Redo"}
-                onMouseDown={keepSelection}
-                onClick={() => {
-                  editor.redo();
-                  editor.focus();
-                }}
-              >
-                <Redo2 size={16} aria-hidden />
-              </Button>
-              <Popover.Menu
-                trigger={
-                  <Button
-                    type="button"
-                    size="small"
-                    iconOnly
-                    aria-label={zh ? "更多格式" : "More formatting"}
-                    onMouseDown={keepSelection}
-                  >
-                    <Ellipsis size={16} aria-hidden />
-                  </Button>
-                }
-                items={formatActions(editor, zh)}
-              />
-              <Popover.Menu
-                trigger={
-                  <Button
-                    type="button"
-                    size="small"
-                    iconOnly
-                    aria-label={zh ? "当前块操作" : "Current block actions"}
-                  >
-                    <Ellipsis size={16} aria-hidden />
-                  </Button>
-                }
-                items={blockActions(
-                  editor,
-                  locale,
-                  () => editor.getTextCursorPosition().block,
-                )}
-              />
-            </>
-          }
-        />
-      </TooltipProvider>
+      <FormattingToolbarController formattingToolbar={SelectedTextToolbar} />
+      <div className="mt-block-editor-insert">
+        <Button
+          type="button"
+          iconOnly
+          size="small"
+          variant="ghost"
+          aria-label={zh ? "添加块" : "Add block"}
+          onMouseDown={keepSelection}
+          onClick={openInsert}
+        >
+          <Plus size={16} aria-hidden />
+        </Button>
+      </div>
       {activeBlock?.type === "table" && (
         <TableControls editor={editor} block={activeBlock} zh={zh} />
       )}
