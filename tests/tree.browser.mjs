@@ -193,6 +193,7 @@ try {
       "the last virtual item scrolls flush to the bottom without a trailing gap");
       const drag = page.getByRole("tree", { name: "Drag tree", exact: true });
       const dropRow = drag.getByRole("treeitem", { name: "Last", exact: true });
+      await drag.getByRole("treeitem", { name: "Alpha", exact: true }).hover();
       await drag.getByRole("button", { name: "Drag row action" }).dragTo(dropRow);
       await expect(page.locator("output")).toHaveText("");
       await drag
@@ -258,7 +259,7 @@ try {
         const title = row.querySelector(".mt-tree-title").getBoundingClientRect();
         const controls = row.querySelector(".mt-tree-actions").getBoundingClientRect();
         const bounds = row.getBoundingClientRect();
-        return { height: bounds.height, titleWidth: title.width, offsetFromEnd: bounds.right - controls.right };
+        return { height: bounds.height, titleWidth: title.width, actionsWidth: controls.width, offsetFromEnd: bounds.right - controls.right };
       };
       const before = await references.evaluate(measures);
       const standardHeight = await tight.getByRole("treeitem").first().evaluate((row) => row.getBoundingClientRect().height);
@@ -268,7 +269,22 @@ try {
       await references.hover();
       await expect(hoverMore.locator("..")).toHaveCSS("opacity", "1");
       await expect(inactiveAdd).toBeHidden();
-      assert.deepEqual(await references.evaluate(measures), before, "hover shows an action without moving or widening the row");
+      const during = await references.evaluate(measures);
+      assert(before.actionsWidth === 0 && during.actionsWidth > 0, "hidden hover controls take no space");
+      assert(during.titleWidth < before.titleWidth && during.height === before.height,
+        "reveal only takes width from the title");
+      await page.mouse.move(0, 0);
+      const long = actions.getByRole("treeitem", { name: "从电脑桌面端开始：完整的项目文档、协作流程和发布检查", exact: true });
+      const marquee = long.locator(".mt-tree-title.mt-hover-marquee");
+      await expect(marquee).toHaveAttribute("data-overflow", "");
+      const marqueeTrack = marquee.locator(".mt-hover-marquee-text");
+      await expect(marqueeTrack).toHaveCSS("animation-name", "none");
+      // Enter on the stable leading side: row hover shrinks the label as
+      // trailing controls appear, so its pre-hover midpoint is not the target.
+      await marquee.hover({ position: { x: 8, y: 8 } });
+      await expect(marqueeTrack).toHaveCSS("animation-name", "mt-hover-marquee-pan");
+      await long.getByRole("button", { name: /更多操作/ }).hover();
+      await expect(marqueeTrack).toHaveCSS("animation-name", "none");
       await page.mouse.move(0, 0);
 
       await manual.focus();
@@ -317,20 +333,18 @@ try {
       const rtl = await manual.evaluate((row) => {
         const controls = row.querySelector(".mt-tree-actions").getBoundingClientRect();
         const counter = row.querySelector(".mt-tree-end").getBoundingClientRect();
-        return { offset: controls.left - row.getBoundingClientRect().left, counterGap: counter.left - controls.right };
+        const trailingAction = row.querySelector(".mt-tree-action").getBoundingClientRect();
+        return { offset: controls.left - row.getBoundingClientRect().left, counterGap: counter.left - trailingAction.right };
       });
       assert(Math.abs(rtl.offset - before.offsetFromEnd) < 0.1 && rtl.counterGap > 0,
         "RTL puts the controls at the logical end, beyond passive endContent");
       await actions.evaluate((tree) => tree.removeAttribute("dir"));
       for (const width of [900, 375, 320]) {
         await page.setViewportSize({ width, height: 1000 });
-        await page.waitForTimeout(50);
-        assert(
-          await page.evaluate(
-            () => document.documentElement.scrollWidth <= innerWidth + 1,
-          ),
-          "no page overflow",
-        );
+        await expect.poll(
+          () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+          { message: `no page overflow at ${width}px after layout settles` },
+        ).toBe(true);
         const aligned = await checked
           .locator(".mt-tree-item")
           .evaluateAll((rows) =>

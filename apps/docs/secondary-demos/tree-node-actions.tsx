@@ -35,6 +35,12 @@ const initialNodes: TreeItem[] = [
       },
     ],
   },
+  {
+    id: "desktop",
+    label: "从电脑桌面端开始：完整的项目文档、协作流程和发布检查",
+    icon: <FileText size={15} />,
+    isLeaf: true,
+  },
 ];
 
 const compact = { "--mt-height": "24px" } as CSSProperties;
@@ -87,7 +93,7 @@ export default function Demo() {
         }
         actions={({ node }) => [
           {
-            visibility: node.id === "manual" ? "always" : "hover",
+            visibility: node.id === "manual" ? "always" : undefined,
             content: (
               <Popover.Menu
                 trigger={

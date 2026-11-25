@@ -8,6 +8,7 @@ import {
   File,
 } from "lucide-react";
 import { cn, useMtone } from "./basic";
+import { HoverMarquee } from "./hover-marquee";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Check, Minus } from "lucide-react";
 import type { TreeItem, TreeKey } from "./tree-types";
@@ -39,6 +40,7 @@ export type TreeNodeInfo = {
 /** An independent control at the logical end of a tree row. */
 export interface TreeAction {
   content: React.ReactNode;
+  /** Defaults to hover; keyboard focus also reveals the control. */
   visibility?: "always" | "hover" | "active";
 }
 export type TreeDropInfo = {
@@ -126,6 +128,8 @@ export interface TreeProps extends Omit<
   switcherIcon?: React.ReactNode | ((info: TreeNodeInfo) => React.ReactNode);
   switcherLoadingIcon?: React.ReactNode;
   titleRender?: (node: TreeItem) => React.ReactNode;
+  /** Use HoverMarquee for plain node labels, unless a node opts out. Defaults to true. */
+  labelMarquee?: boolean;
   /** Pixels of indentation per level; defaults to 20. */
   indent?: number;
   /** Space between adjacent rows in pixels; defaults to 2. */
@@ -201,6 +205,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     switcherIcon,
     switcherLoadingIcon,
     titleRender,
+    labelMarquee = true,
     indent = DEFAULT_TREE_INDENT,
     gap = DEFAULT_TREE_ROW_GAP,
     endContent,
@@ -657,6 +662,10 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
             : "content" in renderedActions
               ? [renderedActions]
               : renderedActions;
+          const title = titleRender ? titleRender(node) : node.label;
+          const marquee =
+            (node.labelMarquee ?? labelMarquee) &&
+            (typeof title === "string" || typeof title === "number");
           // Controls must not become part of the row's accessible name.
           const titleId = rowActions.length && typeof node.label !== "string"
             ? `${treeId}-title-${start + rowIndex}`
@@ -950,9 +959,13 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                     ) : null)}
                 </span>
               )}
-              <span className="mt-tree-title" id={titleId}>
-                {titleRender ? titleRender(node) : node.label}
-              </span>
+              {marquee ? (
+                <HoverMarquee className="mt-tree-title" id={titleId} tabIndex={-1}>
+                  {title}
+                </HoverMarquee>
+              ) : (
+                <span className="mt-tree-title" id={titleId}>{title}</span>
+              )}
               {errors.has(node.id) && (
                 <span className="mt-tree-load-error" role="status">
                   {zh ? "加载失败，请重试" : "Load failed. Retry"}
@@ -971,7 +984,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                   onDragStart={(event) => event.stopPropagation()}
                   onDragEnd={(event) => event.stopPropagation()}
                 >
-                  {rowActions.map(({ content, visibility = "always" }, actionIndex) => (
+                  {rowActions.map(({ content, visibility = "hover" }, actionIndex) => (
                     <div className="mt-tree-action" key={actionIndex} data-visibility={visibility}>
                       {content}
                     </div>
