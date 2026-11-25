@@ -882,6 +882,7 @@ export default function Demo() {
 - Import: Splitter from @bixlab/mtone
 - children: Splitter.Panel elements. 面板直接子元素，可使用 Fragment 和条件渲染；支持多个面板及在面板内嵌套另一个 Splitter。
 - orientation: 'horizontal' | 'vertical' (default: 'horizontal'). 横向并排或纵向堆叠。容器必须有可测量的宽高。
+- bordered: boolean (default: false). 显示一圈主题外框，仅作用于 Splitter 根元素，不改变内部拖动分隔条。
 - sizes: SplitterSize[]. 整个布局的受控大小，按面板顺序一一对应；数量必须与面板数一致。数值为 px，字符串仅支持明确的 % 或 px。
 - onResize: (sizes: number[]) => void. 用户拖动、键盘或折叠交互中的大小请求，数组值为像素。受控时父组件接受并更新 sizes；不在首次挂载、容器变化或受控值同步时触发。
 - onResizeStart / onResizeEnd: (sizes: number[]) => void. 交互开始/结束回调；结束在后续帧报告最终接受/约束后的像素大小，无变化的交互也会结束。
@@ -918,7 +919,7 @@ import "@bixlab/mtone/styles.css";
 export default function Demo() {
   const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>(["30%", "70%"]);
   return (
-    <Splitter style={{ height: 280 }} sizes={sizes} onResize={setSizes}>
+    <Splitter bordered style={{ height: 280 }} sizes={sizes} onResize={setSizes}>
       <Splitter.Panel id="navigation" label="导航" min="15%" collapsible>
         <div style={{ padding: 12 }}>导航内容</div>
       </Splitter.Panel>

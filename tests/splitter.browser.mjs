@@ -50,6 +50,32 @@ try{for(const [name,engine] of engines){if (selectedBrowser && selectedBrowser !
  const panel=key=>page.locator(`[data-content="${key}"]`);const size=async(key,vertical=false)=>panel(key).evaluate((el,v)=>{const r=el.closest('[data-panel]').getBoundingClientRect();return v?r.height:r.width;},vertical);const ratio=async(v=false)=>(await size('left',v))/((await size('left',v))+(await size('right',v)));
  const events=async()=>JSON.parse(await page.getByTestId('events').textContent());
  const drag=async(delta,vertical=false)=>{const handle=page.getByRole('separator').first();await handle.scrollIntoViewIfNeeded();const b=await handle.boundingBox();const x=b.x+b.width/2,y=b.y+b.height/2;await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(Math.max(1,Math.min(899,x+(vertical?0:delta))),Math.max(1,Math.min(799,y+(vertical?delta:0))),{steps:8});await page.mouse.up();await page.waitForTimeout(100);};
+
+ const workspace=page.getByLabel('Test workspace',{exact:true});
+ const borderStyle=element=>element.evaluate(el=>{
+   const css=getComputedStyle(el);
+   return [css.borderTopWidth,css.borderRightWidth,css.borderBottomWidth,css.borderLeftWidth,css.borderTopStyle,css.borderTopColor];
+ });
+ const outerWidth=(await workspace.boundingBox()).width;
+ const originalSeam=await borderStyle(page.getByRole('separator').first());
+ await expect(workspace).toHaveCSS('border-top-width','0px');
+ await page.getByRole('button',{name:'Border',exact:true}).click();
+ await expect(workspace).toHaveCSS('border-top-width','1px');
+ const themeBorder=await workspace.evaluate(el=>{
+   const probe=el.ownerDocument.createElement('span');
+   probe.style.color='var(--mt-border)';
+   el.append(probe);
+   const color=getComputedStyle(probe).color;
+   probe.remove();
+   return color;
+ });
+ assert.deepEqual(await borderStyle(workspace),['1px','1px','1px','1px','solid',themeBorder]);
+ assert.deepEqual(await borderStyle(page.getByRole('separator').first()),originalSeam);
+ assert.equal((await workspace.boundingBox()).width,outerWidth,'border remains inside the sized workspace');
+ await page.getByRole('button',{name:'Orientation',exact:true}).click();
+ await expect(workspace).toHaveCSS('border-top-width','1px');
+ await assertThreeDotGrip(page.getByRole('separator').first(),'horizontal');
+ await page.goto(url);
  await expect.poll(()=>ratio()).toBeCloseTo(.4,1);await assertThreeDotGrip(page.getByRole('separator').first(), 'vertical');let start=await size('left');await drag(60);assert((await size('left'))>start+30,name+' pointer resize');assert((await events()).starts>0);assert((await events()).ends>0);
  const separator=page.getByRole('separator').first();await separator.focus();assert.equal(await separator.getAttribute('aria-orientation'),'vertical');assert(await separator.getAttribute('aria-controls'));start=await size('left');await page.keyboard.press('ArrowRight');await expect.poll(()=>size('left')).toBeGreaterThan(start);await drag(1000);assert((await ratio())<=.705,name+' max');
  await page.getByRole('separator').first().press('Enter');await expect.poll(()=>size('left')).toBeLessThan(1);const content=panel('left');assert(await content.evaluate(el=>!!el.closest('[inert]')),name+' collapsed content inert');await page.getByRole('separator').first().press('Enter');await expect.poll(()=>size('left')).toBeGreaterThan(50);

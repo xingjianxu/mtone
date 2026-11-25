@@ -262,6 +262,13 @@ provider per application. Nested providers share the same listener.
 - Alert: tone info/success/warning/error, title, children, onClose.
 - Empty(title,description,action), Skeleton(native div props), Spinner(label).
 
+## Splitter
+
+`bordered` (default `false`) draws a 1px theme-colored border around the
+outer edge of the Splitter. It does not add borders to individual panels or
+change the drag separator. Enable it for a standalone Splitter, and leave
+it off when the surrounding layout already supplies an outer border.
+
 ## Panel
 
 Use `Panel` for IDE-style work areas. Pass `items` (tab value, label, content, optional

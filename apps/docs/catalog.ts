@@ -2017,7 +2017,7 @@ export default function Demo() {
   "importNames": [
     "Splitter"
   ],
-  "code": "import { useState } from \"react\";\nimport { Splitter } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>([\"30%\", \"70%\"]);\n  return (\n    <Splitter style={{ height: 280 }} sizes={sizes} onResize={setSizes}>\n      <Splitter.Panel id=\"navigation\" label=\"导航\" min=\"15%\" collapsible>\n        <div style={{ padding: 12 }}>导航内容</div>\n      </Splitter.Panel>\n      <Splitter.Panel id=\"content\" label=\"正文\" min=\"30%\" collapsible>\n        <div style={{ padding: 12 }}>正文内容</div>\n      </Splitter.Panel>\n    </Splitter>\n  );\n}",
+  "code": "import { useState } from \"react\";\nimport { Splitter } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>([\"30%\", \"70%\"]);\n  return (\n    <Splitter bordered style={{ height: 280 }} sizes={sizes} onResize={setSizes}>\n      <Splitter.Panel id=\"navigation\" label=\"导航\" min=\"15%\" collapsible>\n        <div style={{ padding: 12 }}>导航内容</div>\n      </Splitter.Panel>\n      <Splitter.Panel id=\"content\" label=\"正文\" min=\"30%\" collapsible>\n        <div style={{ padding: 12 }}>正文内容</div>\n      </Splitter.Panel>\n    </Splitter>\n  );\n}",
   "props": [
     {
       "name": "children",
@@ -2029,6 +2029,12 @@ export default function Demo() {
       "type": "'horizontal' | 'vertical'",
       "default": "'horizontal'",
       "description": "横向并排或纵向堆叠。容器必须有可测量的宽高。"
+    },
+    {
+      "name": "bordered",
+      "type": "boolean",
+      "default": "false",
+      "description": "显示一圈主题外框，仅作用于 Splitter 根元素，不改变内部拖动分隔条。"
     },
     {
       "name": "sizes",

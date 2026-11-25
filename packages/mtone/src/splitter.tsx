@@ -36,6 +36,8 @@ export interface SplitterProps extends Omit<
   "onResize"
 > {
   orientation?: "horizontal" | "vertical";
+  /** Show a themed border around the outside of the splitter. Defaults to false. */
+  bordered?: boolean;
   sizes?: SplitterSize[];
   disabled?: boolean;
   lazy?: boolean;
@@ -82,6 +84,7 @@ function SplitterRoot(props: SplitterProps) {
   const {
     children,
     orientation = "horizontal",
+    bordered = false,
     sizes,
     disabled = false,
     lazy = false,
@@ -488,7 +491,7 @@ function SplitterRoot(props: SplitterProps) {
       resizePreviewMode={lazy ? "separator" : "panel"}
       groupRef={group}
       elementRef={element}
-      className={cn("mt-splitter", className)}
+      className={cn("mt-splitter", bordered && "mt-splitter-bordered", className)}
       style={{ ...style, position: "relative" }}
       data-orientation={orientation}
       onPointerDownCapture={(e) => {

@@ -20,7 +20,7 @@ export function SplitterExample() {
         <Button variant="ghost" onClick={() => setDisabled(value => !value)}>{disabled ? "解锁调整" : "锁定分栏"}</Button>
         <Tag>受控示例</Tag>
       </div>
-      <Splitter key={generation + String(vertical)} orientation={vertical ? "vertical" : "horizontal"} sizes={sizes} onResize={setSizes} onResizeEnd={values => setNotice("调整完成：" + values.map(value => Math.round(value) + "px").join(" / "))} disabled={disabled} style={{ height: 320, border: "1px solid var(--mt-border, #e9e9e7)", borderRadius: 6, overflow: "hidden" }}>
+      <Splitter bordered key={generation + String(vertical)} orientation={vertical ? "vertical" : "horizontal"} sizes={sizes} onResize={setSizes} onResizeEnd={values => setNotice("调整完成：" + values.map(value => Math.round(value) + "px").join(" / "))} disabled={disabled} style={{ height: 320, borderRadius: 6, overflow: "hidden" }}>
         <Splitter.Panel id="library" label="知识库导航" defaultSize="32%" min="20%" collapsible>
           <div style={pane}>
             <strong style={{ display: "flex", alignItems: "center", gap: 6 }}><BookOpen size={16} />知识库</strong>

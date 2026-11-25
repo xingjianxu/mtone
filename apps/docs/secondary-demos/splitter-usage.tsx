@@ -61,6 +61,7 @@ export default function Demo() {
           <Tag>受控示例</Tag>
         </div>
         <Splitter
+          bordered
           key={generation + String(vertical)}
           orientation={vertical ? "vertical" : "horizontal"}
           sizes={sizes}
@@ -74,7 +75,6 @@ export default function Demo() {
           disabled={disabled}
           style={{
             height: 320,
-            border: "1px solid var(--mt-border, #e9e9e7)",
             borderRadius: 6,
             overflow: "hidden",
           }}
