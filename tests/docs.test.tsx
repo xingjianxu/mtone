@@ -22,7 +22,8 @@ describe("documentation", () => {
     expect(docSections.BlockEditor.find((d) => d.id === "usage")?.source).toContain('from "@bixlab/mtone-blockeditor"');
     const blockEditorDoc = componentDocs.find(({ name }) => name === "BlockEditor")!;
     expect(blockEditorDoc.code).toContain('import "@bixlab/mtone-blockeditor/styles.css"');
-    expect(blockEditorDoc.notes.join(" ")).toContain("尚未发布到 npm");
+    expect(blockEditorDoc.notes.join(" ")).toContain("npm install @bixlab/mtone @bixlab/mtone-blockeditor");
+    expect(blockEditorDoc.notes.join(" ")).toContain("主包不包含、也不依赖编辑器");
     expect(new Set(componentDocs.map((d) => d.name)).size).toBe(
       componentDocs.length,
     );
