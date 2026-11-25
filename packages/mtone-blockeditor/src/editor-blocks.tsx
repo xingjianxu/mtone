@@ -51,13 +51,40 @@ const image = createReactBlockSpec(
     content: "none",
   },
   {
-    render: ({ block }) => {
+    render: function ImageBlockView({ block, editor }) {
+      const mode = codePresentation(editor);
+      const readOnly = React.useSyncExternalStore(
+        React.useCallback(
+          (update) => {
+            mode.listeners.add(update);
+            return () => {
+              mode.listeners.delete(update);
+            };
+          },
+          [mode],
+        ),
+        () => mode.state.readOnly,
+        () => false,
+      );
       const url = safeImageUrl(block.props.url);
       return (
-        <figure className="mt-block-editor-image">
+        <figure
+          className="mt-block-editor-image"
+          onClick={
+            readOnly
+              ? undefined
+              : (event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  editor.setTextCursorPosition(block.id);
+                  editor.focus();
+                }
+          }
+        >
           {url && (
             <Image
               src={url}
+              preview={readOnly}
               alt={block.props.alt}
               loading="lazy"
               referrerPolicy="no-referrer"

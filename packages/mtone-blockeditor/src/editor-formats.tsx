@@ -100,12 +100,14 @@ export function CodeControls({
   zh,
   showPreview,
   setShowPreview,
+  onLanguageOpenChange,
 }: {
   editor: Editor;
   block: Extract<BlockEditorBlock, { type: "codeBlock" }>;
   zh: boolean;
   showPreview: boolean;
   setShowPreview: (value: boolean) => void;
+  onLanguageOpenChange: (open: boolean) => void;
 }) {
   const options = languages.map(([value, label]) => ({
     value,
@@ -122,6 +124,7 @@ export function CodeControls({
       <Select
         label={zh ? "代码语言" : "Code language"}
         searchable
+        onOpenChange={onLanguageOpenChange}
         options={options}
         value={block.props.language}
         onValueChange={(language) => {
@@ -132,6 +135,7 @@ export function CodeControls({
       <Button
         size="small"
         aria-pressed={showPreview}
+        onMouseDown={(event) => event.preventDefault()}
         onClick={() => setShowPreview(!showPreview)}
       >
         {zh ? "高亮预览" : "Highlight preview"}
@@ -308,7 +312,7 @@ export function ImageForm({
   const [error, setError] = React.useState("");
   const ref = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
-    ref.current?.focus();
+    ref.current?.focus({ preventScroll: true });
   }, []);
   function save() {
     const safe = safeImageUrl(url);
