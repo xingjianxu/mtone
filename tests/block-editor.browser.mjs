@@ -399,93 +399,86 @@ try {
         Math.abs(toolsBox.y - (tableBox.y + tableBox.height)) < 36),
     "table actions float next to the selected table",
   );
-  await formatDemo.getByRole("button", { name: "添加行", exact: true }).click();
-  assert.equal(await table.getByRole("row").count(), 3);
-  await formatDemo.getByRole("button", { name: "添加列", exact: true }).click();
-  assert.equal(await table.getByRole("row").first().locator("th").count(), 3);
+  const rowActions = tableTools.getByRole("button", { name: "行操作", exact: true });
+  const columnActions = tableTools.getByRole("button", { name: "列操作", exact: true });
+  const command = async (trigger, name) => {
+    await trigger.click();
+    await tableTools.getByRole("menuitem", { name, exact: true }).click();
+    await expect(tableTools.getByRole("menu")).toHaveCount(0);
+  };
+  const body = table.getByRole("cell", { name: "文档", exact: true });
+  const header = table.getByRole("columnheader", { name: "检查项", exact: true });
+  const placeCaret = async (cell) => {
+    await cell.click();
+    // Repeat clicks on text can select part of it. Collapse that range
+    // without changing cells so we exercise table, not text-format tools.
+    if (await page.evaluate(() => document.getSelection()?.isCollapsed === false))
+      await page.keyboard.press("ArrowRight");
+    await expect(tableTools).toBeVisible();
+  };
+  await command(rowActions, "向下添加行");
+  await expect(table.getByRole("row")).toHaveCount(3);
+  await placeCaret(body);
+  await command(columnActions, "向右添加列");
+  await expect(table.getByRole("row").first().locator("th")).toHaveCount(3);
   await tableTools.getByRole("button", { name: "表头行", exact: true }).click();
-  assert.equal(await table.getByRole("row").first().locator("th").count(), 0);
+  await expect(table.getByRole("row").first().locator("th")).toHaveCount(0);
   await tableTools.getByRole("button", { name: "表头行", exact: true }).click();
-  assert.equal(await table.getByRole("row").first().locator("th").count(), 3);
-  await table.getByRole("cell", { name: "文档" }).hover();
-  const columnHandle = formatDemo.getByRole("button", {
-    name: "列操作",
-    exact: true,
-  });
-  const rowHandle = formatDemo.getByRole("button", {
-    name: "行操作",
-    exact: true,
-  });
-  await columnHandle.waitFor({ state: "visible", timeout: 3000 });
-  assert.equal(await columnHandle.getAttribute("draggable"), "true");
-  assert.equal(await rowHandle.getAttribute("draggable"), "true");
-  const columnBox = await columnHandle.boundingBox();
-  const rowBox = await rowHandle.boundingBox();
-  const gripTableBox = await table.boundingBox();
-  assert(
-    columnBox.y < gripTableBox.y && rowBox.x < gripTableBox.x,
-    "column grip sits above the table and row grip sits to its left",
-  );
-  await columnHandle.click();
-  await page.getByRole("menuitem", { name: "向左添加列" }).click();
-  assert.equal(await table.getByRole("row").first().locator("th").count(), 4);
-  await table.getByRole("cell", { name: "文档" }).hover();
-  await rowHandle.click();
-  await page.getByRole("menuitem", { name: "删除行", exact: true }).click();
-  assert.equal(await table.getByRole("row").count(), 2);
+  await expect(table.getByRole("row").first().locator("th")).toHaveCount(3);
+
+  await placeCaret(body);
+  await header.hover(); // Commands use the selected cell, never the hovered cell.
+  await expect(formatDemo.locator(".mt-block-editor-table-grip")).toHaveCount(0);
+  await expect(formatDemo.getByRole("button", { name: "行操作", exact: true })).toHaveCount(1);
+  await expect(formatDemo.getByRole("button", { name: "列操作", exact: true })).toHaveCount(1);
+  await command(rowActions, "上移行");
+  await expect(table.getByRole("row").first()).toContainText("文档");
+  await placeCaret(table.getByRole("columnheader", { name: "文档", exact: true }));
+  await command(rowActions, "下移行");
+  await expect(table.getByRole("row").nth(1)).toContainText("文档");
+  await placeCaret(header);
+  await command(columnActions, "右移列");
+  await expect(table.getByRole("row").first().locator("th").nth(1)).toHaveText("检查项");
+  await placeCaret(header);
+  await command(columnActions, "左移列");
+  await expect(table.getByRole("row").first().locator("th").first()).toHaveText("检查项");
+
+  await placeCaret(header);
+  await columnActions.focus();
+  await columnActions.press("ArrowDown");
+  await expect(tableTools.getByRole("menuitem", { name: "左移列" })).toHaveAttribute("aria-disabled", "true");
+  await page.keyboard.press("Escape");
+  await expect(tableTools).toBeVisible();
+  await expect(tableTools.getByRole("menu")).toHaveCount(0);
+  await placeCaret(body);
+  await command(rowActions, "向上添加行");
+  await expect(table.getByRole("row")).toHaveCount(4);
+  await expect(table.getByRole("row").nth(1)).not.toContainText("文档");
+  await placeCaret(body);
+  await command(columnActions, "向左添加列");
+  await expect(table.getByRole("row").first().locator("th")).toHaveCount(4);
+  await placeCaret(body);
+  await command(columnActions, "删除列");
+  await expect(table.getByRole("row").first().locator("th")).toHaveCount(3);
+  await placeCaret(table.getByRole("cell", { name: "已更新", exact: true }));
+  await command(rowActions, "删除行");
+  await expect(table.getByRole("row")).toHaveCount(3);
+  await expect(table.getByRole("cell", { name: "已更新", exact: true })).toHaveCount(0);
 
   const bottomRight = table.getByRole("row").last().getByRole("cell").last();
   await bottomRight.hover();
-  const appendRow = formatDemo.getByRole("button", {
-    name: "在表格底部添加行",
-  });
-  const appendColumn = formatDemo.getByRole("button", {
-    name: "在表格右侧添加列",
-  });
+  const appendRow = formatDemo.getByRole("button", { name: "在表格底部添加行" });
+  const appendColumn = formatDemo.getByRole("button", { name: "在表格右侧添加列" });
   const currentTableBox = await table.boundingBox();
   const bottomStripBox = await appendRow.boundingBox();
   const rightStripBox = await appendColumn.boundingBox();
   assert(bottomStripBox && bottomStripBox.width >= currentTableBox.width - 2);
   assert(rightStripBox && rightStripBox.height >= currentTableBox.height - 2);
   await appendRow.click();
-  assert.equal(await table.getByRole("row").count(), 3);
+  await expect(table.getByRole("row")).toHaveCount(4);
   await bottomRight.hover();
   await appendColumn.click();
-  assert.equal(await table.getByRole("row").first().locator("th").count(), 5);
-
-  const firstHeader = table.getByRole("columnheader", { name: "检查项" });
-  await firstHeader.hover();
-  const source = await columnHandle.boundingBox();
-  const destination = await table
-    .getByRole("row")
-    .first()
-    .getByRole("columnheader")
-    .last()
-    .boundingBox();
-  await page.mouse.move(
-    source.x + source.width / 2,
-    source.y + source.height / 2,
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    destination.x + destination.width / 2,
-    destination.y + destination.height / 2,
-    { steps: 10 },
-  );
-  await page.mouse.move(
-    destination.x + destination.width / 2 + 2,
-    destination.y + destination.height / 2,
-  );
-  await page.mouse.up();
-  assert.equal(
-    await table
-      .getByRole("row")
-      .first()
-      .getByRole("columnheader")
-      .last()
-      .innerText(),
-    "检查项",
-  );
+  await expect(table.getByRole("row").first().locator("th")).toHaveCount(4);
 
   const codeSource = formats.locator(".mt-block-editor-code-source code");
   const keyword = codeSource.locator(".shiki").filter({ hasText: /^const$/ });
