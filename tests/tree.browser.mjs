@@ -197,15 +197,6 @@ try {
       assert(Math.abs(await last.evaluate((row) =>
         row.getBoundingClientRect().bottom - row.parentElement.getBoundingClientRect().bottom)) < 0.1,
       "the last virtual item scrolls flush to the bottom without a trailing gap");
-      const drag = page.getByRole("tree", { name: "Drag tree", exact: true });
-      const dropRow = drag.getByRole("treeitem", { name: "Last", exact: true });
-      await drag.getByRole("treeitem", { name: "Alpha", exact: true }).hover();
-      await drag.getByRole("button", { name: "Drag row action" }).dragTo(dropRow);
-      await expect(page.locator("output")).toHaveText("");
-      await drag
-        .getByRole("treeitem", { name: "Alpha", exact: true })
-        .dragTo(drag.getByRole("treeitem", { name: "Last", exact: true }));
-      await expect(page.locator("output")).toHaveText("a:z");
       const sidebar = page.getByRole("complementary", { name: "文档导航侧栏" });
       const docs = sidebar.getByRole("tree", { name: "文档目录" });
       const guide = docs.getByRole("treeitem", { name: "使用指南", exact: true });
@@ -431,6 +422,85 @@ try {
       await expect(richTrack).toHaveCSS("animation-name", "none");
       await expect(richViewport).toHaveCSS("overflow-x", "auto");
       await page.emulateMedia({ reducedMotion: "no-preference" });
+
+      // Native drag sessions have separate mouse state from the hover and
+      // keyboard scenarios above. Test them on a fresh document.
+      const dragPage = await browser.newPage({ viewport: { width: 900, height: 1000 } });
+      dragPage.on("pageerror", (error) => errors.push(error.message));
+      await dragPage.goto("http://127.0.0.1:5217/tests/fixtures/tree.html");
+      const drag = dragPage.getByRole("tree", { name: "Drag tree", exact: true });
+      const dropRow = drag.getByRole("treeitem", { name: "Last", exact: true });
+      await drag.getByRole("treeitem", { name: "Alpha", exact: true }).hover();
+      await drag.getByRole("button", { name: "Drag row action" }).dragTo(dropRow);
+      await expect(dragPage.locator("output")).toHaveText("");
+      await drag
+        .getByRole("treeitem", { name: "Alpha", exact: true })
+        .dragTo(drag.getByRole("treeitem", { name: "Last", exact: true }));
+      await expect(dragPage.locator("output")).toHaveText("a:z");
+      await expect(dragPage.locator(".mt-tree-drag-preview")).toHaveCount(0);
+      const sort = dragPage.getByRole("tree", { name: "Animated drag", exact: true });
+      const sortRow = (name) => sort.getByRole("treeitem", { name, exact: true });
+      await sort.scrollIntoViewIfNeeded();
+      const moving = await sortRow("Moving").boundingBox();
+      const first = await sortRow("First").boundingBox();
+      let folder = await sortRow("Folder").boundingBox();
+      const move = (box, y) => dragPage.mouse.move(box.x + 65, box.y + y, { steps: 4 });
+      const preview = dragPage.locator(".mt-tree-drag-preview");
+      await move(moving, 16);
+      await dragPage.mouse.down();
+      await move(first, 3);
+      await move(first, 3);
+      await expect(preview).toBeVisible();
+      await expect(preview).toContainText("Moving");
+      assert.equal(await preview.evaluate((element) => getComputedStyle(element).opacity), "1");
+      await expect(sortRow("First")).toHaveClass(/mt-tree-drop--1/);
+      for (const y of [2, 13, 3, 29, 4]) {
+        await move(first, y);
+        assert.equal((await sortRow("Folder").boundingBox()).y, folder.y, "unrelated row stays still on hover");
+        assert.equal((await sortRow("First").boundingBox()).y, first.y, "indicator never shifts the target row");
+      }
+      await move(folder, 16);
+      await move(folder, 16);
+      await expect(sortRow("Folder")).toHaveAttribute("aria-expanded", "true");
+      const child = await sortRow("Child").boundingBox();
+      await move(child, -1);
+      await move(child, -1);
+      await expect(sortRow("Child")).toHaveClass(/mt-tree-drop--1/);
+      await dragPage.mouse.up();
+      await expect(sortRow("Moving")).toHaveAttribute("aria-level", "2");
+      await expect(sortRow("Moving")).toHaveAttribute("aria-posinset", "1");
+      await expect(preview).toHaveCount(0);
+      await dragPage.close();
+
+      // Give the reduced motion scenario its own initial media preference.
+      const reduced = await browser.newPage({
+        viewport: { width: 900, height: 1000 },
+        reducedMotion: "reduce",
+      });
+      reduced.on("pageerror", (error) => errors.push(error.message));
+      await reduced.goto("http://127.0.0.1:5217/tests/fixtures/tree.html");
+      const reducedTree = reduced.getByRole("tree", { name: "Animated drag", exact: true });
+      const sourceRow = reducedTree.getByRole("treeitem", { name: "Moving", exact: true });
+      await reducedTree.scrollIntoViewIfNeeded();
+      const sourceBox = await sourceRow.boundingBox();
+      const targetBox = await reducedTree.getByRole("treeitem", { name: "First", exact: true }).boundingBox();
+      const moveReduced = (box, y) => reduced.mouse.move(box.x + 65, box.y + y, { steps: 4 });
+      await moveReduced(sourceBox, 16);
+      await reduced.mouse.down();
+      await moveReduced(targetBox, 3);
+      await moveReduced(targetBox, 3);
+      const reducedPreview = reduced.locator(".mt-tree-drag-preview");
+      await expect(reducedPreview).toBeVisible();
+      assert.equal(await reducedPreview.evaluate((element) => element.getAnimations().length), 0,
+        "reduced motion skips pickup animation but still shows drag feedback");
+      await moveReduced(sourceBox, 16);
+      await moveReduced(sourceBox, 16);
+      await expect(reducedPreview.locator(".mt-tree-drag-invalid")).toBeVisible();
+      await reduced.mouse.up();
+      await expect(reducedPreview).toHaveCount(0);
+      await expect(sourceRow).toHaveAttribute("aria-level", "1");
+      await expect(sourceRow).toHaveAttribute("aria-posinset", "3");
+      await reduced.close();
 
       assert.deepEqual(errors, []);
       console.log(`${name}: Tree passed`);

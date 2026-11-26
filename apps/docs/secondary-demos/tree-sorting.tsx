@@ -1,38 +1,83 @@
 import * as React from "react";
-import { Tree, type TreeItem } from "../../../packages/mtone/src";
+import {
+  Switch,
+  Tree,
+  type TreeDropInfo,
+  type TreeItem,
+  type TreeKey,
+} from "../../../packages/mtone/src";
+
+const sample: TreeItem[] = [
+  { id: "draft", label: "草稿" },
+  {
+    id: "review",
+    label: "评审",
+    children: [
+      { id: "design", label: "设计评审" },
+      { id: "code", label: "代码评审" },
+    ],
+  },
+  { id: "done", label: "完成" },
+];
+
+function move(
+  items: TreeItem[],
+  { dragNode, targetParentKey, targetIndex }: TreeDropInfo,
+): TreeItem[] {
+  const detach = (list: TreeItem[]): TreeItem[] =>
+    list.flatMap((item) =>
+      item.id === dragNode.id
+        ? []
+        : [item.children ? { ...item, children: detach(item.children) } : item],
+    );
+  const insert = (list: TreeItem[]) => [
+    ...list.slice(0, targetIndex),
+    dragNode,
+    ...list.slice(targetIndex),
+  ];
+  const into = (list: TreeItem[]): TreeItem[] =>
+    list.map((item) =>
+      item.id === targetParentKey
+        ? { ...item, children: insert(item.children ?? []) }
+        : item.children
+          ? { ...item, children: into(item.children) }
+          : item,
+    );
+  const detached = detach(items);
+  return targetParentKey === null ? insert(detached) : into(detached);
+}
 
 export default function Demo() {
-  const [dragItems, setDragItems] = React.useState<TreeItem[]>([
-    { id: "draft", label: "草稿" },
-    { id: "review", label: "评审" },
-    { id: "done", label: "完成" },
-  ]);
-  const [dropMessage, setDropMessage] =
-    React.useState("拖到条目前后可调整顺序。");
+  const [items, setItems] = React.useState(sample);
+  const [allowReparent, setAllowReparent] = React.useState(false);
+  const [expandedKeys, setExpandedKeys] = React.useState<TreeKey[]>([]);
   return (
-    <div style={{ display: "grid", gap: 24, width: "100%", minWidth: 0 }}>
+    <div style={{ display: "grid", gap: 12, minWidth: 0 }}>
+      <Switch
+        label="允许跨层拖动"
+        checked={allowReparent}
+        onCheckedChange={setAllowReparent}
+      />
       <Tree
         label="拖动调整流程"
-        items={dragItems}
+        items={items}
         draggable
-        allowDrop={({ dropPosition }) => dropPosition !== 0}
-        onDrop={({ dragNode, node, dropPosition }) => {
-          setDragItems((current) => {
-            const moving = current.find((item) => item.id === dragNode.id);
-            if (!moving) return current;
-            const next = current.filter((item) => item.id !== dragNode.id);
-            const at = next.findIndex((item) => item.id === node.id);
-            if (at < 0) return current;
-            next.splice(at + (dropPosition === 1 ? 1 : 0), 0, moving);
-            return next;
-          });
-          setDropMessage(
-            `已将“${dragNode.label}”移到“${node.label}”${dropPosition === -1 ? "前" : "后"}。`,
-          );
+        allowReparent={allowReparent}
+        expandedKeys={expandedKeys}
+        onExpand={setExpandedKeys}
+        onDrop={(info) => {
+          setItems((current) => move(current, info));
+          if (info.dropPosition === 0)
+            setExpandedKeys((current) => [
+              ...new Set([...current, info.node.id]),
+            ]);
         }}
       />
-      <p aria-live="polite">{dropMessage}</p>
-      <p>此例由 onDrop 更新 items；Tree 只报告拖放意图，不修改传入数据。</p>
+      <p>
+        {allowReparent
+          ? "拖到行的边缘可插入前后；拖到行的中间可移入节点。"
+          : "拖到同组节点的上半部或下半部可调整顺序。"}
+      </p>
     </div>
   );
 }

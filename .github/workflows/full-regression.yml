@@ -45,6 +45,7 @@ jobs:
       - run: node tests/focus-unify.browser.mjs
       - run: node tests/control-height.browser.mjs
       - run: node tests/sidebar-navigation.browser.mjs
+      - run: node tests/layout-persistence.browser.mjs
       - run: node tests/admin-layout-header.browser.mjs
       - run: node tests/menu-icons.browser.mjs
       - run: node tests/menu.browser.mjs
