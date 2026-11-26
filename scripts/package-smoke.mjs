@@ -100,7 +100,7 @@ try {
     join(dir, "smoke.mjs"),
     `import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MtoneProvider, MtoneScope, Input, ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, Container, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Tooltip, TooltipProvider, Form, DataList, Toolbar, Card, CardGroup, Splitter, Table, DataTable, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
+import { moveTreeItem, MtoneProvider, MtoneScope, Input, ShortcutsProvider, ShortcutScope, useShortcut, formatShortcut, TreeSelect, TagSelect, List, ListItem, Progress, LoadingOverlay, HoverCard, Menubar, Popover, Typography, Text, Title, Paragraph, Link, Menu, Transfer, Cascader, CascaderPanel, AutoComplete, Divider, Tabs, TableOfContents, Image, ImageGroup, ImagePreview, Tree, Affix, Result, Button, Container, PageLayout, AdminLayout, Dialog, AiTask, ToastProvider, NumberInput, Select, Spotlight, Tooltip, TooltipProvider, Form, DataList, Toolbar, Card, CardGroup, Splitter, Table, DataTable, Calendar, Timeline, Rate, Avatar, AvatarGroup, Popconfirm, Mentions, getMentions, Questionnaire, NavSubmenu, NavItem } from '@bixlab/mtone';
 import assert from 'node:assert/strict';
 assert(!Object.hasOwn(await import('@bixlab/mtone'), 'IconButton'));
 assert.equal(formatShortcut('Mod+K', 'other'), 'Ctrl+K');
@@ -160,6 +160,9 @@ assert(renderToStaticMarkup(createElement(Popconfirm, {title:"Confirm?",trigger:
 assert(renderToStaticMarkup(createElement(Timeline, {items:[{content:'Timeline check'}]})).includes('Timeline check'));
 assert(renderToStaticMarkup(createElement(Affix, {}, 'fixed')).includes('fixed'));
 assert(renderToStaticMarkup(createElement(Tree, {items:[{id:'root',label:'Tree package check'}]})).includes('Tree package check'));
+const inputTree = [{ id: "a", label: "A" }, { id: "b", label: "B" }];
+assert.deepEqual(moveTreeItem(inputTree, { dragNode: inputTree[0], targetParentKey: null, targetIndex: 1 }).map(item => item.id), ["b", "a"]);
+assert.deepEqual(inputTree.map(item => item.id), ["a", "b"]);
 const directoryHtml = renderToStaticMarkup(createElement(Tree, {directory:true,treeData:[{key:1,title:'Directory package check'}]}));
 assert.match(directoryHtml, /mt-tree-directory/);
 assert(directoryHtml.includes('Directory package check'));
@@ -289,6 +292,8 @@ export const imageGroupDemo = <ImageGroup items={imageItems} current={0} onCurre
 export const imagePreviewDemo = <ImagePreview items={imageItems} open={false} onOpenChange={open=>Boolean(open)} />;
 const treeRef = createRef<TreeRef>();
 const treeProps: TreeProps = { treeData:[{key:1,title:"Root",children:[{key:2,title:"Leaf"}]}], checkable:true, defaultExpandedKeys:[1], onCheck:keys=>console.log(keys), onSelect:(keys:TreeKey[])=>console.log(keys), height:150 };
+import { moveTreeItem } from "@bixlab/mtone";
+export const treeSortDemo = <Tree items={[{id:1,label:"One"}]} draggable onDrop={info=>moveTreeItem([{id:1,label:"One"}],info)} />;
 export const treeDemo = <Tree {...treeProps} ref={treeRef}/>;
 export const directoryDemo = <Tree directory items={[{id:"root",label:"Folder"}]} multiple expandAction="doubleClick"/>;
 treeRef.current?.scrollTo({key:2,autoExpand:true,align:"top"});

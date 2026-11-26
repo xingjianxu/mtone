@@ -2,7 +2,7 @@ import * as React from "react";
 import {
   Switch,
   Tree,
-  type TreeDropInfo,
+  moveTreeItem,
   type TreeItem,
   type TreeKey,
 } from "../../../packages/mtone/src";
@@ -19,33 +19,6 @@ const sample: TreeItem[] = [
   },
   { id: "done", label: "完成" },
 ];
-
-function move(
-  items: TreeItem[],
-  { dragNode, targetParentKey, targetIndex }: TreeDropInfo,
-): TreeItem[] {
-  const detach = (list: TreeItem[]): TreeItem[] =>
-    list.flatMap((item) =>
-      item.id === dragNode.id
-        ? []
-        : [item.children ? { ...item, children: detach(item.children) } : item],
-    );
-  const insert = (list: TreeItem[]) => [
-    ...list.slice(0, targetIndex),
-    dragNode,
-    ...list.slice(targetIndex),
-  ];
-  const into = (list: TreeItem[]): TreeItem[] =>
-    list.map((item) =>
-      item.id === targetParentKey
-        ? { ...item, children: insert(item.children ?? []) }
-        : item.children
-          ? { ...item, children: into(item.children) }
-          : item,
-    );
-  const detached = detach(items);
-  return targetParentKey === null ? insert(detached) : into(detached);
-}
 
 export default function Demo() {
   const [items, setItems] = React.useState(sample);
@@ -66,7 +39,7 @@ export default function Demo() {
         expandedKeys={expandedKeys}
         onExpand={setExpandedKeys}
         onDrop={(info) => {
-          setItems((current) => move(current, info));
+          setItems((current) => moveTreeItem(current, info));
           if (info.dropPosition === 0)
             setExpandedKeys((current) => [
               ...new Set([...current, info.node.id]),
