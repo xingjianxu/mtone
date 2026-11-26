@@ -480,6 +480,7 @@ export function EditorControls({
   const [focused, setFocused] = React.useState(() =>
     editor.isFocused({ includeEditorUI: true }),
   );
+  const [tableMenuOpen, setTableMenuOpen] = React.useState(false);
   const [codeSelectOpen, setCodeSelectOpen] = React.useState(false);
   const [dismissedId, setDismissedId] = React.useState<string>();
   const hasTextToolbar = useExtensionState(FormattingToolbarExtension, {
@@ -648,6 +649,9 @@ export function EditorControls({
     !image &&
     !media &&
     !link;
+  if (editor.domElement?.getAttribute("aria-label") === "格式示例正文") {
+    console.log("[tbl-debug]", String(blockToolsOpen), activeBlock?.type, focused, tableMenuOpen, Boolean(hasTextToolbar), dismissedId, editor.prosemirrorState.selection.from, editor.prosemirrorState.selection.to);
+  }
   return (
     <>
       {!image &&
@@ -664,17 +668,27 @@ export function EditorControls({
             ...blockFloatingProps,
             open: true,
             onOpenChange: (open, _event, reason) => {
-              if (!open) setDismissedId(activeBlock.id);
+              if (!open) {
+                console.log("[tbl-debug] dismiss", activeBlock.type, reason);
+                setDismissedId(activeBlock.id);
+              }
               if (reason === "escape-key") editor.focus();
             },
           }}
-          useDismissProps={{ enabled: !codeSelectOpen }}
+          useDismissProps={{
+            enabled: !codeSelectOpen && !tableMenuOpen,
+            // Clicking another cell retargets the table actions. The editor
+            // selection decides whether this toolbar stays mounted.
+            outsidePress: (event) =>
+              activeBlock.type !== "table" ||
+              !(event.target instanceof Node && editor.domElement?.contains(event.target)),
+          }}
           focusManagerProps={noFocusTrap}
           elementProps={blockFloatingElement}
         >
           <div className="mt-block-editor-toolbar-panel">
             {activeBlock?.type === "table" && (
-              <TableControls editor={editor} block={activeBlock} zh={zh} />
+              <TableControls key={activeBlock.id} editor={editor} block={activeBlock} zh={zh} onMenuOpenChange={setTableMenuOpen} />
             )}
             {activeBlock?.type === "codeBlock" && (
               <CodeControls
