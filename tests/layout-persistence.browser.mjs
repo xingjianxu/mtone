@@ -26,6 +26,11 @@ try {
   await expect.poll(() => width(left)).toBe(160);
   await resize(splitter, 60);
   await expect.poll(() => width(left)).toBe(220);
+  // Geometry can be visible before Splitter ends the gesture on its next frame.
+  await expect.poll(() => page.evaluate(() => {
+    const record = localStorage.getItem("mtone:layout:v1:splitter:test-split");
+    return record ? Math.round(JSON.parse(record).panels[0].px) : null;
+  })).toBe(220);
   await page.reload();
   await expect.poll(() => width(left)).toBe(220);
   await page.goto(url + "?narrow");
@@ -47,6 +52,10 @@ try {
   await expect.poll(() => width(sidebar)).toBe(240);
   await resize(page.getByRole("separator"), 66);
   await expect.poll(() => width(sidebar)).toBe(306);
+  await expect.poll(() => page.evaluate(() => {
+    const record = localStorage.getItem("mtone:layout:v1:sidebar-resize:page:page");
+    return record ? Math.round(JSON.parse(record).panels[0].px) : null;
+  })).toBe(306);
   await page.getByRole("button", { name: "收起侧边栏" }).click();
   await expect(page.locator(".mt-sidebar-resize")).toHaveAttribute("data-sidebar-collapsed", "true");
   await page.reload();
