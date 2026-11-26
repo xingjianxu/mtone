@@ -2,7 +2,9 @@ import React from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { useDirection } from "@base-ui/react/direction-provider";
 import { Button, cn, useMtone } from "./basic";
-import { Tabs, TabsPanelContext, tabHint, type TabItem, type TabsProps, type TabsSize } from "./tabs";
+import { Tabs, TabsPanelContext, TabsStorageScopeContext, tabHint, type TabItem, type TabsProps, type TabsSize } from "./tabs";
+
+import { readBoolean, useLayoutPreference } from "./layout-persistence";
 
 type PanelTab = Pick<TabItem, "value" | "label" | "content" | "disabled" | "icon">;
 
@@ -11,6 +13,8 @@ export interface PanelProps extends Omit<
   "children" | "defaultValue" | "onChange"
 >, Pick<TabsProps, "label" | "value" | "defaultValue" | "onValueChange"> {
   items: PanelTab[];
+  /** Remember uncontrolled collapse and tab selection in this browser. */
+  storageKey?: string;
   actions?: React.ReactNode;
   /** Tab item height, independent of external panel sizing. Defaults to md. */
   size?: TabsSize;
@@ -30,6 +34,7 @@ export function Panel({
   tabPlacement = "top",
   collapsed,
   defaultCollapsed = false,
+  storageKey,
   collapseOnTabClick = true,
   onCollapsedChange,
   className,
@@ -45,7 +50,9 @@ export function Panel({
   const placement = !sideRail ? tabPlacement
     : (tabPlacement === "left") !== rtl ? "start" : "end";
   const compactRail = sideRail && items.every(item => item.icon != null && !!tabHint(item.label));
-  const [localCollapsed, setLocalCollapsed] = React.useState(defaultCollapsed);
+  const [localCollapsed, setLocalCollapsed] = useLayoutPreference(
+    "panel-collapse", collapsed === undefined ? storageKey : undefined, defaultCollapsed, readBoolean,
+  );
   const isCollapsed = collapsed ?? localCollapsed;
   const changeCollapsed = (next: boolean) => {
     if (collapsed === undefined) setLocalCollapsed(next);
@@ -75,10 +82,12 @@ export function Panel({
       : (isCollapsed ? ChevronUp : ChevronDown);
   return (
     <TabsPanelContext.Provider value={{ collapsed: isCollapsed, sideRail, onTabActivate }}>
+      <TabsStorageScopeContext.Provider value="panel-tabs">
       <Tabs
         {...props}
         ref={root}
         items={items}
+        storageKey={storageKey}
         placement={placement}
         size={size}
         indicatorColor="blue"
@@ -123,6 +132,7 @@ export function Panel({
           </>
         }
       />
+      </TabsStorageScopeContext.Provider>
     </TabsPanelContext.Provider>
   );
 }

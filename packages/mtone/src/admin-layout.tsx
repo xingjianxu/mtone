@@ -1,4 +1,5 @@
 import * as React from "react";
+import { readBoolean, useLayoutPreference } from "./layout-persistence";
 import { cn } from "./basic";
 import { Sidebar, type SidebarProps } from "./navigation";
 import { SidebarResize, type SidebarResizeOptions } from "./sidebar-resize";
@@ -34,13 +35,19 @@ function AdminLayoutSider({
   onBreakpoint,
   collapsed,
   defaultCollapsed = false,
+  storageKey,
   onCollapsedChange,
   collapsible = false,
   className,
   style,
   ...props
 }: AdminLayoutSiderProps) {
-  const [internal, setInternal] = React.useState(defaultCollapsed);
+  const [internal, setInternal] = useLayoutPreference(
+    "admin-sider-collapse", collapsed === undefined ? storageKey : undefined, defaultCollapsed, readBoolean,
+  );
+  const [responsiveCollapsed, setResponsiveCollapsed] = React.useState<boolean>();
+  const setInternalRef = React.useRef(setInternal);
+  setInternalRef.current = setInternal;
   const previousBreakpoint = React.useRef<number | undefined>(undefined);
   const callbacks = React.useRef({
     onBreakpoint,
@@ -49,18 +56,26 @@ function AdminLayoutSider({
   });
   callbacks.current = { onBreakpoint, onCollapsedChange, collapsed };
   const update = (next: boolean) => {
-    if (collapsed === undefined) setInternal(next);
+    if (collapsed === undefined) {
+      setResponsiveCollapsed(undefined);
+      setInternal(next);
+    }
     onCollapsedChange?.(next);
   };
   React.useEffect(() => {
-    if (!collapsible || !breakpoint || typeof window.matchMedia !== "function")
+    if (!collapsible || !breakpoint || typeof window.matchMedia !== "function") {
+      setResponsiveCollapsed(undefined);
       return;
+    }
     const media = window.matchMedia(`(max-width: ${breakpoint - 0.02}px)`);
     const notify = (matches: boolean, initial = false) => {
       callbacks.current.onBreakpoint?.(matches);
       // A wide initial viewport must not erase defaultCollapsed.
       if (!initial || matches) {
-        if (callbacks.current.collapsed === undefined) setInternal(matches);
+        if (callbacks.current.collapsed === undefined) {
+          if (storageKey) setResponsiveCollapsed(matches || undefined);
+          else setInternalRef.current(matches, false);
+        }
         callbacks.current.onCollapsedChange?.(matches);
       }
     };
@@ -72,7 +87,7 @@ function AdminLayoutSider({
     const listener = (event: MediaQueryListEvent) => notify(event.matches);
     media.addEventListener("change", listener);
     return () => media.removeEventListener("change", listener);
-  }, [breakpoint, collapsible]);
+  }, [breakpoint, collapsible, storageKey]);
   const safeWidth = Number.isFinite(width) ? Math.max(40, width) : 240;
   const safeCollapsedWidth = Number.isFinite(collapsedWidth)
     ? Math.max(40, collapsedWidth)
@@ -81,7 +96,8 @@ function AdminLayoutSider({
     <Sidebar
       {...props}
       collapsible={collapsible}
-      collapsed={collapsed ?? internal}
+      storageKey={storageKey}
+      collapsed={collapsed ?? responsiveCollapsed ?? internal}
       onCollapsedChange={update}
       collapsePlacement="footer"
       footer={version != null ? (small) => (small ? null : version) : undefined}

@@ -4,6 +4,8 @@ import { createPortal } from "react-dom";
 import { GripHorizontal, Maximize2, Minus, PanelTop, X } from "lucide-react";
 import { Button, MtoneScope, useMtone } from "./basic";
 
+import { useLayoutPreference } from "./layout-persistence";
+
 type Position = { left: number; top: number };
 type Size = { width: number; height: number };
 type Geometry = Position & Size;
@@ -20,6 +22,8 @@ export interface FloatingWindowProps {
   onOpenChange?: (open: boolean) => void;
   initialPosition?: Position;
   initialSize?: Size;
+  /** Remember position and size, not open/minimized state. */
+  storageKey?: string;
   minWidth?: number;
   minHeight?: number;
   maxWidth?: number;
@@ -29,6 +33,14 @@ export interface FloatingWindowProps {
   minimizable?: boolean;
   minimizedIcon?: React.ReactNode;
   zIndex?: number;
+}
+
+function readGeometry(value: unknown): Geometry | undefined {
+  const g = value as Partial<Geometry> | null;
+  if (!g || typeof g !== "object" ||
+    ![g.left, g.top, g.width, g.height].every(Number.isFinite) ||
+    g.width! <= 0 || g.height! <= 0) return undefined;
+  return g as Geometry;
 }
 
 const inset = 12;
@@ -100,7 +112,7 @@ function assignRef<T>(ref: React.Ref<T> | undefined, node: T | null): void | (()
 
 export function FloatingWindow({
   title, children, trigger, open: controlledOpen, defaultOpen = false, onOpenChange,
-  initialPosition, initialSize, minWidth, minHeight, maxWidth, maxHeight,
+  initialPosition, initialSize, storageKey, minWidth, minHeight, maxWidth, maxHeight,
   draggable = true, resizable = true, minimizable = true, minimizedIcon, zIndex = 1150,
 }: FloatingWindowProps) {
   const { locale } = useMtone();
@@ -114,7 +126,9 @@ export function FloatingWindow({
   const [minimized, setMinimized] = React.useState(false);
   const collapsed = minimizable && minimized;
   const [bounds, setBounds] = React.useState<Bounds>();
-  const [storedGeometry, setGeometry] = React.useState<Geometry>();
+  const [storedGeometry, setGeometry] = useLayoutPreference<Geometry | undefined>(
+    "floating-window", storageKey, undefined, readGeometry,
+  );
   const initial = React.useRef({ position: initialPosition, size: initialSize });
   const triggerRef = React.useRef<HTMLElement>(null);
   const triggerElement = typeof trigger === "object" ? trigger as React.ReactElement<TriggerProps> : undefined;
@@ -136,7 +150,7 @@ export function FloatingWindow({
       if (pendingFocus.current === "trigger") pendingFocus.current = undefined;
     }
   };
-  const gesture = React.useRef<{ id: number; kind: GestureKind; x: number; y: number; geometry: Geometry } | null>(null);
+  const gesture = React.useRef<{ id: number; kind: GestureKind; x: number; y: number; geometry: Geometry; last?: Geometry } | null>(null);
 
   React.useEffect(() => {
     if (!open) return;
@@ -222,10 +236,15 @@ export function FloatingWindow({
   function pointerMove(event: React.PointerEvent<HTMLElement>) {
     const start = gesture.current;
     if (!start || !bounds || !limits || start.id !== event.pointerId) return;
-    setGeometry(updateGeometry(start.geometry, start.kind, event.clientX - start.x, event.clientY - start.y, bounds, limits));
+    start.last = updateGeometry(start.geometry, start.kind, event.clientX - start.x, event.clientY - start.y, bounds, limits);
+    setGeometry(start.last, false);
   }
   function pointerEnd(event: React.PointerEvent<HTMLElement>) {
-    if (gesture.current?.id === event.pointerId) gesture.current = null;
+    const start = gesture.current;
+    if (!start || start.id !== event.pointerId) return;
+    gesture.current = null;
+    if (start.last && event.type === "pointerup") setGeometry(start.last);
+    else if (start.last) setGeometry(start.geometry, false);
   }
   function keyDown(kind: GestureKind, event: React.KeyboardEvent<HTMLButtonElement>) {
     if (!geometry || !bounds || !limits || event.altKey || event.ctrlKey || event.metaKey) return;

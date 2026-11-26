@@ -524,6 +524,7 @@ export default function Demo() {
     importNames: ["Panel"],
     code: 'import { Panel } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Panel label="工作区" items={[{ value: "output", label: "输出", content: <code>编译完成</code> }]} />;\n}',
     props: [
+      { name: "storageKey", type: "string", description: "可选。同一浏览器刷新后恢复非受控折叠和选中标签；未设置时不写入本地存储。" },
       { name: "items", type: "Pick<TabItem, 'value' | 'label' | 'content' | 'disabled' | 'icon'>[]", description: "标签数据。已访问的标签内容在切换和收起后保持挂载。" },
       { name: "label", type: "string", description: "标签列表的无障碍名称。" },
       { name: "value / defaultValue / onValueChange", type: "string / string / (value: string) => void", description: "受控或非受控的选中标签。" },
@@ -2019,6 +2020,7 @@ export default function Demo() {
   ],
   "code": "import { useState } from \"react\";\nimport { Splitter } from \"@bixlab/mtone\";\nimport \"@bixlab/mtone/styles.css\";\n\nexport default function Demo() {\n  const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>([\"30%\", \"70%\"]);\n  return (\n    <Splitter bordered style={{ height: 280 }} sizes={sizes} onResize={setSizes}>\n      <Splitter.Panel id=\"navigation\" label=\"导航\" min=\"15%\" collapsible>\n        <div style={{ padding: 12 }}>导航内容</div>\n      </Splitter.Panel>\n      <Splitter.Panel id=\"content\" label=\"正文\" min=\"30%\" collapsible>\n        <div style={{ padding: 12 }}>正文内容</div>\n      </Splitter.Panel>\n    </Splitter>\n  );\n}",
   "props": [
+    { "name": "storageKey", "type": "string", "description": "可选。交互完成后在同一浏览器保存分栏布局；受控 sizes 优先，不读写记忆。请为动态面板提供稳定 id。" },
     {
       "name": "children",
       "type": "Splitter.Panel elements",
@@ -2134,7 +2136,7 @@ export default function Demo() {
     "min/max、容器可用尺寸与总布局必须协调。无效单位和同单位 min 大于 max 会报错；空间不足或相互冲突时引擎会调整布局以填满可用区域，不保证所有不可能同时满足的约束。",
     "这是基于 react-resizable-panels 的 mtone 封装。没有 Panel.size、layout/vertical 别名、动画配置或 destroyOnHidden；样式通过根节点和面板的 className/style 设置。",
     "Esc 或 pointercancel 撤销本次拖动并请求回到开始大小；窗口失焦提交最后有效大小。lazy 模式在释放时发出大小请求，取消时发回滚请求。0 大小面板保留挂载内容，但会 inert/aria-hidden，不参与交互。",
-    "按需保存布局由宿主负责；示例只保留当前页面状态，不做服务器或浏览器持久化。库已包含所需依赖，使用者无需单独安装拖拽组件。"
+    "storageKey 只保存同源浏览器本地布局，不同步账号或设备。比例面板按容器缩放，像素面板优先恢复像素；面板结构或方向不匹配时忽略旧记录。库已包含所需依赖。"
   ]
 },
 {
@@ -2274,7 +2276,7 @@ export default function Demo() {
       { name: "tabs", type: "ReactNode", description: "可选，可传入完整 Tabs。省略时不占空间。" },
       { name: "sidebar", type: "ReactNode", description: "页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。" },
       { name: "sidebarPosition", type: '"left" | "right"', default: '"left"', description: "侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。" },
-      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。" },
+      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度。" },
       { name: "headerSpan", type: '"full" | "header" | "main"', default: '"full"', description: "full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。" },
       { name: "maxWidth", type: '"sm" | "md" | "lg" | "xl" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
       { name: "children", type: "ReactNode", description: "正文。" },
@@ -2327,6 +2329,7 @@ export default function Demo() {
     importNames: ["AdminLayout"],
     code: 'import { useState } from "react";\nimport { Box, BookOpen, Home, Settings } from "lucide-react";\nimport { AdminLayout, Breadcrumb, NavItem, Button, Card } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [collapsed, setCollapsed] = useState(false);\n  return (\n    <AdminLayout hasSider style={{ height: 480 }}>\n      <AdminLayout.Sider\n        collapsible\n        collapsed={collapsed}\n        onCollapsedChange={setCollapsed}\n        width={240}\n        collapsedWidth={52}\n        version="v1.0.0"\n        breakpoint={768}\n        logo={<strong>mtone</strong>}\n        collapsedLogo={<Box size={22} aria-label="mtone" />}\n        aria-label="主导航"\n      >\n        <NavItem icon={<Home size={16} />}>首页</NavItem>\n        <NavItem icon={<BookOpen size={16} />} active>知识库</NavItem>\n      </AdminLayout.Sider>\n      <AdminLayout>\n        <AdminLayout.Header\n          breadcrumb={<Breadcrumb items={[{ label: "知识库" }, { label: "设计规范" }]} />}\n          extra={<Button iconOnly aria-label="设置"><Settings size={16} /></Button>}\n        />\n        <AdminLayout.Content>\n          <h1>设计规范</h1>\n          <Card>这里是独立滚动的主体内容。</Card>\n        </AdminLayout.Content>\n      </AdminLayout>\n    </AdminLayout>\n  );\n}',
     props: [
+      { name: "AdminLayout.Sider.storageKey", type: "string", description: "可选。保存非受控的手动折叠和标签选择；断点自动折叠不覆盖已记住的手动偏好。" },
       {
         name: "AdminLayout.Sider.version",
         type: "ReactNode",
@@ -2350,7 +2353,7 @@ export default function Demo() {
         name: "AdminLayout.sidebarResize",
         type: "boolean | SidebarResizeOptions",
         default: "false",
-        description: "对一个直接的 AdminLayout.Sider（可放在 Fragment 中）启用 Splitter 调宽。默认初始宽度继承 Sider.width；可传 defaultWidth / minWidth / maxWidth（像素，下限 160、上限 480）。折叠和窄容器隐藏手柄，不影响通知或断点规则。",
+        description: "对一个直接的 AdminLayout.Sider（可放在 Fragment 中）启用 Splitter 调宽。默认初始宽度继承 Sider.width；可传 defaultWidth / minWidth / maxWidth（像素，下限 160、上限 480）；设置 storageKey 可记住拖拽宽度。折叠和窄容器隐藏手柄，不影响通知或断点规则。",
       },
       {
         name: "AdminLayout.Sider.tabs",
@@ -3363,6 +3366,7 @@ export default function Demo() {
     importNames: ["Sidebar", "NavItem"],
     code: 'import { Sidebar, NavItem } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Sidebar collapsible><NavItem active>我的知识库</NavItem><NavItem>最近访问</NavItem></Sidebar>\n  );\n}',
     props: [
+      { name: "storageKey", type: "string", description: "可选。记住非受控的折叠状态和当前标签；如需记住宽度，请在管理尺寸的 Splitter 或 sidebarResize 上另设 storageKey。" },
       {
         name: "footer",
         type: "ReactNode | ((collapsed: boolean) => ReactNode)",
@@ -3946,6 +3950,7 @@ export default function Demo() {
     importNames: ["Tabs"],
     code: 'import { Tabs } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Tabs items={[{value:"all",label:"全部",content:"全部文档"},{value:"saved",label:"收藏",content:"收藏文档"}]} />;\n}',
     props: [
+      { name: "storageKey", type: "string", description: "可选。记住非受控的选中标签；已移除或禁用的标签不会恢复，不保存标签顺序或内容。" },
       {
         name: "items",
         type: "TabItem[]",
@@ -5710,6 +5715,7 @@ export default function Demo() {
     importNames: ["FloatingWindow"],
     code: 'import { Button, FloatingWindow } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <FloatingWindow title="任务速记" trigger={<Button>打开窗口</Button>} initialSize={{ width: 360, height: 235 }}><p>整理本周的任务。</p></FloatingWindow>;\n}',
     props: [
+      { name: "storageKey", type: "string", description: "可选。记住拖动或调整后的窗口位置和尺寸，重新打开时按当前视口校正。不记住打开和最小化状态。" },
       { name: "title", type: "ReactNode", description: "窗口标题，用于对话框的可访问名称。" },
       { name: "trigger", type: "ReactElement | string", description: "可选打开或恢复按钮；自定义组件需转发 ref 与触发属性。" },
       { name: "open / defaultOpen / onOpenChange", type: "boolean / boolean / (open: boolean) => void", description: "受控显示状态、非受控初始状态和显示状态回调。" },
@@ -5724,7 +5730,7 @@ export default function Demo() {
     notes: [
       "窗口非模态，不显示遮罩，不锁定背景滚动或焦点，按 Esc 或点击外部都不关闭。需要阻止用户与背景交互时用 Dialog。",
       "可用指针拖动标题栏或右下角手柄，也可聚焦“移动窗口”或“调整窗口大小”后用方向键调整，每步 8px，按住 Shift 为 24px。窗口位置和尺寸保持在当前视口内。",
-      "最小化后点击右下角图标恢复；过程保留窗口位置、尺寸和已挂载子组件的状态。关闭会卸载窗口正文，并将焦点还给可用触发器；不提供持久化或应用级窗口管理。",
+      "最小化后点击右下角图标恢复；过程保留窗口位置、尺寸和已挂载子组件的状态。关闭会卸载窗口正文，并将焦点还给可用触发器；不提供应用级窗口管理。",
     ],
   },
   {

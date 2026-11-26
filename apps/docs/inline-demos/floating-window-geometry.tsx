@@ -6,6 +6,7 @@ export default function Demo() {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
       <FloatingWindow
+        storageKey="docs:floating-window:geometry"
         title="任务速记"
         initialSize={{ width: 360, height: 235 }}
         minWidth={240}

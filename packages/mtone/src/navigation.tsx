@@ -9,7 +9,8 @@ import {
 import { Popover as BPopover } from "@base-ui/react/popover";
 import { Button, cn, MtoneScope, useMtone } from "./basic";
 import { Popover, type PopoverMenuProps, Tooltip } from "./interactive";
-import { Tabs, type TabItem, type TabsProps } from "./tabs";
+import { Tabs, TabsStorageScopeContext, type TabItem, type TabsProps } from "./tabs";
+import { readBoolean, useLayoutPreference, SidebarResizeCollapseContext } from "./layout-persistence";
 import { NavSubmenuSelectionContext, SidebarContext } from "./navigation-context";
 export interface SidebarTabsOptions extends Pick<TabsProps, "label" | "value" | "defaultValue" | "onValueChange"> {
   items: readonly Pick<TabItem, "value" | "label" | "content" | "disabled" | "icon">[];
@@ -19,6 +20,8 @@ export type SidebarProps = React.HTMLAttributes<HTMLElement> & {
   footer?: React.ReactNode | ((collapsed: boolean) => React.ReactNode);
   /** A nonempty list replaces children with tabbed local navigation. */
   tabs?: SidebarTabsOptions;
+  /** Remember uncontrolled collapse and tab selection in this browser. */
+  storageKey?: string;
   collapsePlacement?: "header" | "footer";
   collapsible?: boolean;
   collapsed?: boolean;
@@ -37,13 +40,18 @@ export function Sidebar({
   collapsible = false,
   collapsed,
   defaultCollapsed = false,
+  storageKey,
   onCollapsedChange,
   collapseLabel = "收起侧边栏",
   expandLabel = "展开侧边栏",
   ...p
 }: SidebarProps) {
-  const [internal, setInternal] = React.useState(defaultCollapsed);
+  const [internal, setInternal] = useLayoutPreference(
+    "sidebar-collapse", collapsed === undefined ? storageKey : undefined, defaultCollapsed, readBoolean,
+  );
   const isCollapsed = collapsible && (collapsed ?? internal);
+  const reportCollapse = React.useContext(SidebarResizeCollapseContext);
+  React.useLayoutEffect(() => { reportCollapse?.(isCollapsed); }, [isCollapsed, reportCollapse]);
   const contentId = React.useId();
   const items = React.useMemo(() => tabs?.items.map(({ content, ...item }) => ({
     ...item,
@@ -71,6 +79,7 @@ export function Sidebar({
     </Button>
   );
   return (
+    <SidebarResizeCollapseContext.Provider value={null}>
     <SidebarContext.Provider value={isCollapsed}>
       <aside
         {...p}
@@ -89,10 +98,13 @@ export function Sidebar({
         )}
         {tabs && items?.length ? (
           <div id={contentId} className="mt-sidebar-tab-region">
+            <TabsStorageScopeContext.Provider value="sidebar-tabs">
             <Tabs className="mt-sidebar-tabs"
               items={items} label={tabs.label} value={tabs.value} defaultValue={tabs.defaultValue}
+              storageKey={storageKey}
               onValueChange={tabs.onValueChange} placement="top" variant="line" size="small"
               indicatorColor="blue" destroyOnHidden={false} />
+            </TabsStorageScopeContext.Provider>
           </div>
         ) : collapsible || header !== undefined ? (
           <div id={contentId} className="mt-sidebar-content">
@@ -114,6 +126,7 @@ export function Sidebar({
         )}
       </aside>
     </SidebarContext.Provider>
+    </SidebarResizeCollapseContext.Provider>
   );
 }
 

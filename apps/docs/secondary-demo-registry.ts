@@ -82,6 +82,8 @@ import Spotlight0 from "./secondary-demos/spotlight-usage";
 import Spotlight0Source from "./secondary-demos/spotlight-usage.tsx?raw";
 import Splitter0 from "./secondary-demos/splitter-usage";
 import Splitter0Source from "./secondary-demos/splitter-usage.tsx?raw";
+import SplitterPersistence from "./secondary-demos/splitter-persistence";
+import SplitterPersistenceSource from "./secondary-demos/splitter-persistence.tsx?raw";
 import TableOfContents0 from "./secondary-demos/table-of-contents-usage";
 import TableOfContents0Source from "./secondary-demos/table-of-contents-usage.tsx?raw";
 import Progress0 from "./secondary-demos/ProgressExamples-usage";
@@ -463,6 +465,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
       Demo: Splitter0,
       source: source(Splitter0Source),
     },
+    { id: "persistence", title: "布局记忆", Demo: SplitterPersistence, source: source(SplitterPersistenceSource) },
   ],
   TableOfContents: [
     {

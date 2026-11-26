@@ -26,10 +26,18 @@ additional application actions in a panel.
 
 ## Examples and persistence
 
-The documentation example changes local React state only. Its reset action
-restores the example proportions; resizing does not save account preferences or
-send requests. An application can persist an accepted layout explicitly after
-an interaction, using its own storage and validation policy.
+Pass a stable `storageKey` to opt in to browser-local layout memory. The
+splitter saves after a completed resize or collapse, not during a drag. A
+cancelled drag does not replace the saved layout. On restore, relative panels
+scale with the container and pixel-preserving panels preferentially restore
+their pixel width or height under the current constraints. Use stable panel
+IDs; a saved layout for a different panel topology or orientation is ignored.
+
+Controlled `sizes` take precedence and do not read or write browser storage.
+Use distinct keys for distinct views or workspaces. For account-level or
+cross-device preferences, keep the layout controlled and save it in the host
+application. When Splitter owns a sidebar's width, don't save it a second
+time in the sidebar.
 
 ## Scope
 

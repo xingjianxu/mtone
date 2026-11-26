@@ -9,6 +9,10 @@ import { Plus, X, Ellipsis } from "lucide-react";
 import { cn, useMtone, MtoneScope } from "./basic";
 import { resolveAccentColor, type MtoneAccent } from "./accent-colors";
 
+import { useLayoutPreference } from "./layout-persistence";
+
+export const TabsStorageScopeContext = React.createContext("tabs");
+
 export interface TabItem {
   value: string;
   label: React.ReactNode;
@@ -30,6 +34,8 @@ export interface TabsProps extends Omit<
   "defaultValue" | "onChange" | "children"
 > {
   items: TabItem[];
+  /** Remember the uncontrolled selected tab in this browser. */
+  storageKey?: string;
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -80,6 +86,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     items,
     value,
     defaultValue,
+    storageKey,
     onValueChange,
     label,
     placement = "top",
@@ -112,10 +119,14 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   const inheritedDirection = useDirection();
   const direction =
     props.dir === "rtl" || props.dir === "ltr" ? props.dir : inheritedDirection;
-  const [internal, setInternal] = useState<string | null>(
-    () => defaultValue ?? items.find((i) => !i.disabled)?.value ?? null,
-  );
+  const storageScope = React.useContext(TabsStorageScopeContext);
   const controlled = value !== undefined;
+  const [internal, setInternal] = useLayoutPreference<string | null>(
+    storageScope, controlled ? undefined : storageKey,
+    defaultValue ?? items.find((i) => !i.disabled)?.value ?? null,
+    (saved) => typeof saved === "string" && items.some((item) => item.value === saved && !item.disabled)
+      ? saved : undefined,
+  );
   const selected = controlled ? value : internal;
   const [visited, setVisited] = useState<Set<string>>(
     () => new Set(selected == null ? [] : [selected]),
@@ -142,7 +153,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     ) {
       const next = items.find((item) => !item.disabled)?.value ?? null;
       if (next !== internal) {
-        setInternal(next);
+        setInternal(next, false);
         if (next !== null) onValueChange?.(next);
       }
     }
@@ -251,6 +262,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     onOrderChange(values);
   };
   return (
+    <TabsStorageScopeContext.Provider value="tabs">
     <DirectionProvider direction={direction}>
       <BTabs.Root
         {...props}
@@ -464,5 +476,6 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
         ))}
       </BTabs.Root>
     </DirectionProvider>
+    </TabsStorageScopeContext.Provider>
   );
 });

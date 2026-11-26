@@ -8,6 +8,7 @@ import {
   type Layout,
 } from "react-resizable-panels";
 import { cn, useMtone } from "./basic";
+import { readLayout, saveLayout, SplitterStorageScopeContext } from "./layout-persistence";
 import {
   splitterControlledLayout,
   splitterPairTarget,
@@ -39,6 +40,8 @@ export interface SplitterProps extends Omit<
   /** Show a themed border around the outside of the splitter. Defaults to false. */
   bordered?: boolean;
   sizes?: SplitterSize[];
+  /** Remember an uncontrolled layout after user adjustments. */
+  storageKey?: string;
   disabled?: boolean;
   lazy?: boolean;
   onResize?: (sizes: number[]) => void;
@@ -86,6 +89,7 @@ function SplitterRoot(props: SplitterProps) {
     orientation = "horizontal",
     bordered = false,
     sizes,
+    storageKey,
     disabled = false,
     lazy = false,
     onResize,
@@ -104,6 +108,9 @@ function SplitterRoot(props: SplitterProps) {
   } = props;
   const { locale } = useMtone();
   const prefix = React.useId();
+  const storageScope = React.useContext(SplitterStorageScopeContext);
+  const restoredKey = React.useRef<string | null>(null);
+  const persist = React.useRef<() => void>(() => {});
   const panels = collect(children);
   const ids = panels.map(
     (child, i) => child.props.id ?? `${prefix}-${child.key ?? i}`,
@@ -250,10 +257,12 @@ function SplitterRoot(props: SplitterProps) {
   };
   const finish = () => {
     if (!session.current) return;
+    const { before, cancelled } = session.current;
     session.current = null;
+    if (!cancelled && !splitterLayoutsEqual(before, layout.current)) persist.current();
     latest.current.onResizeEnd?.(pixels());
   };
-  const reportCollapse = () => {
+  const reportCollapse = (notify = true) => {
     const next = Object.fromEntries(
       latest.current.ids.map((id) => [
         id,
@@ -271,7 +280,7 @@ function SplitterRoot(props: SplitterProps) {
       collapsedRef.current = next;
       setCollapsed(next);
     }
-    if (changed)
+    if (changed && notify)
       latest.current.onCollapse?.(
         latest.current.ids.map((id) => next[id]),
         pixels(),
@@ -384,9 +393,88 @@ function SplitterRoot(props: SplitterProps) {
       cycleToken.current++;
     }
   });
-  React.useEffect(() => {
-    phases.current.clear();
-  }, [orientation]);
+  React.useLayoutEffect(() => { phases.current.clear(); }, [orientation]);
+  // Use caller-defined identities, not generated DOM ids (which can change after reload).
+  const signature = JSON.stringify([
+    orientation, panels.map((panel, index) => [
+      panel.props.id ?? panel.key ?? index, !!panel.props.collapsible,
+      panel.props.groupResizeBehavior === "preserve-pixel-size",
+    ]),
+  ]);
+  const restoreKey = storageKey && !sizes ? JSON.stringify([storageScope, storageKey, signature]) : null;
+  persist.current = () => {
+    if (!storageKey || !restoreKey || restoredKey.current !== restoreKey) return;
+    const available = measure();
+    if (available <= 0 || !ids.length) return;
+    const panels = ids.map((id) => ({
+      ratio: layout.current[id],
+      px: (layout.current[id] * available) / 100,
+      collapsed: panelRefs.current.get(id)?.isCollapsed() ?? false,
+    }));
+    if (panels.every((p) => Number.isFinite(p.ratio) && Number.isFinite(p.px))) {
+      saveLayout(storageScope, storageKey, { signature, panels });
+    }
+  };
+  React.useLayoutEffect(() => {
+    if (!restoreKey || !storageKey) {
+      restoredKey.current = null;
+      return;
+    }
+    if (restoredKey.current === restoreKey || axis <= 0 || !group.current ||
+      initial.current?.key !== topology || !ids.every((id) => layout.current[id] !== undefined)) return;
+    const previous = restoredKey.current;
+    const setRestored = (next: Layout) => {
+      if (!write(next)) return;
+      reportCollapse(false);
+      phases.current.clear();
+      for (let i = 0; i < ids.length - 1; i++) {
+        const left = collapsedRef.current[ids[i]];
+        const right = collapsedRef.current[ids[i + 1]];
+        if (left !== right) phases.current.set(JSON.stringify([ids[i], ids[i + 1]]), left ? "first" : "second");
+      }
+    };
+    restoredKey.current = restoreKey;
+    const saved = readLayout(storageScope, storageKey) as {
+      signature?: unknown; panels?: { ratio: number; px: number; collapsed: boolean }[];
+    } | null;
+    if (saved?.signature !== signature || !Array.isArray(saved.panels) ||
+      saved.panels.length !== ids.length || !saved.panels.every((p) =>
+        p && Number.isFinite(p.ratio) && p.ratio >= 0 && p.ratio <= 100.01 &&
+        Number.isFinite(p.px) && p.px >= 0 && typeof p.collapsed === "boolean"
+      ) || !saved.panels.some((p) => p.ratio > 0)) {
+      if (previous !== null) setRestored(initial.current.layout);
+      return;
+    }
+    const available = measure();
+    if (available <= 0) {
+      restoredKey.current = null;
+      return;
+    }
+    const percent = (v: SplitterSize) => splitterSizeToPixels(v, available) * 100 / available;
+    let fixed = 0, weights = 0;
+    const proposed = saved.panels.map((entry, i) => {
+      const { props } = panels[i];
+      if (entry.collapsed && props.collapsible) {
+        const size = percent(props.collapsedSize ?? 0);
+        fixed += size;
+        return { size, weight: 0 };
+      }
+      const min = percent(props.min ?? (props.collapsible ? "10%" : 0));
+      const max = percent(props.max ?? "100%");
+      if (props.groupResizeBehavior === "preserve-pixel-size") {
+        const size = Math.max(min, Math.min(max, (entry.px / available) * 100));
+        fixed += size;
+        return { size, weight: 0 };
+      }
+      weights += entry.ratio;
+      return { size: 0, weight: entry.ratio };
+    });
+    const values = proposed.map((p, i) => fixed < 100 && weights > 0
+      ? p.size + (p.weight / weights) * (100 - fixed)
+      : saved.panels![i].ratio);
+    setRestored(Object.fromEntries(ids.map((id, i) => [id, values[i]])));
+  });
+
   const cycle = (boundary: number) => {
     const current = latest.current;
     const a = current.panels[boundary]?.props,
@@ -703,7 +791,9 @@ function SplitterRoot(props: SplitterProps) {
               inert={view[id] === 0}
               aria-hidden={view[id] === 0 || undefined}
             >
+              <SplitterStorageScopeContext.Provider value="splitter">
               {panelChildren}
+            </SplitterStorageScopeContext.Provider>
             </div>
           </ResizablePanel>
         );

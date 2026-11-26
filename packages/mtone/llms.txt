@@ -281,6 +281,7 @@ export default function Demo() {
 
 - [Panel](https://xingjianxu.github.io/mtone/#/components/Panel): IDE 风格的标签面板，可独立使用，也可与 Splitter 组合停靠和调节大小。
 - Import: Panel from @bixlab/mtone
+- storageKey: string. 可选。同一浏览器刷新后恢复非受控折叠和选中标签；未设置时不写入本地存储。
 - items: Pick<TabItem, 'value' | 'label' | 'content' | 'disabled' | 'icon'>[]. 标签数据。已访问的标签内容在切换和收起后保持挂载。
 - label: string. 标签列表的无障碍名称。
 - value / defaultValue / onValueChange: string / string / (value: string) => void. 受控或非受控的选中标签。
@@ -880,6 +881,7 @@ export default function Demo() {
 
 - [Splitter](https://xingjianxu.github.io/mtone/#/components/Splitter): 可拖动的紧凑分栏布局，支持横向、纵向、受控大小和可折叠面板。
 - Import: Splitter from @bixlab/mtone
+- storageKey: string. 可选。交互完成后在同一浏览器保存分栏布局；受控 sizes 优先，不读写记忆。请为动态面板提供稳定 id。
 - children: Splitter.Panel elements. 面板直接子元素，可使用 Fragment 和条件渲染；支持多个面板及在面板内嵌套另一个 Splitter。
 - orientation: 'horizontal' | 'vertical' (default: 'horizontal'). 横向并排或纵向堆叠。容器必须有可测量的宽高。
 - bordered: boolean (default: false). 显示一圈主题外框，仅作用于 Splitter 根元素，不改变内部拖动分隔条。
@@ -909,7 +911,7 @@ export default function Demo() {
 - min/max、容器可用尺寸与总布局必须协调。无效单位和同单位 min 大于 max 会报错；空间不足或相互冲突时引擎会调整布局以填满可用区域，不保证所有不可能同时满足的约束。
 - 这是基于 react-resizable-panels 的 mtone 封装。没有 Panel.size、layout/vertical 别名、动画配置或 destroyOnHidden；样式通过根节点和面板的 className/style 设置。
 - Esc 或 pointercancel 撤销本次拖动并请求回到开始大小；窗口失焦提交最后有效大小。lazy 模式在释放时发出大小请求，取消时发回滚请求。0 大小面板保留挂载内容，但会 inert/aria-hidden，不参与交互。
-- 按需保存布局由宿主负责；示例只保留当前页面状态，不做服务器或浏览器持久化。库已包含所需依赖，使用者无需单独安装拖拽组件。
+- storageKey 只保存同源浏览器本地布局，不同步账号或设备。比例面板按容器缩放，像素面板优先恢复像素；面板结构或方向不匹配时忽略旧记录。库已包含所需依赖。
 
 ```tsx
 import { useState } from "react";
@@ -1002,7 +1004,7 @@ export default function Demo() {
 - tabs: ReactNode. 可选，可传入完整 Tabs。省略时不占空间。
 - sidebar: ReactNode. 页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。
 - sidebarPosition: "left" | "right" (default: "left"). 侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。
-- sidebarResize: boolean | SidebarResizeOptions (default: false). 可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。
+- sidebarResize: boolean | SidebarResizeOptions (default: false). 可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度。
 - headerSpan: "full" | "header" | "main" (default: "full"). full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。
 - maxWidth: "sm" | "md" | "lg" | "xl" | number. 可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。
 - children: ReactNode. 正文。
@@ -1066,10 +1068,11 @@ export default function Demo() {
 
 - [AdminLayout](https://xingjianxu.github.io/mtone/#/components/AdminLayout): 可组合的页面骨架，组织左侧品牌与导航、右侧顶部操作和独立滚动主体。
 - Import: AdminLayout from @bixlab/mtone
+- AdminLayout.Sider.storageKey: string. 可选。保存非受控的手动折叠和标签选择；断点自动折叠不覆盖已记住的手动偏好。
 - AdminLayout.Sider.version: ReactNode. 底部左侧的应用版本文字/内容；默认不显示，收起时隐藏。折叠按钮固定在底部右侧。
 - AdminLayout.hasSider: boolean. 是否采用横向布局。省略时自动识别直接子元素中的 AdminLayout.Sider；包装组件内的 Sider 请显式指定。
 - AdminLayout.fullHeight: boolean (default: false). 占满视口高度（100dvh）；嵌入页面时可改用 style.height 指定有限高度。
-- AdminLayout.sidebarResize: boolean | SidebarResizeOptions (default: false). 对一个直接的 AdminLayout.Sider（可放在 Fragment 中）启用 Splitter 调宽。默认初始宽度继承 Sider.width；可传 defaultWidth / minWidth / maxWidth（像素，下限 160、上限 480）。折叠和窄容器隐藏手柄，不影响通知或断点规则。
+- AdminLayout.sidebarResize: boolean | SidebarResizeOptions (default: false). 对一个直接的 AdminLayout.Sider（可放在 Fragment 中）启用 Splitter 调宽。默认初始宽度继承 Sider.width；可传 defaultWidth / minWidth / maxWidth（像素，下限 160、上限 480）；设置 storageKey 可记住拖拽宽度。折叠和窄容器隐藏手柄，不影响通知或断点规则。
 - AdminLayout.Sider.tabs: SidebarTabsOptions. 透传 Sidebar 顶部标签配置；侧栏宽屏时显示标签，收起时保持当前面板图标导航。
 - AdminLayout.Sider.collapsible: boolean (default: false). 启用复用自 Sidebar 的收起/展开按钮和图标窄栏。
 - AdminLayout.Sider.collapsed: boolean. 受控收起状态；搭配 onCollapsedChange 由父组件更新。
@@ -1610,6 +1613,7 @@ export default function Demo() {
 
 - [Sidebar](https://xingjianxu.github.io/mtone/#/components/Sidebar): 支持顶部标签、展开与图标窄栏切换的侧栏。
 - Import: Sidebar, NavItem from @bixlab/mtone
+- storageKey: string. 可选。记住非受控的折叠状态和当前标签；如需记住宽度，请在管理尺寸的 Splitter 或 sidebarResize 上另设 storageKey。
 - footer: ReactNode | ((collapsed: boolean) => ReactNode). 可选底部内容。
 - collapsePlacement: "header" | "footer" (default: header). 折叠按钮位置；AdminLayout.Sider 使用 footer，独立 Sidebar 保持原默认。
 - header: ReactNode | ((collapsed: boolean) => ReactNode). 可选品牌头部，与已有折叠按钮同排；AdminLayout.Sider 的 logo 通过该插槽复用。
@@ -2040,6 +2044,7 @@ export default function Demo() {
 
 - [Tabs](https://xingjianxu.github.io/mtone/#/components/Tabs): 中性风格的标签切换，支持顶部贴合、卡片编辑、多方向布局和溢出导航。
 - Import: Tabs from @bixlab/mtone
+- storageKey: string. 可选。记住非受控的选中标签；已移除或禁用的标签不会恢复，不保存标签顺序或内容。
 - items: TabItem[]. 必填；value、label、content，另可设 disabled、icon、closable、closeLabel、forceRender、destroyOnHidden。
 - value / defaultValue: string. 受控/初始值；省略时选择首个未禁用项。
 - onValueChange: (value: string) => void. 用户切换及非受控有效回退时触发。
@@ -3017,6 +3022,7 @@ export default function Demo() {
 
 - [FloatingWindow](https://xingjianxu.github.io/mtone/#/components/FloatingWindow): 可拖动、调整尺寸并最小化的非模态浮动窗口。
 - Import: FloatingWindow from @bixlab/mtone
+- storageKey: string. 可选。记住拖动或调整后的窗口位置和尺寸，重新打开时按当前视口校正。不记住打开和最小化状态。
 - title: ReactNode. 窗口标题，用于对话框的可访问名称。
 - trigger: ReactElement | string. 可选打开或恢复按钮；自定义组件需转发 ref 与触发属性。
 - open / defaultOpen / onOpenChange: boolean / boolean / (open: boolean) => void. 受控显示状态、非受控初始状态和显示状态回调。
@@ -3029,7 +3035,7 @@ export default function Demo() {
 - children: ReactNode. 窗口正文；高度不足时可在窗口内滚动。
 - 窗口非模态，不显示遮罩，不锁定背景滚动或焦点，按 Esc 或点击外部都不关闭。需要阻止用户与背景交互时用 Dialog。
 - 可用指针拖动标题栏或右下角手柄，也可聚焦“移动窗口”或“调整窗口大小”后用方向键调整，每步 8px，按住 Shift 为 24px。窗口位置和尺寸保持在当前视口内。
-- 最小化后点击右下角图标恢复；过程保留窗口位置、尺寸和已挂载子组件的状态。关闭会卸载窗口正文，并将焦点还给可用触发器；不提供持久化或应用级窗口管理。
+- 最小化后点击右下角图标恢复；过程保留窗口位置、尺寸和已挂载子组件的状态。关闭会卸载窗口正文，并将焦点还给可用触发器；不提供应用级窗口管理。
 
 ```tsx
 import { Button, FloatingWindow } from "@bixlab/mtone";

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { SidebarResizeCollapseContext, SplitterStorageScopeContext } from "./layout-persistence";
 import type { SidebarProps } from "./navigation";
 import { Splitter } from "./splitter";
 
@@ -7,6 +8,8 @@ export interface SidebarResizeOptions {
   defaultWidth?: number;
   minWidth?: number;
   maxWidth?: number;
+  /** Remember the dragged sidebar width in this browser. */
+  storageKey?: string;
 }
 type CollapseProps = Pick<SidebarProps, "collapsible" | "collapsed" | "defaultCollapsed" | "onCollapsedChange">;
 
@@ -35,13 +38,8 @@ export function SidebarResize({
   const [internalCollapsed, setCollapsed] = React.useState<boolean | undefined>();
   const collapse = collapsibleSidebar?.props;
   const collapsed = !!collapse?.collapsible && (collapse.collapsed ?? internalCollapsed ?? collapse.defaultCollapsed ?? false);
-  const side = collapse && collapsibleSidebar
-    ? React.cloneElement(collapsibleSidebar, {
-      onCollapsedChange(next) {
-        if (collapse.collapsed === undefined) setCollapsed(next);
-        collapse.onCollapsedChange?.(next);
-      },
-    })
+  const side = collapsibleSidebar
+    ? <SidebarResizeCollapseContext.Provider value={setCollapsed}>{collapsibleSidebar}</SidebarResizeCollapseContext.Provider>
     : sidebar;
   const host = React.useRef<HTMLDivElement>(null);
   const [compact, setCompact] = React.useState(false);
@@ -79,9 +77,11 @@ export function SidebarResize({
         "--_mt-sidebar-resize-initial": `${startingWidth}px`,
         "--_mt-sidebar-resize-collapsed": `${collapsedWidth}px`,
       } as React.CSSProperties}>
-      <Splitter disabled={compact || collapsed} style={{ overflow: "visible", height: layout === "page" ? "auto" : "100%" }}>
+      <SplitterStorageScopeContext.Provider value={`sidebar-resize:${layout}`}>
+      <Splitter storageKey={config.storageKey} disabled={compact || collapsed} style={{ overflow: "visible", height: layout === "page" ? "auto" : "100%" }}>
         {position === "before" ? [sidebarPanel, mainPanel] : [mainPanel, sidebarPanel]}
       </Splitter>
+      </SplitterStorageScopeContext.Provider>
     </div>
   );
 }

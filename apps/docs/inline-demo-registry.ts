@@ -234,7 +234,7 @@ export const inlineDocSections: Readonly<
   ToastProvider: toastSections,
   Panel: [
     { id: "ide", title: "IDE 工作区", Demo: PanelIde, source: source(PanelIdeSource) },
-    { id: "standalone", title: "独立面板", Demo: PanelStandalone, source: source(PanelStandaloneSource) },
+    { id: "standalone", title: "独立面板与布局记忆", note: "切换标签或收起面板，然后刷新页面。", Demo: PanelStandalone, source: source(PanelStandaloneSource) },
   ],
   HoverMarquee: [{
     id: "usage",

@@ -4,8 +4,8 @@ import { NavGroup, NavItem, PageLayout, Sidebar, Text } from "../../../packages/
 export default function Demo() {
   return (
     <PageLayout headingLevel={3} title="项目文件" sidebarPosition="right"
-      sidebarResize={{ defaultWidth: 220, minWidth: 160, maxWidth: 360 }}
-      sidebar={<Sidebar collapsible aria-label="项目文件筛选">
+      sidebarResize={{ defaultWidth: 220, minWidth: 160, maxWidth: 360, storageKey: "docs:page:sidebar-width" }}
+      sidebar={<Sidebar storageKey="docs:page:sidebar-collapse" collapsible aria-label="项目文件筛选">
         <NavGroup label="筛选">
           <NavItem icon={<FileText size={15} />} active>全部文件</NavItem>
           <NavItem icon={<Filter size={15} />}>有待办</NavItem>
