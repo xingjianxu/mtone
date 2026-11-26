@@ -22,7 +22,7 @@ interface SidebarResizeProps {
   defaultWidth?: number;
   collapsedWidth?: number;
   position?: "before" | "after";
-  layout: "admin" | "page";
+  layout: "admin" | "page" | "app";
 }
 const dimension = (value: number | undefined, fallback: number) =>
   value !== undefined && Number.isFinite(value) && value >= 0 ? value : fallback;

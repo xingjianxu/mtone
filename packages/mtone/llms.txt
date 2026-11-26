@@ -1000,13 +1000,16 @@ export default function Demo() {
 - Import: AppLayout from @bixlab/mtone
 - brand: ReactNode. 左侧顶部品牌插槽，省略时不占位。
 - navigation / navigationLabel: ReactNode / string. 导航内容及无障碍名称，推荐组合 NavGroup 与 NavItem。路由和选中状态由应用控制。
-- sidebarWidth: number (default: 240). 侧栏目标宽度（px）。为主内容留空间，侧栏不会超过布局宽度的 40%。
+- sidebarWidth: number (default: 240). 侧栏目标宽度（px）。启用拖拽时用作初始宽度，sidebarResize.defaultWidth 可覆盖；未启用拖拽或容器宽度小于 640px 时，展开的侧栏最多占布局宽度的 40%。
+- sidebarResize: boolean | SidebarResizeOptions (default: false). 显示 Splitter，可用鼠标拖动或键盘调宽。选项包括 defaultWidth、minWidth（默认 160px）、maxWidth（默认 480px）及记忆宽度的 storageKey。窄容器或收起时不显示手柄。
+- sidebarCollapsible: boolean (default: false). 显示收起按钮。收起后是 52px 的图标栏，保留导航和底部账户入口；再次展开时恢复原宽度。图标和可访问名称由 NavItem 或 NavSubmenu 提供。
 - account: AppLayoutAccount. 侧栏底部账户：name、可选 description、装饰性 avatar、MenuEntry[] items 及 menuLabel。菜单优先从底部账户入口向上打开；不传菜单项时只显示资料。真实操作由应用处理。
-- sidebarFooter: ReactNode. 可选自定义侧栏底部内容，和 account 同传时位于账户入口之上。
+- sidebarFooter: ReactNode. 可选自定义侧栏底部内容，和 account 同传时位于账户入口之上，收起时隐藏。
 - fullHeight: boolean (default: false). 使用 100dvh，导航及主内容独立滚动，品牌和账户区留在侧栏两端。嵌套时也可直接通过 style.height 指定有界高度。
 - contentAs / contentLabel: "main" | "section" | "div" / string (default: "main" / —). 主内容语义元素及可选无障碍名称。放入已有 main 时可改为 section 或 div。
 - children: ReactNode. 右侧主内容，可组合不带 tabs 的 PageLayout。根元素还接受标准 div 属性、className、style 和 ref。
 - 本组件只渲染应用框架，不创建全局顶栏、面包屑或标签栏。需要带全局顶栏的后台外壳时用 AdminLayout。
+- 拖拽调宽和图标收起独立启用。图标栏隐藏品牌和自定义底部内容，建议用带 icon 的 NavItem、NavSubmenu 组合导航。
 - 侧栏复用 Sidebar，账户菜单复用 Popover.Menu。账号资料、主题切换及退出逻辑由使用方提供。可用 --mt-app-layout-content-padding 调整主内容内边距。
 
 ```tsx

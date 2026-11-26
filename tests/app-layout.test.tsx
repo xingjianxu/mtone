@@ -44,6 +44,10 @@ test("omits empty account chrome and supports a custom footer and a non-main con
     <AppLayout navigation="Pages">Body</AppLayout>,
   );
   expect(container.querySelector(".mt-sidebar-footer")).toBeNull();
+  expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: /sidebar|侧边栏/i }),
+  ).not.toBeInTheDocument();
   rerender(
     <AppLayout
       navigation="Pages"
@@ -65,3 +69,54 @@ test("omits empty account chrome and supports a custom footer and a non-main con
   expect(screen.getByText("Xu")).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "Xu" })).not.toBeInTheDocument();
 });
+
+test.each([false, true])(
+  "optionally collapses AppLayout to icon navigation (resizable: %s)",
+  async (resizable) => {
+    const { AppLayout, NavItem, MtoneProvider } = Mtone;
+    const selectPage = vi.fn();
+    const accountAction = vi.fn();
+    const { container } = render(
+      <MtoneProvider locale="en">
+        <AppLayout
+          sidebarResize={resizable}
+          sidebarCollapsible
+          brand="Workspace"
+          navigation={
+            <NavItem icon={<svg aria-hidden="true" />} onClick={selectPage}>
+              Projects
+            </NavItem>
+          }
+          sidebarFooter={<button>Switch workspace</button>}
+          account={{
+            name: "Xu",
+            items: [
+              { key: "profile", label: "Profile", onSelect: accountAction },
+            ],
+          }}
+        >
+          Body
+        </AppLayout>
+      </MtoneProvider>,
+    );
+    expect(screen.queryByRole("separator") !== null).toBe(resizable);
+    const complementary = screen.getByRole("complementary");
+    const collapse = screen.getByRole("button", { name: "Collapse sidebar" });
+    fireEvent.click(collapse);
+    expect(complementary).toHaveAttribute("data-collapsed", "true");
+    const expand = screen.getByRole("button", { name: "Expand sidebar" });
+    expect(expand).toBe(collapse);
+    expect(expand).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(screen.getByRole("button", { name: "Projects" }));
+    expect(selectPage).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "Xu" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Profile" }));
+    expect(accountAction).toHaveBeenCalledOnce();
+    expect(container.querySelector("[data-sidebar-collapsed]") !== null).toBe(
+      resizable,
+    );
+    fireEvent.click(expand);
+    expect(complementary).toHaveAttribute("data-collapsed", "false");
+    expect(screen.getByRole("main")).toHaveTextContent("Body");
+  },
+);

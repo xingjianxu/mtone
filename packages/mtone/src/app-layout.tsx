@@ -3,6 +3,7 @@ import { ChevronUp } from "lucide-react";
 import { Avatar, Button, cn, useMtone } from "./basic";
 import { Popover, type MenuEntry } from "./interactive";
 import { Sidebar } from "./navigation";
+import { SidebarResize, type SidebarResizeOptions } from "./sidebar-resize";
 
 export interface AppLayoutAccount {
   name: string;
@@ -19,6 +20,10 @@ export interface AppLayoutProps extends React.ComponentPropsWithRef<"div"> {
   navigation: React.ReactNode;
   navigationLabel?: string;
   sidebarWidth?: number;
+  /** Enable dragging the divider; optionally configure limits or persistence. */
+  sidebarResize?: boolean | SidebarResizeOptions;
+  /** Show a button that toggles between expanded and icon-only navigation. */
+  sidebarCollapsible?: boolean;
   sidebarFooter?: React.ReactNode;
   account?: AppLayoutAccount;
   /** Fill the viewport; alternatively set a height on the layout. */
@@ -33,6 +38,8 @@ export function AppLayout({
   navigation,
   navigationLabel,
   sidebarWidth = 240,
+  sidebarResize = false,
+  sidebarCollapsible = false,
   sidebarFooter,
   account,
   fullHeight = false,
@@ -65,7 +72,11 @@ export function AppLayout({
   const footer =
     sidebarFooter != null || account ? (
       <>
-        {sidebarFooter}
+        {sidebarCollapsible && sidebarFooter != null ? (
+          <div className="mt-app-layout-custom-footer">{sidebarFooter}</div>
+        ) : (
+          sidebarFooter
+        )}
         {account &&
           (account.items?.length ? (
             <Popover.Menu
@@ -93,11 +104,34 @@ export function AppLayout({
           ))}
       </>
     ) : undefined;
+  const sidebar = (
+    <Sidebar
+      className="mt-app-layout-sidebar"
+      header={brand ?? (sidebarCollapsible ? null : undefined)}
+      footer={footer}
+      collapsible={sidebarCollapsible}
+      collapseLabel={zh ? "收起侧边栏" : "Collapse sidebar"}
+      expandLabel={zh ? "展开侧边栏" : "Expand sidebar"}
+    >
+      <nav
+        className="mt-app-layout-navigation"
+        aria-label={navigationLabel ?? (zh ? "主导航" : "Main navigation")}
+      >
+        {navigation}
+      </nav>
+    </Sidebar>
+  );
+  const content = (
+    <Content className="mt-app-layout-content" aria-label={contentLabel}>
+      {children}
+    </Content>
+  );
   return (
     <div
       {...props}
       className={cn(
         "mt-app-layout",
+        sidebarResize && "mt-app-layout-resizable",
         fullHeight && "mt-app-layout-full-height",
         className,
       )}
@@ -108,21 +142,22 @@ export function AppLayout({
         } as React.CSSProperties
       }
     >
-      <Sidebar
-        className="mt-app-layout-sidebar"
-        header={brand ?? undefined}
-        footer={footer}
-      >
-        <nav
-          className="mt-app-layout-navigation"
-          aria-label={navigationLabel ?? (zh ? "主导航" : "Main navigation")}
+      {sidebarResize ? (
+        <SidebarResize
+          layout="app"
+          options={sidebarResize}
+          sidebar={sidebar}
+          collapsibleSidebar={sidebar}
+          defaultWidth={width}
         >
-          {navigation}
-        </nav>
-      </Sidebar>
-      <Content className="mt-app-layout-content" aria-label={contentLabel}>
-        {children}
-      </Content>
+          {content}
+        </SidebarResize>
+      ) : (
+        <>
+          {sidebar}
+          {content}
+        </>
+      )}
     </div>
   );
 }

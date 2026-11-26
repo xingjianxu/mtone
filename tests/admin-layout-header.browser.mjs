@@ -205,6 +205,58 @@ try {
     await expect(main.getByRole("status")).toHaveText("Profile opened");
     await expect(menu).toBeHidden();
   }
+  const resizeFixture = new URL("tests/fixtures/app-layout.html", server.resolvedUrls.local[0]);
+  await appPage.setViewportSize({ width: 1100, height: 640 });
+  await appPage.goto(resizeFixture.href + "?resize=true");
+  const sidebar = appPage.locator(".mt-app-layout-sidebar");
+  const divider = appPage.getByRole("separator");
+  const collapse = appPage.getByRole("button", { name: "Collapse sidebar" });
+  const expand = appPage.getByRole("button", { name: "Expand sidebar" });
+  const navIcon = nav.getByRole("button", { name: "Workspace navigation page 1", exact: true });
+  const sidebarWidth = async () => Math.round((await sidebar.boundingBox()).width);
+  await expect.poll(sidebarWidth).toBe(240);
+  await expect(divider).toBeVisible();
+  const grip = await divider.boundingBox();
+  await appPage.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await appPage.mouse.down();
+  await appPage.mouse.move(grip.x + grip.width / 2 + 45, grip.y + grip.height / 2, { steps: 10 });
+  await appPage.mouse.up();
+  await expect.poll(sidebarWidth).toBe(285);
+  await divider.focus();
+  await divider.press("ArrowLeft");
+  await expect.poll(sidebarWidth).toBeLessThan(285);
+  const draggedWidth = await sidebarWidth();
+  await collapse.click();
+  await expect.poll(sidebarWidth).toBe(52);
+  await expect(divider).toBeHidden();
+  await expect(expand).toBeFocused();
+  await expect(navIcon.locator("svg")).toBeVisible();
+  await expect(navIcon.locator(".mt-sidebar-sr-only")).toHaveText("Workspace navigation page 1");
+  await updateMenu();
+  await expand.click();
+  await expect.poll(sidebarWidth).toBe(draggedWidth);
+  await expect(divider).toBeVisible();
+  await appPage.setViewportSize({ width: 320, height: 640 });
+  await expect(divider).toBeHidden();
+  await expect.poll(sidebarWidth).toBe(128);
+  await collapse.click();
+  await expect.poll(sidebarWidth).toBe(52);
+  assert(await appPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+
+  await appPage.setViewportSize({ width: 1100, height: 640 });
+  await appPage.goto(resizeFixture.href + "?resize=natural");
+  await expect(main.getByText("End of projects")).toBeInViewport();
+  assert((await main.boundingBox()).height > 40);
+  assert(Math.abs((await main.boundingBox()).height - (await sidebar.boundingBox()).height) < 1);
+
+  async function updateMenu() {
+    await account.click();
+    const menu = appPage.getByRole("menu", { name: "Account actions" });
+    await expect(menu).toBeVisible();
+    await menu.getByRole("menuitem", { name: "Profile", exact: true }).click();
+    await expect(main.getByRole("status")).toHaveText("Profile opened");
+    await expect(menu).toBeHidden();
+  }
   assert.deepEqual(errors, []);
 
   console.log(
