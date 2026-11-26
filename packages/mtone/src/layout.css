@@ -170,6 +170,11 @@
   margin-inline-end: 4px;
   vertical-align: middle;
 }
+.mt-topbar-status {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  max-inline-size: 50%;
+}
 .mt-layout-header-extra {
   display: flex;
   align-items: center;
@@ -180,6 +185,30 @@
   scrollbar-width: none;
   gap: 8px;
   margin-inline-start: auto;
+}
+.mt-topbar-with-center {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) fit-content(40%) minmax(0, 1fr);
+}
+.mt-topbar-with-center > .mt-layout-header-main {
+  grid-column: 1;
+  overflow: hidden;
+}
+.mt-topbar-center {
+  grid-column: 2;
+  min-inline-size: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  block-size: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.mt-topbar-center > * { flex: none; }
+.mt-topbar-with-center > .mt-layout-header-extra {
+  grid-column: 3;
+  min-inline-size: 0;
+  justify-self: end;
 }
 .mt-layout-content {
   flex: 1 1 auto;

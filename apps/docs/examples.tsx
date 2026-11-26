@@ -1,3 +1,4 @@
+import TopbarExample from "./inline-demos/topbar-usage";
 import AppLayoutExample from "./inline-demos/app-layout-usage";
 import NavGroupExample from "./inline-demos/nav-group-usage";
 import HoverMarqueeExample from "./inline-demos/hover-marquee-usage";
@@ -164,6 +165,8 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       return <SpotlightExample />;
     case "Container":
       return <ContainerExample />;
+    case "Topbar":
+      return <TopbarExample />;
     case "AppLayout":
       return <AppLayoutExample />;
     case "PageLayout":

@@ -1,3 +1,7 @@
+import TopbarCenter from "./inline-demos/topbar-center";
+import TopbarCenterSource from "./inline-demos/topbar-center.tsx?raw";
+import TopbarUsage from "./inline-demos/topbar-usage";
+import TopbarUsageSource from "./inline-demos/topbar-usage.tsx?raw";
 import AppLayoutUsage from "./inline-demos/app-layout-usage";
 import AppLayoutUsageSource from "./inline-demos/app-layout-usage.tsx?raw";
 import SettingsDialogUsage from "./inline-demos/settings-dialog-usage";
@@ -234,6 +238,10 @@ export const inlineDocSections: Readonly<
   Record<string, readonly DocSection[]>
 > = {
   ToastProvider: toastSections,
+  Topbar: [
+    { id: "usage", title: "笔记顶栏", Demo: TopbarUsage, source: source(TopbarUsageSource) },
+    { id: "center", title: "居中控件", Demo: TopbarCenter, source: source(TopbarCenterSource) },
+  ],
   AppLayout: [{ id: "usage", title: "工作区布局", Demo: AppLayoutUsage, source: source(AppLayoutUsageSource) }],
   Panel: [
     { id: "ide", title: "IDE 工作区", Demo: PanelIde, source: source(PanelIdeSource) },

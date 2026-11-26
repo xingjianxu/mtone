@@ -11,7 +11,7 @@ export type PropDoc = {
  */
 const taxonomy = {
   "布局容器": [
-    "AdminLayout", "AppLayout", "PageLayout", "Container", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
+    "AdminLayout", "AppLayout", "PageLayout", "Topbar", "Container", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
@@ -2329,6 +2329,26 @@ export default function Demo() {
     ],
   },
   {
+    name: "Topbar",
+    description: "独立的单行顶栏，左侧组合面包屑与状态，可选居中控件，右侧放置常用操作。",
+    importNames: ["Topbar", "Breadcrumb", "Tag", "Button"],
+    code: 'import { Breadcrumb, Button, Tag, Topbar } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <Topbar\n    breadcrumb={<Breadcrumb items={[{ label: "笔记", href: "/notes" }, { label: "产品架构与设计规范" }]} />}\n    status={<Tag tone="green">已保存 · v18</Tag>}\n    extra={<Button variant="solid">记录版本</Button>}\n  />;\n}',
+    props: [
+      { name: "breadcrumb", type: "ReactNode", description: "左侧的路径或标题区，推荐传入 Breadcrumb。" },
+      { name: "status", type: "ReactNode", description: "紧跟路径的可选状态。推荐传入简短 Tag 或文本。" },
+      { name: "children", type: "ReactNode", description: "左侧追加内容；保留 AdminLayout.Header 的组合用法。" },
+      { name: "center", type: "ReactNode", description: "可选控件插槽，相对整条顶栏居中，不受左右操作宽度差异影响。窄栏时最多占可用宽度的 40%，过宽内容可横向滚动；省略时仍是两栏。" },
+      { name: "extra", type: "ReactNode", description: "右侧操作。可组合 Button、Tooltip、Avatar 和 Popover.Menu。" },
+      { name: "as", type: '"header" | "div"', default: '"header"', description: "根元素。页面内不需要头部地标时可用 as=\"div\"。" },
+      { name: "HTML 属性", type: "HTMLAttributes<HTMLElement>", description: "className、style、aria 属性与 ref 传给根元素。" },
+    ],
+    notes: [
+      "AdminLayout.Header 直接复用 Topbar，已有 breadcrumb、children 和 extra 不必迁移。默认高度仍为 48px，可用 --mt-layout-header-height 覆盖。",
+      "路径过长会省略，右侧仍保持单行可横向滚动；示例在窄容器把次要按钮收到「更多操作」菜单。Topbar 不接管路由、主题、全屏或账号逻辑，也不自动移动调用方传入的操作。",
+      "Topbar 是面包屑式标题与操作栏，Toolbar 则是通用操作控件容器。AppLayout 默认不包含顶栏。",
+    ],
+  },
+  {
     name: "Toolbar",
     description: "独立排列搜索、筛选和操作，可放在表格、列表或普通页面。",
     importNames: ["Toolbar"],
@@ -2444,6 +2464,16 @@ export default function Demo() {
         name: "AdminLayout.Header.breadcrumb",
         type: "ReactNode",
         description: "顶部左侧插槽；建议传入已有 Breadcrumb 组件。",
+      },
+      {
+        name: "AdminLayout.Header.status",
+        type: "ReactNode",
+        description: "可选，紧跟面包屑的状态插槽（与 Topbar 相同）。",
+      },
+      {
+        name: "AdminLayout.Header.center",
+        type: "ReactNode",
+        description: "可选，控件相对整个顶栏居中（与 Topbar 相同）。",
       },
       {
         name: "AdminLayout.Header.extra",

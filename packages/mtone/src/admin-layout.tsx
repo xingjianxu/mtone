@@ -3,6 +3,7 @@ import { readBoolean, useLayoutPreference } from "./layout-persistence";
 import { cn } from "./basic";
 import { Sidebar, type SidebarProps } from "./navigation";
 import { SidebarResize, type SidebarResizeOptions } from "./sidebar-resize";
+import { Topbar, type TopbarProps } from "./topbar";
 
 export type { SidebarResizeOptions } from "./sidebar-resize";
 
@@ -113,27 +114,7 @@ function AdminLayoutSider({
     />
   );
 }
-export type AdminLayoutHeaderProps = React.HTMLAttributes<HTMLElement> & {
-  breadcrumb?: React.ReactNode;
-  extra?: React.ReactNode;
-};
-function AdminLayoutHeader({
-  breadcrumb,
-  extra,
-  children,
-  className,
-  ...props
-}: AdminLayoutHeaderProps) {
-  return (
-    <header {...props} className={cn("mt-layout-header", className)}>
-      <div className="mt-layout-header-main">
-        {breadcrumb}
-        {children}
-      </div>
-      {extra != null && <div className="mt-layout-header-extra">{extra}</div>}
-    </header>
-  );
-}
+export type AdminLayoutHeaderProps = TopbarProps;
 export type AdminLayoutContentProps = React.HTMLAttributes<HTMLElement> & {
   as?: "main" | "section" | "div";
 };
@@ -214,7 +195,7 @@ function AdminLayoutRoot({
 /** Compose nested layouts with the familiar AdminLayout.Sider/Header/Content/Footer API. */
 export const AdminLayout = Object.assign(AdminLayoutRoot, {
   Sider: AdminLayoutSider,
-  Header: AdminLayoutHeader,
+  Header: Topbar,
   Content: AdminLayoutContent,
   Footer: AdminLayoutFooter,
 });

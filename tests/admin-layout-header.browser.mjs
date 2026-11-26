@@ -86,6 +86,52 @@ try {
   await page.getByText("暂时没有新通知。").waitFor();
   await page.getByRole("menu").waitFor({ state: "hidden" });
 
+  await demo.press("Enter");
+  await page.getByRole("menu").waitFor();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("menu")).toBeHidden();
+  await expect(demo).toBeFocused();
+
+  for (const width of [1000, 320]) {
+    await page.setViewportSize({ width, height: 720 });
+    await page.goto(fixture + "?topbar");
+    const bar = page.getByRole("banner");
+    await expect(bar).toHaveCount(1);
+    await expect(bar.getByText("产品架构与设计规范")).toBeVisible();
+    const record = bar.getByRole("button", { name: "记录版本" });
+    await expect(record).toBeInViewport();
+    await expect(bar.getByRole("button", { name: "账号菜单" })).toBeInViewport();
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await record.click();
+    await expect(page.getByRole("status")).toHaveText("已记录新版本");
+    if (width === 320) {
+      const more = bar.getByRole("button", { name: "更多操作" });
+      await expect(more).toBeInViewport();
+      await more.press("Enter");
+      await page.getByRole("menuitem", { name: "通知", exact: true }).click();
+      await expect(page.getByRole("status")).toHaveText("已选择通知");
+      await expect(page.getByRole("menu")).toBeHidden();
+    } else {
+      await expect(bar.getByText("已保存 · v19")).toBeVisible();
+      await expect(bar.getByRole("button", { name: "通知", exact: true })).toBeInViewport();
+    }
+  }
+
+  for (const width of [1000, 320]) {
+    await page.setViewportSize({ width, height: 720 });
+    await page.goto(fixture + "?topbar-center");
+    const bar = page.getByRole("banner");
+    const group = bar.getByRole("group", { name: "文档模式" });
+    await expect(group).toBeVisible();
+    const rootBox = await bar.boundingBox();
+    const groupBox = await group.boundingBox();
+    assert(Math.abs(rootBox.x + rootBox.width / 2 - groupBox.x - groupBox.width / 2) < 1,
+      "the center follows the full bar, not the gap between unequal sides");
+    await group.getByRole("button", { name: "预览" }).click();
+    await expect(page.getByRole("status")).toHaveText("当前模式：预览");
+    await expect(bar.getByRole("button", { name: "分享" })).toBeInViewport();
+  }
+
   const appPage = await browser.newPage({
     viewport: { width: 1100, height: 640 },
   });
@@ -162,7 +208,7 @@ try {
   assert.deepEqual(errors, []);
 
   console.log(
-    "AdminLayout and AppLayout: header alignment, narrow composition, independent scroll, bottom account menu passed",
+    "AdminLayout, Topbar and AppLayout: header alignment, narrow composition, independent scroll and account menus passed",
   );
 } finally {
   await browser?.close();
