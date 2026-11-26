@@ -1,5 +1,5 @@
 import { createRef } from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeAll, expect, test, vi } from "vitest";
 import { BlockEditor, type BlockEditorRef } from "../packages/mtone-blockeditor/src";
 
@@ -203,6 +203,25 @@ test("renders an editable table without persistent table controls", async () => 
   expect(
     screen.queryByRole("button", { name: "Add row" }),
   ).not.toBeInTheDocument();
+});
+
+test("the floating table toolbar has row and column menus instead of edge grips", async () => {
+  const ref = createRef<BlockEditorRef>();
+  const { container } = render(
+    <BlockEditor
+      ref={ref}
+      locale="en"
+      initialContent={[
+        { type: "table", content: { type: "tableContent", rows: [{ cells: ["A", "B"] }, { cells: ["C", "D"] }] } },
+      ]}
+    />,
+  );
+  await screen.findByRole("table");
+  act(() => ref.current?.focus());
+  const toolbar = await screen.findByRole("group", { name: "Table actions" });
+  expect(toolbar.querySelector("button[aria-label='Row actions']")).toHaveAttribute("aria-haspopup", "menu");
+  expect(toolbar.querySelector("button[aria-label='Column actions']")).toHaveAttribute("aria-haspopup", "menu");
+  expect(container.querySelector(".mt-block-editor-table-grip")).toBeNull();
 });
 
 test("read-only code is rendered with mtone Typography.Code", async () => {
