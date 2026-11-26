@@ -5,6 +5,8 @@ const LOOP_GAP = 16;
 const PIXELS_PER_SECOND = 30;
 const HEAD_PAUSE = 0.45;
 const TAIL_PAUSE = 0.65;
+const INTERACTIVE =
+  "a[href],area[href],button,input,select,textarea,summary,details,audio[controls],video[controls],[tabindex],[contenteditable]:not([contenteditable=false]),[role=button],[role=link]";
 
 /** Copy rendered markup without a second React mount, duplicate IDs, or controls. */
 function syncVisualCopy(original: HTMLElement, copy: HTMLElement) {
@@ -14,9 +16,7 @@ function syncVisualCopy(original: HTMLElement, copy: HTMLElement) {
   )) {
     element.remove();
   }
-  for (const element of snapshot.querySelectorAll(
-    "a[href],area[href],button,input,select,textarea,summary,details,audio[controls],video[controls],[tabindex],[contenteditable],[role=button],[role=link]",
-  )) {
+  for (const element of snapshot.querySelectorAll(INTERACTIVE)) {
     element.replaceWith(
       original.ownerDocument.createTextNode(element.textContent ?? ""),
     );
@@ -37,7 +37,7 @@ function syncVisualCopy(original: HTMLElement, copy: HTMLElement) {
 export interface HoverMarqueeProps extends React.ComponentPropsWithRef<"span"> {
   /** Inline content on a single line. */
   children: React.ReactNode;
-  /** Use "single" for interactive JSX: pan out and back without a visual copy. */
+  /** "single" reveals the tail once and holds it. Interactive content uses it automatically. */
   mode?: "loop" | "single";
 }
 
@@ -61,12 +61,14 @@ export function HoverMarquee({
     advance: 0,
   });
   const overflowing = distance > 0;
-  const single = mode === "single";
+  const [interactive, setInteractive] = React.useState(false);
+  const single = mode === "single" || interactive;
 
   const measure = React.useCallback(() => {
     const frame = viewport.current;
     const track = text.current;
     if (!frame || !track) return;
+    setInteractive(!!track.querySelector(INTERACTIVE));
     // Measure original text only: the decorative next copy never contributes.
     const distance = Math.max(0, track.scrollWidth - frame.clientWidth);
     const advance = distance > 0 ? track.scrollWidth + LOOP_GAP : 0;
@@ -85,7 +87,7 @@ export function HoverMarquee({
   React.useLayoutEffect(() => {
     measure();
     updateCopy();
-  }, [children, measure, overflowing, updateCopy]);
+  }, [children, measure, overflowing, single, updateCopy]);
   React.useEffect(() => {
     const frame = viewport.current;
     const track = text.current;
@@ -121,9 +123,9 @@ export function HoverMarquee({
     };
   }, [measure, updateCopy]);
 
-  // Loop mode continues to the copy; single mode returns the same track.
+  // Loop mode continues to the copy; single mode holds the original tail.
   const duration =
-    HEAD_PAUSE + TAIL_PAUSE + (single ? 2 * distance : advance) / PIXELS_PER_SECOND;
+    HEAD_PAUSE + TAIL_PAUSE + (single ? distance : advance) / PIXELS_PER_SECOND;
   const tailStart = HEAD_PAUSE + distance / PIXELS_PER_SECOND;
   const percent = (seconds: number) => `${(100 * seconds) / duration}%`;
 
@@ -149,33 +151,35 @@ export function HoverMarquee({
         onPointerLeave?.(event);
       }}
     >
-      <span
-        className="mt-hover-marquee-text"
-        style={
-          overflowing
-            ? ({
-                "--mt-marquee-duration": `${duration}s`,
-                "--mt-marquee-gap": `${LOOP_GAP}px`,
-                "--mt-marquee-head-end": percent(HEAD_PAUSE),
-                "--mt-marquee-tail-start": percent(tailStart),
-                "--mt-marquee-tail-end": percent(tailStart + TAIL_PAUSE),
-                "--mt-marquee-tail-progress": distance / advance,
-                "--mt-marquee-distance": `${distance}px`,
-              } as React.CSSProperties)
-            : undefined
-        }
-      >
-        <span ref={text} className="mt-hover-marquee-original">
-          {children}
+      <span className="mt-hover-marquee-lane">
+        <span
+          className="mt-hover-marquee-text"
+          style={
+            overflowing
+              ? ({
+                  "--mt-marquee-duration": `${duration}s`,
+                  "--mt-marquee-gap": `${LOOP_GAP}px`,
+                  "--mt-marquee-head-end": percent(HEAD_PAUSE),
+                  "--mt-marquee-tail-start": percent(tailStart),
+                  "--mt-marquee-tail-end": percent(tailStart + TAIL_PAUSE),
+                  "--mt-marquee-tail-progress": distance / advance,
+                  "--mt-marquee-distance": `${distance}px`,
+                } as React.CSSProperties)
+              : undefined
+          }
+        >
+          <span ref={text} className="mt-hover-marquee-original">
+            {children}
+          </span>
+          {overflowing && !single && (
+            <span
+              ref={repeat}
+              className="mt-hover-marquee-copy"
+              aria-hidden="true"
+              inert
+            />
+          )}
         </span>
-        {overflowing && !single && (
-          <span
-            ref={repeat}
-            className="mt-hover-marquee-copy"
-            aria-hidden="true"
-            inert
-          />
-        )}
       </span>
     </span>
   );

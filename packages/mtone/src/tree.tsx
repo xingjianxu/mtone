@@ -774,7 +774,6 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               : renderedActions;
           const title = titleRender ? titleRender(node) : node.label;
           const marquee = node.labelMarquee ?? labelMarquee;
-          const plainTitle = typeof title === "string" || typeof title === "number";
           const titleControl = (event: React.SyntheticEvent<HTMLDivElement>) => {
             const target = event.target;
             if (!(target instanceof Element)) return false;
@@ -1112,7 +1111,6 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                   className="mt-tree-title"
                   id={titleId}
                   tabIndex={-1}
-                  mode={plainTitle ? "loop" : "single"}
                 >
                   {title}
                 </HoverMarquee>

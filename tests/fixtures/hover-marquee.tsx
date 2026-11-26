@@ -23,7 +23,7 @@ function Fixture() {
         <HoverMarquee data-testid="rich">
           <strong id="formatted-start">Formatted start</strong> followed by a
           long rich label
-          <button type="button">Single interactive source</button>
+          <em> with formatted ending</em>
         </HoverMarquee>
       </div>
       <div dir="rtl" style={{ width: 142 }}>

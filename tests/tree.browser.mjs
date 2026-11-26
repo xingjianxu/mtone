@@ -393,10 +393,11 @@ try {
           animation.currentTime = span * fraction;
           return new DOMMatrix(getComputedStyle(node).transform).m41;
         };
-        return { distance, end: at((arrive + leave) / 2), returning: at((leave + 1) / 2) };
+        return { distance, end: at((arrive + leave) / 2), held: at((leave + 1) / 2), later: at(2) };
       });
       assert(Math.abs(translation.end + translation.distance) < 0.6);
-      assert(Math.abs(translation.returning * 2 - translation.end) < 1);
+      assert(Math.abs(translation.held - translation.end) < 1, "interactive JSX holds the tail instead of bouncing back");
+      assert(Math.abs(translation.later - translation.end) < 1, "single mode does not restart while hovered");
       assert.deepEqual(await action.boundingBox(), actionBox, "trailing actions do not move with rich labels");
       await expect(richViewport.locator(".mt-hover-marquee-copy")).toHaveCount(0);
       await action.hover();

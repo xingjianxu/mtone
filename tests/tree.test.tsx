@@ -440,7 +440,7 @@ test("Tree actions don't rename nodes or show actions for disabled nodes", () =>
   expect(screen.queryByRole("button", { name: "disabled command" })).not.toBeInTheDocument();
 });
 
-test("uses loop mode for plain labels and a single track for JSX, respecting tree and node overrides", () => {
+test("loops plain and noninteractive JSX labels, respecting tree and node overrides", () => {
   const data = [
     { id: "a", label: "Alpha" },
     { id: "b", label: "Beta", labelMarquee: false },
@@ -452,7 +452,7 @@ test("uses loop mode for plain labels and a single track for JSX, respecting tre
   expect(marquee("Alpha")).toBeInTheDocument();
   expect(marquee("Beta")).not.toBeInTheDocument();
   expect(marquee("Alpha")).not.toHaveAttribute("data-motion", "single");
-  expect(marquee("Custom title")).toHaveAttribute("data-motion", "single");
+  expect(marquee("Custom title")).not.toHaveAttribute("data-motion", "single");
   rerender(<Tree items={data} labelMarquee={false} />);
   expect(marquee("Alpha")).not.toBeInTheDocument();
   expect(marquee("Gamma")).toBeInTheDocument();

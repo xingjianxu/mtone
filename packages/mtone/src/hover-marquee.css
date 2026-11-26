@@ -10,6 +10,7 @@
   outline: 1px solid var(--mt-focus, #93b4dc);
   outline-offset: -1px;
 }
+.mt-hover-marquee-lane,
 .mt-hover-marquee-text,
 .mt-hover-marquee-original {
   display: block;
@@ -26,8 +27,17 @@
 /* One full stride aligns the hidden repetition exactly with the start of the
    original so a new animation iteration does not visibly jump. */
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  /* Align the moving track to the physical left without changing the
+     direction of its contents (in particular Arabic and mixed-bidi labels). */
+  .mt-hover-marquee[data-overflow]:not([data-motion="single"]):is(:hover, :focus-within) > .mt-hover-marquee-lane,
+  .mt-hover-marquee[data-motion="single"][data-overflow]:hover:not(:focus-visible, :has(:focus-visible)) > .mt-hover-marquee-lane {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: visible;
+  }
   .mt-hover-marquee[data-overflow]:not([data-motion="single"]):is(:hover, :focus-within)
-    > .mt-hover-marquee-text {
+    > .mt-hover-marquee-lane > .mt-hover-marquee-text {
+    justify-self: unsafe left;
     inline-size: max-content;
     overflow: visible;
     --mt-marquee-offset: calc(-100% - var(--mt-marquee-gap));
@@ -40,38 +50,30 @@
       )
       infinite;
   }
-  .mt-hover-marquee[data-overflow]:not([data-motion="single"]):dir(rtl):is(:hover, :focus-within)
-    > .mt-hover-marquee-text {
-    --mt-marquee-offset: calc(100% + var(--mt-marquee-gap));
-  }
   .mt-hover-marquee[data-overflow]:is(:hover, :focus-within)
-    .mt-hover-marquee-copy {
+    > .mt-hover-marquee-lane > .mt-hover-marquee-text > .mt-hover-marquee-copy {
     position: absolute;
     inset-block-start: 0;
-    inset-inline-start: calc(100% + var(--mt-marquee-gap));
+    left: calc(100% + var(--mt-marquee-gap));
     display: block;
     inline-size: 100%;
     pointer-events: none;
     user-select: none;
   }
-  /* A single track moves back to its origin without clipping off its tail
-     or creating a second copy of any inline component. */
+  /* An interactive track pans only once and holds its tail without creating
+     a duplicate control or moving backwards while hovered. */
   .mt-hover-marquee[data-motion="single"][data-overflow]:hover:not(:focus-visible, :has(:focus-visible))
-    > .mt-hover-marquee-text {
+    > .mt-hover-marquee-lane > .mt-hover-marquee-text {
+    justify-self: unsafe left;
     inline-size: max-content;
     overflow: visible;
     --mt-marquee-offset: calc(-1 * var(--mt-marquee-distance));
     animation: mt-hover-marquee-pan var(--mt-marquee-duration)
       linear(
         0 0% var(--mt-marquee-head-end),
-        1 var(--mt-marquee-tail-start) var(--mt-marquee-tail-end),
-        0 100%
+        1 var(--mt-marquee-tail-start) 100%
       )
-      infinite;
-  }
-  .mt-hover-marquee[data-motion="single"][data-overflow]:dir(rtl):hover:not(:focus-visible, :has(:focus-visible))
-    > .mt-hover-marquee-text {
-    --mt-marquee-offset: var(--mt-marquee-distance);
+      both;
   }
 }
 
@@ -82,7 +84,9 @@
   scrollbar-width: none;
 }
 .mt-hover-marquee[data-motion="single"][data-overflow]:is(:focus-visible, :has(:focus-visible))
-  > .mt-hover-marquee-text {
+  > .mt-hover-marquee-lane,
+.mt-hover-marquee[data-motion="single"][data-overflow]:is(:focus-visible, :has(:focus-visible))
+  > .mt-hover-marquee-lane > .mt-hover-marquee-text {
   inline-size: max-content;
 }
 
@@ -93,7 +97,9 @@
     overflow-y: hidden;
   }
   .mt-hover-marquee[data-overflow]:is(:hover, :focus-within)
-    > .mt-hover-marquee-text {
+    > .mt-hover-marquee-lane,
+  .mt-hover-marquee[data-overflow]:is(:hover, :focus-within)
+    > .mt-hover-marquee-lane > .mt-hover-marquee-text {
     inline-size: max-content;
   }
 }

@@ -28,8 +28,8 @@ try {
       animation.currentTime = Number(timing.duration) * fraction;
       return new DOMMatrix(getComputedStyle(node).transform).m41;
     }, fraction);
-  const assertContinuousLoop = async (box, rtl = false) => {
-    const frames = await track(box).evaluate((node, rtl) => {
+  const assertContinuousLoop = async (box) => {
+    const frames = await track(box).evaluate((node) => {
       const original = node.querySelector(".mt-hover-marquee-original") ?? node;
       const copy = node.querySelector(".mt-hover-marquee-copy");
       const animation = node.getAnimations()[0];
@@ -45,9 +45,9 @@ try {
         Number.parseFloat(style.getPropertyValue("--mt-marquee-gap")) || 0;
       const box = node.parentElement.getBoundingClientRect();
       const fromStart = (rect) =>
-        rtl ? box.right - rect.right : rect.left - box.left;
+        rect.left - box.left;
       const fromEnd = (rect) =>
-        rtl ? box.left - rect.left : rect.right - box.right;
+        rect.right - box.right;
       animation.pause();
       const at = (fraction) => {
         animation.currentTime = duration * fraction;
@@ -58,13 +58,12 @@ try {
           sourceEnd: fromEnd(source),
           repeatStart: repeat ? fromStart(repeat) : null,
           separation: repeat
-            ? rtl
-              ? source.left - repeat.right
-              : repeat.left - source.right
+            ? repeat.left - source.right
             : null,
         };
       };
       return {
+        initial: at(0),
         paused1: at(tailStart + (tailEnd - tailStart) / 4),
         paused2: at(tailStart + ((tailEnd - tailStart) * 3) / 4),
         advancing: at((tailEnd + 1) / 2),
@@ -73,7 +72,8 @@ try {
         gap,
         pauseMs: (tailEnd - tailStart) * duration,
       };
-    }, rtl);
+    });
+    assert(Math.abs(frames.initial.sourceStart) < 1, "track starts at the physical left even in RTL");
     assert(
       frames.beforeWrap.repeatStart !== null,
       "the original tail must hand off to the next visible repetition before the boundary",
@@ -136,17 +136,17 @@ try {
   await expect(track(long)).toHaveCSS("animation-name", "none");
   await rtl.hover();
   assert(
-    (await positionAt(rtl, 0.4)) > 20,
-    "RTL pans toward the opposite physical side",
+    (await positionAt(rtl, 0.4)) < -20,
+    "RTL still pans physically left",
   );
-  await assertContinuousLoop(rtl, true);
+  await assertContinuousLoop(rtl);
   await rich.hover();
   const copy = rich.locator(".mt-hover-marquee-copy");
   await expect(copy).toHaveAttribute("aria-hidden", "true");
   await expect(copy).toHaveAttribute("inert", "");
   await expect(copy.locator("strong")).toHaveText("Formatted start");
   await expect(rich.locator('[id="formatted-start"]')).toHaveCount(1);
-  await expect(rich.locator("button")).toHaveCount(1);
+  await expect(copy.locator("em")).toHaveText("with formatted ending");
   assert.equal(
     (await rich.ariaSnapshot()).match(/Formatted start/g)?.length,
     1,
