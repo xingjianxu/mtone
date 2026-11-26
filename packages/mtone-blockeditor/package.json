@@ -1,6 +1,6 @@
 {
   "name": "@bixlab/mtone-blockeditor",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "type": "module",
   "description": "Optional BlockNote editor styled with mtone",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "build": "tsup && cp src/styles.css dist/styles.css"
   },
   "peerDependencies": {
-    "@bixlab/mtone": "^0.14.0 || ^0.15.0",
+    "@bixlab/mtone": "^0.14.0 || ^0.15.0 || ^1.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

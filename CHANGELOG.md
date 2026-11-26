@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.0
+
+- Add AppLayout without a global header, with independent navigation and content scrolling, bottom account actions, and optional sidebar resizing and icon-only collapse.
+- Add standalone Topbar with a true center slot for controls, reused by AdminLayout.Header.
+- Add optional Splitter separator borders independently of the outer frame. The AppLayout docs demo enables both edges.
+
+### BlockEditor 1.0.0 (separate package)
+
+- Move table row and column commands into the contextual toolbar and remove the floating row and column grips.
+- Support mtone 1.x as a peer in addition to the previously supported mtone versions. The editor remains a separate installation.
+
 ## 0.15.5
 
 - Add opt-in browser layout memory for Panel, Sidebar, Splitter, Tabs, FloatingWindow, and resizable layout sidebars.
