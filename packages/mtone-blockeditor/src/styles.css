@@ -395,7 +395,6 @@
 }
 
 /* The upstream controller anchors these controls against table edges. */
-.mt-block-editor .mt-btn.mt-block-editor-table-grip,
 .mt-block-editor .mt-btn.mt-block-editor-table-extend {
   display: flex;
   align-items: center;
@@ -407,23 +406,9 @@
   background: var(--mt-subtle);
   box-shadow: none;
 }
-.mt-block-editor .mt-btn:is(.mt-block-editor-table-grip,.mt-block-editor-table-extend):is(:hover,[aria-expanded="true"]) {
+.mt-block-editor .mt-btn.mt-block-editor-table-extend:hover {
   color: var(--mt-fg);
   background: var(--mt-hover);
-}
-.mt-block-editor .mt-btn.mt-block-editor-table-grip[data-orientation="row"] {
-  width: 22px;
-  height: 26px;
-}
-.mt-block-editor .mt-btn.mt-block-editor-table-grip[data-orientation="column"] {
-  width: 26px;
-  height: 22px;
-}
-.mt-block-editor-table-grip[draggable="true"] {
-  cursor: grab;
-}
-.mt-block-editor-table-grip[data-dragging="true"] {
-  cursor: grabbing;
 }
 .mt-block-editor .mt-btn.mt-block-editor-table-extend[data-orientation="row"] {
   width: 100%;
