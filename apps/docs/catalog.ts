@@ -11,7 +11,7 @@ export type PropDoc = {
  */
 const taxonomy = {
   "布局容器": [
-    "AdminLayout", "PageLayout", "Container", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
+    "AdminLayout", "AppLayout", "PageLayout", "Container", "Toolbar", "SectionGroup", "Panel", "Splitter", "Affix", "Divider",
   ],
   "基础组件": [
     "Button", "ButtonGroup", "Typography", "Title", "Text",
@@ -2265,6 +2265,26 @@ export default function Demo() {
   ]
 },
   {
+    name: "AppLayout",
+    description: "无全局顶栏的应用外壳，左侧导航及底部账户入口，右侧直接显示内容。",
+    importNames: ["AppLayout"],
+    code: 'import { AppLayout, NavItem, PageLayout } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function App() {\n  return (\n    <AppLayout fullHeight brand="mtone" navigation={<NavItem href="/projects" active>项目</NavItem>}\n      account={{ name: "工作区成员", description: "个人工作区", items: [{ key: "profile", label: "个人资料", onSelect: () => console.log("profile") }] }}>\n      <PageLayout title="项目">项目列表</PageLayout>\n    </AppLayout>\n  );\n}',
+    props: [
+      { name: "brand", type: "ReactNode", description: "左侧顶部品牌插槽，省略时不占位。" },
+      { name: "navigation / navigationLabel", type: "ReactNode / string", description: "导航内容及无障碍名称，推荐组合 NavGroup 与 NavItem。路由和选中状态由应用控制。" },
+      { name: "sidebarWidth", type: "number", default: "240", description: "侧栏目标宽度（px）。为主内容留空间，侧栏不会超过布局宽度的 40%。" },
+      { name: "account", type: "AppLayoutAccount", description: "侧栏底部账户：name、可选 description、装饰性 avatar、MenuEntry[] items 及 menuLabel。菜单优先从底部账户入口向上打开；不传菜单项时只显示资料。真实操作由应用处理。" },
+      { name: "sidebarFooter", type: "ReactNode", description: "可选自定义侧栏底部内容，和 account 同传时位于账户入口之上。" },
+      { name: "fullHeight", type: "boolean", default: "false", description: "使用 100dvh，导航及主内容独立滚动，品牌和账户区留在侧栏两端。嵌套时也可直接通过 style.height 指定有界高度。" },
+      { name: "contentAs / contentLabel", type: '"main" | "section" | "div" / string', default: '"main" / —', description: "主内容语义元素及可选无障碍名称。放入已有 main 时可改为 section 或 div。" },
+      { name: "children", type: "ReactNode", description: "右侧主内容，可组合不带 tabs 的 PageLayout。根元素还接受标准 div 属性、className、style 和 ref。" },
+    ],
+    notes: [
+      "本组件只渲染应用框架，不创建全局顶栏、面包屑或标签栏。需要带全局顶栏的后台外壳时用 AdminLayout。",
+      "侧栏复用 Sidebar，账户菜单复用 Popover.Menu。账号资料、主题切换及退出逻辑由使用方提供。可用 --mt-app-layout-content-padding 调整主内容内边距。",
+    ],
+  },
+  {
     name: "PageLayout",
     description: "组织单页标题、操作、标签页和正文，可添加页面侧栏，也可限制整页宽度并在父容器内居中。",
     importNames: ["PageLayout"],
@@ -4302,6 +4322,12 @@ export default function Demo() {
         name: "Popover.Menu.width / align",
         type: 'CSSProperties["width"] / "start" | "end" | "left" | "right"',
         description: "菜单面板默认随内容且最小 160px；对齐默认为 start。子菜单独立定宽。",
+      },
+      {
+        name: "Popover.Menu.side",
+        type: '"top" | "bottom" | "left" | "right"',
+        default: '"bottom"',
+        description: "菜单优先打开的方向；空间不足时可翻转。",
       },
       {
         name: "Popover.Menu.open / defaultOpen / onOpenChange",

@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { createServer } from "vite";
-import { chromium } from "@playwright/test";
+import { chromium, expect } from "@playwright/test";
 
 const server = await createServer({
   configFile: false,
-  optimizeDeps: { entries: ["tests/fixtures/admin-layout-header.html"] },
+  optimizeDeps: { entries: ["tests/fixtures/admin-layout-header.html", "tests/fixtures/app-layout.html"] },
   server: { host: "127.0.0.1", port: 0 },
   logLevel: "error",
 });
@@ -86,8 +86,83 @@ try {
   await page.getByText("暂时没有新通知。").waitFor();
   await page.getByRole("menu").waitFor({ state: "hidden" });
 
+  const appPage = await browser.newPage({
+    viewport: { width: 1100, height: 640 },
+  });
+  const errors = [];
+  appPage.on("pageerror", (error) => errors.push(error.message));
+  await appPage.goto(new URL("tests/fixtures/app-layout.html", server.resolvedUrls.local[0]).href);
+  const main = appPage.getByRole("main");
+  const nav = appPage.getByRole("navigation", { name: "Team navigation" });
+  const account = appPage.getByRole("button", { name: "Team member" });
+  await expect(main.getByRole("heading", { name: "Projects" })).toBeVisible();
+  await expect(appPage.getByRole("banner")).toHaveCount(0);
+  await expect(appPage.getByRole("tablist")).toHaveCount(0);
+  await expect(nav.getByRole("button").first()).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+
+  for (const width of [1100, 320]) {
+    await appPage.setViewportSize({ width, height: 640 });
+    const rects = await appPage.locator(".mt-app-layout").evaluate((root) => {
+      const side = root
+        .querySelector(".mt-app-layout-sidebar")
+        .getBoundingClientRect();
+      const main = root.querySelector("main").getBoundingClientRect();
+      return {
+        sideWidth: side.width,
+        sideRight: side.right,
+        mainLeft: main.left,
+        bounded: document.documentElement.scrollWidth <= innerWidth,
+        height: root.getBoundingClientRect().height,
+      };
+    });
+    assert(rects.bounded && Math.abs(rects.sideRight - rects.mainLeft) < 1);
+    assert.equal(rects.height, 640);
+    assert(Math.abs(rects.sideWidth - Math.min(240, width * 0.4)) < 1);
+
+    const start = await account.boundingBox();
+    await nav.getByRole("button").last().scrollIntoViewIfNeeded();
+    assert.deepEqual(
+      await account.boundingBox(),
+      start,
+      "navigation scroll keeps account at bottom",
+    );
+    assert.equal(await main.evaluate((el) => el.scrollTop), 0);
+    await main.getByText("End of projects").scrollIntoViewIfNeeded();
+    assert.deepEqual(
+      await account.boundingBox(),
+      start,
+      "main scroll keeps sidebar fixed",
+    );
+    assert((await main.evaluate((el) => el.scrollTop)) > 0);
+    await main.evaluate((el) => {
+      el.scrollTop = 0;
+    });
+
+    await account.focus();
+    await account.press("ArrowDown");
+    const menu = appPage.getByRole("menu", { name: "Account actions" });
+    await expect(menu).toBeVisible();
+    const popup = await menu.boundingBox();
+    assert(popup.y + popup.height <= start.y, "account menu opens upward");
+    assert(
+      popup.x >= 0 && popup.x + popup.width <= width + 1,
+      "menu stays inside narrow viewport",
+    );
+    await appPage.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(account).toBeFocused();
+    await account.click();
+    await menu.getByRole("menuitem", { name: "Profile", exact: true }).click();
+    await expect(main.getByRole("status")).toHaveText("Profile opened");
+    await expect(menu).toBeHidden();
+  }
+  assert.deepEqual(errors, []);
+
   console.log(
-    "AdminLayout: fixed and centered header, narrow breadcrumb, responsive sidebar and scroll passed",
+    "AdminLayout and AppLayout: header alignment, narrow composition, independent scroll, bottom account menu passed",
   );
 } finally {
   await browser?.close();
