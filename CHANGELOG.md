@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.5
+
+- Add opt-in browser layout memory for Panel, Sidebar, Splitter, Tabs, FloatingWindow, and resizable layout sidebars.
+- Keep Tree rows still while dragging, then animate the affected rows once on release. Enable `allowReparent` to drop into another node or insert between its children; the default is same-parent sorting.
+- Add `moveTreeItem(items, info)` for immutable moves and `getTreeNodeInfo(items, key)` for parent, path and sibling position queries.
+
+### BlockEditor 0.2.2 (separate package)
+
+- Add `getBlockEditorStats(blocks)` to count words, characters, non-whitespace characters, and blocks without mounting an editor.
+- Add `BlockEditorRef.focus()` to return focus to the editable document without exposing the underlying BlockNote instance.
+
 ## 0.15.4
 
 - Add Container with shared 720 / 960 / 1200 / 1440px width presets, responsive centering, and configurable inline padding. PageLayout stays fluid by default.
