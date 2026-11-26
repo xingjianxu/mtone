@@ -188,3 +188,75 @@ export function toggleTreeCheck(
   }
   return conductTreeChecks(items, [...checked]);
 }
+
+/**
+ * Apply a Tree drop to an items array without mutating it. The insertion index
+ * is relative to the destination list after the source has been removed.
+ * Invalid or unchanged moves return the original array.
+ */
+export function moveTreeItem(
+  items: TreeItem[],
+  info: {
+    dragNode: Pick<TreeItem, "id">;
+    targetParentKey: TreeKey | null;
+    targetIndex: number;
+  },
+): TreeItem[] {
+  const { dragNode, targetParentKey, targetIndex } = info;
+  if (!Number.isInteger(targetIndex) || targetIndex < 0) return items;
+
+  const index = buildTreeIndex(items);
+  const source = index.get(dragNode.id);
+  const target =
+    targetParentKey === null ? undefined : index.get(targetParentKey);
+  if (!source || (targetParentKey !== null && (!target || target.item.isLeaf)))
+    return items;
+  const path =
+    targetParentKey === null ? [] : getTreePath(index, targetParentKey);
+  if (path.includes(source.item.id)) return items;
+
+  const sameParent = (source.parent ?? null) === targetParentKey;
+  const count = target ? (target.item.children?.length ?? 0) : items.length;
+  const sourceIndex = source.posInSet - 1;
+  if (
+    targetIndex > count - Number(sameParent) ||
+    (sameParent && targetIndex === sourceIndex)
+  )
+    return items;
+
+  // Each shallow copy touches only the affected list and its ancestor paths.
+  const edit = (
+    list: TreeItem[],
+    ancestors: TreeKey[],
+    update: (siblings: TreeItem[]) => void,
+    depth = 0,
+  ): TreeItem[] => {
+    const next = list.slice();
+    if (depth === ancestors.length) {
+      update(next);
+    } else {
+      const at = list.findIndex((node) => node.id === ancestors[depth]);
+      const parent = list[at];
+      next[at] = {
+        ...parent,
+        children: edit(parent.children ?? [], ancestors, update, depth + 1),
+      };
+    }
+    return next;
+  };
+  const insert = (siblings: TreeItem[]) => {
+    siblings.splice(targetIndex, 0, source.item);
+  };
+
+  if (sameParent)
+    return edit(items, path, (siblings) => {
+      siblings.splice(sourceIndex, 1);
+      insert(siblings);
+    });
+
+  const sourcePath = getTreePath(index, source.item.id).slice(0, -1);
+  const detached = edit(items, sourcePath, (siblings) => {
+    siblings.splice(sourceIndex, 1);
+  });
+  return edit(detached, path, insert);
+}

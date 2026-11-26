@@ -3681,7 +3681,7 @@ export default function Demo() {
     name: "Tree",
     description:
       "保持紧凑风格的层级树，支持多选、级联勾选、目录模式、异步加载、拖放事件与虚拟滚动。",
-    importNames: ["Tree"],
+    importNames: ["Tree", "moveTreeItem"],
     code: 'import { useState } from "react";\nimport { Tree, type TreeKey } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [checked, setChecked] = useState<TreeKey[]>([]);\n  return <Tree label="资料目录" checkable defaultExpandAll\n    checkedKeys={checked}\n    onCheck={keys => setChecked(Array.isArray(keys) ? keys : keys.checked)}\n    items={[{id:"root",label:"知识库",children:[\n      {id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}\n    ]}]} />;\n}',
     props: [
       {
@@ -3902,6 +3902,12 @@ export default function Demo() {
         type: "(info: TreeDropInfo) => void",
         description:
           "info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap 和目标位置。targetParentKey 在根层为 null；targetIndex 是移除拖动节点之后，从 0 开始的目标列表插入位置。应用按结果更新数据，组件不自动移动节点。",
+      },
+      {
+        name: "moveTreeItem（独立导出）",
+        type: "(items: TreeItem[], info: { dragNode: { id: TreeKey }; targetParentKey: TreeKey | null; targetIndex: number }) => TreeItem[]",
+        description:
+          "从 @bixlab/mtone 导入的纯函数，不是 Tree 属性。onDrop 中可直接使用 setItems(current => moveTreeItem(current, info))。不修改原数据或拖动节点；位置无效或顺序未变时返回原数组。使用 id / label / children 的 items 格式，不直接修改映射前的 treeData。",
       },
       {
         name: "onDragStart / onDragEnd / onDragOver / onDragLeave",

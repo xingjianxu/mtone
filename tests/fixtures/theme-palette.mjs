@@ -30,7 +30,7 @@ export const semanticColorMarkup = `
 const queries = {
   nav: ["nav", "background-color", "::before"],
   date: ["date", "color"],
-  treeDrop: ["tree-drop", "border-top-color"],
+  treeDrop: ["tree-drop", "background-color", "::after"],
   uploadDrop: ["upload-drop", "border-top-color"],
   selection: ["tree-drop", "background-color"],
   toast: ["toast-info", "color"],
