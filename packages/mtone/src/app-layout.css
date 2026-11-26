@@ -164,3 +164,13 @@
   > [data-sidebar-resize-pane="main"] {
   flex: 1 1 0 !important;
 }
+
+/* Use the handle's edge instead of doubling it with the sidebar divider. */
+.mt-sidebar-resize-app:not([data-compact], [data-sidebar-collapsed])
+  > .mt-splitter:has(> .mt-splitter-separator-bordered)
+  > [data-sidebar-resize-pane="sidebar"]
+  > .mt-splitter-panel
+  > .mt-splitter-content
+  > .mt-app-layout-sidebar {
+  border-inline-end: 0;
+}

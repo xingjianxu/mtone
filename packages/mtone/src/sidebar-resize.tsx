@@ -8,6 +8,8 @@ export interface SidebarResizeOptions {
   defaultWidth?: number;
   minWidth?: number;
   maxWidth?: number;
+  /** Show the Splitter separator’s two edge borders. */
+  separatorBordered?: boolean;
   /** Remember the dragged sidebar width in this browser. */
   storageKey?: string;
 }
@@ -78,7 +80,7 @@ export function SidebarResize({
         "--_mt-sidebar-resize-collapsed": `${collapsedWidth}px`,
       } as React.CSSProperties}>
       <SplitterStorageScopeContext.Provider value={`sidebar-resize:${layout}`}>
-      <Splitter storageKey={config.storageKey} disabled={compact || collapsed} style={{ overflow: "visible", height: layout === "page" ? "auto" : "100%" }}>
+      <Splitter storageKey={config.storageKey} separatorBordered={config.separatorBordered} disabled={compact || collapsed} style={{ overflow: "visible", height: layout === "page" ? "auto" : "100%" }}>
         {position === "before" ? [sidebarPanel, mainPanel] : [mainPanel, sidebarPanel]}
       </Splitter>
       </SplitterStorageScopeContext.Provider>

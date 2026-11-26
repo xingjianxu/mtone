@@ -17,7 +17,15 @@ function Fixture() {
     <MtoneProvider locale="en">
       <AppLayout
         fullHeight={resize !== "natural"}
-        sidebarResize={resize ? { minWidth: 170, maxWidth: 310 } : false}
+        sidebarResize={
+          resize
+            ? {
+                minWidth: 170,
+                maxWidth: 310,
+                separatorBordered: resize === "true",
+              }
+            : false
+        }
         sidebarCollapsible={resize !== null}
         brand={<strong>Workspace</strong>}
         navigationLabel="Team navigation"

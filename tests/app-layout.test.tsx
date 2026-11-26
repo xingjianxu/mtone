@@ -120,3 +120,25 @@ test.each([false, true])(
     expect(screen.getByRole("main")).toHaveTextContent("Body");
   },
 );
+
+test("opts into Splitter separator borders without adding an outer frame", () => {
+  const { AppLayout } = Mtone;
+  const { container, rerender } = render(
+    <AppLayout navigation="Pages" sidebarResize>
+      Body
+    </AppLayout>,
+  );
+  const separator = screen.getByRole("separator");
+  expect(separator).not.toHaveClass("mt-splitter-separator-bordered");
+  rerender(
+    <AppLayout navigation="Pages" sidebarResize={{ separatorBordered: true }}>
+      Body
+    </AppLayout>,
+  );
+  expect(screen.getByRole("separator")).toHaveClass(
+    "mt-splitter-separator-bordered",
+  );
+  expect(container.querySelector(".mt-splitter")).not.toHaveClass(
+    "mt-splitter-bordered",
+  );
+});

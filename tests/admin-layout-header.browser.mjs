@@ -216,6 +216,10 @@ try {
   const sidebarWidth = async () => Math.round((await sidebar.boundingBox()).width);
   await expect.poll(sidebarWidth).toBe(240);
   await expect(divider).toBeVisible();
+  await expect(divider).toHaveCSS("border-left-width", "1px");
+  await expect(divider).toHaveCSS("border-right-width", "1px");
+  await expect(divider).toHaveCSS("width", "6px");
+  await expect(sidebar).toHaveCSS("border-right-width", "0px");
   const grip = await divider.boundingBox();
   await appPage.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
   await appPage.mouse.down();
@@ -228,6 +232,7 @@ try {
   const draggedWidth = await sidebarWidth();
   await collapse.click();
   await expect.poll(sidebarWidth).toBe(52);
+  await expect(sidebar).toHaveCSS("border-right-width", "1px");
   await expect(divider).toBeHidden();
   await expect(expand).toBeFocused();
   await expect(navIcon.locator("svg")).toBeVisible();
@@ -246,6 +251,8 @@ try {
   await appPage.setViewportSize({ width: 1100, height: 640 });
   await appPage.goto(resizeFixture.href + "?resize=natural");
   await expect(main.getByText("End of projects")).toBeInViewport();
+  await expect(divider).toHaveCSS("border-left-width", "0px");
+  await expect(divider).toHaveCSS("border-right-width", "0px");
   assert((await main.boundingBox()).height > 40);
   assert(Math.abs((await main.boundingBox()).height - (await sidebar.boundingBox()).height) < 1);
 

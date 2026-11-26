@@ -37,7 +37,7 @@ export default function Demo() {
         borderRadius: 8,
         overflow: "hidden",
       }}
-      sidebarResize={{ minWidth: 160, maxWidth: 300 }}
+      sidebarResize={{ minWidth: 160, maxWidth: 300, separatorBordered: true }}
       sidebarCollapsible
       contentAs="section"
       contentLabel="工作区预览"

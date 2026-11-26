@@ -39,6 +39,8 @@ export interface SplitterProps extends Omit<
   orientation?: "horizontal" | "vertical";
   /** Show a themed border around the outside of the splitter. Defaults to false. */
   bordered?: boolean;
+  /** Outline both edges of each drag separator, independently of the outer frame. */
+  separatorBordered?: boolean;
   sizes?: SplitterSize[];
   /** Remember an uncontrolled layout after user adjustments. */
   storageKey?: string;
@@ -88,6 +90,7 @@ function SplitterRoot(props: SplitterProps) {
     children,
     orientation = "horizontal",
     bordered = false,
+    separatorBordered = false,
     sizes,
     storageKey,
     disabled = false,
@@ -804,7 +807,10 @@ function SplitterRoot(props: SplitterProps) {
               <Separator
                 key={`${id}-separator`}
                 id={`${id}-separator`}
-                className="mt-splitter-separator"
+                className={cn(
+                  "mt-splitter-separator",
+                  separatorBordered && "mt-splitter-separator-bordered",
+                )}
                 data-boundary={i}
                 disableDoubleClick
                 aria-description={collapsible || panels[i + 1].props.collapsible

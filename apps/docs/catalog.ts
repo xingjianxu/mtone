@@ -2043,6 +2043,12 @@ export default function Demo() {
       "description": "显示一圈主题外框，仅作用于 Splitter 根元素，不改变内部拖动分隔条。"
     },
     {
+      "name": "separatorBordered",
+      "type": "boolean",
+      "default": "false",
+      "description": "为每个拖动分隔条的两侧添加 1px 边线：横向分栏画左右两边，纵向分栏画上下两边。与 bordered 外框独立。"
+    },
+    {
       "name": "sizes",
       "type": "SplitterSize[]",
       "description": "整个布局的受控大小，按面板顺序一一对应；数量必须与面板数一致。数值为 px，字符串仅支持明确的 % 或 px。"
@@ -2273,7 +2279,7 @@ export default function Demo() {
       { name: "brand", type: "ReactNode", description: "左侧顶部品牌插槽，省略时不占位。" },
       { name: "navigation / navigationLabel", type: "ReactNode / string", description: "导航内容及无障碍名称，推荐组合 NavGroup 与 NavItem。路由和选中状态由应用控制。" },
       { name: "sidebarWidth", type: "number", default: "240", description: "侧栏目标宽度（px）。启用拖拽时用作初始宽度，sidebarResize.defaultWidth 可覆盖；未启用拖拽或容器宽度小于 640px 时，展开的侧栏最多占布局宽度的 40%。" },
-      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "显示 Splitter，可用鼠标拖动或键盘调宽。选项包括 defaultWidth、minWidth（默认 160px）、maxWidth（默认 480px）及记忆宽度的 storageKey。窄容器或收起时不显示手柄。" },
+      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "显示 Splitter，可用鼠标拖动或键盘调宽。选项包括 defaultWidth、minWidth（默认 160px）、maxWidth（默认 480px）、记忆宽度的 storageKey 及开启手柄两侧边线的 separatorBordered。窄容器或收起时不显示手柄。" },
       { name: "sidebarCollapsible", type: "boolean", default: "false", description: "显示收起按钮。收起后是 52px 的图标栏，保留导航和底部账户入口；再次展开时恢复原宽度。图标和可访问名称由 NavItem 或 NavSubmenu 提供。" },
       { name: "account", type: "AppLayoutAccount", description: "侧栏底部账户：name、可选 description、装饰性 avatar、MenuEntry[] items 及 menuLabel。菜单优先从底部账户入口向上打开；不传菜单项时只显示资料。真实操作由应用处理。" },
       { name: "sidebarFooter", type: "ReactNode", description: "可选自定义侧栏底部内容，和 account 同传时位于账户入口之上，收起时隐藏。" },
@@ -2303,7 +2309,7 @@ export default function Demo() {
       { name: "tabs", type: "ReactNode", description: "可选，可传入完整 Tabs。省略时不占空间。" },
       { name: "sidebar", type: "ReactNode", description: "页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。" },
       { name: "sidebarPosition", type: '"left" | "right"', default: '"left"', description: "侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。" },
-      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度。" },
+      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度；separatorBordered 可为手柄两侧加边线。" },
       { name: "headerSpan", type: '"full" | "header" | "main"', default: '"full"', description: "full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。" },
       { name: "maxWidth", type: '"sm" | "md" | "lg" | "xl" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
       { name: "children", type: "ReactNode", description: "正文。" },
@@ -2400,7 +2406,7 @@ export default function Demo() {
         name: "AdminLayout.sidebarResize",
         type: "boolean | SidebarResizeOptions",
         default: "false",
-        description: "对一个直接的 AdminLayout.Sider（可放在 Fragment 中）启用 Splitter 调宽。默认初始宽度继承 Sider.width；可传 defaultWidth / minWidth / maxWidth（像素，下限 160、上限 480）；设置 storageKey 可记住拖拽宽度。折叠和窄容器隐藏手柄，不影响通知或断点规则。",
+        description: "对一个直接的 AdminLayout.Sider（可放在 Fragment 中）启用 Splitter 调宽。默认初始宽度继承 Sider.width；可传 defaultWidth / minWidth / maxWidth（像素，下限 160、上限 480）；设置 storageKey 可记住拖拽宽度；separatorBordered 可为手柄两侧加边线。折叠和窄容器隐藏手柄，不影响通知或断点规则。",
       },
       {
         name: "AdminLayout.Sider.tabs",
