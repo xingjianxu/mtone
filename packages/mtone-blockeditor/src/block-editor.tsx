@@ -10,7 +10,7 @@ import { SuggestionMenu } from "@blocknote/core/extensions";
 import { en, zh } from "@blocknote/core/locales";
 import { BlockNoteViewEditor, BlockNoteViewRaw } from "@blocknote/react";
 import { useMtone } from "@bixlab/mtone";
-import { EditorTableHandles } from "./editor-table-handles";
+import { EditorTableExtend } from "./editor-table-extend";
 import { EditorControls } from "./editor-controls";
 import { editorCodeHighlight } from "./editor-code-highlight";
 import { safeLink } from "./editor-link";
@@ -185,7 +185,7 @@ function EditorInstance({
         <AudioLocale.Provider value={locale}>
           <BlockNoteViewEditor />
         </AudioLocale.Provider>
-        {!readOnly && <EditorTableHandles zh={locale === "zh"} />}
+        {!readOnly && <EditorTableExtend zh={locale === "zh"} />}
         {!readOnly && (
           <EditorControls
             editor={editor}

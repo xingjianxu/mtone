@@ -480,6 +480,7 @@ export function EditorControls({
   const [focused, setFocused] = React.useState(() =>
     editor.isFocused({ includeEditorUI: true }),
   );
+  const [tableMenuOpen, setTableMenuOpen] = React.useState(false);
   const [codeSelectOpen, setCodeSelectOpen] = React.useState(false);
   const [dismissedId, setDismissedId] = React.useState<string>();
   const hasTextToolbar = useExtensionState(FormattingToolbarExtension, {
@@ -668,13 +669,13 @@ export function EditorControls({
               if (reason === "escape-key") editor.focus();
             },
           }}
-          useDismissProps={{ enabled: !codeSelectOpen }}
+          useDismissProps={{ enabled: !codeSelectOpen && !tableMenuOpen }}
           focusManagerProps={noFocusTrap}
           elementProps={blockFloatingElement}
         >
           <div className="mt-block-editor-toolbar-panel">
             {activeBlock?.type === "table" && (
-              <TableControls editor={editor} block={activeBlock} zh={zh} />
+              <TableControls key={activeBlock.id} editor={editor} block={activeBlock} zh={zh} onMenuOpenChange={setTableMenuOpen} />
             )}
             {activeBlock?.type === "codeBlock" && (
               <CodeControls
