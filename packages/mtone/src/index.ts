@@ -6,6 +6,7 @@ export * from "./interactive";
 export * from "./data";
 
 export * from "./admin-layout";
+export * from "./app-layout";
 export * from "./global-notice";
 export * from "./page-layout";
 export * from "./container";

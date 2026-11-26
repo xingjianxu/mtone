@@ -244,6 +244,8 @@ export interface MenuProps {
 export interface PopoverMenuProps
   extends OpenProps, FloatingLayoutProps, Omit<MenuProps, "className"> {
   trigger: string | React.ReactElement;
+  /** Preferred side. The menu can flip when space is limited. */
+  side?: "top" | "bottom" | "left" | "right";
   /** Whether a mouse hover can open the menu in addition to normal presses. */
   triggerMode?: "click" | "hover";
 }
@@ -694,6 +696,7 @@ function PopoverMenu({
   onSelect,
   width,
   align,
+  side,
   label,
   ...props
 }: PopoverMenuProps) {
@@ -748,6 +751,7 @@ function PopoverMenu({
         kind="menu"
         width={width}
         align={align}
+        side={side}
         label={label}
         initialFocus={hover && openedByHover ? false : undefined}
       >

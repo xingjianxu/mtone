@@ -1,3 +1,5 @@
+import AppLayoutUsage from "./inline-demos/app-layout-usage";
+import AppLayoutUsageSource from "./inline-demos/app-layout-usage.tsx?raw";
 import SettingsDialogUsage from "./inline-demos/settings-dialog-usage";
 import SettingsDialogUsageSource from "./inline-demos/settings-dialog-usage.tsx?raw";
 import SettingRowUsage from "./inline-demos/setting-row-usage";
@@ -232,6 +234,7 @@ export const inlineDocSections: Readonly<
   Record<string, readonly DocSection[]>
 > = {
   ToastProvider: toastSections,
+  AppLayout: [{ id: "usage", title: "工作区布局", Demo: AppLayoutUsage, source: source(AppLayoutUsageSource) }],
   Panel: [
     { id: "ide", title: "IDE 工作区", Demo: PanelIde, source: source(PanelIdeSource) },
     { id: "standalone", title: "独立面板与布局记忆", note: "切换标签或收起面板，然后刷新页面。", Demo: PanelStandalone, source: source(PanelStandaloneSource) },
