@@ -226,7 +226,7 @@ test("scrollTo auto expands nested node only in uncontrolled mode", async () => 
 });
 test("drop rejects own descendant and reports valid intent without mutating items", () => {
   const drop = vi.fn();
-  render(<Tree items={items} defaultExpandAll draggable onDrop={drop} />);
+  render(<Tree items={items} defaultExpandAll draggable allowReparent onDrop={drop} />);
   fireEvent.dragStart(row("Parent"));
   fireEvent.drop(row("Alpha"));
   expect(drop).not.toHaveBeenCalled();
@@ -234,6 +234,39 @@ test("drop rejects own descendant and reports valid intent without mutating item
   fireEvent.drop(row("Last"));
   expect(drop).toHaveBeenCalled();
   expect(items[0].children).toHaveLength(2);
+});
+
+test("default dragging keeps nodes under their current parent", () => {
+  const onDrop = vi.fn();
+  render(<Tree items={items} defaultExpandAll draggable onDrop={onDrop} />);
+  fireEvent.dragStart(row("Alpha"));
+  fireEvent.drop(row("Last"));
+  expect(onDrop).not.toHaveBeenCalled();
+  fireEvent.dragStart(row("Alpha"));
+  fireEvent.drop(row("Beta"));
+  expect(onDrop).toHaveBeenLastCalledWith(expect.objectContaining({
+    targetParentKey: "p", targetIndex: 1, dropPosition: 1,
+  }));
+});
+
+test("reparenting reports the parent and insertion index after removal", () => {
+  const onDrop = vi.fn();
+  render(<Tree items={items} defaultExpandAll draggable allowReparent onDrop={onDrop} />);
+  fireEvent.dragStart(row("Alpha"));
+  fireEvent.drop(row("Parent"));
+  expect(onDrop).toHaveBeenLastCalledWith(expect.objectContaining({
+    targetParentKey: "p", targetIndex: 1, dropPosition: 0, dropToGap: false,
+  }));
+  const beta = row("Beta");
+  const bounds = vi.spyOn(beta, "getBoundingClientRect").mockReturnValue({ top: 0, height: 32 } as DOMRect);
+  const drop = new Event("drop", { bubbles: true, cancelable: true });
+  Object.defineProperty(drop, "clientY", { value: 3 });
+  fireEvent.dragStart(row("Last"));
+  fireEvent(beta, drop);
+  bounds.mockRestore();
+  expect(onDrop).toHaveBeenLastCalledWith(expect.objectContaining({
+    targetParentKey: "p", targetIndex: 1, dropPosition: -1, dropToGap: true,
+  }));
 });
 
 test("virtual list remains keyboard reachable after scrolling away from active row", () => {
