@@ -1,3 +1,4 @@
+import { getTreeNodeInfo } from "../packages/mtone/src";
 import { expect, test } from "vitest";
 import {
   normalizeTree,
@@ -205,4 +206,24 @@ test("moveTreeItem returns the original array for impossible and unchanged moves
       moveTreeItem(root, { dragNode: { id }, targetParentKey, targetIndex }),
     ).toBe(root);
   }
+});
+
+
+test("gets the current node, parent, root-to-node path and zero-based sibling position", () => {
+  const leaf = { id: "0", label: "String zero" };
+  const inner = { id: "inner", label: "Inner", children: [{ id: "other", label: "Other" }, leaf] };
+  const root = { id: 0, label: "Root", children: [inner] };
+  const tree = [root] as const;
+  const info = getTreeNodeInfo(tree, "0");
+  expect(info).toEqual({ node: leaf, parent: inner, path: [root, inner, leaf], index: 1 });
+  expect(info?.node).toBe(leaf);
+  expect(getTreeNodeInfo(tree, 0)).toEqual({ node: root, parent: null, path: [root], index: 0 });
+  expect(getTreeNodeInfo(tree, "missing")).toBeUndefined();
+});
+
+test("queries the updated tree returned by moveTreeItem", () => {
+  const next = moveTreeItem(items, { dragNode: { id: "a" }, targetParentKey: null, targetIndex: 1 });
+  const result = getTreeNodeInfo(next, "a");
+  expect(result).toMatchObject({ parent: null, index: 1 });
+  expect(result?.path.map(node => node.id)).toEqual(["a"]);
 });

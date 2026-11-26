@@ -23,6 +23,11 @@ export type BlockEditorBlock = Block<TextSchema>;
 export type BlockEditorInput = PartialBlock<TextSchema>;
 export type Editor = BlockNoteEditor<TextSchema>;
 
+export interface BlockEditorRef {
+  /** Focus the editable document. Does nothing in read-only mode. */
+  focus(): void;
+}
+
 export interface BlockEditorProps {
   /** Change the key to load a different document. */
   documentKey?: string | number;
@@ -46,22 +51,30 @@ export interface BlockEditorProps {
   uploadImage?: (file: File) => Promise<string>;
 }
 
-export function BlockEditor({ documentKey, ...props }: BlockEditorProps) {
-  const [client, setClient] = React.useState(false);
-  React.useEffect(() => setClient(true), []);
-  if (!client)
+export const BlockEditor = React.forwardRef<BlockEditorRef, BlockEditorProps>(
+  function BlockEditor({ documentKey, ...props }, ref) {
+    const [client, setClient] = React.useState(false);
+    React.useEffect(() => setClient(true), []);
+    if (!client)
+      return (
+        <div
+          className={props.className}
+          data-mtone-block-editor-placeholder=""
+        />
+      );
     return (
-      <div className={props.className} data-mtone-block-editor-placeholder="" />
+      <EditorInstance
+        key={
+          documentKey === undefined
+            ? ""
+            : `${typeof documentKey}:${documentKey}`
+        }
+        {...props}
+        editorRef={ref}
+      />
     );
-  return (
-    <EditorInstance
-      key={
-        documentKey === undefined ? "" : `${typeof documentKey}:${documentKey}`
-      }
-      {...props}
-    />
-  );
-}
+  },
+);
 
 function EditorInstance({
   initialContent,
@@ -74,7 +87,8 @@ function EditorInstance({
   className,
   uploadImage,
   uploadFile,
-}: BlockEditorProps) {
+  editorRef,
+}: BlockEditorProps & { editorRef: React.ForwardedRef<BlockEditorRef> }) {
   const { locale: inheritedLocale, theme } = useMtone();
   const locale = explicitLocale ?? inheritedLocale;
   const name = label ?? (locale === "zh" ? "块编辑器" : "Block editor");
@@ -100,6 +114,16 @@ function EditorInstance({
       },
     }),
   );
+  React.useImperativeHandle(
+    editorRef,
+    () => ({
+      focus() {
+        if (!readOnly && editor.domElement?.isConnected) editor.focus();
+      },
+    }),
+    [editor, readOnly],
+  );
+
   const [previewCodeId, setPreviewCodeId] = React.useState<string>();
   React.useLayoutEffect(() => {
     setCodePresentation(editor, { id: previewCodeId, readOnly });

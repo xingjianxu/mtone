@@ -260,3 +260,37 @@ export function moveTreeItem(
   });
   return edit(detached, path, insert);
 }
+
+
+export interface TreeNodeLocation {
+  node: TreeItem;
+  /** The direct parent, or null for a root node. */
+  parent: TreeItem | null;
+  /** Nodes from the root down to and including the node itself. */
+  path: TreeItem[];
+  /** Zero-based position in the parent's children or the root list. */
+  index: number;
+}
+
+/** Query the application-owned items without mounting a Tree. */
+export function getTreeNodeInfo(
+  items: readonly TreeItem[],
+  key: TreeKey,
+): TreeNodeLocation | undefined {
+  const path: TreeItem[] = [];
+  const visit = (
+    list: readonly TreeItem[],
+    parent: TreeItem | null,
+  ): TreeNodeLocation | undefined => {
+    for (let index = 0; index < list.length; index++) {
+      const node = list[index];
+      path.push(node);
+      if (node.id === key) return { node, parent, path, index };
+      const match = node.children && visit(node.children, node);
+      if (match) return match;
+      path.pop();
+    }
+    return undefined;
+  };
+  return visit(items, null);
+}

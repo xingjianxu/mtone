@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { chromium, firefox, webkit } from "@playwright/test";
+import { chromium, expect, firefox, webkit } from "@playwright/test";
 import { preview } from "vite";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -47,6 +47,8 @@ try {
   await page.goto(base + "#/components/BlockEditor");
   const editor = page.getByRole("textbox", { name: "发布周记正文" });
   await editor.waitFor();
+  await page.getByRole("button", { name: "聚焦正文", exact: true }).click();
+  await expect(editor).toBeFocused();
   const usageDemo = page.locator(".mt-block-editor").filter({ has: editor });
   const frameCorner = await editor.evaluate((node) => {
     const frame = node.closest(".mt-block-editor");

@@ -47,6 +47,7 @@ This file describes this package checkout, not necessarily the latest published 
 - initialContent: readonly BlockEditorInput[]. 仅在创建该文档时读取。支持正文、标题、列表、待办、引用、分割线、代码、表格、折叠、提示块、图片、视频、音频和附件。默认空段落。
 - documentKey: string | number. 换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。
 - onChange: (blocks: BlockEditorBlock[]) => void. 内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。
+- ref: React.Ref<BlockEditorRef>. 编辑器挂载后可调用 ref.current?.focus() 聚焦可编辑正文；只读时不移动焦点。不暴露 BlockNote 实例。
 - getBlockEditorStats（独立导出）: (blocks: readonly BlockEditorInput[]) => BlockEditorStats. 不是组件属性。可用初始内容或 onChange 返回的块；返回 wordCount、characterCount、nonWhitespaceCharacterCount、blockCount。不需要挂载编辑器，不修改输入。
 - readOnly: boolean (default: false). 显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。
 - borderless: boolean (default: false). 只移除编辑器外框，保留内部样式和键盘焦点提示。
@@ -1973,7 +1974,7 @@ export default function Demo() {
 ### Tree
 
 - [Tree](https://xingjianxu.github.io/mtone/#/components/Tree): 保持紧凑风格的层级树，支持多选、级联勾选、目录模式、异步加载、拖放事件与虚拟滚动。
-- Import: Tree, moveTreeItem from @bixlab/mtone
+- Import: Tree, moveTreeItem, getTreeNodeInfo from @bixlab/mtone
 - items: TreeItem[] (default: []). 原有数据格式：id、label、children；可含 disabled、disableCheckbox、checkable、selectable、isLeaf、icon 及自定义字段。
 - treeData: TreeNode[] | Record<string, unknown>[]. key、title、children 数据格式；提供时优先于 items。标准化后的事件节点仍使用 id / label。
 - fieldNames: { key?: string; title?: string; children?: string }. 映射输入数据字段。items 默认 id / label / children，treeData 默认 key / title / children。
@@ -2011,6 +2012,7 @@ export default function Demo() {
 - allowReparent: boolean (default: false). 默认只允许同一父节点下排序。开启后，目标行中间可追加为子节点，边缘可插到目标节点前后（允许跨父节点）。isLeaf=true 不接收子节点。有效落点悬停约 450ms 时可展开折叠分支。
 - allowDrop: ({ dragNode, dropNode, dropPosition, targetParentKey, targetIndex }) => boolean. 可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。
 - onDrop: (info: TreeDropInfo) => void. info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap 和目标位置。targetParentKey 在根层为 null；targetIndex 是移除拖动节点之后，从 0 开始的目标列表插入位置。应用按结果更新数据，组件不自动移动节点。
+- getTreeNodeInfo（独立导出）: (items: readonly TreeItem[], key: TreeKey) => TreeNodeLocation | undefined. 从 @bixlab/mtone 导入的纯查询，不是 Tree 属性。返回 node、parent（根层为 null）、path（根节点到当前节点，包含自身）和 index（同级从 0 计数）。键找不到时返回 undefined。可传 moveTreeItem 返回的新 items 查询排序后的位置；使用 id / label / children 格式。
 - moveTreeItem（独立导出）: (items: TreeItem[], info: { dragNode: { id: TreeKey }; targetParentKey: TreeKey | null; targetIndex: number }) => TreeItem[]. 从 @bixlab/mtone 导入的纯函数，不是 Tree 属性。onDrop 中可直接使用 setItems(current => moveTreeItem(current, info))。不修改原数据或拖动节点；位置无效或顺序未变时返回原数组。使用 id / label / children 的 items 格式，不直接修改映射前的 treeData。
 - onDragStart / onDragEnd / onDragOver / onDragLeave: ({ event, node }) => void. 原生拖放阶段回调。
 - onDragEnter: ({ event, node, expandedKeys }) => void. 有效目标进入回调。allowReparent 下悬停展开仍遵循 expandedKeys / onExpand 的受控约定。

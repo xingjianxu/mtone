@@ -6,4 +6,5 @@ export type {
   BlockEditorBlock,
   BlockEditorInput,
   BlockEditorProps,
+  BlockEditorRef,
 } from "./block-editor";

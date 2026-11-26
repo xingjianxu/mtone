@@ -26,6 +26,10 @@ Use a new `documentKey` to load a different `initialContent`; do not feed the ch
 
 For Next.js, dynamically load the editor in a client component with `ssr: false`. To support on-screen keyboard layout in Chromium, add `interactive-widget=resizes-content` to the viewport settings. The editor supports basic tables, collapsible blocks, semantic callouts, and images by HTTP(S) URL. Code stays editable in BlockNote with live Shiki highlighting and a monospace font. Grammar files are loaded on demand from the application assets, not a CDN. The optional preview and read-only display still use mtone Typography.Code. Use `/Video`, `/Audio`, or `/File` with a direct HTTP(S) URL to add media. Media and image captions are shown in tooltips on hover or keyboard focus; video supports a responsive width percentage (25–100), and files support an optional display name and open in a new tab. Neither autoplays. Audio uses mtone playback, seek, volume and speed controls in both editing and read-only mode; narrower layouts move volume and speed into More. Video uses native controls. Cell merging, collaboration, and AI are not included. See the [shared documentation](https://xingjianxu.github.io/mtone/#/components/BlockEditor).
 
+## Focus the editor
+
+Pass a React ref typed as `BlockEditorRef` to `BlockEditor` and call `ref.current?.focus()` to return focus to the editable document. The ref is unavailable until the editor mounts; calling focus in read-only mode is a no-op. This interface does not expose the underlying editor instance.
+
 ## Document statistics
 
 `getBlockEditorStats(blocks)` is independent of the editor instance. Pass saved blocks, initial content, or the latest blocks from `onChange`.

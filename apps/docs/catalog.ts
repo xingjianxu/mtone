@@ -102,6 +102,7 @@ export default function Demo() {
       { name: "initialContent", type: "readonly BlockEditorInput[]", description: "仅在创建该文档时读取。支持正文、标题、列表、待办、引用、分割线、代码、表格、折叠、提示块、图片、视频、音频和附件。默认空段落。" },
       { name: "documentKey", type: "string | number", description: "换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。" },
       { name: "onChange", type: "(blocks: BlockEditorBlock[]) => void", description: "内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。" },
+      { name: "ref", type: "React.Ref<BlockEditorRef>", description: "编辑器挂载后可调用 ref.current?.focus() 聚焦可编辑正文；只读时不移动焦点。不暴露 BlockNote 实例。" },
       { name: "getBlockEditorStats（独立导出）", type: "(blocks: readonly BlockEditorInput[]) => BlockEditorStats", description: "不是组件属性。可用初始内容或 onChange 返回的块；返回 wordCount、characterCount、nonWhitespaceCharacterCount、blockCount。不需要挂载编辑器，不修改输入。" },
       { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。" },
       { name: "borderless", type: "boolean", default: "false", description: "只移除编辑器外框，保留内部样式和键盘焦点提示。" },
@@ -3684,7 +3685,7 @@ export default function Demo() {
     name: "Tree",
     description:
       "保持紧凑风格的层级树，支持多选、级联勾选、目录模式、异步加载、拖放事件与虚拟滚动。",
-    importNames: ["Tree", "moveTreeItem"],
+    importNames: ["Tree", "moveTreeItem", "getTreeNodeInfo"],
     code: 'import { useState } from "react";\nimport { Tree, type TreeKey } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  const [checked, setChecked] = useState<TreeKey[]>([]);\n  return <Tree label="资料目录" checkable defaultExpandAll\n    checkedKeys={checked}\n    onCheck={keys => setChecked(Array.isArray(keys) ? keys : keys.checked)}\n    items={[{id:"root",label:"知识库",children:[\n      {id:"notes",label:"工作笔记"},{id:"ideas",label:"灵感"}\n    ]}]} />;\n}',
     props: [
       {
@@ -3905,6 +3906,12 @@ export default function Demo() {
         type: "(info: TreeDropInfo) => void",
         description:
           "info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap 和目标位置。targetParentKey 在根层为 null；targetIndex 是移除拖动节点之后，从 0 开始的目标列表插入位置。应用按结果更新数据，组件不自动移动节点。",
+      },
+      {
+        name: "getTreeNodeInfo（独立导出）",
+        type: "(items: readonly TreeItem[], key: TreeKey) => TreeNodeLocation | undefined",
+        description:
+          "从 @bixlab/mtone 导入的纯查询，不是 Tree 属性。返回 node、parent（根层为 null）、path（根节点到当前节点，包含自身）和 index（同级从 0 计数）。键找不到时返回 undefined。可传 moveTreeItem 返回的新 items 查询排序后的位置；使用 id / label / children 格式。",
       },
       {
         name: "moveTreeItem（独立导出）",

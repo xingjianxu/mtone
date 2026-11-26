@@ -5,6 +5,7 @@ import {
   getBlockEditorStats,
   type BlockEditorBlock,
   type BlockEditorInput,
+  type BlockEditorRef,
 } from "@bixlab/mtone-blockeditor";
 import "@bixlab/mtone-blockeditor/styles.css";
 import flowImage from "./block-editor-image.svg?no-inline";
@@ -23,6 +24,7 @@ const initialContent: readonly BlockEditorInput[] = [
 ];
 
 export default function BlockEditorExample() {
+  const editorRef = React.useRef<BlockEditorRef>(null);
   const [readOnly, setReadOnly] = React.useState(false);
   const [borderless, setBorderless] = React.useState(false);
   const [saved, setSaved] =
@@ -63,6 +65,9 @@ export default function BlockEditorExample() {
         >
           保留当前草稿
         </Button>
+        <Button type="button" disabled={readOnly} onClick={() => editorRef.current?.focus()}>
+          聚焦正文
+        </Button>
         <Dialog
           title="草稿快照"
           trigger={<Button type="button">打开草稿快照</Button>}
@@ -75,6 +80,7 @@ export default function BlockEditorExample() {
         </Dialog>
       </div>
       <BlockEditor
+        ref={editorRef}
         label="发布周记正文"
         initialContent={initialContent}
         onChange={update}

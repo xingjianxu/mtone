@@ -1,6 +1,7 @@
+import { createRef } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeAll, expect, test, vi } from "vitest";
-import { BlockEditor } from "../packages/mtone-blockeditor/src";
+import { BlockEditor, type BlockEditorRef } from "../packages/mtone-blockeditor/src";
 
 beforeAll(() => {
   const viewport = document.createElement("meta");
@@ -50,6 +51,28 @@ test("loads native blocks once per key and switches to read-only without replaci
     "Beta",
   );
   expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
+});
+
+test("public focus handle focuses the current editable document without exposing its editor", async () => {
+  const ref = createRef<BlockEditorRef>();
+  const { rerender } = render(<><button onClick={() => ref.current?.focus()}>Resume</button>
+    <BlockEditor ref={ref} label="Notes" documentKey="a" /></>);
+  const button = screen.getByRole("button", { name: "Resume" });
+  button.focus();
+  fireEvent.click(button);
+  await waitFor(() => expect(screen.getByRole("textbox", { name: "Notes" })).toHaveFocus());
+  expect(Object.keys(ref.current ?? {})).toEqual(["focus"]);
+
+  rerender(<><button onClick={() => ref.current?.focus()}>Resume</button>
+    <BlockEditor ref={ref} label="Notes" documentKey="b" readOnly /></>);
+  button.focus();
+  fireEvent.click(button);
+  expect(button).toHaveFocus();
+
+  rerender(<><button onClick={() => ref.current?.focus()}>Resume</button>
+    <BlockEditor ref={ref} label="Notes" documentKey="b" /></>);
+  fireEvent.click(button);
+  await waitFor(() => expect(screen.getByRole("textbox", { name: "Notes" })).toHaveFocus());
 });
 
 test("can remove just the frame without remounting the editor", () => {
