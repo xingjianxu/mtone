@@ -9,10 +9,11 @@ import { docSections, parseRoute, searchDocs } from "../apps/docs/docs-app";
 const nonStandaloneExports = [
   "cn", "useMtone", "useToast", "getMentions",
   "ShortcutScope", "useShortcut", "formatShortcut", "TooltipProvider",
+  "moveTreeItem", "getTreeNodeInfo",
 ];
 
 describe("documentation", () => {
-  it("covers every component export without counting hooks as components", () => {
+  it("covers every component export without counting supporting APIs as components", () => {
     const names = Object.keys(M).filter(
       (k) => !nonStandaloneExports.includes(k),
     );
@@ -30,6 +31,14 @@ describe("documentation", () => {
     for (const doc of componentDocs) {
       expect(doc.code).toContain(doc.name);
       expect(doc.description.length).toBeGreaterThan(4);
+    }
+  });
+  it("documents the Tree data helpers alongside Tree", () => {
+    const tree = componentDocs.find((doc) => doc.name === "Tree")!;
+    for (const helper of ["moveTreeItem", "getTreeNodeInfo"] as const) {
+      expect(M[helper]).toBeTypeOf("function");
+      expect(tree.importNames).toContain(helper);
+      expect(tree.props.some(({ name }) => name.startsWith(helper))).toBe(true);
     }
   });
   it("handles routes and unknown routes safely", () => {
