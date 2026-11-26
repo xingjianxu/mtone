@@ -23,7 +23,7 @@ The `/mtone/` base is specific to the repository's Pages project site. The build
 
 ## First deployment
 
-In the repository's **Settings → Pages → Build and deployment**, choose **GitHub Actions** as the source. The Documentation workflow runs checks and deploys on each push to `master`; it also supports manual dispatch. It does not update the ChatGPT Site or publish the npm package.
+In the repository's **Settings → Pages → Build and deployment**, choose **GitHub Actions** as the source. The Documentation workflow runs targeted validation on `release-candidate/**`. A push to `master` checks the matching candidate proof, then builds and deploys GitHub Pages without rerunning tests. Manual dispatch can validate a candidate, but it does not deploy Pages from `master`. To retry a deployment, rerun the original `master` push run for the same commit; see the [CI guide](CONTRIBUTING-CI.md#pages-与重试). This workflow does not update the ChatGPT Site or publish npm.
 
 Site target: `https://xingjianxu.github.io/mtone/`. This is the configured target, not proof of a successful deployment. Check the workflow's deployment URL and status after enabling Pages.
 

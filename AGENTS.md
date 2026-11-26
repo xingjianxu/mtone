@@ -1,5 +1,13 @@
 # mtone contributor and agent instructions
 
+## Track work in GitHub Issues
+
+For repository changes, start from an existing issue or open one before editing.
+Set the GitHub Issue Type when the repository supports it. Use an issue-linked
+development branch, record material progress and verification on the issue, and
+close it only after the agreed work is verified and delivered. See the
+[CI and issue guide](docs/CONTRIBUTING-CI.md) for the exact handoff.
+
 ## Keep the AI reference synchronized
 
 Whenever changing a component's public API, exports, defaults, behavior, usage
