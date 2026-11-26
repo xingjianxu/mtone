@@ -3889,6 +3889,13 @@ export default function Demo() {
         default: "false",
       },
       {
+        name: "showDragHandle",
+        type: "boolean",
+        description:
+          "在可拖动节点悬停、键盘聚焦时和拖动预览中显示左侧六点句柄。默认隐藏，不影响整行拖动。需启用 draggable。",
+        default: "false",
+      },
+      {
         name: "allowReparent",
         type: "boolean",
         description:

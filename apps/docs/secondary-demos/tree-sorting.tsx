@@ -22,6 +22,7 @@ const sample: TreeItem[] = [
 
 export default function Demo() {
   const [items, setItems] = React.useState(sample);
+  const [showDragHandle, setShowDragHandle] = React.useState(false);
   const [allowReparent, setAllowReparent] = React.useState(false);
   const [expandedKeys, setExpandedKeys] = React.useState<TreeKey[]>([]);
   return (
@@ -31,10 +32,16 @@ export default function Demo() {
         checked={allowReparent}
         onCheckedChange={setAllowReparent}
       />
+      <Switch
+        label="显示六点拖动句柄"
+        checked={showDragHandle}
+        onCheckedChange={setShowDragHandle}
+      />
       <Tree
         label="拖动调整流程"
         items={items}
         draggable
+        showDragHandle={showDragHandle}
         allowReparent={allowReparent}
         expandedKeys={expandedKeys}
         onExpand={setExpandedKeys}

@@ -2009,6 +2009,7 @@ export default function Demo() {
 - onLoad / onLoadError: (keys, { node }) => void / (error, node) => void. 加载成功或失败回调。失败显示错误提示并允许通过展开控件重试。
 - height / itemHeight / virtual: number / number / boolean (default: — / 32 / true). 正数 height 开启定高滚动；默认虚拟化，只挂载可见附近行。itemHeight 控制所有模式的实际行高，默认 32px，最小 24px，不包含 gap。非正数或非有限值回退到默认值；virtual=false 保留滚动容器但渲染全部节点。
 - draggable: boolean | (node: TreeItem) => boolean (default: false). 启用原生拖放，可按节点决定是否允许拖动。整行预览随鼠标移动，悬停时只绘制落点提示，不移动其他行；有效落下后才过渡到新位置。尊重系统的减少动态效果设置。
+- showDragHandle: boolean (default: false). 在可拖动节点悬停、键盘聚焦时和拖动预览中显示左侧六点句柄。默认隐藏，不影响整行拖动。需启用 draggable。
 - allowReparent: boolean (default: false). 默认只允许同一父节点下排序。开启后，目标行中间可追加为子节点，边缘可插到目标节点前后（允许跨父节点）。isLeaf=true 不接收子节点。有效落点悬停约 450ms 时可展开折叠分支。
 - allowDrop: ({ dragNode, dropNode, dropPosition, targetParentKey, targetIndex }) => boolean. 可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。
 - onDrop: (info: TreeDropInfo) => void. info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap 和目标位置。targetParentKey 在根层为 null；targetIndex 是移除拖动节点之后，从 0 开始的目标列表插入位置。应用按结果更新数据，组件不自动移动节点。

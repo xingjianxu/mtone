@@ -150,6 +150,7 @@ function App() {
           <span id="rich-title-destination" data-testid="rich-title-destination">{guideOpened ? "Opened" : ""}</span>
         </div>
         <Tree label="Animated drag" items={sorting} draggable allowReparent
+          {...(new URLSearchParams(location.search).has("handle") ? { showDragHandle: true } : {})}
           onDrop={({ targetParentKey, targetIndex, dragNode }) => {
             const remaining = sorting.filter((item) => item.id !== dragNode.id);
             const insert = (list: TreeItem[]) => [...list.slice(0, targetIndex), dragNode, ...list.slice(targetIndex)];

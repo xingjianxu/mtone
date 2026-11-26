@@ -236,6 +236,20 @@ test("drop rejects own descendant and reports valid intent without mutating item
   expect(items[0].children).toHaveLength(2);
 });
 
+test("drag handle is opt-in and does not change which rows can drag", () => {
+  const onlyParent = (node: { id: string | number }) => node.id === "p";
+  const { rerender } = render(<Tree items={items} draggable={onlyParent} />);
+  expect(row("Parent")).toHaveAttribute("draggable", "true");
+  expect(row("Parent")).not.toHaveAttribute("data-drag-handle");
+  rerender(<Tree items={items} draggable={onlyParent} showDragHandle />);
+  expect(row("Parent")).toHaveAttribute("draggable", "true");
+  expect(row("Parent")).toHaveAttribute("data-drag-handle");
+  expect(row("Last")).toHaveAttribute("draggable", "false");
+  expect(row("Last")).not.toHaveAttribute("data-drag-handle");
+  rerender(<Tree items={items} draggable={onlyParent} showDragHandle={false} />);
+  expect(row("Parent")).not.toHaveAttribute("data-drag-handle");
+});
+
 test("default dragging keeps nodes under their current parent", () => {
   const onDrop = vi.fn();
   render(<Tree items={items} defaultExpandAll draggable onDrop={onDrop} />);

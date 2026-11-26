@@ -119,8 +119,7 @@
 }
 .mt-tree-item.mt-tree-drop--1::after { inset-block-start: -1px; }
 .mt-tree-item.mt-tree-drop-1::after { inset-block-end: -1px; }
-.mt-tree-item[draggable="true"]::before,
-.mt-tree-item.mt-tree-drag-preview::before {
+.mt-tree-item[data-drag-handle]::before {
   content: "";
   position: absolute;
   inset-inline-start: 1px;
@@ -132,8 +131,7 @@
   background: radial-gradient(circle, currentColor .75px, transparent 1px) 0 0 / 3px 3px;
   opacity: 0;
 }
-.mt-tree-item[draggable="true"]:is(:hover, :focus-visible)::before,
-.mt-tree-item.mt-tree-drag-preview::before { opacity: 1; }
+.mt-tree-item[data-drag-handle]:is(:hover, :focus-visible, .mt-tree-drag-preview)::before { opacity: 1; }
 .mt-tree[data-tree-dragging] > .mt-tree-item > * { pointer-events: none; }
 .mt-tree-item[data-tree-drag-source] {
   background: var(--mt-hover, #f1f1ef);

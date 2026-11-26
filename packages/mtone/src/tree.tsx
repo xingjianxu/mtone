@@ -156,6 +156,8 @@ export interface TreeProps extends Omit<
   itemHeight?: number;
   virtual?: boolean;
   draggable?: boolean | ((node: TreeItem) => boolean);
+  /** Show the six-dot grip on draggable rows and their preview. Defaults to false. */
+  showDragHandle?: boolean;
   /** Allow dropping into nodes and inserting across parents. Defaults to false. */
   allowReparent?: boolean;
   allowDrop?: (info: TreeDropDestination & {
@@ -229,6 +231,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     itemHeight = DEFAULT_TREE_ROW_HEIGHT,
     virtual = true,
     draggable = false,
+    showDragHandle = false,
     allowReparent = false,
     allowDrop,
     onDragStart,
@@ -782,6 +785,8 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
             );
             return !!control && label.contains(control);
           };
+          const canDrag = !isDisabled &&
+            (typeof draggable === "function" ? draggable(node) : draggable);
           // Controls must not become part of the row's accessible name.
           const titleId = rowActions.length && typeof node.label !== "string"
             ? `${treeId}-title-${start + rowIndex}`
@@ -917,10 +922,8 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
                     }
                 }
               }}
-              draggable={
-                !isDisabled &&
-                (typeof draggable === "function" ? draggable(node) : draggable)
-              }
+              draggable={canDrag}
+              data-drag-handle={canDrag && showDragHandle ? "" : undefined}
               onPointerDownCapture={(e) => {
                 pressedActionRow.current = titleControl(e) ? node.id : undefined;
               }}
@@ -929,7 +932,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               onDragStart={(e) => {
                 const row = e.currentTarget;
                 if (pressedActionRow.current === node.id || titleControl(e) ||
-                    isDisabled || !(typeof draggable === "function" ? draggable(node) : draggable)) {
+                    !canDrag) {
                   e.preventDefault();
                   return;
                 }

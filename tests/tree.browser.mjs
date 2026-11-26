@@ -427,10 +427,16 @@ try {
       // keyboard scenarios above. Test them on a fresh document.
       const dragPage = await browser.newPage({ viewport: { width: 900, height: 1000 } });
       dragPage.on("pageerror", (error) => errors.push(error.message));
-      await dragPage.goto("http://127.0.0.1:5217/tests/fixtures/tree.html");
+      await dragPage.goto("http://127.0.0.1:5217/tests/fixtures/tree.html?handle");
       const drag = dragPage.getByRole("tree", { name: "Drag tree", exact: true });
       const dropRow = drag.getByRole("treeitem", { name: "Last", exact: true });
-      await drag.getByRole("treeitem", { name: "Alpha", exact: true }).hover();
+      const hasDragHandle = (row) => row.evaluate((element) => {
+        const grip = getComputedStyle(element, "::before");
+        return grip.content !== "none" && grip.backgroundImage !== "none" && grip.opacity === "1";
+      });
+      const dragRow = drag.getByRole("treeitem", { name: "Alpha", exact: true });
+      await dragRow.hover();
+      assert.equal(await hasDragHandle(dragRow), false, "the draggable row hides its grip by default");
       await drag.getByRole("button", { name: "Drag row action" }).dragTo(dropRow);
       await expect(dragPage.locator("output")).toHaveText("");
       await drag
@@ -447,11 +453,13 @@ try {
       const move = (box, y) => dragPage.mouse.move(box.x + 65, box.y + y, { steps: 4 });
       const preview = dragPage.locator(".mt-tree-drag-preview");
       await move(moving, 16);
+      assert.equal(await hasDragHandle(sortRow("Moving")), true, "opt-in grip is visible on hover");
       await dragPage.mouse.down();
       await move(first, 3);
       await move(first, 3);
       await expect(preview).toBeVisible();
       await expect(preview).toContainText("Moving");
+      assert.equal(await hasDragHandle(preview), true, "opt-in grip appears in the drag preview");
       assert.equal(await preview.evaluate((element) => getComputedStyle(element).opacity), "1");
       await expect(sortRow("First")).toHaveClass(/mt-tree-drop--1/);
       for (const y of [2, 13, 3, 29, 4]) {
@@ -491,6 +499,7 @@ try {
       await moveReduced(targetBox, 3);
       const reducedPreview = reduced.locator(".mt-tree-drag-preview");
       await expect(reducedPreview).toBeVisible();
+      assert.equal(await hasDragHandle(reducedPreview), false, "default drag preview hides the grip");
       assert.equal(await reducedPreview.evaluate((element) => element.getAnimations().length), 0,
         "reduced motion skips pickup animation but still shows drag feedback");
       await moveReduced(sourceBox, 16);
