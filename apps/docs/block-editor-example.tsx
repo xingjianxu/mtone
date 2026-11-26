@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Dialog, Switch } from "@bixlab/mtone";
 import {
   BlockEditor,
+  getBlockEditorStats,
   type BlockEditorBlock,
   type BlockEditorInput,
 } from "@bixlab/mtone-blockeditor";
@@ -28,8 +29,10 @@ export default function BlockEditorExample() {
     React.useState<readonly BlockEditorInput[]>(initialContent);
   const [copy, setCopy] = React.useState(0);
   const draft = React.useRef<readonly BlockEditorInput[]>(initialContent);
+  const [stats, setStats] = React.useState(() => getBlockEditorStats(initialContent));
   const update = (blocks: BlockEditorBlock[]) => {
     draft.current = blocks;
+    setStats(getBlockEditorStats(blocks));
   };
   return (
     <div style={{ inlineSize: "100%", display: "grid", gap: 10 }}>
@@ -78,6 +81,9 @@ export default function BlockEditorExample() {
         readOnly={readOnly}
         borderless={borderless}
       />
+      <output aria-live="off" aria-label="文档统计" style={{ color: "var(--mt-muted)" }}>
+        {stats.wordCount} 字 / 词 · {stats.characterCount} 字符 · {stats.nonWhitespaceCharacterCount} 非空白字符 · {stats.blockCount} 块
+      </output>
     </div>
   );
 }

@@ -80,14 +80,15 @@ const componentReferences: (Omit<ComponentDoc, "category"> & { name: DocumentedC
     name: "BlockEditor",
     packageName: "@bixlab/mtone-blockeditor",
     description: "可选的块编辑器：BlockNote 管理正文与选区，mtone 提供工具栏、菜单和主题。独立于主包。",
-    importNames: ["BlockEditor"],
-    code: `import { BlockEditor, type BlockEditorBlock } from "@bixlab/mtone-blockeditor";
+    importNames: ["BlockEditor", "getBlockEditorStats"],
+    code: `import { BlockEditor, getBlockEditorStats, type BlockEditorBlock } from "@bixlab/mtone-blockeditor";
 import "@bixlab/mtone/styles.css";
 import "@bixlab/mtone-blockeditor/styles.css";
 
 export default function Demo() {
   const save = (blocks: BlockEditorBlock[]) => {
     localStorage.setItem("meeting-draft", JSON.stringify(blocks));
+    console.log(getBlockEditorStats(blocks));
   };
 
   return <BlockEditor
@@ -101,6 +102,7 @@ export default function Demo() {
       { name: "initialContent", type: "readonly BlockEditorInput[]", description: "仅在创建该文档时读取。支持正文、标题、列表、待办、引用、分割线、代码、表格、折叠、提示块、图片、视频、音频和附件。默认空段落。" },
       { name: "documentKey", type: "string | number", description: "换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。" },
       { name: "onChange", type: "(blocks: BlockEditorBlock[]) => void", description: "内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。" },
+      { name: "getBlockEditorStats（独立导出）", type: "(blocks: readonly BlockEditorInput[]) => BlockEditorStats", description: "不是组件属性。可用初始内容或 onChange 返回的块；返回 wordCount、characterCount、nonWhitespaceCharacterCount、blockCount。不需要挂载编辑器，不修改输入。" },
       { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。" },
       { name: "borderless", type: "boolean", default: "false", description: "只移除编辑器外框，保留内部样式和键盘焦点提示。" },
       { name: "fillHeight", type: "boolean", default: "false", description: "开启后填满具有明确高度的父容器；内容超出则自然撑开。父容器高度未确定时仍使用正文 15rem 最小高度。" },
@@ -115,6 +117,7 @@ export default function Demo() {
       "悬停表格时，行列六点手柄可拖动排序，也可点开菜单前后插入或删除；右侧和底部加号分别追加列与行。只读模式不显示这些控件。",
       "视频、音频和附件使用直接 HTTP(S) 地址。图片、视频、音频和附件的说明在悬停或键盘聚焦时以提示气泡显示。视频支持设置宽度百分比；视频使用浏览器控件；音频使用 mtone 播放器，支持进度、音量和倍速，窄栏把音量与倍速收进更多。两者均不自动播放。附件支持自定义显示名称并在新标签页打开。",
       "提供上传回调后可在「上传」和「嵌入链接」之间切换。上传支持选择或拖放单个文件，失败后可以重试。库不提供存储服务；文件大小、类型和权限由宿主服务验证。取消会忽略上传结果，不会停止宿主正在执行的上传。",
+      "统计包含嵌套内容、代码、表格单元格和链接显示文字，不计元数据（如媒体说明和链接地址），不添加块间分隔字符。汉字逐个计字，其他连续字母或数字计一词，词内撇号不拆分，标点与表情不计词。字符按可见字素统计，不支持 Intl.Segmenter 时按 Unicode 码点；块数包含空块、非文本块和子块，表格单元格不单独计块。",
       "原生 JSON 是主存储格式。只读只影响界面。外部内容仍需由应用验证来源、权限以及数据结构。",
     ],
   },
