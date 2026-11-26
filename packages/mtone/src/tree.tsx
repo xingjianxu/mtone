@@ -11,6 +11,7 @@ import { cn, useMtone } from "./basic";
 import { HoverMarquee } from "./hover-marquee";
 import { Checkbox as BCheckbox } from "@base-ui/react/checkbox";
 import { Check, Minus } from "lucide-react";
+import { animateTreeDrop, startTreeDragVisual } from "./tree-drag-visual";
 import type { TreeItem, TreeKey } from "./tree-types";
 import {
   normalizeTree,
@@ -43,7 +44,13 @@ export interface TreeAction {
   /** Defaults to hover; keyboard focus also reveals the control. */
   visibility?: "always" | "hover" | "active";
 }
-export type TreeDropInfo = {
+type TreeDropDestination = {
+  /** Parent of the destination list; null means the root. */
+  targetParentKey: TreeKey | null;
+  /** Zero-based insertion index after removing the dragged node. */
+  targetIndex: number;
+};
+export type TreeDropInfo = TreeDropDestination & {
   event: React.DragEvent;
   node: TreeItem;
   dragNode: TreeItem;
@@ -149,7 +156,9 @@ export interface TreeProps extends Omit<
   itemHeight?: number;
   virtual?: boolean;
   draggable?: boolean | ((node: TreeItem) => boolean);
-  allowDrop?: (info: {
+  /** Allow dropping into nodes and inserting across parents. Defaults to false. */
+  allowReparent?: boolean;
+  allowDrop?: (info: TreeDropDestination & {
     dragNode: TreeItem;
     dropNode: TreeItem;
     dropPosition: -1 | 0 | 1;
@@ -220,6 +229,7 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     itemHeight = DEFAULT_TREE_ROW_HEIGHT,
     virtual = true,
     draggable = false,
+    allowReparent = false,
     allowDrop,
     onDragStart,
     onDragEnd,
@@ -556,37 +566,117 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
     key: TreeKey;
     position: -1 | 0 | 1;
   }>();
-  const dropInfo = (event: React.DragEvent, node: TreeItem) => {
-    const source =
-      dragKey.current !== undefined
-        ? index.get(dragKey.current)?.item
-        : undefined;
-    if (
-      !source ||
-      disabled ||
-      node.disabled ||
-      source.id === node.id ||
-      getTreePath(index, node.id).includes(source.id)
-    )
+  const activeTarget = React.useRef<typeof dropTarget>(undefined);
+  const dragVisual = React.useRef<ReturnType<typeof startTreeDragVisual>>(undefined);
+  const cleanupDrag = React.useRef<(() => void) | undefined>(undefined);
+  const hoverTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const settleFrame = React.useRef(0);
+  const rowAnimations = React.useRef<Animation[]>([]);
+  const latestDropState = React.useRef({ index, openSet, expand, branch });
+  latestDropState.current = { index, openSet, expand, branch };
+
+  const updateDropTarget = (next?: NonNullable<typeof dropTarget>) => {
+    dragVisual.current?.setValid(!!next);
+    const previous = activeTarget.current;
+    if (previous?.key === next?.key && previous?.position === next?.position) return;
+    activeTarget.current = next;
+    setDropTarget(next);
+    clearTimeout(hoverTimer.current);
+    if (next?.position !== 0 || openSet.has(next.key)) return;
+    const item = index.get(next.key)?.item;
+    if (!item || !branch(item)) return;
+    hoverTimer.current = setTimeout(() => {
+      const current = latestDropState.current;
+      const target = current.index.get(next.key)?.item;
+      if (activeTarget.current === next && target && !current.openSet.has(next.key))
+        current.expand(target, true);
+    }, 450);
+  };
+
+  const finishDrag = (accepted: boolean) => {
+    const source = dragKey.current;
+    if (source === undefined) return;
+    dragKey.current = undefined;
+    cleanupDrag.current?.();
+    cleanupDrag.current = undefined;
+    const visual = dragVisual.current;
+    updateDropTarget();
+    visual?.setValid(true);
+    if (!accepted) {
+      visual?.settle(rows.current.get(source));
       return;
-    const rect = event.currentTarget.getBoundingClientRect(),
-      ratio = rect.height ? (event.clientY - rect.top) / rect.height : 0.5,
-      position: -1 | 0 | 1 = ratio < 0.25 ? -1 : ratio > 0.75 ? 1 : 0;
-    if (
-      allowDrop &&
-      !allowDrop({ dragNode: source, dropNode: node, dropPosition: position })
-    )
+    }
+    const before = new Map([...rows.current].map(([key, row]) => [key, row.getBoundingClientRect()]));
+    const view = root.current?.ownerDocument.defaultView;
+    // React commits the consumer's reordered items before the next paint.
+    // Calculate displacement once against that committed layout, never on hover.
+    if (view) {
+      settleFrame.current = view.requestAnimationFrame(() => {
+        settleFrame.current = 0;
+        rowAnimations.current = animateTreeDrop(rows.current, before, source);
+        visual?.settle(rows.current.get(source));
+      });
+    } else visual?.dispose();
+  };
+  React.useEffect(() => () => {
+    clearTimeout(hoverTimer.current);
+    if (settleFrame.current) window.cancelAnimationFrame(settleFrame.current);
+    cleanupDrag.current?.();
+    dragVisual.current?.dispose();
+    rowAnimations.current.forEach((animation) => animation.cancel());
+  }, []);
+
+  const dropIntent = (event: React.DragEvent, node: TreeItem, row = event.currentTarget) => {
+    const source = dragKey.current === undefined ? undefined : index.get(dragKey.current);
+    const target = index.get(node.id);
+    if (!source || !target || disabled || source.item.disabled || node.disabled ||
+        getTreePath(index, node.id).includes(source.item.id)) return;
+    const rect = row.getBoundingClientRect();
+    const ratio = rect.height ? (event.clientY - rect.top) / rect.height : 0.5;
+    const position: -1 | 0 | 1 =
+      allowReparent && node.isLeaf !== true && ratio >= .25 && ratio <= .75 ? 0 :
+        ratio < .5 ? -1 : 1;
+    const parent = position === 0 ? node.id : target.parent;
+    if ((!allowReparent && parent !== source.parent) ||
+        (parent !== undefined && index.get(parent)?.item.disabled)) return;
+    const unadjusted = position === 0
+      ? node.children?.length ?? 0
+      : target.posInSet - 1 + (position === 1 ? 1 : 0);
+    const targetIndex = unadjusted - Number(source.parent === parent && source.posInSet - 1 < unadjusted);
+    const destination = { targetParentKey: parent ?? null, targetIndex };
+    if (allowDrop && !allowDrop({ ...destination, dragNode: source.item, dropNode: node, dropPosition: position }))
       return;
-    return {
+    return { ...destination, dragNode: source.item, dropPosition: position };
+  };
+
+  const acceptDrop = (event: React.DragEvent, node: TreeItem, row?: HTMLDivElement) => {
+    const info = dropIntent(event, node, row);
+    finishDrag(!!info);
+    if (!info) return;
+    event.preventDefault();
+    onDrop?.({
+      ...info,
       event,
       node,
-      dragNode: source,
-      dragNodesKeys: [...index.keys()].filter((k) =>
-        getTreePath(index, k).includes(source.id),
-      ),
-      dropPosition: position,
-      dropToGap: position !== 0,
-    };
+      dragNodesKeys: [...index.keys()].filter((key) => getTreePath(index, key).includes(info.dragNode.id)),
+      dropToGap: info.dropPosition !== 0,
+    });
+  };
+
+  // The configured gap is not a treeitem. Resolve it without enlarging any
+  // row's hit box, so nested controls and pointer focus keep the same geometry.
+  const gapTarget = (event: React.DragEvent) => {
+    if (event.target !== event.currentTarget || !rowGap || dragKey.current === undefined)
+      return;
+    for (const [key, row] of rows.current) {
+      const box = row.getBoundingClientRect();
+      if (event.clientY < box.top && event.clientY >= box.top - rowGap &&
+          event.clientX >= box.left && event.clientX <= box.right &&
+          row.previousElementSibling?.classList.contains("mt-tree-item")) {
+        const node = index.get(key)?.item;
+        if (node) return { node, row };
+      }
+    }
   };
   return (
     <div
@@ -629,6 +719,23 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
         onScroll?.(e);
       }}
       onKeyDown={onKeyDown}
+      onDragOver={(event) => {
+        const hit = gapTarget(event);
+        if (!hit) {
+          if (event.target === event.currentTarget) updateDropTarget();
+          return;
+        }
+        const info = dropIntent(event, hit.node, hit.row);
+        if (info) {
+          event.preventDefault();
+          if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+        }
+        updateDropTarget(info ? { key: hit.node.id, position: info.dropPosition } : undefined);
+      }}
+      onDrop={(event) => {
+        const hit = gapTarget(event);
+        if (hit) acceptDrop(event, hit.node, hit.row);
+      }}
     >
       {isVirtual && <div aria-hidden style={{ height: start * rowStride }} />}
       {visible
@@ -718,7 +825,8 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               data-match={filterTreeNode?.(node) || undefined}
               style={{
                 paddingInlineStart: 8 + (level - 1) * levelIndent,
-              }}
+                "--_mt-tree-drop-indent": `${(level - 1) * levelIndent}px`,
+              } as React.CSSProperties}
               onFocus={() => setActive(node.id)}
               onClick={(e) => {
                 if (isDisabled || titleControl(e)) return;
@@ -819,56 +927,82 @@ export const Tree = React.forwardRef<TreeRef, TreeProps>(function Tree(
               onPointerUpCapture={() => { pressedActionRow.current = undefined; }}
               onPointerCancelCapture={() => { pressedActionRow.current = undefined; }}
               onDragStart={(e) => {
-                if (
-                  // When a pointer drags a button, the native dragstart target
-                  // can be the draggable ancestor rather than that button.
-                  pressedActionRow.current === node.id ||
-                  isDisabled ||
-                  !(typeof draggable === "function"
-                    ? draggable(node)
-                    : draggable)
-                ) {
+                const row = e.currentTarget;
+                if (pressedActionRow.current === node.id || titleControl(e) ||
+                    isDisabled || !(typeof draggable === "function" ? draggable(node) : draggable)) {
                   e.preventDefault();
                   return;
                 }
-                dragKey.current = node.id;
                 e.dataTransfer?.setData("text/plain", String(node.id));
                 onDragStart?.({ event: e, node });
+                if (e.defaultPrevented) return;
+                if (settleFrame.current) {
+                  row.ownerDocument.defaultView?.cancelAnimationFrame(settleFrame.current);
+                  settleFrame.current = 0;
+                }
+                cleanupDrag.current?.();
+                dragVisual.current?.dispose();
+                rowAnimations.current.forEach((animation) => animation.cancel());
+                dragKey.current = node.id;
+                dragVisual.current = startTreeDragVisual(row, e.nativeEvent);
+
+                const dragRoot = root.current;
+                dragRoot?.setAttribute("data-tree-dragging", "");
+                const doc = row.ownerDocument;
+                const handleOutside = (event: DragEvent) => {
+                  if (!(event.target instanceof Node) || !root.current?.contains(event.target))
+                    updateDropTarget();
+                };
+                const handleEnd = () => finishDrag(false);
+                const handleDocumentDrop = () => {
+                  // Let the row handler claim a valid drop before cancelling.
+                  setTimeout(() => {
+                    if (cleanupDrag.current === cleanup) handleEnd();
+                  }, 0);
+                };
+                const handleEscape = (event: KeyboardEvent) => {
+                  if (event.key === "Escape") finishDrag(false);
+                };
+                doc.addEventListener("dragover", handleOutside, true);
+                doc.addEventListener("dragend", handleEnd, true);
+                doc.addEventListener("drop", handleDocumentDrop, true);
+                doc.addEventListener("keydown", handleEscape, true);
+                const cleanup = () => {
+                  dragRoot?.removeAttribute("data-tree-dragging");
+                  doc.removeEventListener("dragover", handleOutside, true);
+                  doc.removeEventListener("dragend", handleEnd, true);
+                  doc.removeEventListener("drop", handleDocumentDrop, true);
+                  doc.removeEventListener("keydown", handleEscape, true);
+                };
+                cleanupDrag.current = cleanup;
               }}
               onDragEnd={(e) => {
-                dragKey.current = undefined;
-                setDropTarget(undefined);
+                finishDrag(false);
                 onDragEnd?.({ event: e, node });
               }}
               onDragEnter={(e) => {
-                const info = dropInfo(e, node);
+                const info = dropIntent(e, node);
+                updateDropTarget(info ? { key: node.id, position: info.dropPosition } : undefined);
                 if (info) {
                   e.preventDefault();
-                  setDropTarget({ key: node.id, position: info.dropPosition });
                   onDragEnter?.({ event: e, node, expandedKeys: openKeys });
                 }
               }}
               onDragOver={(e) => {
-                const info = dropInfo(e, node);
+                const info = dropIntent(e, node);
+                updateDropTarget(info ? { key: node.id, position: info.dropPosition } : undefined);
                 if (info) {
                   e.preventDefault();
-                  setDropTarget({ key: node.id, position: info.dropPosition });
+                  if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
                   onDragOver?.({ event: e, node });
-                } else setDropTarget(undefined);
-              }}
-              onDragLeave={(e) => {
-                setDropTarget(undefined);
-                onDragLeave?.({ event: e, node });
-              }}
-              onDrop={(e) => {
-                const info = dropInfo(e, node);
-                setDropTarget(undefined);
-                dragKey.current = undefined;
-                if (info) {
-                  e.preventDefault();
-                  onDrop?.(info);
                 }
               }}
+              onDragLeave={(e) => {
+                if (e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget)) return;
+                if (activeTarget.current?.key === node.id) updateDropTarget();
+                onDragLeave?.({ event: e, node });
+              }}
+              onDrop={(e) => acceptDrop(e, node)}
             >
               {showLine &&
                 level > 1 &&

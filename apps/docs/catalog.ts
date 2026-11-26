@@ -3881,12 +3881,19 @@ export default function Demo() {
       {
         name: "draggable",
         type: "boolean | (node: TreeItem) => boolean",
-        description: "启用 HTML 原生拖放，可按节点决定是否允许拖动。",
+        description: "启用原生拖放，可按节点决定是否允许拖动。整行预览随鼠标移动，悬停时只绘制落点提示，不移动其他行；有效落下后才过渡到新位置。尊重系统的减少动态效果设置。",
+        default: "false",
+      },
+      {
+        name: "allowReparent",
+        type: "boolean",
+        description:
+          "默认只允许同一父节点下排序。开启后，目标行中间可追加为子节点，边缘可插到目标节点前后（允许跨父节点）。isLeaf=true 不接收子节点。有效落点悬停约 450ms 时可展开折叠分支。",
         default: "false",
       },
       {
         name: "allowDrop",
-        type: "({ dragNode, dropNode, dropPosition }) => boolean",
+        type: "({ dragNode, dropNode, dropPosition, targetParentKey, targetIndex }) => boolean",
         description:
           "可限制落点。dropPosition=-1 / 0 / 1 分别表示目标前 / 内 / 后；自身及后代始终禁止。",
       },
@@ -3894,7 +3901,7 @@ export default function Demo() {
         name: "onDrop",
         type: "(info: TreeDropInfo) => void",
         description:
-          "info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap。应用按结果更新数据，组件不自动移动节点。",
+          "info 含 event、node、dragNode、dragNodesKeys、dropPosition、dropToGap 和目标位置。targetParentKey 在根层为 null；targetIndex 是移除拖动节点之后，从 0 开始的目标列表插入位置。应用按结果更新数据，组件不自动移动节点。",
       },
       {
         name: "onDragStart / onDragEnd / onDragOver / onDragLeave",
@@ -3905,7 +3912,7 @@ export default function Demo() {
         name: "onDragEnter",
         type: "({ event, node, expandedKeys }) => void",
         description:
-          "有效目标进入回调，可由应用结合受控展开键实现悬停展开；组件不自动延时展开。",
+          "有效目标进入回调。allowReparent 下悬停展开仍遵循 expandedKeys / onExpand 的受控约定。",
       },
       {
         name: "onRightClick / onDoubleClick",

@@ -14,6 +14,11 @@ function App() {
   const [items, setItems] = React.useState<TreeItem[]>([
     { id: "async", label: "Async", isLeaf: false },
   ]);
+  const [sorting, setSorting] = React.useState<TreeItem[]>([
+    { id: "first", label: "First" },
+    { id: "folder", label: "Folder", children: [{ id: "child", label: "Child" }] },
+    { id: "moving", label: "Moving" },
+  ]);
   const [drop, setDrop] = React.useState("");
   const [guideOpened, setGuideOpened] = React.useState(false);
   const ref = React.useRef<TreeRef>(null);
@@ -69,12 +74,21 @@ function App() {
           items={basic}
           defaultExpandAll
           draggable
+          allowReparent
           actions={({ node }) => node.id === "a" ? {
             content: <Button type="button" size="sm" variant="ghost">Drag row action</Button>,
           } : undefined}
           onDrop={(info) => setDrop(`${info.dragNode.id}:${info.node.id}`)}
         />
         <output>{drop}</output>
+        <Tree label="Animated drag" items={sorting} draggable allowReparent
+          onDrop={({ targetParentKey, targetIndex, dragNode }) => {
+            const remaining = sorting.filter((item) => item.id !== dragNode.id);
+            const insert = (list: TreeItem[]) => [...list.slice(0, targetIndex), dragNode, ...list.slice(targetIndex)];
+            setSorting(targetParentKey === null ? insert(remaining) : remaining.map((item) =>
+              item.id === targetParentKey ? { ...item, children: insert(item.children ?? []) } : item));
+          }}
+        />
         <Button
           onClick={() => ref.current?.scrollTo({ key: "900", align: "top" })}
         >

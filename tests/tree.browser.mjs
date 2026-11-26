@@ -206,6 +206,55 @@ try {
         .getByRole("treeitem", { name: "Alpha", exact: true })
         .dragTo(drag.getByRole("treeitem", { name: "Last", exact: true }));
       await expect(page.locator("output")).toHaveText("a:z");
+      await expect(page.locator(".mt-tree-drag-preview")).toHaveCount(0);
+      const sort = page.getByRole("tree", { name: "Animated drag", exact: true });
+      const sortRow = (name) => sort.getByRole("treeitem", { name, exact: true });
+      await sort.scrollIntoViewIfNeeded();
+      const moving = await sortRow("Moving").boundingBox();
+      const first = await sortRow("First").boundingBox();
+      let folder = await sortRow("Folder").boundingBox();
+      const move = (box, y) => page.mouse.move(box.x + 65, box.y + y, { steps: 4 });
+      const preview = page.locator(".mt-tree-drag-preview");
+      await move(moving, 16);
+      await page.mouse.down();
+      await move(first, 3);
+      await move(first, 3);
+      await expect(preview).toBeVisible();
+      await expect(preview).toContainText("Moving");
+      assert.equal(await preview.evaluate((element) => getComputedStyle(element).opacity), "1");
+      await expect(sortRow("First")).toHaveClass(/mt-tree-drop--1/);
+      for (const y of [2, 13, 3, 29, 4]) {
+        await move(first, y);
+        assert.equal((await sortRow("Folder").boundingBox()).y, folder.y, "unrelated row stays still on hover");
+        assert.equal((await sortRow("First").boundingBox()).y, first.y, "indicator never shifts the target row");
+      }
+      await move(folder, 16);
+      await move(folder, 16);
+      await expect(sortRow("Folder")).toHaveAttribute("aria-expanded", "true");
+      const child = await sortRow("Child").boundingBox();
+      await move(child, -1);
+      await move(child, -1);
+      await expect(sortRow("Child")).toHaveClass(/mt-tree-drop--1/);
+      await page.mouse.up();
+      await expect(sortRow("Moving")).toHaveAttribute("aria-level", "2");
+      await expect(sortRow("Moving")).toHaveAttribute("aria-posinset", "1");
+      await expect(preview).toHaveCount(0);
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      const nested = await sortRow("Moving").boundingBox();
+      await move(nested, 16);
+      await page.mouse.down();
+      await move(first, 3);
+      await move(first, 3);
+      await expect(preview).toBeVisible();
+      assert.equal(await preview.evaluate((element) => element.getAnimations().length), 0,
+        "reduced motion skips pickup animation but still shows drag feedback");
+      await move(nested, 16);
+      await move(nested, 16);
+      await expect(preview.locator(".mt-tree-drag-invalid")).toBeVisible();
+      await page.mouse.up();
+      await expect(preview).toHaveCount(0);
+      await expect(sortRow("Moving")).toHaveAttribute("aria-level", "2");
+      await page.emulateMedia({ reducedMotion: "no-preference" });
       const sidebar = page.getByRole("complementary", { name: "文档导航侧栏" });
       const docs = sidebar.getByRole("tree", { name: "文档目录" });
       const guide = docs.getByRole("treeitem", { name: "使用指南", exact: true });
