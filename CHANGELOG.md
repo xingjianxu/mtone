@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+- Enable the new `PageLayout` bordered layout by default. It features a full-height sidebar, single shared borders, and both full-width and main-column headers. Use `bordered={false}` for the previous unframed layout.
+- Keep borders aligned in narrow stacked layouts, with a resizable sidebar, and around empty Tabs panels.
+
 ## 1.1.0
 
 - Name the unchanged built-in design Original (原调) and add theme presets with shared and mode-specific tokens for Provider and Scope.

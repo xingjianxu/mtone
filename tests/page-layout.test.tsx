@@ -119,8 +119,11 @@ test.each(["full", "header", "main"] as const)("empty sidebar preserves the orig
       Rows
     </Mtone.PageLayout>,
   );
-  expect([...container.firstElementChild!.children].map((child) => child.className))
-    .toEqual(["mt-page-layout-header", "mt-page-layout-tabs", "mt-page-layout-body"]);
+  const slots = [...container.firstElementChild!.children];
+  expect(slots).toHaveLength(3);
+  expect(slots[0]).toHaveClass("mt-page-layout-header");
+  expect(slots[1]).toHaveClass("mt-page-layout-tabs");
+  expect(slots[2]).toHaveClass("mt-page-layout-body");
 });
 
 test("renders a full-width header with a sidebar and no empty tabs slot", () => {
@@ -170,7 +173,7 @@ test.each(["header", "main"] as const)(
   (headerSpan) => {
     const ref = React.createRef<HTMLDivElement>();
     const { rerender } = render(
-      <Mtone.PageLayout ref={ref} title="Page" bordered headerSpan={headerSpan}
+      <Mtone.PageLayout ref={ref} title="Page" headerSpan={headerSpan}
         topbar={<Mtone.Topbar as="div">Path</Mtone.Topbar>}
         tabs={<button>Tabs</button>} sidebar={<Mtone.Sidebar>Links</Mtone.Sidebar>}>
         Content
@@ -181,7 +184,7 @@ test.each(["header", "main"] as const)(
     const header = ref.current?.querySelector(".mt-page-layout-header");
     expect(header?.closest(".mt-page-layout-main") !== null).toBe(headerSpan === "main");
     expect(header).toHaveTextContent("PathPage");
-    rerender(<Mtone.PageLayout ref={ref} title="Page" />);
+    rerender(<Mtone.PageLayout ref={ref} title="Page" bordered={false} />);
     expect(ref.current).not.toHaveClass("mt-page-layout-bordered");
   },
 );

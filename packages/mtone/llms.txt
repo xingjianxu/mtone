@@ -2,7 +2,7 @@
 
 > Ready-styled React UI library built on Base UI, Tailwind CSS and Lucide icons. Install one package, not individual copied components.
 
-This file describes this package checkout, not necessarily the latest published npm release. Package version: 1.1.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
+This file describes this package checkout, not necessarily the latest published npm release. Package version: 1.2.0. Prefer the llms.txt and dist/index.d.ts bundled with your installed version over the live website, which follows master.
 
 ## Setup
 
@@ -1037,7 +1037,7 @@ export default function App() {
 - [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): 组织单页标题、操作、标签页和正文，可添加页面顶栏与侧栏，也可限制整页宽度并在父容器内居中。
 - Import: PageLayout from @bixlab/mtone
 - title: ReactNode. 必填标题，渲染在语义标题元素中。
-- bordered: boolean (default: false). 开启边框布局。外框和相邻区域共用细分隔线；分栏时侧栏撑满剩余列高，窄容器仍上下堆叠。没有可用高度的父容器时，随正文自然增长。
+- bordered: boolean (default: true). 默认使用边框布局，可设为 false 恢复无框布局。外框和相邻区域共用细分隔线；分栏时侧栏撑满剩余列高，窄容器仍上下堆叠。没有可用高度的父容器时，随正文自然增长。
 - topbar: ReactNode. 标题上方的可选顶栏。可传入 Topbar（页面内建议 as="div"）或自定义内容；随 headerSpan 对齐，省略时不占空间。
 - headingLevel: 1 | 2 | 3 | 4 | 5 | 6 (default: 1). 标题级别；嵌入时按页面结构调整。
 - subtitle: ReactNode. 标题下方的简短补充。

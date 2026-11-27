@@ -67,7 +67,7 @@ function SidebarFixture() {
         ["right-header", { sidebarPosition: "right", headerSpan: "header" }],
         ["left-header-no-tabs", { headerSpan: "header" }],
       ] as const).map(([id, options]) => (
-        <PageLayout {...options} key={id}
+        <PageLayout {...options} bordered={false} key={id}
           data-testid={id}
           maxWidth={840}
           style={id.startsWith("right") ? { "--mt-page-layout-sidebar-width": "200px" } as React.CSSProperties : undefined}
@@ -91,6 +91,7 @@ function AdminContentFixture() {
   const sidebar = !query.has("no-sidebar");
   const layout = (
     <PageLayout
+      bordered={false}
       data-testid="fill-page"
       title="Project overview"
       tabs={<Tabs items={[{ value: "today", label: "Today", content: "Daily activity" }]} />}
@@ -156,7 +157,6 @@ function BorderedFixture() {
         <div key={headerSpan} style={{ width: narrow ? 355 : 840, height: 420, maxWidth: "100%" }}>
           <PageLayout
             data-testid={`frame-${headerSpan}`}
-            bordered
             headerSpan={headerSpan}
             sidebarPosition={query.has("right") ? "right" : "left"}
             sidebarResize={query.has("resize")}

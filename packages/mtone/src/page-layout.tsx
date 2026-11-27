@@ -7,7 +7,7 @@ import { layoutWidths, type LayoutWidthPreset } from "./layout-widths";
 export interface PageLayoutProps
   extends Omit<React.ComponentPropsWithRef<"div">, "title"> {
   title: React.ReactNode;
-  /** Frame the page and separate slots with shared edges; stretch the sidebar with its column. */
+  /** Frame the page and stretch the sidebar with its column. Defaults to true. */
   bordered?: boolean;
   /** Optional page-local bar above the title; follows headerSpan. */
   topbar?: React.ReactNode;
@@ -40,7 +40,7 @@ function hasContent(node: React.ReactNode): boolean {
 }
 
 export function PageLayout({
-  title, bordered = false, topbar, subtitle, icon, actions, description, extra, tabs, children,
+  title, bordered = true, topbar, subtitle, icon, actions, description, extra, tabs, children,
   sidebar, sidebarPosition = "left", sidebarResize, headerSpan = "full",
   headingLevel = 1, maxWidth, className, style, ...rootProps
 }: PageLayoutProps) {
