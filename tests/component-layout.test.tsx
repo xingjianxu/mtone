@@ -186,3 +186,29 @@ test("redirects the former Panel tab placement section to the combined IDE examp
     kind: "component", name: "Panel", section: "ide",
   });
 });
+
+test("PageLayout puts the combined playground first and reuses the old topbar deep link", ({ onTestFinished }) => {
+  if (!window.PointerEvent) {
+    vi.stubGlobal("PointerEvent", window.MouseEvent);
+    onTestFinished(() => { vi.unstubAllGlobals(); });
+  }
+  window.location.hash = "#/components/PageLayout?section=topbar";
+  render(<DocsApp />);
+  expect(docSections.PageLayout[0]).toMatchObject({ id: "sidebar", title: "布局配置" });
+  expect(parseRoute(window.location.hash)).toEqual({ kind: "component", name: "PageLayout", section: "sidebar" });
+  expect(docSections.PageLayout.some(({ id }) => id === "topbar")).toBe(false);
+  const section = within(document.getElementById("sidebar")!.parentElement!);
+  const topbar = section.getByRole("switch", { name: "顶栏" });
+  expect(topbar).toBeChecked();
+  fireEvent.click(topbar);
+  expect(section.queryByRole("button", { name: "标记已审阅" })).not.toBeInTheDocument();
+  fireEvent.click(section.getByRole("switch", { name: "标签页" }));
+  expect(section.queryByRole("tablist")).not.toBeInTheDocument();
+  fireEvent.click(section.getByRole("switch", { name: "侧栏" }));
+  expect(section.queryByRole("complementary", { name: "资料分类" })).not.toBeInTheDocument();
+  expect(section.getByRole("button", { name: "侧栏：左侧" })).toBeDisabled();
+  fireEvent.click(section.getByRole("button", { name: "恢复默认" }));
+  expect(topbar).toBeChecked();
+  expect(section.getByRole("tablist")).toBeInTheDocument();
+  expect(section.getByRole("complementary", { name: "资料分类" })).toBeInTheDocument();
+});

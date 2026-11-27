@@ -35,6 +35,8 @@ export type Route =
   | { kind: "gallery" | "showcase" | "start" | "theme" | "color-presets" | "not-found" }
   | { kind: "component"; name: string; section?: string };
 export function parseRoute(hash: string): Route {
+  if (hash === "#/components/PageLayout?section=topbar")
+    return { kind: "component", name: "PageLayout", section: "sidebar" };
   if (hash === "#/components/Panel?section=tab-placement")
     return { kind: "component", name: "Panel", section: "ide" };
   const typography = hash.match(/^#\/components\/Typography\?section=([A-Za-z]+)$/);

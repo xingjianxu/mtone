@@ -25,7 +25,7 @@ try {
     await page.setViewportSize({ width: viewport, height: 800 });
     url.searchParams.set("viewport", String(viewport));
     await page.goto(url.href);
-    const topbarHeading = page.getByRole("heading", { name: "交付记录", exact: true, level: 3 });
+    const topbarHeading = page.getByRole("heading", { name: "项目资料库", exact: true, level: 3 });
     const topbarStage = page.locator(".component-demo-stage").filter({ has: topbarHeading });
     await expect(topbarHeading).toBeVisible();
     const topbar = topbarStage.locator(".mt-page-layout-topbar");
@@ -36,6 +36,29 @@ try {
     assert(Math.abs(barBox.width - headerBox.width) < 1);
     await topbar.getByRole("button", { name: "标记已审阅" }).click();
     await expect(topbar.getByText("已审阅", { exact: true })).toBeVisible();
+    const topbarSwitch = topbarStage.getByRole("switch", { name: "顶栏" });
+    await topbarSwitch.click();
+    await expect(topbar).toHaveCount(0);
+    await topbarSwitch.click();
+    await expect(topbar.getByText("已审阅", { exact: true })).toBeVisible();
+    await topbarStage.getByRole("switch", { name: "标签页" }).click();
+    await expect(topbarStage.getByRole("tablist")).toHaveCount(0);
+    await topbarStage.getByRole("switch", { name: "侧栏", exact: true }).click();
+    await expect(topbarStage.getByRole("complementary", { name: "资料分类" })).toHaveCount(0);
+    await expect(topbarStage.getByRole("button", { name: "侧栏：左侧" })).toBeDisabled();
+    await topbarStage.getByRole("switch", { name: "页头操作" }).click();
+    await expect(topbarStage.getByRole("button", { name: "新建资料" })).toHaveCount(0);
+    await topbarStage.getByRole("switch", { name: "页头详情" }).click();
+    await expect(topbarStage.getByText("本周更新", { exact: true })).toHaveCount(0);
+    await topbarStage.getByRole("combobox", { name: "布局宽度" }).click();
+    await page.getByRole("option", { name: "限宽 720px" }).click();
+    assert.equal(
+      await topbarStage.locator(".mt-page-layout").evaluate((layout) => layout.style.getPropertyValue("--mt-page-layout-max-width")),
+      "720px",
+    );
+    await topbarStage.getByRole("button", { name: "恢复默认" }).click();
+    await expect(topbarStage.getByRole("tablist")).toBeVisible();
+    await expect(topbarStage.getByRole("complementary", { name: "资料分类" })).toBeVisible();
 
     const heading = page.getByRole("heading", {
       name: "跨部门协同与项目交付记录",

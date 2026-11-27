@@ -9,8 +9,6 @@ import ContainerUsage from "./secondary-demos/container-usage";
 import ContainerUsageSource from "./secondary-demos/container-usage.tsx?raw";
 import ContainerPresets from "./secondary-demos/container-presets";
 import ContainerPresetsSource from "./secondary-demos/container-presets.tsx?raw";
-import PageLayoutTopbar from "./secondary-demos/page-layout-topbar";
-import PageLayoutTopbarSource from "./secondary-demos/page-layout-topbar.tsx?raw";
 import PageLayoutUsage from "./secondary-demos/page-layout-usage";
 import PageLayoutUsageSource from "./secondary-demos/page-layout-usage.tsx?raw";
 import PageLayoutComposed from "./secondary-demos/page-layout-composed";
@@ -420,10 +418,9 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
     { id: "width-presets", title: "宽度预设", Demo: ContainerPresets, source: source(ContainerPresetsSource) },
   ],
   PageLayout: [
+    { id: "sidebar", title: "布局配置", Demo: PageLayoutSidebar, source: source(PageLayoutSidebarSource) },
     { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },
-    { id: "topbar", title: "标题上方的顶栏", Demo: PageLayoutTopbar, source: source(PageLayoutTopbarSource) },
     { id: "actions-and-tabs", title: "居中限宽、操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
-    { id: "sidebar", title: "页面侧栏与页头跨度", Demo: PageLayoutSidebar, source: source(PageLayoutSidebarSource) },
     { id: "sidebar-resize", title: "拖拽调整页面侧栏", Demo: PageLayoutSidebarResize, source: source(PageLayoutSidebarResizeSource) },
     { id: "admin-layout", title: "撑满应用主内容区", Demo: PageLayoutAdmin, source: source(PageLayoutAdminSource) },
   ],
