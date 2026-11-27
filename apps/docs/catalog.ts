@@ -2299,11 +2299,12 @@ export default function Demo() {
   },
   {
     name: "PageLayout",
-    description: "组织单页标题、操作、标签页和正文，可添加页面侧栏，也可限制整页宽度并在父容器内居中。",
+    description: "组织单页标题、操作、标签页和正文，可添加页面顶栏与侧栏，也可限制整页宽度并在父容器内居中。",
     importNames: ["PageLayout"],
     code: 'import { PageLayout } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <PageLayout title="项目总览" maxWidth="md">本周有 3 项任务待处理。</PageLayout>;\n}',
     props: [
       { name: "title", type: "ReactNode", description: "必填标题，渲染在语义标题元素中。" },
+      { name: "topbar", type: "ReactNode", description: "标题上方的可选顶栏。可传入 Topbar（页面内建议 as=\"div\"）或自定义内容；随 headerSpan 对齐，省略时不占空间。" },
       { name: "headingLevel", type: "1 | 2 | 3 | 4 | 5 | 6", default: "1", description: "标题级别；嵌入时按页面结构调整。" },
       { name: "subtitle", type: "ReactNode", description: "标题下方的简短补充。" },
       { name: "icon", type: "ReactNode", description: "标题前的图标。" },
@@ -2314,7 +2315,7 @@ export default function Demo() {
       { name: "sidebar", type: "ReactNode", description: "页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。" },
       { name: "sidebarPosition", type: '"left" | "right"', default: '"left"', description: "侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。" },
       { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度；separatorBordered 可为手柄两侧加边线。" },
-      { name: "headerSpan", type: '"full" | "header" | "main"', default: '"full"', description: "full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。" },
+      { name: "headerSpan", type: '"full" | "header" | "main"', default: '"full"', description: "full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含顶栏、标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。" },
       { name: "maxWidth", type: '"sm" | "md" | "lg" | "xl" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
       { name: "children", type: "ReactNode", description: "正文。" },
       { name: "HTML div 属性", type: 'Omit<ComponentPropsWithRef<"div">, "title">', description: "className、style、ref 等传给根元素。" },

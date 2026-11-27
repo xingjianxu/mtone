@@ -7,6 +7,8 @@ import { layoutWidths, type LayoutWidthPreset } from "./layout-widths";
 export interface PageLayoutProps
   extends Omit<React.ComponentPropsWithRef<"div">, "title"> {
   title: React.ReactNode;
+  /** Optional page-local bar above the title; follows headerSpan. */
+  topbar?: React.ReactNode;
   subtitle?: React.ReactNode;
   icon?: React.ReactNode;
   actions?: React.ReactNode;
@@ -36,7 +38,7 @@ function hasContent(node: React.ReactNode): boolean {
 }
 
 export function PageLayout({
-  title, subtitle, icon, actions, description, extra, tabs, children,
+  title, topbar, subtitle, icon, actions, description, extra, tabs, children,
   sidebar, sidebarPosition = "left", sidebarResize, headerSpan = "full",
   headingLevel = 1, maxWidth, className, style, ...rootProps
 }: PageLayoutProps) {
@@ -59,6 +61,7 @@ export function PageLayout({
     : style;
   const header = (
     <div className="mt-page-layout-header">
+      {hasContent(topbar) && <div className="mt-page-layout-topbar">{topbar}</div>}
       <div className="mt-page-layout-row">
         {hasContent(icon) && <div className="mt-page-layout-icon">{icon}</div>}
         <div className="mt-page-layout-heading">

@@ -25,6 +25,18 @@ try {
     await page.setViewportSize({ width: viewport, height: 800 });
     url.searchParams.set("viewport", String(viewport));
     await page.goto(url.href);
+    const topbarHeading = page.getByRole("heading", { name: "交付记录", exact: true, level: 3 });
+    const topbarStage = page.locator(".component-demo-stage").filter({ has: topbarHeading });
+    await expect(topbarHeading).toBeVisible();
+    const topbar = topbarStage.locator(".mt-page-layout-topbar");
+    const titleBox = await topbarHeading.boundingBox();
+    const barBox = await topbar.boundingBox();
+    const headerBox = await topbarStage.locator(".mt-page-layout-header").boundingBox();
+    assert(titleBox && barBox && headerBox && barBox.y + barBox.height < titleBox.y);
+    assert(Math.abs(barBox.width - headerBox.width) < 1);
+    await topbar.getByRole("button", { name: "标记已审阅" }).click();
+    await expect(topbar.getByText("已审阅", { exact: true })).toBeVisible();
+
     const heading = page.getByRole("heading", {
       name: "跨部门协同与项目交付记录",
       exact: true,

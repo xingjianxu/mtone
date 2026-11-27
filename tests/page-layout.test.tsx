@@ -132,3 +132,35 @@ test("renders a full-width header with a sidebar and no empty tabs slot", () => 
   expect(container.firstElementChild?.textContent).toBe("ProjectFiltersRows");
   expect(container.querySelector(".mt-page-layout-tabs")).not.toBeInTheDocument();
 });
+
+test.each(["full", "header", "main"] as const)(
+  "renders the optional topbar before the title in the same header region (%s)",
+  (headerSpan) => {
+    const onAction = vi.fn();
+    const { container, rerender } = render(
+      <Mtone.PageLayout
+        title="Project details"
+        headerSpan={headerSpan}
+        topbar={<Mtone.Topbar as="div" extra={<button onClick={onAction}>Review</button>}>Project path</Mtone.Topbar>}
+        sidebar={<Mtone.Sidebar>Navigation</Mtone.Sidebar>}
+        tabs={<button>Activity</button>}
+      >
+        Project content
+      </Mtone.PageLayout>,
+    );
+    const root = container.firstElementChild!;
+    const header = root.querySelector(".mt-page-layout-header")!;
+    const topbar = header.querySelector<HTMLElement>(".mt-topbar")!;
+    expect(header.firstElementChild).toContainElement(topbar);
+    expect(topbar).toHaveTextContent("Project path");
+    expect(topbar.compareDocumentPosition(screen.getByRole("heading", { name: "Project details" })))
+      .toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(header.closest(".mt-page-layout-main") !== null).toBe(headerSpan === "main");
+    expect(root).not.toHaveAttribute("topbar");
+    fireEvent.click(screen.getByRole("button", { name: "Review" }));
+    expect(onAction).toHaveBeenCalledOnce();
+
+    rerender(<Mtone.PageLayout title="Project details" topbar={<>{[null, false, ""]}</>} />);
+    expect(root.querySelector(".mt-page-layout-topbar")).toBeNull();
+  },
+);

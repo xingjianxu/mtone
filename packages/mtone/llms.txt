@@ -1034,9 +1034,10 @@ export default function App() {
 
 ### PageLayout
 
-- [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): 组织单页标题、操作、标签页和正文，可添加页面侧栏，也可限制整页宽度并在父容器内居中。
+- [PageLayout](https://xingjianxu.github.io/mtone/#/components/PageLayout): 组织单页标题、操作、标签页和正文，可添加页面顶栏与侧栏，也可限制整页宽度并在父容器内居中。
 - Import: PageLayout from @bixlab/mtone
 - title: ReactNode. 必填标题，渲染在语义标题元素中。
+- topbar: ReactNode. 标题上方的可选顶栏。可传入 Topbar（页面内建议 as="div"）或自定义内容；随 headerSpan 对齐，省略时不占空间。
 - headingLevel: 1 | 2 | 3 | 4 | 5 | 6 (default: 1). 标题级别；嵌入时按页面结构调整。
 - subtitle: ReactNode. 标题下方的简短补充。
 - icon: ReactNode. 标题前的图标。
@@ -1047,7 +1048,7 @@ export default function App() {
 - sidebar: ReactNode. 页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。
 - sidebarPosition: "left" | "right" (default: "left"). 侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。
 - sidebarResize: boolean | SidebarResizeOptions (default: false). 可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度；separatorBordered 可为手柄两侧加边线。
-- headerSpan: "full" | "header" | "main" (default: "full"). full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。
+- headerSpan: "full" | "header" | "main" (default: "full"). full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含顶栏、标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。
 - maxWidth: "sm" | "md" | "lg" | "xl" | number. 可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。
 - children: ReactNode. 正文。
 - HTML div 属性: Omit<ComponentPropsWithRef<"div">, "title">. className、style、ref 等传给根元素。

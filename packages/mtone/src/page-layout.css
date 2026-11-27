@@ -118,6 +118,7 @@
   margin-inline-start: auto;
   overflow-wrap: anywhere;
 }
+.mt-page-layout-topbar,
 .mt-page-layout-tabs,
 .mt-page-layout-body {
   min-inline-size: 0;
