@@ -183,7 +183,7 @@ try {
           mainLeft: css(".mt-page-layout-main").borderLeftWidth,
           sideLeft: css(".mt-page-layout-sidebar").borderLeftWidth,
           mainTop: css(".mt-page-layout-main").borderTopWidth,
-          paneTop: seam && css("[data-sidebar-resize-pane]:last-child").borderTopWidth,
+          paneTop: seam && css("[data-sidebar-resize-pane]:last-child > .mt-splitter-panel").borderTopWidth,
           splitterLine: seam && getComputedStyle(seam).backgroundSize,
           fits: el.scrollWidth <= el.clientWidth,
         };
