@@ -209,8 +209,11 @@
   padding-inline: 16px;
 }
 /* The Tabs baseline already separates a tab bar that has no panel content. */
-.mt-page-layout-tabs-bordered:has(
-  > .mt-tabs[data-placement="top"][data-variant="line"]:not(:has(> .mt-tab-panel:not([hidden]):not(:empty)))
+.mt-page-layout-tabs-bordered > .mt-tabs[data-placement="top"][data-variant="line"] > .mt-tab-panel:empty {
+  padding: 0;
+}
+.mt-page-layout-tabs-bordered:has(> .mt-tabs[data-placement="top"][data-variant="line"]):not(
+  :has(> .mt-tabs > .mt-tab-panel:not([hidden]):not(:empty))
 ) {
   border-block-end: 0;
 }
