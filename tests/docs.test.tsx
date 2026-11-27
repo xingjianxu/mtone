@@ -7,7 +7,7 @@ import { ComponentExample } from "../apps/docs/examples";
 import { docSections, parseRoute, searchDocs } from "../apps/docs/docs-app";
 // These supporting exports share a component guide instead of having standalone pages.
 const nonStandaloneExports = [
-  "cn", "useMtone", "useToast", "getMentions",
+  "cn", "useMtone", "useToast", "getMentions", "mtoneOriginalTheme",
   "ShortcutScope", "useShortcut", "formatShortcut", "TooltipProvider",
   "moveTreeItem", "getTreeNodeInfo",
 ];
