@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Name the unchanged built-in design Original (原调) and add theme presets with shared and mode-specific tokens for Provider and Scope.
+- Add the optional `PageLayout.topbar` slot above the title; it follows `headerSpan` and does not change the layout when omitted.
+- Share the 3px spacing token for adjacent navigation and popup options. Document the navigation selection colors and add interactive theme and layout previews.
+
 ## BlockEditor 1.1.0 (separate package)
 
 - Expose the native BlockNote instance and allow additive inline content specs and editor extensions, including async mentions.
