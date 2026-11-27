@@ -2293,7 +2293,7 @@ export default function Demo() {
     ],
     notes: [
       "本组件只渲染应用框架，不创建全局顶栏、面包屑或标签栏。需要带全局顶栏的后台外壳时用 AdminLayout。",
-      "拖拽调宽和图标收起独立启用。图标栏隐藏品牌和自定义底部内容，建议用带 icon 的 NavItem、NavSubmenu 组合导航。",
+      "拖拽调宽和图标收起独立启用。双击 Splitter 不会收起侧栏；用侧栏按钮切换图标模式。交互示例可试调初始宽度、分隔条边框和侧栏内容。图标栏隐藏品牌和自定义底部内容，建议用带 icon 的 NavItem、NavSubmenu 组合导航。",
       "侧栏复用 Sidebar，账户菜单复用 Popover.Menu。账号资料、主题切换及退出逻辑由使用方提供。可用 --mt-app-layout-content-padding 调整主内容内边距。",
     ],
   },
