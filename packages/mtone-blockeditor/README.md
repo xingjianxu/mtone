@@ -72,7 +72,9 @@ Each Han character counts as one word, and each run of other letters or numbers 
 
 ## Upload or embed a file
 
-Without an upload callback, the editor only asks for a direct HTTP(S) URL. Pass `uploadFile(file): Promise<string>` to enable both Upload and Embed link for images, video, audio, and attachments. Upload supports selecting or dropping one file at a time and retrying after an error. Return a durable direct HTTP(S) URL for the saved file, not a `blob:` URL. The package does not transmit or store files itself: validate type, size, and permissions in your upload service. Cancel closes the panel and ignores any pending result; it does not cancel a request started by your callback. The existing `uploadImage` is an image-only fallback when `uploadFile` is not provided.
+Without an upload callback, the editor only asks for a direct HTTP(S) URL. Pass `uploadFile(file): Promise<string>` to enable both Upload and Embed link for images, video, audio, and attachments. Upload supports selecting or dropping one file at a time and retrying after an error. Return a durable direct HTTP(S) URL for the saved file, not a `blob:` URL. The package does not transmit or store files itself: validate type, size, and permissions in your upload service. Cancel closes the panel and ignores any pending result; it does not cancel a request started by your callback. The existing `uploadImage` is an image-only fallback for the upload panel when `uploadFile` is not provided.
+
+Provide `uploadFile` when the document mounts to also enable BlockNote's native clipboard and drop handling in the editable document. Pasting a screenshot or dropping a local file calls the same callback. Image, video, and audio files are routed by MIME type; other files become attachments. Pasting supported text or HTML takes precedence over uploading files when the clipboard contains both. If upload becomes available after mount, change `documentKey` and supply the saved content to initialize native uploads for that document. See the [upload demo](https://xingjianxu.github.io/mtone/#/components/BlockEditor?section=upload).
 
 ## Development
 

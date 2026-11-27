@@ -441,3 +441,61 @@ test("adds native inline content per document and mounts extensions in the nativ
   unmount();
   expect(ref.current).toBeNull();
 });
+
+function pasteIntoEditor(file: File) {
+  fireEvent.paste(screen.getByRole("textbox", { name: "Upload notes" }), {
+    clipboardData: {
+      types: ["Files"],
+      items: [{ kind: "file", type: file.type, getAsFile: () => file }],
+      getData: () => "",
+    },
+  });
+}
+
+test("native paste uses the host uploader and retains mtone media block types", async () => {
+  const ref = createRef<BlockEditorRef>();
+  const uploadFile = vi.fn(async (file: File) => `https://example.com/${file.name}`);
+  render(<BlockEditor ref={ref} uploadFile={uploadFile} label="Upload notes" />);
+  const editor = ref.current!.getEditor();
+  const samples = [
+    ["image", "shot.png", "image/png"],
+    ["video", "clip.mp4", "video/mp4"],
+    ["audio", "track.mp3", "audio/mpeg"],
+    ["file", "notes.txt", ""],
+  ] as const;
+  for (const [kind, name, mime] of samples) {
+    const file = new File(["fixture"], name, { type: mime });
+    pasteIntoEditor(file);
+    await waitFor(() => expect(editor.document).toContainEqual(
+      expect.objectContaining({
+        type: kind,
+        props: expect.objectContaining({ url: `https://example.com/${name}` }),
+      }),
+    ));
+    expect(uploadFile).toHaveBeenLastCalledWith(file);
+  }
+  expect(uploadFile).toHaveBeenCalledTimes(samples.length);
+});
+
+test("native upload uses the current callback, rejects unsafe URLs and ignores read-only paste", async () => {
+  const ref = createRef<BlockEditorRef>();
+  const first = vi.fn(async () => "https://example.com/stale.png");
+  const latest = vi.fn(async () => "blob:https://example.com/local");
+  const file = new File(["fixture"], "shot.png", { type: "image/png" });
+  const { rerender } = render(<BlockEditor ref={ref} uploadFile={first} label="Upload notes" />);
+  const editor = ref.current!.getEditor();
+
+  rerender(<BlockEditor ref={ref} uploadFile={latest} label="Upload notes" />);
+  expect(ref.current!.getEditor()).toBe(editor);
+  await act(async () => pasteIntoEditor(file));
+  expect(first).not.toHaveBeenCalled();
+  expect(latest).toHaveBeenCalledOnce();
+  expect(editor.document).toContainEqual(expect.objectContaining({
+    type: "image",
+    props: expect.objectContaining({ url: "" }),
+  }));
+
+  rerender(<BlockEditor ref={ref} uploadFile={latest} label="Upload notes" readOnly />);
+  pasteIntoEditor(file);
+  expect(latest).toHaveBeenCalledOnce();
+});

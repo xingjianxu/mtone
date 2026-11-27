@@ -109,8 +109,8 @@ export default function Demo() {
       { name: "readOnly", type: "boolean", default: "false", description: "显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。" },
       { name: "borderless", type: "boolean", default: "false", description: "只移除编辑器外框，保留内部样式和键盘焦点提示。" },
       { name: "fillHeight", type: "boolean", default: "false", description: "开启后填满具有明确高度的父容器；内容超出则自然撑开。父容器高度未确定时仍使用正文 15rem 最小高度。" },
-      { name: "uploadFile", type: "(file: File) => Promise<string>", description: "可选。由宿主上传图片、视频、音频或附件，返回可持久访问的直接 HTTP(S) 地址。提供回调后显示「上传」和「嵌入链接」；未提供时只显示带标签的链接字段。" },
-      { name: "uploadImage", type: "(file: File) => Promise<string>", description: "可选。未提供 uploadFile 时仅为图片启用上传；两者同时提供时优先使用 uploadFile。" },
+      { name: "uploadFile", type: "(file: File) => Promise<string>", description: "可选。由宿主上传图片、视频、音频或附件，返回可持久访问的直接 HTTP(S) 地址。提供回调后显示「上传」和「嵌入链接」；在创建文档时提供回调还会启用正文内粘贴文件和拖放上传。" },
+      { name: "uploadImage", type: "(file: File) => Promise<string>", description: "可选。仅是自定义图片面板的旧版回调，不支持正文粘贴或拖放。两者同时提供时优先使用 uploadFile。" },
       { name: "label / locale / className", type: "string / 'zh' | 'en' / string", description: "正文的无障碍名称、界面语言和外层样式。语言未指定时继承 mtone，主题同步继承。" },
     ],
     notes: [
@@ -120,6 +120,7 @@ export default function Demo() {
       "选中单元格后，在表格悬浮工具栏打开「行」或「列」菜单，可在当前行列前后插入、移动或删除；不显示点阵拖动手柄。右侧和底部加号仍分别快速追加列与行。只读模式不显示编辑控件。",
       "视频、音频和附件使用直接 HTTP(S) 地址。图片、视频、音频和附件的说明在悬停或键盘聚焦时以提示气泡显示。视频支持设置宽度百分比；视频使用浏览器控件；音频使用 mtone 播放器，支持进度、音量和倍速，窄栏把音量与倍速收进更多。两者均不自动播放。附件支持自定义显示名称并在新标签页打开。",
       "提供上传回调后可在「上传」和「嵌入链接」之间切换。上传支持选择或拖放单个文件，失败后可以重试。库不提供存储服务；文件大小、类型和权限由宿主服务验证。取消会忽略上传结果，不会停止宿主正在执行的上传。",
+      "正文粘贴与拖放复用 BlockNote 原生处理。浏览器须提供实际文件，截图与媒体按 MIME 类型插入对应块，其他文件插入附件块；剪贴板若同时提供可用文本或 HTML，优先粘贴文字内容。首次启用正文上传时须在文档创建时提供回调。",
       "统计包含嵌套内容、代码、表格单元格和链接显示文字，不计元数据（如媒体说明和链接地址），不添加块间分隔字符。汉字逐个计字，其他连续字母或数字计一词，词内撇号不拆分，标点与表情不计词。字符按可见字素统计，不支持 Intl.Segmenter 时按 Unicode 码点；块数包含空块、非文本块和子块，表格单元格不单独计块。",
       "使用原生扩展时，应用直接依赖与编辑器相同版本的 @blocknote/core 和 @blocknote/react。自定义节点用 BlockEditorRef<typeof inlineContentSpecs>、BlockEditorBlock<typeof inlineContentSpecs> 和 BlockEditorInput<typeof inlineContentSpecs> 获得类型。候选请求、校验与错误处理由应用负责；统计不计自定义节点的显示标签。",
       "原生 JSON 是主存储格式。只读只影响界面。不要自行销毁或重新挂载 getEditor() 返回的实例，也不要把它当作权限控制。外部内容仍需由应用验证来源、权限以及数据结构。",

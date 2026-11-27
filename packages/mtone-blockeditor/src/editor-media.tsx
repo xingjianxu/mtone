@@ -130,6 +130,7 @@ export const video = createReactBlockSpec(
     content: "none",
   },
   {
+    meta: { fileBlockAccept: ["video/*"] },
     render: ({ block, editor }) => (
       <MediaFigure
         kind="video"
@@ -147,6 +148,7 @@ export const video = createReactBlockSpec(
 export const audio = createReactBlockSpec(
   { type: "audio", propSchema: mediaProps, content: "none" },
   {
+    meta: { fileBlockAccept: ["audio/*"] },
     render: ({ block, editor }) => (
       <MediaFigure
         kind="audio"

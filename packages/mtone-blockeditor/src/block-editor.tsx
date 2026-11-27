@@ -17,6 +17,7 @@ import { EditorTableExtend } from "./editor-table-extend";
 import { EditorControls } from "./editor-controls";
 import { editorCodeHighlight } from "./editor-code-highlight";
 import { safeLink } from "./editor-link";
+import { safeMediaUrl } from "./editor-media";
 import { AudioLocale } from "./editor-audio-player";
 
 import { schema, setCodePresentation } from "./editor-blocks";
@@ -68,6 +69,7 @@ export interface BlockEditorProps<Extra extends InlineSpecs = NoInlineSpecs> {
   /**
    * Upload images, video, audio, or attachments through the host application.
    * Return a durable HTTP(S) URL. Takes precedence over uploadImage.
+   * Provide this when the document mounts to enable native paste and drop.
    */
   uploadFile?: (file: File) => Promise<string>;
   /** Legacy image-only upload fallback when uploadFile is not provided. */
@@ -132,6 +134,13 @@ function EditorInstance<Extra extends InlineSpecs>({
   const { locale: inheritedLocale, theme } = useMtone();
   const locale = explicitLocale ?? inheritedLocale;
   const name = label ?? (locale === "zh" ? "块编辑器" : "Block editor");
+  const nativeUploader = React.useRef(uploadFile);
+  React.useLayoutEffect(() => {
+    nativeUploader.current = uploadFile;
+    return () => {
+      nativeUploader.current = undefined;
+    };
+  }, [uploadFile]);
   const [editor] = React.useState(() =>
     BlockNoteEditor.create({
       // The native constructor merges the exact spec configs described by InlineSchema.
@@ -141,6 +150,19 @@ function EditorInstance<Extra extends InlineSpecs>({
         typeof schema.styleSchema
       >,
       extensions: [editorCodeHighlight],
+      uploadFile: uploadFile
+        ? async (file) => {
+            const upload = nativeUploader.current;
+            if (!upload) throw new Error("File upload is unavailable.");
+            const result = await upload(file);
+            if (!nativeUploader.current)
+              throw new Error("File upload is unavailable.");
+            const url = typeof result === "string" && safeMediaUrl(result);
+            if (!url)
+              throw new Error("Upload did not return a valid HTTP(S) URL.");
+            return url;
+          }
+        : undefined,
       tables: { headers: true },
       links: {
         isValidLink: (href) => Boolean(safeLink(href)),

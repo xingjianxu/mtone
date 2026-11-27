@@ -252,13 +252,13 @@ export function BlockEditorMediaExample() {
 export function BlockEditorUploadExample() {
   return (
     <div style={{ inlineSize: "100%", display: "grid", gap: 10 }}>
-      <p>此示例不会上传你的文件，而是用本站示例资源演示上传结果。</p>
+      <p>可粘贴截图、将文件拖进正文，也可通过 / 打开上传面板。本示例只显示本站资源，不会发送本地文件。</p>
       <BlockEditor
         label="上传示例正文"
         initialContent={[
           {
             type: "paragraph",
-            content: "在本行下方输入 /，选择图片、视频、音频或附件。",
+            content: "在这里粘贴截图、拖入文件，或输入 / 来添加文件。",
           },
         ]}
         uploadFile={demoUploadFile}

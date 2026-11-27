@@ -52,6 +52,7 @@ const image = createReactBlockSpec(
     content: "none",
   },
   {
+    meta: { fileBlockAccept: ["image/*"] },
     render: function ImageBlockView({ block, editor }) {
       const mode = codePresentation(editor);
       const readOnly = React.useSyncExternalStore(

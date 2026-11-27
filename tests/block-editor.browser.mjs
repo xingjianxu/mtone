@@ -911,6 +911,48 @@ try {
     base + "block-editor-media/release-notes.txt",
   );
   await fileSettings.waitFor({ state: "hidden" });
+
+  // Feed actual File items through the browser's native clipboard/drop handlers.
+  await uploadBody.press("Control+Home");
+  await uploadBody.evaluate((element) => {
+    const clipboardData = new DataTransfer();
+    clipboardData.items.add(new File(["fixture"], "ignored.png", { type: "image/png" }));
+    clipboardData.setData("text/plain", "Copied plain text");
+    element.dispatchEvent(new ClipboardEvent("paste", {
+      clipboardData, bubbles: true, cancelable: true,
+    }));
+  });
+  await expect(uploadBody).toContainText("Copied plain text");
+  await expect(uploadBody.locator(".mt-block-editor-image")).toHaveCount(0);
+
+  await uploadBody.evaluate((element) => {
+    const clipboardData = new DataTransfer();
+    clipboardData.items.add(new File(["fixture"], "screenshot.png", { type: "image/png" }));
+    element.dispatchEvent(new ClipboardEvent("paste", {
+      clipboardData, bubbles: true, cancelable: true,
+    }));
+  });
+  await expect(uploadBody.locator(".mt-block-editor-image img")).toHaveAttribute(
+    "src",
+    /block-editor-image-.*\.svg$/,
+  );
+
+  const dropTarget = uploadBody.getByText(/Copied plain text/);
+  await dropTarget.scrollIntoViewIfNeeded();
+  await dropTarget.evaluate((element) => {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File(["fixture"], "recording.webm", { type: "video/webm" }));
+    const { left, top, height } = element.getBoundingClientRect();
+    element.dispatchEvent(new DragEvent("drop", {
+      dataTransfer, bubbles: true, cancelable: true,
+      clientX: left + 6, clientY: top + height / 2,
+    }));
+  });
+  await expect(uploadBody.locator("video")).toHaveAttribute(
+    "src",
+    base + "block-editor-media/sample.webm",
+  );
+
   await page.goto(base + "#/components/BlockEditor?section=native-extensions");
   const mentionBody = page.getByRole("textbox", { name: "原生提及示例正文" });
   await page.getByRole("button", { name: "定位到正文末尾" }).click();
