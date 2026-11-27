@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { AdminLayout, Button, PageLayout, Sidebar, Splitter, Tabs } from "../../packages/mtone/src";
+import { AdminLayout, Button, PageLayout, Sidebar, Splitter, Tabs, Topbar } from "../../packages/mtone/src";
 import "../../packages/mtone/dist/styles.css";
 
 function Fixture() {
@@ -147,7 +147,32 @@ function ResizableFixture() {
   );
 }
 
+function BorderedFixture() {
+  const query = new URLSearchParams(window.location.search);
+  const narrow = query.has("narrow");
+  return (
+    <div dir={query.has("rtl") ? "rtl" : "ltr"} data-mt-theme="dark">
+      {(["header", "main", "full"] as const).map((headerSpan) => (
+        <div key={headerSpan} style={{ width: narrow ? 355 : 840, height: 420, maxWidth: "100%" }}>
+          <PageLayout
+            data-testid={`frame-${headerSpan}`}
+            bordered
+            headerSpan={headerSpan}
+            sidebarPosition={query.has("right") ? "right" : "left"}
+            sidebarResize={query.has("resize")}
+            sidebar={<Sidebar collapsible aria-label="Framed navigation"><Button>Open</Button></Sidebar>}
+            topbar={<Topbar as="div">Workspace path</Topbar>}
+            title="Frame title"
+            tabs={<Tabs items={[{ value: "first", label: "Recent", content: null }]} />}>
+            Short content
+          </PageLayout>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const query = new URLSearchParams(window.location.search);
 createRoot(document.getElementById("root")!).render(
-  query.has("resizable") ? <ResizableFixture /> : query.has("admin-content") ? <AdminContentFixture /> : query.has("sidebar") ? <SidebarFixture /> : query.has("max-width") ? <MaxWidthFixture /> : <Fixture />,
+  query.has("framed") ? <BorderedFixture /> : query.has("resizable") ? <ResizableFixture /> : query.has("admin-content") ? <AdminContentFixture /> : query.has("sidebar") ? <SidebarFixture /> : query.has("max-width") ? <MaxWidthFixture /> : <Fixture />,
 );

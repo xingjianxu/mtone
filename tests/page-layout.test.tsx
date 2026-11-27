@@ -164,3 +164,24 @@ test.each(["full", "header", "main"] as const)(
     expect(root.querySelector(".mt-page-layout-topbar")).toBeNull();
   },
 );
+
+test.each(["header", "main"] as const)(
+  "supports the bordered frame without changing slots for %s",
+  (headerSpan) => {
+    const ref = React.createRef<HTMLDivElement>();
+    const { rerender } = render(
+      <Mtone.PageLayout ref={ref} title="Page" bordered headerSpan={headerSpan}
+        topbar={<Mtone.Topbar as="div">Path</Mtone.Topbar>}
+        tabs={<button>Tabs</button>} sidebar={<Mtone.Sidebar>Links</Mtone.Sidebar>}>
+        Content
+      </Mtone.PageLayout>,
+    );
+    expect(ref.current).toHaveClass("mt-page-layout-bordered");
+    expect(ref.current).not.toHaveAttribute("bordered");
+    const header = ref.current?.querySelector(".mt-page-layout-header");
+    expect(header?.closest(".mt-page-layout-main") !== null).toBe(headerSpan === "main");
+    expect(header).toHaveTextContent("PathPage");
+    rerender(<Mtone.PageLayout ref={ref} title="Page" />);
+    expect(ref.current).not.toHaveClass("mt-page-layout-bordered");
+  },
+);

@@ -8,6 +8,7 @@ const headerSpanOptions = [
 ] as const;
 
 const switches = [
+  ["bordered", "边框布局"],
   ["topbar", "顶栏"],
   ["tabs", "标签页"],
   ["sidebar", "侧栏"],
@@ -16,7 +17,7 @@ const switches = [
   ["resize", "拖拽调宽"],
 ] as const;
 
-const defaults = { topbar: true, tabs: true, sidebar: true, actions: true, details: true, resize: false };
+const defaults = { bordered: true, topbar: true, tabs: true, sidebar: true, actions: true, details: true, resize: false };
 const wrap = { display: "flex", alignItems: "center", gap: "8px 12px", flexWrap: "wrap" } as const;
 const tabItems = [
   { value: "files", label: "文件", content: "项目需求说明、原型文件和会议纪要" },
@@ -26,14 +27,14 @@ const tabItems = [
 export default function Demo() {
   const [visible, setVisible] = useState(defaults);
   const [position, setPosition] = useState<"left" | "right">("left");
-  const [span, setSpan] = useState<(typeof headerSpanOptions)[number][0]>("full");
+  const [span, setSpan] = useState<(typeof headerSpanOptions)[number][0]>("header");
   const [width, setWidth] = useState<"full" | "sm" | "md">("md");
   const [tab, setTab] = useState("files");
   const [reviewed, setReviewed] = useState(false);
   function reset() {
     setVisible(defaults);
     setPosition("left");
-    setSpan("full");
+    setSpan("header");
     setWidth("md");
     setTab("files");
     setReviewed(false);
@@ -73,9 +74,11 @@ export default function Demo() {
       </div>
       <PageLayout
         headingLevel={3}
+        bordered={visible.bordered}
+        style={visible.bordered ? { minBlockSize: 400 } : undefined}
         maxWidth={width === "full" ? undefined : width}
         title="项目资料库"
-        topbar={visible.topbar && <Topbar as="div" style={{ paddingInline: 0 }}
+        topbar={visible.topbar && <Topbar as="div"
           breadcrumb={<Breadcrumb items={[{ label: "项目" }, { label: "资料库" }]} />}
           extra={reviewed ? <Tag tone="green">已审阅</Tag> :
             <Button size="small" onClick={() => setReviewed(true)}>标记已审阅</Button>} />}

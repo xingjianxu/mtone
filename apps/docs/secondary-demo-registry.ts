@@ -418,7 +418,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
     { id: "width-presets", title: "宽度预设", Demo: ContainerPresets, source: source(ContainerPresetsSource) },
   ],
   PageLayout: [
-    { id: "sidebar", title: "布局配置", Demo: PageLayoutSidebar, source: source(PageLayoutSidebarSource) },
+    { id: "sidebar", title: "布局配置", Demo: PageLayoutSidebar, source: source(PageLayoutSidebarSource), note: "图 A：页头跨整页，标签留在主栏。图 B：仅主栏。两种都可开启边框布局，侧栏会撑满所在列。", },
     { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },
     { id: "actions-and-tabs", title: "居中限宽、操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
     { id: "sidebar-resize", title: "拖拽调整页面侧栏", Demo: PageLayoutSidebarResize, source: source(PageLayoutSidebarResizeSource) },

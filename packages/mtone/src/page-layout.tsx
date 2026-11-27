@@ -7,6 +7,8 @@ import { layoutWidths, type LayoutWidthPreset } from "./layout-widths";
 export interface PageLayoutProps
   extends Omit<React.ComponentPropsWithRef<"div">, "title"> {
   title: React.ReactNode;
+  /** Frame the page and separate slots with shared edges; stretch the sidebar with its column. */
+  bordered?: boolean;
   /** Optional page-local bar above the title; follows headerSpan. */
   topbar?: React.ReactNode;
   subtitle?: React.ReactNode;
@@ -38,7 +40,7 @@ function hasContent(node: React.ReactNode): boolean {
 }
 
 export function PageLayout({
-  title, topbar, subtitle, icon, actions, description, extra, tabs, children,
+  title, bordered = false, topbar, subtitle, icon, actions, description, extra, tabs, children,
   sidebar, sidebarPosition = "left", sidebarResize, headerSpan = "full",
   headingLevel = 1, maxWidth, className, style, ...rootProps
 }: PageLayoutProps) {
@@ -52,6 +54,7 @@ export function PageLayout({
   const constrained = width !== undefined && Number.isFinite(width) && width > 0;
   const rootClassName = [
     "mt-page-layout",
+    bordered && "mt-page-layout-bordered",
     constrained && "mt-page-layout-constrained",
     showSidebar && "mt-page-layout-with-sidebar",
     className,
@@ -59,10 +62,14 @@ export function PageLayout({
   const rootStyle = constrained
     ? { "--mt-page-layout-max-width": `${width}px`, ...style } as React.CSSProperties
     : style;
+  const slot = (name: string) => {
+    const className = `mt-page-layout-${name}`;
+    return bordered ? `${className} ${className}-bordered` : className;
+  };
   const header = (
-    <div className="mt-page-layout-header">
-      {hasContent(topbar) && <div className="mt-page-layout-topbar">{topbar}</div>}
-      <div className="mt-page-layout-row">
+    <div className={slot("header")}>
+      {hasContent(topbar) && <div className={slot("topbar")}>{topbar}</div>}
+      <div className={slot("row")}>
         {hasContent(icon) && <div className="mt-page-layout-icon">{icon}</div>}
         <div className="mt-page-layout-heading">
           <Heading className="mt-page-layout-title">{title}</Heading>
@@ -71,18 +78,18 @@ export function PageLayout({
         {hasContent(actions) && <div className="mt-page-layout-actions">{actions}</div>}
       </div>
       {(showDescription || showExtra) && (
-        <div className="mt-page-layout-details">
+        <div className={slot("details")}>
           {showDescription && <div className="mt-page-layout-description">{description}</div>}
           {showExtra && <div className="mt-page-layout-extra">{extra}</div>}
         </div>
       )}
     </div>
   );
-  const tabsSlot = hasContent(tabs) && <div className="mt-page-layout-tabs">{tabs}</div>;
-  const body = hasContent(children) && <div className="mt-page-layout-body">{children}</div>;
-  const sidebarSlot = (content: React.ReactNode) => <div className="mt-page-layout-sidebar">{content}</div>;
+  const tabsSlot = hasContent(tabs) && <div className={slot("tabs")}>{tabs}</div>;
+  const body = hasContent(children) && <div className={slot("body")}>{children}</div>;
+  const sidebarSlot = (content: React.ReactNode) => <div className={slot("sidebar")}>{content}</div>;
   const main = (
-    <div className="mt-page-layout-main">
+    <div className={slot("main")}>
       {headerSpan === "main" && header}
       {headerSpan !== "full" && tabsSlot}
       {body}
@@ -94,7 +101,7 @@ export function PageLayout({
       {(!showSidebar || headerSpan !== "main") && header}
       {(!showSidebar || headerSpan === "full") && tabsSlot}
       {showSidebar ? (
-        <div className="mt-page-layout-columns">
+        <div className={slot("columns")}>
           {sidebarResize ? (
             <SidebarResize layout="page" options={sidebarResize} sidebar={sidebar}
               collapsibleSidebar={React.isValidElement<SidebarProps>(sidebar) && sidebar.type === Sidebar ? sidebar : undefined}

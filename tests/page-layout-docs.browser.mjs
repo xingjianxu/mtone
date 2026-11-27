@@ -107,6 +107,12 @@ try {
           document.documentElement.scrollWidth <= innerWidth,
       };
     });
+    // Exercise original unframed geometry separately from the framed A/B defaults.
+    const frameToggle = sidebarStage.getByRole("switch", { name: "边框布局" });
+    await expect(frameToggle).toBeChecked();
+    await expect(sidebarLayout).toHaveClass(/mt-page-layout-bordered/);
+    await frameToggle.click();
+    await sidebarStage.getByRole("button", { name: "跨整页", exact: true }).click();
     const before = await layoutBoxes();
     assert(before.fits && before.header.width === before.width && before.tabs.width === before.width, JSON.stringify(before));
     assert(viewport === 1440 ? before.side.right < before.body.x : before.side.bottom < before.body.y,

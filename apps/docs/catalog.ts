@@ -2304,6 +2304,7 @@ export default function Demo() {
     code: 'import { PageLayout } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return <PageLayout title="项目总览" maxWidth="md">本周有 3 项任务待处理。</PageLayout>;\n}',
     props: [
       { name: "title", type: "ReactNode", description: "必填标题，渲染在语义标题元素中。" },
+      { name: "bordered", type: "boolean", default: "false", description: "开启边框布局。外框和相邻区域共用细分隔线；分栏时侧栏撑满剩余列高，窄容器仍上下堆叠。没有可用高度的父容器时，随正文自然增长。" },
       { name: "topbar", type: "ReactNode", description: "标题上方的可选顶栏。可传入 Topbar（页面内建议 as=\"div\"）或自定义内容；随 headerSpan 对齐，省略时不占空间。" },
       { name: "headingLevel", type: "1 | 2 | 3 | 4 | 5 | 6", default: "1", description: "标题级别；嵌入时按页面结构调整。" },
       { name: "subtitle", type: "ReactNode", description: "标题下方的简短补充。" },

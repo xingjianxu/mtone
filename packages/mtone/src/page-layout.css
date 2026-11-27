@@ -174,3 +174,102 @@
     flex: 1 0 auto;
   }
 }
+
+/* The framed design owns the edges between its slots. Unframed PageLayout,
+ * and PageLayout instances nested inside a slot, keep their own layout. */
+.mt-page-layout-bordered {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--mt-border, #e9e9e7);
+  border-radius: var(--mt-radius, 4px);
+  background: var(--mt-bg, #fff);
+}
+.mt-page-layout-bordered:only-child {
+  min-block-size: 100%;
+}
+.mt-page-layout-columns-bordered {
+  flex: 1 0 auto;
+  gap: 0;
+}
+.mt-page-layout-main-bordered,
+.mt-page-layout-header-bordered {
+  gap: 0;
+}
+.mt-page-layout-header-bordered:not(:last-child),
+.mt-page-layout-topbar-bordered,
+.mt-page-layout-tabs-bordered:not(:last-child) {
+  border-block-end: 1px solid var(--mt-border, #e9e9e7);
+}
+/* Topbar already has a bottom edge; in this layout its slot draws that edge. */
+.mt-page-layout-topbar-bordered > .mt-topbar {
+  border-block-end: 0;
+  padding-inline: 16px;
+}
+/* The Tabs baseline already separates a tab bar that has no panel content. */
+.mt-page-layout-tabs-bordered:has(
+  > .mt-tabs[data-placement="top"][data-variant="line"]:not(:has(> .mt-tab-panel:not([hidden]):not(:empty)))
+) {
+  border-block-end: 0;
+}
+.mt-page-layout-row-bordered,
+.mt-page-layout-details-bordered,
+.mt-page-layout-body-bordered {
+  padding-inline: 16px;
+}
+.mt-page-layout-row-bordered,
+.mt-page-layout-body-bordered {
+  padding-block: 12px;
+}
+.mt-page-layout-details-bordered {
+  padding-block-end: 12px;
+}
+.mt-page-layout-sidebar-bordered {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: var(--mt-subtle, #f7f7f5);
+}
+.mt-page-layout-sidebar-bordered > .mt-sidebar {
+  flex: 1 0 auto;
+  min-inline-size: 0;
+  border-radius: 0;
+}
+.mt-page-layout-columns-bordered > .mt-sidebar-resize-page[data-compact] > .mt-splitter {
+  gap: 0;
+}
+@container mt-page-layout (width < 640px) {
+  .mt-page-layout-columns-bordered > .mt-page-layout-sidebar + .mt-page-layout-main,
+  .mt-page-layout-columns-bordered > .mt-page-layout-main + .mt-page-layout-sidebar,
+  .mt-page-layout-columns-bordered > .mt-sidebar-resize-page[data-compact]
+    > .mt-splitter > [data-sidebar-resize-pane]:last-child {
+    border-block-start: 1px solid var(--mt-border, #e9e9e7);
+  }
+}
+@container mt-page-layout (width >= 640px) {
+  .mt-page-layout-columns-bordered {
+    align-items: stretch;
+  }
+  /* DOM order follows the physical columns even in RTL. The second column
+   * owns the shared edge; the two adjacent panels never both draw it. */
+  .mt-page-layout-columns-bordered > .mt-page-layout-sidebar + .mt-page-layout-main,
+  .mt-page-layout-columns-bordered > .mt-page-layout-main + .mt-page-layout-sidebar,
+  .mt-page-layout-columns-bordered > .mt-sidebar-resize-page[data-sidebar-collapsed]
+    > .mt-splitter > [data-sidebar-resize-pane]:last-child {
+    box-sizing: border-box;
+    border-left: 1px solid var(--mt-border, #e9e9e7);
+  }
+  .mt-page-layout-columns-bordered > .mt-sidebar-resize-page > .mt-splitter
+    > [data-sidebar-resize-pane] > .mt-splitter-panel > .mt-splitter-content
+    > :is(.mt-page-layout-sidebar-bordered, .mt-page-layout-main-bordered) {
+    min-block-size: 100%;
+  }
+  /* Keep Splitter's existing hit area and optional explicit edge styling.
+   * In its default appearance, show just one hairline through the handle. */
+  .mt-page-layout-columns-bordered > .mt-sidebar-resize-page > .mt-splitter
+    > .mt-splitter-separator:not(.mt-splitter-separator-bordered) {
+    background: linear-gradient(var(--mt-border, #e9e9e7), var(--mt-border, #e9e9e7)) center / 1px 100% no-repeat;
+  }
+}

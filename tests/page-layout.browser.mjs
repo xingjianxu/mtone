@@ -151,6 +151,69 @@ try {
       }
     }
   }
+  for (const configuration of ["", "&rtl&right", "&narrow", "&resize", "&narrow&resize"]) {
+    const narrow = configuration.includes("narrow");
+    const resize = configuration.includes("resize");
+    const right = configuration.includes("right");
+    await page.goto(`http://127.0.0.1:5284/tests/fixtures/page-layout.html?framed${configuration}`);
+    for (const span of ["header", "main", "full"]) {
+      const root = page.getByTestId(`frame-${span}`);
+      await expect(root.getByRole("heading", { name: "Frame title" })).toBeVisible();
+      if (resize) {
+        const separator = root.getByRole("separator");
+        if (narrow) await expect(separator).toBeHidden();
+        else await expect(separator).toBeVisible();
+      }
+      const result = await root.evaluate((el) => {
+        const get = (selector) => el.querySelector(selector);
+        const box = (selector) => get(selector).getBoundingClientRect().toJSON();
+        const css = (selector) => getComputedStyle(get(selector));
+        const frame = el.getBoundingClientRect().toJSON();
+        const seam = get(".mt-splitter-separator");
+        return {
+          frame, sidebar: box(".mt-sidebar"), sidebarSlot: box(".mt-page-layout-sidebar"),
+          header: box(".mt-page-layout-header"), main: box(".mt-page-layout-main"),
+          tabs: box(".mt-page-layout-tabs"), body: box(".mt-page-layout-body"),
+          frameEdge: getComputedStyle(el).borderTopWidth,
+          frameColor: getComputedStyle(el).borderTopColor,
+          headerEdge: css(".mt-page-layout-header").borderBottomWidth,
+          topbarSlotEdge: css(".mt-page-layout-topbar").borderBottomWidth,
+          topbarOwnEdge: css(".mt-topbar").borderBottomWidth,
+          tabsSlotEdge: css(".mt-page-layout-tabs").borderBottomWidth,
+          mainLeft: css(".mt-page-layout-main").borderLeftWidth,
+          sideLeft: css(".mt-page-layout-sidebar").borderLeftWidth,
+          mainTop: css(".mt-page-layout-main").borderTopWidth,
+          paneTop: seam && css("[data-sidebar-resize-pane]:last-child").borderTopWidth,
+          splitterLine: seam && getComputedStyle(seam).backgroundSize,
+          fits: el.scrollWidth <= el.clientWidth,
+        };
+      });
+      const { frame, sidebar, sidebarSlot, header, main, tabs, body } = result;
+      const ctx = JSON.stringify({ configuration, span, result });
+      const close = (a, b) => assert(Math.abs(a - b) < 1, ctx);
+      assert.equal(result.frameEdge, "1px", ctx);
+      assert.equal(result.frameColor, "rgb(61, 60, 57)", ctx);
+      assert.equal(result.headerEdge, "1px", ctx);
+      assert.equal(result.topbarSlotEdge, "1px", ctx);
+      assert.equal(result.topbarOwnEdge, "0px", ctx);
+      assert.equal(result.tabsSlotEdge, "0px", ctx); // the Tabs underline owns this seam
+      assert(result.fits, ctx);
+      close(frame.height, 420);
+      close(header.width, span === "main" ? body.width : frame.width - 2);
+      close(tabs.width, span === "full" ? frame.width - 2 : body.width);
+      if (narrow) {
+        close(sidebarSlot.bottom + 1, span === "main" ? header.top : span === "header" ? tabs.top : body.top);
+        assert.equal(resize ? result.paneTop : result.mainTop, "1px", ctx);
+      } else {
+        close(sidebar.bottom, frame.bottom - 1);
+        close(sidebar.bottom, main.bottom);
+        if (span === "header") close(sidebar.top, header.bottom);
+        if (span === "main") close(sidebar.top, header.top);
+        if (!resize) assert.equal(right ? result.sideLeft : result.mainLeft, "1px", ctx);
+        else assert.equal(result.splitterLine, "1px 100%", ctx);
+      }
+    }
+  }
   for (const [width, mode, options] of [
     [1200, "short", ""], [1200, "short", "&no-sidebar&no-footer"],
     [1200, "short", "&resize"], [375, "short", "&resize"],
