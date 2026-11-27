@@ -1,3 +1,4 @@
+/* Original (原调): built-in defaults. Named presets override these roles at their scope. */
 /* Unopted scopes remain light; an explicit nested scope starts a new palette.
  * Only theme-marked nodes opt the document or a portalled surface into color-scheme. */
 :where(.mt-scope, [data-mt-theme="light"], [data-mt-theme="system"]) {
@@ -15,6 +16,13 @@
 :where(:root) {
   /* Vertical space between adjacent compact interactive rows. */
   --mt-option-row-gap: 3px;
+  --_mt-original-option-row-gap: var(--mt-option-row-gap);
+}
+
+/* Original control geometry is the same in light and dark modes. */
+.mt-scope {
+  --mt-height: 32px;
+  --mt-radius: 4px;
 }
 
 /* Accents are reusable without a provider and reset at nested theme scopes. */
@@ -287,4 +295,12 @@
     --mt-button-separator: rgb(32 32 31 / 24%);
     --mt-blue-button-separator: rgb(255 255 255 / 40%);
   }
+}
+
+/* Explicit presets start at Original instead of inheriting theme overrides
+ * for these shared roles. Initial on the optional indicator keeps the legacy
+ * --mt-blue fallback resolving where the indicator is actually painted. */
+:where([data-mt-theme-preset-boundary]) {
+  --mt-option-row-gap: var(--_mt-original-option-row-gap, 3px);
+  --mt-nav-current-indicator: initial;
 }

@@ -2,7 +2,7 @@ import { useFieldsetDisabled } from "./fieldset-context";
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { X, LoaderCircle } from "lucide-react";
-import { cn, useMtone } from "./basic";
+import { cn, MtoneScope, useMtone } from "./basic";
 import {
   findMention,
   insertMention,
@@ -154,7 +154,7 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
     forwardedRef,
   ) {
     disabled = useFieldsetDisabled(disabled);
-    const { locale, theme, tokens } = useMtone();
+    const { locale } = useMtone();
     const inputRef = React.useRef<HTMLTextAreaElement>(null),
       popupRef = React.useRef<HTMLDivElement>(null);
     const [internal, setInternal] = React.useState(defaultValue),
@@ -386,12 +386,10 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
       });
     }
     const popup = open ? (
-      <div
+      <MtoneScope
         ref={popupRef}
-        className={cn("mt-scope", "mt-mentions-popup", classNames?.popup)}
-        data-mt-theme={theme}
+        className={cn("mt-mentions-popup", classNames?.popup)}
         style={{
-          ...tokens,
           ...styles?.popup,
           position: "fixed",
           left: position.left,
@@ -445,7 +443,7 @@ export const Mentions = React.forwardRef<MentionsRef, MentionsProps>(
             </div>
           )}
         </div>
-      </div>
+      </MtoneScope>
     ) : null;
     const clearConfig = typeof allowClear === "object" ? allowClear : {};
     return (

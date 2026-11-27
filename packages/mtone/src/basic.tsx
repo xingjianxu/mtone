@@ -23,43 +23,87 @@ export type Locale = "zh" | "en";
 export type Tokens = React.CSSProperties &
   Record<`--mt-${string}`, string | number>;
 export type MtoneTheme = "light" | "dark" | "system";
+/** A named design with optional mode-specific overrides of Original. */
+export interface MtoneThemePreset {
+  readonly id: string;
+  readonly name: string;
+  readonly tokens?: Tokens;
+  readonly light?: Tokens;
+  readonly dark?: Tokens;
+}
+
+/** mtone's built-in light and dark palettes and compact sizing, defined in CSS. */
+export const mtoneOriginalTheme: MtoneThemePreset = Object.freeze({
+  id: "original",
+  name: "Original",
+});
+
+const darkModeQuery = "(prefers-color-scheme: dark)";
+const lightSnapshot = () => false;
+function systemIsDark() {
+  return typeof window !== "undefined" && (window.matchMedia?.(darkModeQuery).matches ?? false);
+}
+function subscribeSystemMode(notify: () => void) {
+  const query = window.matchMedia?.(darkModeQuery);
+  query?.addEventListener?.("change", notify);
+  return () => query?.removeEventListener?.("change", notify);
+}
+const noSubscription = () => () => {};
+
 type Context = {
   theme: MtoneTheme;
+  themePreset: MtoneThemePreset;
   locale: Locale;
   tokens?: Tokens;
 };
 const MtoneContext = React.createContext<Context>({
   locale: "zh",
   theme: "light",
+  themePreset: mtoneOriginalTheme,
 });
 export const useMtone = () => React.useContext(MtoneContext);
-export interface MtoneScopeProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface MtoneScopeProps extends React.ComponentPropsWithRef<"div"> {
   /** Inherits the surrounding mtone theme when omitted. */
   theme?: MtoneTheme;
+  /** Inherits the current named design when omitted. */
+  themePreset?: MtoneThemePreset;
 }
 export function MtoneScope({
   children,
   className,
   style,
   theme,
+  themePreset,
   ...props
 }: MtoneScopeProps) {
   const inherited = useMtone();
+  const mode = theme ?? inherited.theme;
+  const preset = themePreset ?? inherited.themePreset;
   const c = React.useMemo(
-    () =>
-      theme && theme !== inherited.theme ? { ...inherited, theme } : inherited,
-    [inherited, theme],
+    () => mode === inherited.theme && preset === inherited.themePreset
+      ? inherited
+      : { ...inherited, theme: mode, themePreset: preset },
+    [inherited, mode, preset],
   );
+  const watchSystem = mode === "system" && Boolean(preset.light || preset.dark);
+  const osDark = React.useSyncExternalStore(
+    watchSystem ? subscribeSystemMode : noSubscription,
+    watchSystem ? systemIsDark : lightSnapshot,
+    lightSnapshot,
+  );
+  const resolvedMode = mode === "system" ? (osDark ? "dark" : "light") : mode;
   const floatingOwners = React.useContext(FloatingOwnerContext);
   return (
     <div
       {...props}
       className={cn("mt-scope", className)}
       data-mt-theme={c.theme}
+      data-mt-theme-preset={preset.id}
+      data-mt-theme-preset-boundary={themePreset ? "" : undefined}
       data-mt-floating-owners={
         floatingOwners.length ? floatingOwners.join(" ") : undefined
       }
-      style={{ ...c.tokens, ...style }}
+      style={{ ...preset.tokens, ...preset[resolvedMode], ...c.tokens, ...style }}
     >
       <MtoneContext.Provider value={c}>{children}</MtoneContext.Provider>
     </div>
@@ -74,16 +118,18 @@ export function MtoneProvider({
   locale = "zh",
   tokens,
   theme,
+  themePreset,
 }: MtoneProviderProps) {
   const inherited = useMtone();
   const resolvedTheme = theme ?? inherited.theme;
+  const preset = themePreset ?? inherited.themePreset;
   const value = React.useMemo(
-    () => ({ locale, tokens, theme: resolvedTheme }),
-    [locale, tokens, resolvedTheme],
+    () => ({ locale, tokens, theme: resolvedTheme, themePreset: preset }),
+    [locale, tokens, resolvedTheme, preset],
   );
   return (
     <MtoneContext.Provider value={value}>
-      <MtoneScope>{children}</MtoneScope>
+      <MtoneScope themePreset={themePreset}>{children}</MtoneScope>
     </MtoneContext.Provider>
   );
 }

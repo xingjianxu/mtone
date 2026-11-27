@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { expect, it } from "vitest";
-import { MtoneProvider, MtoneScope } from "../packages/mtone/src/basic";
+import { MtoneProvider, MtoneScope, mtoneOriginalTheme } from "../packages/mtone/src/basic";
 import { Dialog, Select } from "../packages/mtone/src/interactive";
 import { Mentions } from "../packages/mtone/src/mentions";
 import { ToastProvider, useToast } from "../packages/mtone/src/toast";
@@ -118,4 +118,35 @@ it("keeps input state when a scope changes between inherited and explicit themes
   expect(draft).toHaveValue("still editing");
   rerender(view());
   expect(screen.getByRole("textbox", { name: "Draft" })).toBe(draft);
+});
+
+it("applies named theme presets, local overrides and explicit default reset to portals", async () => {
+  const preset = {
+    id: "sample",
+    name: "Sample",
+    tokens: { "--mt-height": "36px", "--mt-radius": "6px" },
+    light: { "--mt-nav-selected": "#deedfa" },
+    dark: { "--mt-nav-selected": "#25384a" },
+  };
+  render(
+    <MtoneProvider themePreset={preset} tokens={{ "--mt-radius": "8px" }}>
+      <MtoneScope data-testid="sample-light" />
+      <MtoneScope theme="dark" data-testid="sample-dark">
+        <Dialog defaultOpen title="Preset portal">Content</Dialog>
+      </MtoneScope>
+      <MtoneScope themePreset={mtoneOriginalTheme} data-testid="original" />
+    </MtoneProvider>,
+  );
+  const light = screen.getByTestId("sample-light");
+  expect(light).toHaveAttribute("data-mt-theme-preset", "sample");
+  expect(light.style.getPropertyValue("--mt-height")).toBe("36px");
+  expect(light.style.getPropertyValue("--mt-nav-selected")).toBe("#deedfa");
+  expect(light.style.getPropertyValue("--mt-radius")).toBe("8px");
+  expect(screen.getByTestId("sample-dark").style.getPropertyValue("--mt-nav-selected")).toBe("#25384a");
+  const portal = (await screen.findByRole("dialog", { name: "Preset portal" })).closest<HTMLElement>(".mt-scope")!;
+  expect(portal).toHaveAttribute("data-mt-theme-preset", "sample");
+  expect(portal.style.getPropertyValue("--mt-nav-selected")).toBe("#25384a");
+  const original = screen.getByTestId("original");
+  expect(original).toHaveAttribute("data-mt-theme-preset", "original");
+  expect(original.style.getPropertyValue("--mt-nav-selected")).toBe("");
 });

@@ -28,6 +28,7 @@ import { componentDocHref, nestedComponentDoc } from "./component-navigation";
 import { componentLlmsPath, globalLlmsPath } from "./llms-reference";
 import { ShowcasePage } from "./showcase-page";
 import { ThemeSelect, useThemePreference } from "./theme-preference";
+import { ThemePlayground } from "./theme-playground";
 import { CodeBlock, DemoSource } from "./code-block";
 import { ColorPresets, colorPresetsHeading, colorPresetsHref } from "./color-presets";
 export type Route =
@@ -340,6 +341,7 @@ function Theme() {
           <code>theme</code> 支持 <code>light</code>、<code>dark</code> 和 <code>system</code>。
           应用未指定时保持浅色；<code>system</code> 实时跟随设备设置，不用刷新。
           下拉菜单、弹窗和通知继承所在作用域的主题，可用 <code>MtoneScope</code> 局部覆盖。
+          <code>themePreset</code> 定义配色与间距，<code>theme</code> 选择明暗模式。
           Provider 不绘制应用画布，需要时在应用自己的容器上使用 <code>background: var(--mt-bg)</code>。
         </p>
         <p>
@@ -347,8 +349,9 @@ function Theme() {
           默认单行控件统一采用 32px 基准高度，不再区分密度。升级时移除 Provider 上的 density 属性；独立 size 变体与 CSS 变量定制仍可使用。
         </p>
       </section>
+      <ThemePlayground />
       <section>
-        <h2>同页使用不同主题</h2>
+        <h2>同页使用不同明暗模式</h2>
         <div className="theme-samples">
           {(["light", "dark"] as const).map((theme) => (
             <M.MtoneScope key={theme} theme={theme} className="theme-sample">
@@ -384,7 +387,8 @@ function Theme() {
                 ["--mt-primary", "主操作颜色"],
                 ["--mt-hover", "悬停背景"],
                 ["--mt-height", "控件高度"],
-                ["--mt-radius", "圆角"],
+                ["--mt-radius", "控件圆角（原调为 4px）"],
+                ["--mt-option-row-gap", "相邻紧凑选项的垂直间距（原调为 3px）"],
                 ["--mt-focus", "统一焦点色，独立于 --mt-primary"],
                 ["--mt-select-surface", "浅蓝选中与设置定位底色，和焦点、提示色独立。"],
                 ["--mt-accent-*", "八种按色相命名的可选预设色，与组件语义颜色分开。"],

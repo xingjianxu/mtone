@@ -86,3 +86,22 @@ test("documents role overrides without treating them as public palette choices",
   expect(palette.queryByText("--mt-toast-default-icon-ink")).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "局部主操作" })).toBeVisible();
 });
+
+
+test("switches only the demo's named design and mode", () => {
+  window.location.hash = "#/theme";
+  render(<DocsApp />);
+  const preview = screen.getByRole("region", { name: "主题预览" });
+  const presetGroup = within(screen.getByRole("group", { name: "主题方案" }));
+  const modeGroup = within(screen.getByRole("group", { name: "预览模式" }));
+  expect(preview).toHaveAttribute("data-mt-theme-preset", "original");
+  fireEvent.click(presetGroup.getByRole("button", { name: "苔绿（自定义示例）" }));
+  expect(preview.style.getPropertyValue("--mt-height")).toBe("36px");
+  fireEvent.click(modeGroup.getByRole("button", { name: "深色" }));
+  expect(preview.style.getPropertyValue("--mt-nav-selected")).toBe("#31463a");
+  expect(document.documentElement.getAttribute("data-mt-theme-preset")).toBeNull();
+  fireEvent.click(presetGroup.getByRole("button", { name: "原调（Original）" }));
+  expect(preview).toHaveAttribute("data-mt-theme-preset", "original");
+  expect(preview.style.getPropertyValue("--mt-height")).toBe("");
+  expect(preview).toHaveAttribute("data-mt-theme", "dark");
+});

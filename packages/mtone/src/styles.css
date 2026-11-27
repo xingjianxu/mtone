@@ -72,10 +72,6 @@
   --mt-subtle: #f7f7f5;
   --mt-focus: #93b4dc;
 }
-.mt-scope {
-  --mt-height: 32px;
-  --mt-radius: 4px;
-}
 .mt-scope *,
 .mt-scope *::before,
 .mt-scope *::after {

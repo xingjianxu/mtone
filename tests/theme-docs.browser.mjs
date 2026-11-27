@@ -78,6 +78,38 @@ try {
   await pressed(page, "跟随系统");
   await page.goto(base + "#/start");
 
+  await page.goto(base + "#/theme");
+  const design = page.getByRole("group", { name: "主题方案" });
+  const previewMode = page.getByRole("group", { name: "预览模式" });
+  const preview = page.getByRole("region", { name: "主题预览" });
+  const save = preview.getByRole("button", { name: "保存", exact: true });
+  const selected = preview.getByRole("button", { name: "文档", exact: true });
+  await expect(preview).toHaveAttribute("data-mt-theme-preset", "original");
+  await expect(save).toHaveCSS("height", "32px");
+  await expect(save).toHaveCSS("border-radius", "4px");
+  await expect(selected).toHaveCSS("background-color", "rgb(229, 229, 229)");
+  await design.getByRole("button", { name: "苔绿（自定义示例）" }).click();
+  await expect(preview).toHaveAttribute("data-mt-theme-preset", "meadow");
+  await expect(save).toHaveCSS("height", "36px");
+  await expect(save).toHaveCSS("border-radius", "8px");
+  await expect(selected).toHaveCSS("background-color", "rgb(220, 236, 224)");
+  await expect(preview.getByRole("button", { name: "收藏" })).toHaveCSS("margin-top", "6px");
+  await previewMode.getByRole("button", { name: "深色", exact: true }).click();
+  await expect(selected).toHaveCSS("background-color", "rgb(49, 70, 58)");
+  await preview.getByRole("combobox", { name: "范围", exact: true }).click();
+  const range = page.getByRole("listbox");
+  await expect(range).toBeVisible();
+  expect(await range.evaluate(el => el.closest("[data-mt-theme-preset]")?.getAttribute("data-mt-theme-preset"))).toBe("meadow");
+  await page.keyboard.press("Escape");
+  await previewMode.getByRole("button", { name: "跟随系统", exact: true }).click();
+  await expect(selected).toHaveCSS("background-color", "rgb(49, 70, 58)");
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(selected).toHaveCSS("background-color", "rgb(220, 236, 224)");
+  await design.getByRole("button", { name: "原调（Original）" }).click();
+  await expect(save).toHaveCSS("height", "32px");
+  await expect(preview.getByRole("button", { name: "收藏" })).toHaveCSS("margin-top", "3px");
+  await page.goto(base + "#/start");
+
   await page.setViewportSize({ width: 320, height: 740 });
   await expect(mode(page, "跟随系统")).toBeVisible();
   expect(await header.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
