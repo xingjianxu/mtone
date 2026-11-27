@@ -1,5 +1,10 @@
 # Changelog
 
+## BlockEditor 1.1.0 (separate package)
+
+- Expose the native BlockNote instance and allow additive inline content specs and editor extensions, including async mentions.
+- Use the host's `uploadFile` callback for native clipboard file paste and drag-and-drop uploads.
+
 ## 1.0.0
 
 - Add AppLayout without a global header, with independent navigation and content scrolling, bottom account actions, and optional sidebar resizing and icon-only collapse.
