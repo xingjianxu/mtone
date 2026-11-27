@@ -93,9 +93,11 @@ try {
   await expect(save).toHaveCSS("height", "36px");
   await expect(save).toHaveCSS("border-radius", "8px");
   await expect(selected).toHaveCSS("background-color", "rgb(220, 236, 224)");
+  await expect(selected).toHaveCSS("color", "rgb(37, 74, 56)");
   await expect(preview.getByRole("button", { name: "收藏" })).toHaveCSS("margin-top", "6px");
   await previewMode.getByRole("button", { name: "深色", exact: true }).click();
   await expect(selected).toHaveCSS("background-color", "rgb(49, 70, 58)");
+  await expect(selected).toHaveCSS("color", "rgb(214, 240, 222)");
   await preview.getByRole("combobox", { name: "范围", exact: true }).click();
   const range = page.getByRole("listbox");
   await expect(range).toBeVisible();
@@ -108,6 +110,7 @@ try {
   await design.getByRole("button", { name: "原调（Original）" }).click();
   await expect(save).toHaveCSS("height", "32px");
   await expect(preview.getByRole("button", { name: "收藏" })).toHaveCSS("margin-top", "3px");
+  await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(base + "#/start");
 
   await page.setViewportSize({ width: 320, height: 740 });
