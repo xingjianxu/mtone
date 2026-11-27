@@ -96,7 +96,7 @@ try {
   await expect(semantic.getByRole("columnheader", { name: "浅色" })).toBeVisible({ timeout: 3000 });
   await expect(semantic.getByRole("columnheader", { name: "深色" })).toBeVisible();
   const semanticRows = semantic.locator("tbody tr");
-  await expect(semanticRows).toHaveCount(8);
+  await expect(semanticRows).toHaveCount(10);
   for (const row of await semanticRows.all()) {
     const colors = await row.locator(".semantic-swatch").evaluateAll((samples) =>
       samples.map((sample) => {
@@ -112,6 +112,15 @@ try {
       expect(color).toMatch(/^rgb\(/);
       expect(label).toBe(hex);
     }
+  }
+
+  for (const [token, light, dark] of [
+    ["--mt-nav-selected", "#E5E5E5", "#3D3C39"],
+    ["--mt-nav-current-text", "#262626", "#EEECE8"],
+  ]) {
+    const row = semantic.getByRole("row").filter({ has: page.getByRole("cell", { name: token, exact: true }) });
+    await expect(row.getByRole("cell").nth(2)).toHaveText(light);
+    await expect(row.getByRole("cell").nth(3)).toHaveText(dark);
   }
 
   const focusRow = semantic.getByRole("row").filter({ hasText: "键盘焦点" });

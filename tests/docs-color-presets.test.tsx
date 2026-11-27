@@ -56,6 +56,25 @@ test("lists the pale blue selection surface separately from the accent colors", 
   expect(surfaces.getByText("#293746")).toBeVisible();
 });
 
+test("lists the three navigation selection roles together in the semantic colors table", () => {
+  window.location.hash = paletteRoute;
+  render(<DocsApp />);
+  const table = within(screen.getByRole("table", { name: "常用语义颜色" }));
+  const roles = [
+    ["导航选中背景", "--mt-nav-selected"],
+    ["导航选中文字", "--mt-nav-current-text"],
+    ["侧栏当前项标记", "--mt-nav-current-indicator"],
+  ];
+  const rows = table.getAllByRole("row");
+  const first = rows.indexOf(table.getByText(roles[0][1]).closest("tr")!);
+  expect(first).toBeGreaterThan(0);
+  roles.forEach(([label, token], offset) => {
+    const row = within(rows[first + offset]);
+    expect(row.getByRole("cell", { name: label })).toBeVisible();
+    expect(row.getByRole("cell", { name: token })).toBeVisible();
+  });
+});
+
 test("documents role overrides without treating them as public palette choices", () => {
   window.location.hash = paletteRoute;
   render(<DocsApp />);

@@ -22,6 +22,8 @@ const semanticColors = [
   ["键盘焦点", "--mt-focus"],
   ["信息提示底色", "--mt-alert-info-bg"],
   ["警告提示底色", "--mt-alert-warning-bg"],
+  ["导航选中背景", "--mt-nav-selected"],
+  ["导航选中文字", "--mt-nav-current-text"],
   ["侧栏当前项标记", "--mt-nav-current-indicator", "var(--mt-blue, #2383e2)"],
   ["日历当天文字", "--mt-calendar-today-ink", "var(--mt-blue, #2383e2)"],
   ["拖放目标边缘", "--mt-drop-target-edge", "var(--mt-indicator, #5378aa)"],
