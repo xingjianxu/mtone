@@ -911,6 +911,27 @@ try {
     base + "block-editor-media/release-notes.txt",
   );
   await fileSettings.waitFor({ state: "hidden" });
+  await page.goto(base + "#/components/BlockEditor?section=native-extensions");
+  const mentionBody = page.getByRole("textbox", { name: "原生提及示例正文" });
+  await page.getByRole("button", { name: "定位到正文末尾" }).click();
+  await expect(mentionBody).toBeFocused();
+  await mentionBody.pressSequentially("@lin");
+  const people = page.getByRole("listbox", { name: "提及对象" });
+  await expect(people.getByRole("option", { name: /林晓/ })).toBeVisible();
+  await expect(people.getByRole("option", { name: /周然/ })).toHaveCount(0);
+  await mentionBody.press("ArrowDown");
+  await mentionBody.press("Enter");
+  await expect(mentionBody.locator('[data-mention-id="lin-xiao"]')).toHaveText("@林晓");
+  await expect(mentionBody).not.toContainText("@lin");
+  await expect(people).toBeHidden();
+  await mentionBody.press("End");
+  await mentionBody.pressSequentially("@");
+  await expect(people.getByRole("option", { name: /周然/ })).toBeVisible();
+  await people.getByRole("option", { name: /周然/ }).click();
+  await expect(mentionBody.locator('[data-mention-id="zhou-ran"]')).toHaveText("@周然");
+  await page.getByRole("switch", { name: "只读提及预览" }).click();
+  await expect(mentionBody).toHaveAttribute("contenteditable", "false");
+  await expect(mentionBody.locator('[data-mention-id="lin-xiao"]')).toHaveText("@林晓");
   assert.deepEqual(botLogs, []);
   console.log(`Passed BlockEditor targeted browser demo on ${engine}`);
 } finally {

@@ -47,7 +47,9 @@ This file describes this package checkout, not necessarily the latest published 
 - initialContent: readonly BlockEditorInput[]. 仅在创建该文档时读取。支持正文、标题、列表、待办、引用、分割线、代码、表格、折叠、提示块、图片、视频、音频和附件。默认空段落。
 - documentKey: string | number. 换文档时修改键；新文档单独读取 initialContent，旧撤销历史不保留。
 - onChange: (blocks: BlockEditorBlock[]) => void. 内容改变时返回 BlockNote JSON。由应用决定怎样保存、验证和重新加载。
-- ref: React.Ref<BlockEditorRef>. 编辑器挂载后可调用 ref.current?.focus() 聚焦可编辑正文；只读时不移动焦点。不暴露 BlockNote 实例。
+- ref: React.Ref<BlockEditorRef>. 挂载后 ref.current?.getEditor() 返回当前原生 BlockNote 实例；切换 documentKey 后重新读取。focus() 只聚焦可编辑正文。
+- inlineContentSpecs: Record<string, InlineContentSpec>. 可选。在创建文档时追加原生行内节点定义，保留内置块、文字、链接和格式；更新定义要切换 documentKey。同一份 JSON 在编辑和只读时须使用同一套定义。
+- renderExtensions: (editor: BlockEditorInstance) => ReactNode. 可选。在 BlockNote 视图上下文内挂载原生控制器，仅编辑模式挂载。示例使用 SuggestionMenuController 异步查找，独立定制候选列表与文档中的行内渲染。
 - getBlockEditorStats（独立导出）: (blocks: readonly BlockEditorInput[]) => BlockEditorStats. 不是组件属性。可用初始内容或 onChange 返回的块；返回 wordCount、characterCount、nonWhitespaceCharacterCount、blockCount。不需要挂载编辑器，不修改输入。
 - readOnly: boolean (default: false). 显示不可编辑正文；代码使用 Typography.Code 高亮。不替代应用权限校验。
 - borderless: boolean (default: false). 只移除编辑器外框，保留内部样式和键盘焦点提示。
@@ -62,7 +64,8 @@ This file describes this package checkout, not necessarily the latest published 
 - 视频、音频和附件使用直接 HTTP(S) 地址。图片、视频、音频和附件的说明在悬停或键盘聚焦时以提示气泡显示。视频支持设置宽度百分比；视频使用浏览器控件；音频使用 mtone 播放器，支持进度、音量和倍速，窄栏把音量与倍速收进更多。两者均不自动播放。附件支持自定义显示名称并在新标签页打开。
 - 提供上传回调后可在「上传」和「嵌入链接」之间切换。上传支持选择或拖放单个文件，失败后可以重试。库不提供存储服务；文件大小、类型和权限由宿主服务验证。取消会忽略上传结果，不会停止宿主正在执行的上传。
 - 统计包含嵌套内容、代码、表格单元格和链接显示文字，不计元数据（如媒体说明和链接地址），不添加块间分隔字符。汉字逐个计字，其他连续字母或数字计一词，词内撇号不拆分，标点与表情不计词。字符按可见字素统计，不支持 Intl.Segmenter 时按 Unicode 码点；块数包含空块、非文本块和子块，表格单元格不单独计块。
-- 原生 JSON 是主存储格式。只读只影响界面。外部内容仍需由应用验证来源、权限以及数据结构。
+- 使用原生扩展时，应用直接依赖与编辑器相同版本的 @blocknote/core 和 @blocknote/react。自定义节点用 BlockEditorRef<typeof inlineContentSpecs>、BlockEditorBlock<typeof inlineContentSpecs> 和 BlockEditorInput<typeof inlineContentSpecs> 获得类型。候选请求、校验与错误处理由应用负责；统计不计自定义节点的显示标签。
+- 原生 JSON 是主存储格式。只读只影响界面。不要自行销毁或重新挂载 getEditor() 返回的实例，也不要把它当作权限控制。外部内容仍需由应用验证来源、权限以及数据结构。
 
 ```tsx
 import { BlockEditor, getBlockEditorStats, type BlockEditorBlock } from "@bixlab/mtone-blockeditor";

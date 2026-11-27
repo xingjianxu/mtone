@@ -3,6 +3,9 @@
 import * as React from "react";
 import {
   BlockNoteEditor,
+  BlockNoteSchema,
+  type CustomInlineContentConfig,
+  type InlineContentSpec,
   type Block,
   type PartialBlock,
 } from "@blocknote/core";
@@ -19,21 +22,41 @@ import { AudioLocale } from "./editor-audio-player";
 import { schema, setCodePresentation } from "./editor-blocks";
 
 type TextSchema = typeof schema.blockSchema;
-export type BlockEditorBlock = Block<TextSchema>;
-export type BlockEditorInput = PartialBlock<TextSchema>;
-export type Editor = BlockNoteEditor<TextSchema>;
+type InlineSpecs = Record<string, InlineContentSpec<CustomInlineContentConfig>>;
+type NoInlineSpecs = Record<never, never>;
+type InlineSchema<Extra extends InlineSpecs> =
+  typeof schema.inlineContentSchema & {
+    [Key in keyof Extra]: Extra[Key]["config"];
+  };
 
-export interface BlockEditorRef {
+export type BlockEditorBlock<Extra extends InlineSpecs = NoInlineSpecs> = Block<
+  TextSchema,
+  InlineSchema<Extra>,
+  typeof schema.styleSchema
+>;
+export type BlockEditorInput<Extra extends InlineSpecs = NoInlineSpecs> =
+  PartialBlock<TextSchema, InlineSchema<Extra>, typeof schema.styleSchema>;
+export type BlockEditorInstance<Extra extends InlineSpecs = NoInlineSpecs> =
+  BlockNoteEditor<TextSchema, InlineSchema<Extra>, typeof schema.styleSchema>;
+export type Editor = BlockEditorInstance;
+
+export interface BlockEditorRef<Extra extends InlineSpecs = NoInlineSpecs> {
   /** Focus the editable document. Does nothing in read-only mode. */
   focus(): void;
+  /** Return the native editor for this mounted document. Re-read the ref after remounts. */
+  getEditor(): BlockEditorInstance<Extra>;
 }
 
-export interface BlockEditorProps {
+export interface BlockEditorProps<Extra extends InlineSpecs = NoInlineSpecs> {
   /** Change the key to load a different document. */
   documentKey?: string | number;
   /** Read once per document key. */
-  initialContent?: readonly BlockEditorInput[];
-  onChange?: (blocks: BlockEditorBlock[]) => void;
+  initialContent?: readonly BlockEditorInput<Extra>[];
+  onChange?: (blocks: BlockEditorBlock<Extra>[]) => void;
+  /** Additional native inline specs, read once per document key. Built-ins cannot be replaced. */
+  inlineContentSpecs?: Extra;
+  /** Mount edit-only controllers inside the native BlockNote view. */
+  renderExtensions?: (editor: BlockEditorInstance<Extra>) => React.ReactNode;
   readOnly?: boolean;
   /** Hide the outer frame without changing editor content or controls. */
   borderless?: boolean;
@@ -51,34 +74,51 @@ export interface BlockEditorProps {
   uploadImage?: (file: File) => Promise<string>;
 }
 
-export const BlockEditor = React.forwardRef<BlockEditorRef, BlockEditorProps>(
-  function BlockEditor({ documentKey, ...props }, ref) {
-    const [client, setClient] = React.useState(false);
-    React.useEffect(() => setClient(true), []);
-    if (!client)
-      return (
-        <div
-          className={props.className}
-          data-mtone-block-editor-placeholder=""
-        />
-      );
+export function BlockEditor<Extra extends InlineSpecs = NoInlineSpecs>({
+  documentKey,
+  ref,
+  ...props
+}: BlockEditorProps<Extra> & { ref?: React.Ref<BlockEditorRef<Extra>> }) {
+  const [client, setClient] = React.useState(false);
+  React.useEffect(() => setClient(true), []);
+  if (!client)
     return (
-      <EditorInstance
-        key={
-          documentKey === undefined
-            ? ""
-            : `${typeof documentKey}:${documentKey}`
-        }
-        {...props}
-        editorRef={ref}
-      />
+      <div className={props.className} data-mtone-block-editor-placeholder="" />
     );
-  },
-);
+  return (
+    <EditorInstance
+      key={
+        documentKey === undefined ? "" : `${typeof documentKey}:${documentKey}`
+      }
+      {...props}
+      editorRef={ref}
+    />
+  );
+}
 
-function EditorInstance({
+function documentSchema<Extra extends InlineSpecs>(extra?: Extra) {
+  if (!extra || !Object.keys(extra).length) return schema;
+  for (const [name, spec] of Object.entries(extra)) {
+    if (
+      Object.hasOwn(schema.inlineContentSpecs, name) ||
+      spec.config.type !== name
+    ) {
+      throw new Error(`Invalid BlockEditor inline content spec: ${name}`);
+    }
+  }
+  // Build a fresh schema: BlockNote's extend() mutates the receiver.
+  return BlockNoteSchema.create({
+    blockSpecs: schema.blockSpecs,
+    inlineContentSpecs: { ...schema.inlineContentSpecs, ...extra },
+    styleSpecs: schema.styleSpecs,
+  });
+}
+
+function EditorInstance<Extra extends InlineSpecs>({
   initialContent,
   onChange,
+  inlineContentSpecs,
+  renderExtensions,
   readOnly = false,
   borderless = false,
   fillHeight = false,
@@ -88,13 +128,18 @@ function EditorInstance({
   uploadImage,
   uploadFile,
   editorRef,
-}: BlockEditorProps & { editorRef: React.ForwardedRef<BlockEditorRef> }) {
+}: BlockEditorProps<Extra> & { editorRef?: React.Ref<BlockEditorRef<Extra>> }) {
   const { locale: inheritedLocale, theme } = useMtone();
   const locale = explicitLocale ?? inheritedLocale;
   const name = label ?? (locale === "zh" ? "块编辑器" : "Block editor");
-  const [editor] = React.useState<Editor>(() =>
+  const [editor] = React.useState(() =>
     BlockNoteEditor.create({
-      schema,
+      // The native constructor merges the exact spec configs described by InlineSchema.
+      schema: documentSchema(inlineContentSpecs) as unknown as BlockNoteSchema<
+        TextSchema,
+        InlineSchema<Extra>,
+        typeof schema.styleSchema
+      >,
       extensions: [editorCodeHighlight],
       tables: { headers: true },
       links: {
@@ -117,6 +162,7 @@ function EditorInstance({
   React.useImperativeHandle(
     editorRef,
     () => ({
+      getEditor: () => editor,
       focus() {
         if (!readOnly && editor.domElement?.isConnected) editor.focus();
       },
@@ -188,7 +234,8 @@ function EditorInstance({
         {!readOnly && <EditorTableExtend zh={locale === "zh"} />}
         {!readOnly && (
           <EditorControls
-            editor={editor}
+            // Built-in controls target the base blocks and treat extra inline content as opaque.
+            editor={editor as unknown as Editor}
             locale={locale}
             uploadImage={uploadImage}
             uploadFile={uploadFile}
@@ -196,6 +243,7 @@ function EditorInstance({
             setPreviewCodeId={setPreviewCodeId}
           />
         )}
+        {!readOnly && renderExtensions?.(editor)}
       </BlockNoteViewRaw>
     </div>
   );

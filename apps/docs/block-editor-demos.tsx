@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from "react";
+import mentionsSource from "./block-editor-mentions-example.tsx?raw";
 import editorSource from "./block-editor-example.tsx?raw";
 import type { DocSection } from "./doc-section";
 
@@ -23,6 +24,12 @@ const MediaExample = lazy(() =>
 const UploadExample = lazy(() =>
   import("./block-editor-example").then(({ BlockEditorUploadExample }) => ({
     default: BlockEditorUploadExample,
+  })),
+);
+
+const MentionsExample = lazy(() =>
+  import("./block-editor-example").then(({ BlockEditorMentionsExample }) => ({
+    default: BlockEditorMentionsExample,
   })),
 );
 
@@ -76,5 +83,16 @@ export const blockEditorDocSections: readonly DocSection[] = [
       </Suspense>
     ),
     source: editorSource,
+  },
+  {
+    id: "native-extensions",
+    title: "原生扩展：异步 @ 提及",
+    note: "在正文中输入 @lin，使用方向键和回车，或点击候选。只读预览仍显示已插入的提及。",
+    Demo: () => (
+      <Suspense fallback={<p role="status">正在加载编辑器…</p>}>
+        <MentionsExample />
+      </Suspense>
+    ),
+    source: mentionsSource,
   },
 ];

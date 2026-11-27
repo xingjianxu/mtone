@@ -266,3 +266,5 @@ export function BlockEditorUploadExample() {
     </div>
   );
 }
+
+export { default as BlockEditorMentionsExample } from "./block-editor-mentions-example";

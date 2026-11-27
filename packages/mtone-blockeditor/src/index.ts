@@ -5,6 +5,7 @@ export type { BlockEditorStats } from "./block-editor-stats";
 export type {
   BlockEditorBlock,
   BlockEditorInput,
+  BlockEditorInstance,
   BlockEditorProps,
   BlockEditorRef,
 } from "./block-editor";

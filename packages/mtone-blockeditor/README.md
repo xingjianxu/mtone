@@ -26,9 +26,36 @@ Use a new `documentKey` to load a different `initialContent`; do not feed the ch
 
 For Next.js, dynamically load the editor in a client component with `ssr: false`. To support on-screen keyboard layout in Chromium, add `interactive-widget=resizes-content` to the viewport settings. The editor supports basic tables, collapsible blocks, semantic callouts, and images by HTTP(S) URL. Code stays editable in BlockNote with live Shiki highlighting and a monospace font. Grammar files are loaded on demand from the application assets, not a CDN. The optional preview and read-only display still use mtone Typography.Code. Use `/Video`, `/Audio`, or `/File` with a direct HTTP(S) URL to add media. Media and image captions are shown in tooltips on hover or keyboard focus; video supports a responsive width percentage (25–100), and files support an optional display name and open in a new tab. Neither autoplays. Audio uses mtone playback, seek, volume and speed controls in both editing and read-only mode; narrower layouts move volume and speed into More. Video uses native controls. Cell merging, collaboration, and AI are not included. See the [shared documentation](https://xingjianxu.github.io/mtone/#/components/BlockEditor).
 
-## Focus the editor
+## Native BlockNote extensions
 
-Pass a React ref typed as `BlockEditorRef` to `BlockEditor` and call `ref.current?.focus()` to return focus to the editable document. The ref is unavailable until the editor mounts; calling focus in read-only mode is a no-op. This interface does not expose the underlying editor instance.
+Pass a React ref typed as `BlockEditorRef` to call `ref.current?.focus()` or
+`ref.current?.getEditor()`. The second returns the actual BlockNote instance,
+not a copy. The ref is unavailable until mount. Re-read it after changing
+`documentKey`; do not destroy, mount, or keep using the old instance. In
+read-only mode, the ref still provides the instance, but `focus()` is a no-op.
+The read-only UI does not limit imperative calls or enforce permissions.
+
+When using the native APIs, declare `@blocknote/core` and `@blocknote/react`
+as direct dependencies of your app and match the versions in this package
+(currently both `0.57.0`). Multiple copies can break React context.
+
+- Pass `inlineContentSpecs={{ mention }}` with a native spec from
+  `createReactInlineContentSpec`. The key must match its type; built-in text
+  and link specs cannot be replaced. The specs are read once per document key
+  and preserve mtone's built-in blocks and styles. Supply the same specs when
+  displaying saved documents, including in read-only mode.
+- Pass `renderExtensions={(editor) => <MyNativeControllers editor={editor} />}`
+  to mount controls inside the BlockNote view. The slot is not mounted in
+  read-only mode. Put hooks in the returned component, not in the callback.
+- Use `BlockEditorRef<typeof inlineContentSpecs>`,
+  `BlockEditorInput<typeof inlineContentSpecs>`, and
+  `BlockEditorBlock<typeof inlineContentSpecs>` for typed native access and
+  document data. Keep custom node props serializable.
+
+See the [interactive native @ mention example](https://xingjianxu.github.io/mtone/#/components/BlockEditor?section=native-extensions)
+for asynchronous `getItems`, a custom candidate list, and a separately rendered
+inline token. mtone does not wrap the mentions API; your app owns the directory
+request, failure handling, and the stable IDs stored in the document.
 
 ## Document statistics
 
@@ -41,7 +68,7 @@ const stats = getBlockEditorStats([{ type: "paragraph", content: "你好 world" 
 // { wordCount: 3, characterCount: 8, nonWhitespaceCharacterCount: 7, blockCount: 1 }
 ```
 
-Each Han character counts as one word, and each run of other letters or numbers counts as one word. Internal apostrophes do not split words. Punctuation and emoji do not count as words. Character counts use Unicode grapheme clusters when `Intl.Segmenter` is available and Unicode code points otherwise. The totals include nested blocks, code, table cell text, and link labels, but not metadata such as media captions or link URLs. Blocks and cells are counted independently without adding separator characters. The block count includes nested, empty, and non-text blocks; table cells are not blocks.
+Each Han character counts as one word, and each run of other letters or numbers counts as one word. Internal apostrophes do not split words. Punctuation and emoji do not count as words. Character counts use Unicode grapheme clusters when `Intl.Segmenter` is available and Unicode code points otherwise. The totals include nested blocks, code, table cell text, and link labels, but not metadata such as media captions, link URLs, or custom inline labels. Blocks and cells are counted independently without adding separator characters. The block count includes nested, empty, and non-text blocks; table cells are not blocks.
 
 ## Upload or embed a file
 

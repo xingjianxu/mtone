@@ -1,4 +1,5 @@
 import { createRef } from "react";
+import { createReactInlineContentSpec, useBlockNoteEditor } from "@blocknote/react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeAll, expect, test, vi } from "vitest";
 import { BlockEditor, type BlockEditorRef } from "../packages/mtone-blockeditor/src";
@@ -53,7 +54,7 @@ test("loads native blocks once per key and switches to read-only without replaci
   expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
 });
 
-test("public focus handle focuses the current editable document without exposing its editor", async () => {
+test("public ref focuses the current editable document and resolves its native instance", async () => {
   const ref = createRef<BlockEditorRef>();
   const { rerender } = render(<><button onClick={() => ref.current?.focus()}>Resume</button>
     <BlockEditor ref={ref} label="Notes" documentKey="a" /></>);
@@ -61,13 +62,15 @@ test("public focus handle focuses the current editable document without exposing
   button.focus();
   fireEvent.click(button);
   await waitFor(() => expect(screen.getByRole("textbox", { name: "Notes" })).toHaveFocus());
-  expect(Object.keys(ref.current ?? {})).toEqual(["focus"]);
+  const first = ref.current?.getEditor();
+  expect(first?.domElement).toBe(screen.getByRole("textbox", { name: "Notes" }));
 
   rerender(<><button onClick={() => ref.current?.focus()}>Resume</button>
     <BlockEditor ref={ref} label="Notes" documentKey="b" readOnly /></>);
   button.focus();
   fireEvent.click(button);
   expect(button).toHaveFocus();
+  expect(ref.current?.getEditor()).not.toBe(first);
 
   rerender(<><button onClick={() => ref.current?.focus()}>Resume</button>
     <BlockEditor ref={ref} label="Notes" documentKey="b" /></>);
@@ -394,4 +397,47 @@ test("renders media captions and controls without creating unsafe resource URLs"
   ).not.toBeInTheDocument();
   for (const caption of ["Product tour", "Chime", "Release agenda"])
     expect(screen.queryByText(caption)).not.toBeInTheDocument();
+});
+
+test("adds native inline content per document and mounts extensions in the native view context", async () => {
+  const mention = createReactInlineContentSpec(
+    { type: "mention", propSchema: { label: { default: "" } }, content: "none" },
+    { render: ({ inlineContent }) => <span>@{inlineContent.props.label}</span> },
+  );
+  const inlineContentSpecs = { mention };
+  const ref = createRef<BlockEditorRef<typeof inlineContentSpecs>>();
+  let contextEditor: object | undefined;
+  const seen = vi.fn();
+  function Extension() {
+    contextEditor = useBlockNoteEditor();
+    return <span>Native extension</span>;
+  }
+  const props = {
+    ref,
+    inlineContentSpecs,
+    documentKey: "extended",
+    initialContent: [
+      { type: "callout" as const, content: [{ type: "mention" as const, props: { label: "Lin" } }] },
+    ],
+    renderExtensions: (editor: ReturnType<NonNullable<typeof ref.current>["getEditor"]>) => {
+      seen(editor);
+      return <Extension />;
+    },
+  };
+  const { rerender, unmount } = render(<BlockEditor {...props} />);
+  const native = ref.current?.getEditor();
+  expect(native).toBeDefined();
+  expect(contextEditor).toBe(native);
+  expect(seen).toHaveBeenLastCalledWith(native);
+  expect(await screen.findByText("@Lin")).toBeVisible();
+  expect(screen.getByText("Native extension")).toBeVisible();
+  rerender(<BlockEditor {...props} readOnly />);
+  expect(ref.current?.getEditor()).toBe(native);
+  expect(await screen.findByText("@Lin")).toBeVisible();
+  expect(screen.queryByText("Native extension")).toBeNull();
+  rerender(<BlockEditor {...props} documentKey="plain" inlineContentSpecs={undefined} initialContent={undefined} />);
+  expect(ref.current?.getEditor()).not.toBe(native);
+  expect(ref.current?.getEditor().schema.inlineContentSchema).not.toHaveProperty("mention");
+  unmount();
+  expect(ref.current).toBeNull();
 });
