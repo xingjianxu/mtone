@@ -54,7 +54,7 @@
 }
 
 .mt-toc-item + .mt-toc-item {
-  margin-top: 3px;
+  margin-top: var(--mt-option-row-gap);
 }
 
 .mt-toc-disclosure:not([data-collapsible]) > summary {

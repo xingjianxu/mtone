@@ -122,7 +122,7 @@ export default function Demo() {
       "提供上传回调后可在「上传」和「嵌入链接」之间切换。上传支持选择或拖放单个文件，失败后可以重试。库不提供存储服务；文件大小、类型和权限由宿主服务验证。取消会忽略上传结果，不会停止宿主正在执行的上传。",
       "正文粘贴与拖放复用 BlockNote 原生处理。浏览器须提供实际文件，截图与媒体按 MIME 类型插入对应块，其他文件插入附件块；剪贴板若同时提供可用文本或 HTML，优先粘贴文字内容。首次启用正文上传时须在文档创建时提供回调。",
       "统计包含嵌套内容、代码、表格单元格和链接显示文字，不计元数据（如媒体说明和链接地址），不添加块间分隔字符。汉字逐个计字，其他连续字母或数字计一词，词内撇号不拆分，标点与表情不计词。字符按可见字素统计，不支持 Intl.Segmenter 时按 Unicode 码点；块数包含空块、非文本块和子块，表格单元格不单独计块。",
-      "使用原生扩展时，应用直接依赖与编辑器相同版本的 @blocknote/core 和 @blocknote/react。自定义节点用 BlockEditorRef<typeof inlineContentSpecs>、BlockEditorBlock<typeof inlineContentSpecs> 和 BlockEditorInput<typeof inlineContentSpecs> 获得类型。候选请求、校验与错误处理由应用负责；统计不计自定义节点的显示标签。",
+      "使用原生扩展时，应用直接依赖与编辑器相同版本的 @blocknote/core 和 @blocknote/react。自定义节点用 BlockEditorRef<typeof inlineContentSpecs>、BlockEditorBlock<typeof inlineContentSpecs> 和 BlockEditorInput<typeof inlineContentSpecs> 获得类型。候选请求、校验与错误处理由应用负责；统计不计自定义节点的显示标签。示例与内置斜杠菜单共用候选行样式，相邻选项由 --mt-option-row-gap 控制，默认 3px。",
       "原生 JSON 是主存储格式。只读只影响界面。不要自行销毁或重新挂载 getEditor() 返回的实例，也不要把它当作权限控制。外部内容仍需由应用验证来源、权限以及数据结构。",
     ],
   },
@@ -3685,7 +3685,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "组前分隔线是装饰，不会出现在无障碍树中。独立导航和 Sidebar 展开、收起时，分隔线上下留白一致；有其它导航项隔开时不画线。",
+      "同组相邻导航项的默认间距为 3px，可用共享 CSS 变量 --mt-option-row-gap 调整，不影响组前分隔线。组前分隔线是装饰，不会出现在无障碍树中。独立导航和 Sidebar 展开、收起时，分隔线上下留白一致；有其它导航项隔开时不画线。",
       "组内 NavItem 默认行高 32px，相邻项仍保留 3px 间距。首组不额外加上方空白；后续分组上间距仍为 12px，侧边栏自身的内边距不变。",
       '标题操作不触发导航项；建议使用 size="sm"、variant="ghost" 的 Button iconOnly 并提供可访问名称。操作区与标题分开布局，过长的标题会截断。',
     ],

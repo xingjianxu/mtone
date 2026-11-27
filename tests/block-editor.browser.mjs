@@ -969,6 +969,16 @@ try {
   await mentionBody.press("End");
   await mentionBody.pressSequentially("@");
   await expect(people.getByRole("option", { name: /周然/ })).toBeVisible();
+  await expect(people.locator(".mt-block-editor-option")).toHaveCount(3);
+  const mentionGaps = () => people.locator(".mt-block-editor-option").evaluateAll((rows) =>
+    rows.slice(1).map((row, index) =>
+      row.getBoundingClientRect().top - rows[index].getBoundingClientRect().bottom,
+    ),
+  );
+  assert.deepEqual(await mentionGaps(), [3, 3], "mention rows match NavGroup spacing");
+  const override = await page.addStyleTag({ content: ":root { --mt-option-row-gap: 7px; }" });
+  assert.deepEqual(await mentionGaps(), [7, 7], "the popup honors the shared token");
+  await override.evaluate((node) => node.remove());
   await people.getByRole("option", { name: /周然/ }).click();
   await expect(mentionBody.locator('[data-mention-id="zhou-ran"]')).toHaveText("@周然");
   await page.getByRole("switch", { name: "只读提及预览" }).click();

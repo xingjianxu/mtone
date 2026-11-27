@@ -783,7 +783,7 @@ a.mt-nav-item {
 :is(.mt-nav-submenu-children, .mt-nav-submenu-popup)
   > :is(.mt-nav-item, .mt-nav-item-row)
   + :is(.mt-nav-item, .mt-nav-item-row) {
-  margin-top: 3px;
+  margin-top: var(--mt-option-row-gap);
 }
 .mt-nav-submenu {
   min-inline-size: 0;
@@ -803,7 +803,7 @@ a.mt-nav-item {
 }
 .mt-nav-submenu-children {
   padding-inline-start: 20px;
-  margin-block-start: 3px;
+  margin-block-start: var(--mt-option-row-gap);
 }
 .mt-popup.mt-nav-submenu-popup {
   min-width: min(160px, var(--available-width, 100vw), calc(100vw - 16px));

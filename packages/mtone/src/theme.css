@@ -12,6 +12,11 @@
   }
 }
 
+:where(:root) {
+  /* Vertical space between adjacent compact interactive rows. */
+  --mt-option-row-gap: 3px;
+}
+
 /* Accents are reusable without a provider and reset at nested theme scopes. */
 :where(:root, .mt-scope, [data-mt-theme]) {
   --mt-accent-neutral: #62605b;

@@ -257,5 +257,5 @@
 }
 
 .mt-cascader-option + .mt-cascader-option {
-  margin-top: 3px;
+  margin-top: var(--mt-option-row-gap);
 }

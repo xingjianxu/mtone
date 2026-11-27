@@ -28,5 +28,5 @@
 .mt-spotlight-footer { flex-shrink: 0; margin-top: 8px; padding: 9px 16px; border-top: 1px solid var(--mt-border, #e9e9e7); font-size: 11px; color: var(--mt-muted, #787774); }
 
 .mt-spotlight-option + .mt-spotlight-option {
-  margin-top: 3px;
+  margin-top: var(--mt-option-row-gap);
 }

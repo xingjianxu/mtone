@@ -156,7 +156,7 @@ it('spaces consecutive NavGroup items like sidebar menus without widening group 
   const css = readFileSync('packages/mtone/src/styles.css', 'utf8');
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
   const spacing = rules.find((rule) => rule[1].includes('.mt-nav-item-row') &&
-    rule[1].includes('.mt-nav-group') && rule[2].trim() === 'margin-top: 3px;');
+    rule[1].includes('.mt-nav-group') && rule[2].trim() === 'margin-top: var(--mt-option-row-gap);');
   expect(spacing).toBeDefined();
   const nav = document.createElement('div');
   nav.innerHTML = ['mt-nav-group', 'mt-sidebar-content'].map((parent) =>
@@ -168,7 +168,7 @@ it('spaces consecutive NavGroup items like sidebar menus without widening group 
   const showcase = readFileSync('apps/docs/app-showcase.css', 'utf8');
   const item = showcase.slice(showcase.indexOf('.showcase .showcase-sidebar .mt-nav-item {')).split('}')[0];
   expect(item).not.toContain('margin-bottom');
-  expect(showcase).toMatch(/\.showcase \.showcase-sidebar \.mt-nav-item \+ \.mt-nav-item\s*\{\s*margin-top: 3px;\s*\}/);
+  expect(showcase).toMatch(/\.showcase \.showcase-sidebar \.mt-nav-item \+ \.mt-nav-item\s*\{\s*margin-top: var\(--mt-option-row-gap\);\s*\}/);
 });
 
 it("paints a single themed adjacent NavGroup divider without layout or pointer effects", () => {
@@ -196,5 +196,14 @@ it.each([
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
   const rule = rules.find((entry) => entry[1].trim().split(/,\s*/).includes(selector));
   expect(rule, selector).toBeDefined();
-  expect(rule?.[2].trim()).toBe('margin-top: 3px;');
+  expect(rule?.[2].trim()).toBe('margin-top: var(--mt-option-row-gap);');
+});
+
+it('shares the 3px option-row token with BlockEditor, including older mtone peers', () => {
+  const theme = readFileSync('packages/mtone/src/theme.css', 'utf8');
+  const editor = readFileSync('packages/mtone-blockeditor/src/styles.css', 'utf8');
+  const settings = readFileSync('packages/mtone/src/settings-dialog.css', 'utf8');
+  expect(theme).toContain('--mt-option-row-gap: 3px;');
+  expect(editor).toMatch(/\.mt-block-editor-option \+ \.mt-block-editor-option\s*\{\s*margin-block-start: var\(--mt-option-row-gap, 3px\);/);
+  expect(settings).toMatch(/\.mt-settings-dialog-results\s*\{[^}]*gap: var\(--mt-option-row-gap\);/);
 });

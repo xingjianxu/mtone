@@ -97,5 +97,5 @@
 }
 
 .mt-mentions-option + .mt-mentions-option {
-  margin-top: 3px;
+  margin-top: var(--mt-option-row-gap);
 }

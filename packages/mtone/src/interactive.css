@@ -374,9 +374,6 @@
   gap: 8px;
   min-block-size: 32px;
 }
-.mt-select-popup-search-list .mt-option + .mt-option {
-  margin-block-start: 3px;
-}
 .mt-select-popup-check-slot {
   display: grid;
   flex: 0 0 16px;
@@ -924,10 +921,10 @@
 .mt-menubar-icon svg { width: 14px; height: 14px; }
 
 .mt-option + .mt-option {
-  margin-top: 3px;
+  margin-top: var(--mt-option-row-gap);
 }
 
 .mt-menu-item + .mt-menu-item,
 .mt-menu-item-spaced {
-  margin-top: 3px;
+  margin-top: var(--mt-option-row-gap);
 }

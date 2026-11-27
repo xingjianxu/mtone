@@ -322,7 +322,7 @@ it.each(['pointer', 'keyboard'])('keeps logical row spacing when %s opens and cl
   ]} />);
   const { readFileSync } = await import('node:fs');
   const css = readFileSync('packages/mtone/src/interactive.css', 'utf8');
-  const selector = css.match(/([^{}]*\.mt-menu-item[^{}]*)\{\s*margin-top: 3px;\s*\}/)![1].trim();
+  const selector = css.match(/([^{}]*\.mt-menu-item[^{}]*)\{\s*margin-top: var\(--mt-option-row-gap\);\s*\}/)![1].trim();
   expect((await screen.findByRole('menuitem', { name: 'New' })).matches(selector)).toBe(false);
   const exporter = screen.getByRole('menuitem', { name: 'Export' });
   expect(exporter.matches(selector)).toBe(true);

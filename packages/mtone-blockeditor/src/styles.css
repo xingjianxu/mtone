@@ -144,6 +144,10 @@
   border-radius: 4px;
   cursor: pointer;
 }
+/* Older mtone peers do not define the shared token yet. */
+.mt-block-editor-option + .mt-block-editor-option {
+  margin-block-start: var(--mt-option-row-gap, 3px);
+}
 .mt-block-editor-option:hover {
   background: var(--mt-hover, #f1f1ef);
 }

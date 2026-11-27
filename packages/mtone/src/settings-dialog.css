@@ -95,7 +95,7 @@
 .mt-settings-dialog-results {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--mt-option-row-gap);
 }
 .mt-settings-dialog-results [role="option"] {
   display: flex;
