@@ -8,7 +8,7 @@ export interface SidebarResizeOptions {
   defaultWidth?: number;
   minWidth?: number;
   maxWidth?: number;
-  /** Show the Splitter separator’s two edge borders. */
+  /** Show both Splitter edges. PageLayout always shows both while resizing is enabled. */
   separatorBordered?: boolean;
   /** Remember the dragged sidebar width in this browser. */
   storageKey?: string;
@@ -25,14 +25,13 @@ interface SidebarResizeProps {
   collapsedWidth?: number;
   position?: "before" | "after";
   layout: "admin" | "page" | "app";
-  separatorVariant?: "line";
 }
 const dimension = (value: number | undefined, fallback: number) =>
   value !== undefined && Number.isFinite(value) && value >= 0 ? value : fallback;
 
 export function SidebarResize({
   options, sidebar, children, collapsibleSidebar, wrapSidebar,
-  defaultWidth = 240, collapsedWidth = 52, position = "before", layout, separatorVariant,
+  defaultWidth = 240, collapsedWidth = 52, position = "before", layout,
 }: SidebarResizeProps) {
   const config = typeof options === "object" ? options : {};
   const max = Math.max(1, dimension(config.maxWidth, 480));
@@ -81,7 +80,7 @@ export function SidebarResize({
         "--_mt-sidebar-resize-collapsed": `${collapsedWidth}px`,
       } as React.CSSProperties}>
       <SplitterStorageScopeContext.Provider value={`sidebar-resize:${layout}`}>
-      <Splitter storageKey={config.storageKey} separatorBordered={config.separatorBordered} separatorVariant={separatorVariant} disabled={compact || collapsed} style={{ overflow: "visible", height: layout === "page" ? "auto" : "100%" }}>
+      <Splitter storageKey={config.storageKey} separatorBordered={layout === "page" || config.separatorBordered} disabled={compact || collapsed} style={{ overflow: "visible", height: layout === "page" ? "auto" : "100%" }}>
         {position === "before" ? [sidebarPanel, mainPanel] : [mainPanel, sidebarPanel]}
       </Splitter>
       </SplitterStorageScopeContext.Provider>

@@ -133,6 +133,57 @@ try {
     await sidebarStage.getByRole("tab", { name: "交付记录" }).click();
     await expect(sidebarStage.getByRole("tabpanel", { name: "交付记录" })).toContainText("最近交付");
 
+    const resizeStage = page.locator(".component-demo-stage").filter({
+      has: page.getByRole("heading", { name: "项目文件", exact: true, level: 3 }),
+    });
+    const resizeLayout = resizeStage.locator(".mt-page-layout");
+    const resizeSwitch = resizeStage.getByRole("switch", { name: "拖拽调宽" });
+    const borderSwitch = resizeStage.getByRole("switch", { name: "边框布局" });
+    const rightButton = resizeStage.getByRole("button", { name: "右侧", exact: true });
+    const leftButton = resizeStage.getByRole("button", { name: "左侧", exact: true });
+    const separator = resizeLayout.getByRole("separator");
+    const resizeSidebar = resizeLayout.getByRole("complementary", { name: "项目文件筛选" });
+    await expect(resizeSwitch).toBeChecked();
+    await expect(borderSwitch).toBeChecked();
+    await expect(leftButton).toHaveAttribute("aria-pressed", "true");
+    await expect(resizeSidebar).toBeVisible();
+    if (viewport === 1440) {
+      await expect(separator).toBeVisible();
+      await expect(separator).toHaveCSS("border-left-width", "1px");
+      await expect(separator).toHaveCSS("border-right-width", "1px");
+      await expect(separator).not.toHaveClass(/mt-splitter-separator-line/);
+      await separator.scrollIntoViewIfNeeded();
+      const sideWidth = async () => (await resizeSidebar.boundingBox()).width;
+      await expect.poll(sideWidth).toBeCloseTo(220, 0);
+      const { x, y, width, height } = await separator.boundingBox();
+      await page.mouse.move(x + width / 2, y + height / 2);
+      await page.mouse.down();
+      await page.mouse.move(x + 40, y + height / 2, { steps: 6 });
+      await page.mouse.up();
+      await expect.poll(sideWidth).toBeGreaterThan(245);
+      await resizeStage.getByRole("button", { name: "恢复默认" }).click();
+      await expect.poll(sideWidth).toBeCloseTo(220, 0);
+    } else {
+      await expect(separator).toBeHidden();
+    }
+    await rightButton.click();
+    await expect(rightButton).toHaveAttribute("aria-pressed", "true");
+    const side = await resizeSidebar.boundingBox();
+    const body = await resizeLayout.locator(".mt-page-layout-body").boundingBox();
+    assert(viewport === 1440 ? body.x + body.width <= side.x : body.y + body.height <= side.y);
+    await borderSwitch.click();
+    await expect(resizeLayout).not.toHaveClass(/mt-page-layout-bordered/);
+    if (viewport === 1440) {
+      await expect(separator).toHaveCSS("border-left-width", "1px");
+      await expect(separator).toHaveCSS("border-right-width", "1px");
+    }
+    await resizeSwitch.click();
+    await expect(separator).toHaveCount(0);
+    await resizeStage.getByRole("button", { name: "恢复默认" }).click();
+    await expect(leftButton).toHaveAttribute("aria-pressed", "true");
+    await expect(borderSwitch).toBeChecked();
+    await expect(resizeSwitch).toBeChecked();
+
     const adminStage = page.locator(".component-demo-stage").filter({
       has: page.getByRole("heading", { name: "项目资料", exact: true, level: 3 }),
     });

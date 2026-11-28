@@ -104,7 +104,6 @@ export function PageLayout({
         <div className={slot("columns")}>
           {sidebarResize ? (
             <SidebarResize layout="page" options={sidebarResize} sidebar={sidebar}
-              separatorVariant={bordered ? "line" : undefined}
               collapsibleSidebar={React.isValidElement<SidebarProps>(sidebar) && sidebar.type === Sidebar ? sidebar : undefined}
               wrapSidebar={sidebarSlot} position={sidebarPosition === "left" ? "before" : "after"}>
               {main}

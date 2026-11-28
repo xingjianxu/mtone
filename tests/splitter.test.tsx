@@ -13,13 +13,18 @@ test('respects collapsed rails and rejects endpoints outside neighbor bounds',()
 test('clamps initial pair proportions within feasible expanded limits',()=>{expect(splitterPairTarget(100,.1,'initial',{...free,min:25},free)).toEqual([25,75]);expect(splitterPairTarget(100,.9,'initial',free,{...free,min:30})).toEqual([70,30]);expect(splitterPairTarget(20,.5,'initial',free,free)).toBeNull();});
 test('retains an initially collapsed ratio and rejects nonfinite pair targets',()=>{expect(splitterPairTarget(100,0,'initial',free,free)).toEqual([0,100]);expect(splitterPairTarget(Infinity,.5,'initial',free,free)).toBeNull();});
 
-test("framed PageLayout uses the Splitter line instead of two edge borders", () => {
-  const { rerender } = render(<PageLayout title="Notes" sidebar="Folders" sidebarResize={{ separatorBordered: true }}>Draft</PageLayout>);
+test("PageLayout keeps both Splitter edges with or without its outer frame", () => {
+  const { rerender } = render(<PageLayout title="Notes" sidebar="Folders" sidebarResize>Draft</PageLayout>);
   const getSeparator = () => screen.getByRole("separator");
-  expect(getSeparator()).toHaveClass("mt-splitter-separator-line");
-  expect(getSeparator()).not.toHaveClass("mt-splitter-separator-bordered");
-
-  rerender(<PageLayout bordered={false} title="Notes" sidebar="Folders" sidebarResize={{ separatorBordered: true }}>Draft</PageLayout>);
-  expect(getSeparator()).not.toHaveClass("mt-splitter-separator-line");
   expect(getSeparator()).toHaveClass("mt-splitter-separator-bordered");
+  expect(getSeparator()).not.toHaveClass("mt-splitter-separator-line");
+
+  rerender(<PageLayout bordered={false} title="Notes" sidebar="Folders" sidebarResize={{ separatorBordered: false }}>Draft</PageLayout>);
+  expect(getSeparator()).toHaveClass("mt-splitter-separator-bordered");
+});
+
+test("standalone Splitter can still opt in to the single line", () => {
+  render(<Splitter separatorVariant="line" separatorBordered><Splitter.Panel/><Splitter.Panel/></Splitter>);
+  expect(screen.getByRole("separator")).toHaveClass("mt-splitter-separator-line");
+  expect(screen.getByRole("separator")).not.toHaveClass("mt-splitter-separator-bordered");
 });

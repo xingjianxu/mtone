@@ -1049,14 +1049,14 @@ export default function App() {
 - tabs: ReactNode. 可选，可传入完整 Tabs。省略时不占空间。
 - sidebar: ReactNode. 页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。
 - sidebarPosition: "left" | "right" (default: "left"). 侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。
-- sidebarResize: boolean | SidebarResizeOptions (default: false). 可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度。带外框时固定用 Splitter 的 1px 居中单线；仅无外框时 separatorBordered 可为手柄两侧加边线。
+- sidebarResize: boolean | SidebarResizeOptions (default: false). 可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度。PageLayout 使用默认 Splitter 样式，拖动分隔条两侧各保留 1px 边框，独立于页面外框。
 - headerSpan: "full" | "header" | "main" (default: "full"). full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含顶栏、标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。
 - maxWidth: "sm" | "md" | "lg" | "xl" | number. 可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。
 - children: ReactNode. 正文。
 - HTML div 属性: Omit<ComponentPropsWithRef<"div">, "title">. className、style、ref 等传给根元素。
 - maxWidth 同时约束页头、标签页、侧栏和正文，不影响外层 AdminLayout 的侧栏或顶栏。
 - 当 PageLayout 是有可用高度的 AdminLayout.Content 中唯一的直接子元素时，默认至少撑满主内容区的内边距以内；宽屏的页面侧栏同步延伸到底部。长页仍由 AdminLayout.Content 滚动。独立使用、有额外包裹或与其他区块一起使用时，按内容高度布局。
-- PageLayout 本身的可用宽度达到 640px 时左右分栏；未启用拖拽时侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 和 header 模式的页头始终在最上方。
+- 文档的「侧栏分隔线」示例可切换侧栏位置、边框和拖拽调宽；PageLayout 本身的可用宽度达到 640px 时左右分栏；未启用拖拽时侧栏默认 240px，可用 CSS 变量 --mt-page-layout-sidebar-width 覆盖，最多为布局内宽的 50%。较窄时改为上下排列，full 和 header 模式的页头始终在最上方。
 - 只负责单页布局，不管理侧栏折叠、独立滚动、标签状态、路由或应用导航。
 
 ```tsx
