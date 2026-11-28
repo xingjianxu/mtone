@@ -533,6 +533,30 @@ try {
   await listView.click();
   await assertViewBorders(listView, gridView);
 
+  await page.setViewportSize({ width: 900, height: 550 });
+  await page.goto("http://127.0.0.1:5187/tests/fixtures/select-layout.html?compactPopup");
+  for (const name of ["Compact multiple", "Compact tags"]) {
+    const input = page.getByRole("combobox", { name, exact: true });
+    await input.press("ArrowDown");
+    const popup = page.getByRole("listbox").locator("..");
+    await expect(popup).toBeVisible();
+    const { x, width } = await popup.boundingBox();
+    const field = await input.locator("..").boundingBox();
+    assert(field.width >= 500 && width <= 180, `${name}: short options should stay compact, got ${width}px`);
+    assert(Math.abs(x - field.x) < 1, `${name}: popup should align to the whole field`);
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+  }
+
+  await page.setViewportSize({ width: 260, height: 550 });
+  await page.getByRole("combobox", { name: "Long option", exact: true }).press("ArrowDown");
+  const narrowPopup = page.getByRole("listbox").locator("..");
+  await expect(narrowPopup).toBeVisible();
+  const bounds = await narrowPopup.boundingBox();
+  assert(bounds.width > 160 && bounds.x >= 0 && bounds.x + bounds.width <= 260, "Long options expand within the viewport");
+  assert(await narrowPopup.evaluate((node) => node.scrollWidth <= node.clientWidth), "Long options wrap without horizontal overflow");
+  console.log("Compact multiple/tags popups align with the field and respect viewport width");
+
   console.log("Select geometry, shared clear slot, keyboard, touch, tags and unified form checks passed");
 } finally {
   await browser?.close();

@@ -314,6 +314,13 @@
   max-inline-size: var(--available-width, 100vw);
   overscroll-behavior: contain;
 }
+/* The chips surface anchors the popup, but does not dictate its width. */
+.mt-popup.mt-select-multiple-popup {
+  box-sizing: border-box;
+  inline-size: max-content;
+  min-inline-size: min(160px, var(--available-width, 100vw));
+  max-inline-size: min(320px, var(--available-width, 100vw));
+}
 .mt-select-popup-trigger-wrap {
   display: inline-flex;
   align-items: center;

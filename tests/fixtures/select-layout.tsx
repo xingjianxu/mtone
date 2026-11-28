@@ -39,6 +39,24 @@ function TagsFixture() {
     </MtoneProvider>
   );
 }
+function CompactPopupFixture() {
+  const options = [
+    { value: "design", label: "产品设计" },
+    { value: "research", label: "研究笔记" },
+    { value: "long", label: "Long".repeat(50) },
+  ];
+  return (
+    <MtoneProvider locale="en">
+      <div className="compact-popup-fixture" style={{ margin: 12, width: "min(560px, calc(100vw - 24px))" }}>
+        <style>{".compact-popup-fixture .mt-select-multiple { width: 100%; box-sizing: border-box; }"}</style>
+        <Select mode="multiple" label="Compact multiple" options={options.slice(0, 2)} />
+        <Select mode="tags" label="Compact tags"
+          options={options.slice(0, 2)} defaultValue={["design", "research"]} />
+        <Select mode="multiple" label="Long option" options={options} />
+      </div>
+    </MtoneProvider>
+  );
+}
 function ClearSlotFixture() {
   const options = [
     { value: "alpha", label: "Alpha" },
@@ -92,7 +110,7 @@ function IntrinsicFixture() {
 }
 const query = new URLSearchParams(location.search);
 createRoot(document.getElementById("root")!).render(
-  query.has("intrinsic") ? <IntrinsicFixture /> : query.has("tags") ? <TagsFixture /> : query.has("clearSlot") ? <ClearSlotFixture /> : query.has("unified") ? <UnifiedFixture /> : <>
+  query.has("compactPopup") ? <CompactPopupFixture /> : query.has("intrinsic") ? <IntrinsicFixture /> : query.has("tags") ? <TagsFixture /> : query.has("clearSlot") ? <ClearSlotFixture /> : query.has("unified") ? <UnifiedFixture /> : <>
     <style>{`.case .mt-select { width: var(--width); min-width: 0; box-sizing: border-box; } .case { margin: 12px; } .case .tall { width: 200px; height: 48px; font-size: 24px; }`}</style>
     {(["light", "dark"] as const).map((theme) => (
       <MtoneProvider key={theme} theme={theme}>

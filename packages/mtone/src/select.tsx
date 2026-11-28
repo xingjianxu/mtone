@@ -474,7 +474,7 @@ function SelectPopupSearch({ options, renderOption, trigger, popupWidth = 320, p
 
 type OptionData = ReturnType<typeof useOptions>;
 type ComboGroup = { items: string[]; section: OptionSection; index: number };
-function ComboboxPopup({ data, empty, popupRef, label, searchable, renderOption, searchPanel, createOption }: {
+function ComboboxPopup({ data, empty, popupRef, label, searchable, renderOption, searchPanel, createOption, chipsAnchor }: {
   data: OptionData;
   empty: React.ReactNode;
   popupRef?: React.Ref<HTMLDivElement>;
@@ -488,6 +488,7 @@ function ComboboxPopup({ data, empty, popupRef, label, searchable, renderOption,
     initialFocus: React.RefObject<HTMLInputElement | null>;
   };
   createOption?: { value: string; label: string };
+  chipsAnchor?: React.RefObject<HTMLDivElement | null>;
 }) {
   const item = (value: string) => {
     const option = data.byValue.get(value);
@@ -529,9 +530,11 @@ function ComboboxPopup({ data, empty, popupRef, label, searchable, renderOption,
   return (
     <Combobox.Portal>
       <MtoneScope>
-        <Combobox.Positioner className="mt-positioner" sideOffset={4} align={searchPanel ? "start" : undefined}>
+        <Combobox.Positioner className="mt-positioner" sideOffset={4} anchor={chipsAnchor}
+          align={searchPanel || chipsAnchor ? "start" : undefined}>
           <Combobox.Popup ref={popupRef}
-            className={cn("mt-popup", searchable && "mt-select-inline-popup", searchPanel && "mt-select-popup-search")}
+            className={cn("mt-popup", searchable && "mt-select-inline-popup",
+              searchPanel && "mt-select-popup-search", chipsAnchor && "mt-select-multiple-popup")}
             aria-labelledby={searchPanel?.titleId}
             initialFocus={searchPanel?.initialFocus}
             style={width === undefined ? undefined : { "--mt-select-popup-search-width": typeof width === "number" ? `${width}px` : width } as React.CSSProperties}>
@@ -548,6 +551,7 @@ function SelectMultiple({ mode, options, clearable, emptyContent, renderOption, 
   "aria-describedby": describedBy, "aria-labelledby": labelledBy, ...props
 }: SelectMultipleProps | SelectTagsProps) {
   const tags = mode === "tags";
+  const chips = React.useRef<HTMLDivElement>(null);
   const { locale } = useMtone();
   const disabled = useFieldsetDisabled(props.disabled);
   const popup = useSelectPopup(props, disabled);
@@ -614,7 +618,7 @@ function SelectMultiple({ mode, options, clearable, emptyContent, renderOption, 
         } else selection.change(next);
       }}
       open={popup.open} onOpenChange={popup.change}>
-      <Combobox.Chips aria-invalid={invalid} className={cn("mt-select-multiple", className)}>
+      <Combobox.Chips ref={chips} aria-invalid={invalid} className={cn("mt-select-multiple", className)}>
         {selection.value.map((value) => {
           const option = optionData.byValue.get(value);
           return (
@@ -665,7 +669,7 @@ function SelectMultiple({ mode, options, clearable, emptyContent, renderOption, 
           </Combobox.Trigger>
         </span>
       </Combobox.Chips>
-      <ComboboxPopup data={optionData} renderOption={renderOption} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
+      <ComboboxPopup data={optionData} chipsAnchor={chips} renderOption={renderOption} empty={emptyContent ?? (locale === "zh" ? "无匹配结果" : "No results")}
         createOption={createValue === undefined ? undefined : {
           value: createValue, label: locale === "zh" ? `创建“${createValue}”` : `Create “${createValue}”`,
         }} />
