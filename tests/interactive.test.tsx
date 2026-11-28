@@ -217,6 +217,24 @@ describe("styled interactive controls", () => {
       "Preferences",
     );
   });
+  it.each([
+    [undefined, "right"],
+    ["right", "right"],
+    ["left", "left"],
+  ] as const)("drawer placement %s uses the matching swipe direction", async (placement, side) => {
+    render(
+      <UI.Drawer title="Preferences" placement={placement} trigger={<button type="button">Open drawer</button>}>
+        Drawer contents
+      </UI.Drawer>,
+    );
+    const trigger = screen.getByRole("button", { name: "Open drawer" });
+    await userEvent.click(trigger);
+    const drawer = screen.getByRole("dialog", { name: "Preferences" });
+    expect(drawer).toHaveAttribute("data-swipe-direction", side);
+    await userEvent.keyboard("{Escape}");
+    expect(drawer).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
   it("controlled switches request changes without mutating the supplied value", async () => {
     const change = vi.fn();
     render(

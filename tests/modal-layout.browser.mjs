@@ -74,4 +74,16 @@ try {
     assert.equal(await page.locator(".mt-modal-dialog").count(), 0, "Scoped Modal changes must not affect siblings");
     assert.equal(await page.locator(".mt-dialog-footer").evaluate(el => getComputedStyle(el).marginTop), "24px");
   }
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [900, 360]) for (const placement of ["default", "left", "right"]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(`http://127.0.0.1:5188/tests/fixtures/modal-layout.html?mode=drawer&placement=${placement}`);
+    const drawer = page.getByRole("dialog", { name: "抽屉" });
+    await drawer.waitFor();
+    await page.waitForFunction(() => document.querySelector(".mt-drawer[data-open]:not([data-starting-style])"));
+    const { left, right } = await drawer.boundingBox().then(({ x, width }) => ({ left: x, right: x + width }));
+    assert(Math.abs(placement === "left" ? left : right - width) < 0.5, `Drawer ${placement} at ${width}px aligns to its edge`);
+    await page.keyboard.press("Escape");
+    await drawer.waitFor({ state: "hidden" });
+  }
 } finally { await browser?.close(); await server.close(); }

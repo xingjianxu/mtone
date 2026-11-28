@@ -5755,10 +5755,15 @@ export default function Demo() {
   },
   {
     name: "Drawer",
-    description: "从右侧打开的属性抽屉。",
+    description: "支持从左侧或右侧打开的抽屉，默认从右侧打开。",
     importNames: ["Drawer", "Button"],
-    code: 'import { Drawer, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <Drawer title="文档信息" description="编辑当前文档的说明" trigger={<Button>打开Drawer</Button>}><p>这里是内容区域。</p></Drawer>\n  );\n}',
+    code: 'import { Drawer, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <>\n      <Drawer placement="left" title="左侧抽屉" trigger={<Button>从左侧打开</Button>}><p>这里是内容区域。</p></Drawer>\n      <Drawer title="右侧抽屉" trigger={<Button>从右侧打开</Button>}><p>这里是内容区域。</p></Drawer>\n    </>\n  );\n}',
     props: [
+      {
+        name: "placement",
+        type: '"left" | "right"',
+        description: '打开位置，默认为 "right"。触屏可向同一侧滑动关闭。',
+      },
       {
         name: "title",
         type: "ReactNode",
@@ -5807,7 +5812,6 @@ export default function Demo() {
     ],
     notes: [
       "支持 Esc 关闭、焦点管理与关闭后焦点恢复。",
-      "Drawer 当前固定从右侧打开。",
     ],
   },
   {

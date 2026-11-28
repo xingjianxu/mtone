@@ -704,9 +704,14 @@
   inset: 0;
   z-index: 1201;
   display: flex;
-  justify-content: flex-end;
+  justify-content: right;
+}
+.mt-drawer-viewport[data-placement="left"] {
+  justify-content: left;
 }
 .mt-drawer {
+  --mt-drawer-closed-x: 100%;
+  --mt-drawer-shadow-x: -4px;
   position: relative;
   background: var(--mt-bg, #fff);
   color: var(--mt-text, var(--mt-fg, #37352f));
@@ -715,8 +720,25 @@
   overflow: auto;
   padding: 24px;
   box-sizing: border-box;
-  box-shadow: -4px 0 24px var(--mt-shadow-light, #0002);
+  box-shadow: var(--mt-drawer-shadow-x) 0 24px var(--mt-shadow-light, #0002);
   outline: 0;
+  transform: translateX(var(--drawer-swipe-movement-x, 0px));
+  transition: transform 200ms ease;
+}
+.mt-drawer[data-swipe-direction="left"] {
+  --mt-drawer-closed-x: -100%;
+  --mt-drawer-shadow-x: 4px;
+}
+.mt-drawer:is([data-starting-style], [data-ending-style]) {
+  transform: translateX(var(--mt-drawer-closed-x));
+}
+.mt-drawer[data-swiping] {
+  transition-duration: 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-drawer {
+    transition-duration: 0s;
+  }
 }
 .mt-checkbox:focus-visible,
 .mt-radio:focus-visible,

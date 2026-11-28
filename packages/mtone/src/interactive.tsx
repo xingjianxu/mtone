@@ -1141,7 +1141,13 @@ export function ConfirmDialog({
     </AlertDialog.Root>
   );
 }
+export interface DrawerProps extends DialogFrameProps {
+  /** The viewport edge the drawer opens from. @default "right" */
+  placement?: "left" | "right";
+}
+
 export function Drawer({
+  placement = "right",
   title,
   description,
   children,
@@ -1149,15 +1155,15 @@ export function Drawer({
   trigger,
   className,
   ...props
-}: DialogFrameProps) {
+}: DrawerProps) {
   const { locale } = useMtone();
   return (
-    <BDrawer.Root swipeDirection="right" {...props}>
+    <BDrawer.Root {...props} swipeDirection={placement}>
       {trigger && <BDrawer.Trigger render={trigger} />}
       <BDrawer.Portal>
         <MtoneScope>
           <BDrawer.Backdrop className="mt-backdrop" />
-          <BDrawer.Viewport className="mt-drawer-viewport">
+          <BDrawer.Viewport className="mt-drawer-viewport" data-placement={placement}>
             <BDrawer.Popup className={cn("mt-drawer", className)}>
               <BDrawer.Content>
                 <BDrawer.Title className="mt-dialog-title">

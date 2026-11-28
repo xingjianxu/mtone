@@ -673,13 +673,14 @@ function ExampleBody({ name, compact }: { name: string; compact: boolean }) {
       );
     case "Drawer":
       return (
-        <M.Drawer
-          title="文档属性"
-          description="在不离开当前页面的情况下查看信息。"
-          trigger={<M.Button>打开属性抽屉</M.Button>}
-        >
-          {properties}
-        </M.Drawer>
+        <div style={rowStyle}>
+          <M.Drawer placement="left" title="左侧抽屉" trigger={<M.Button>从左侧打开</M.Button>}>
+            {properties}
+          </M.Drawer>
+          <M.Drawer title="右侧抽屉" trigger={<M.Button>从右侧打开</M.Button>}>
+            {properties}
+          </M.Drawer>
+        </div>
       );
     case "FloatingWindow":
       return (
