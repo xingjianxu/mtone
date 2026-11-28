@@ -622,7 +622,9 @@ function SelectMultiple({ mode, options, clearable, emptyContent, renderOption, 
               <span>{option?.label ?? value}</span>
               {!option?.disabled && (
                 <Combobox.ChipRemove aria-label={`${locale === "zh" ? "移除" : "Remove"} ${labelFor(value)}`}
-                  className="mt-chip-remove">×</Combobox.ChipRemove>
+                  className="mt-chip-remove">
+                  <X size={12} aria-hidden="true" />
+                </Combobox.ChipRemove>
               )}
             </Combobox.Chip>
           );

@@ -35,6 +35,19 @@ test("unifies multiple mode without stringifying rich labels or removing disable
   expect(screen.getByText("Default workspace")).toBeVisible();
 });
 
+test.each(["multiple", "tags"] as const)("%s labels render a decorative X in the accessible remove button", async (mode) => {
+  const user = userEvent.setup();
+  const changed = vi.fn();
+  render(<MtoneProvider locale="en">
+    <Select mode={mode} label="Topics" options={[{ value: "vault", label: "Vault" }]}
+      defaultValue={["vault"]} onValueChange={changed} />
+  </MtoneProvider>);
+  const remove = screen.getByRole("button", { name: "Remove Vault" });
+  expect(remove.querySelector("svg.lucide-x")).toHaveAttribute("aria-hidden", "true");
+  await user.click(remove);
+  expect(changed).toHaveBeenCalledWith([]);
+});
+
 test("searchable single uses the only combobox in its surface and keeps grouped rich choices and native values", async () => {
   const user = userEvent.setup();
   const changed = vi.fn();

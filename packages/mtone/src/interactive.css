@@ -432,6 +432,14 @@
   padding: 0 2px;
   cursor: pointer;
 }
+.mt-chip-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 3px;
+}
 .mt-combobox-input {
   padding: 0;
   font: inherit;

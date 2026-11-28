@@ -144,8 +144,28 @@ try {
       .isDisabled(),
     true,
   );
+  const checkChipRemove = async (button) => {
+    await expect(button.locator("svg.lucide-x")).toHaveAttribute("aria-hidden", "true");
+    const geometry = await button.evaluate((node) => {
+      const chip = node.closest(".mt-chip").getBoundingClientRect();
+      const box = node.getBoundingClientRect();
+      const icon = node.querySelector("svg").getBoundingClientRect();
+      return {
+        square: box.width === box.height,
+        width: icon.width,
+        height: icon.height,
+        centeredInButton: Math.abs((icon.left + icon.right - box.left - box.right) / 2) < 1
+          && Math.abs((icon.top + icon.bottom - box.top - box.bottom) / 2) < 1,
+        centeredInChip: Math.abs((icon.top + icon.bottom - chip.top - chip.bottom) / 2) < 1,
+      };
+    });
+    assert.deepEqual(geometry, {
+      square: true, width: 12, height: 12, centeredInButton: true, centeredInChip: true,
+    });
+  };
   for (const theme of ["light", "dark"]) {
     const field = page.locator(`.multi-${theme}`);
+    await checkChipRemove(field.getByRole("button", { name: "移除 Alpha", exact: true }));
     const trigger = field.getByRole("button", { name: "展开选项" });
     const arrow = await trigger.evaluate(el => {
       const b=el.getBoundingClientRect(), svg=el.querySelector("svg"), s=svg.getBoundingClientRect();
@@ -435,6 +455,7 @@ try {
   await expect(tags).toHaveValue("");
   await expect(tags).toBeFocused();
   assert.deepEqual(await tagsValues(), ["plan, notes"]);
+  await checkChipRemove(tagsForm.getByRole("button", { name: "Remove plan, notes", exact: true }));
 
   await tags.fill("Repository 1");
   await expect(create("Repository 1")).toHaveCount(0);
