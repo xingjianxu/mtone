@@ -244,9 +244,9 @@ try {
   await page.mouse.down();
   await page.mouse.move(seamBox.x + 31, seamBox.y + seamBox.height / 2, { steps: 6 });
   await expect(framedSeparator).toHaveAttribute("data-separator", "active");
-  const drag = await seamStyle();
-  assert.equal(drag.image, hover.image);
-  assert.equal(drag.size, idle.size);
+  const dragStyle = await seamStyle();
+  assert.equal(dragStyle.image, hover.image);
+  assert.equal(dragStyle.size, idle.size);
   await page.mouse.up();
 
   await page.goto("http://127.0.0.1:5284/tests/fixtures/page-layout.html?framed&resize");
