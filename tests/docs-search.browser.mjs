@@ -154,8 +154,9 @@ try {
     await page.getByRole("dialog").waitFor({ state: "detached" });
     await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "搜索组件");
     await page.goto(`${base}#/components/Input`);
-    const editor = page.locator(".example-stage input:not([disabled])").first();
+    const editor = page.getByRole("textbox", { name: "示例输入框", exact: true });
     await editor.focus();
+    assert(await editor.evaluate(el => el === document.activeElement));
     await page.keyboard.press("Control+k");
     assert.equal(await page.getByRole("dialog").count(), 0);
   }

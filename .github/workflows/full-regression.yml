@@ -130,6 +130,8 @@ jobs:
             BROWSER=$browser node tests/button-icon-only.browser.mjs || exit 1
           done
       - run: node tests/button-toggle.browser.mjs
+      - run: node tests/azure-theme.browser.mjs
+      - run: node tests/component-playgrounds-docs.browser.mjs
       - run: node tests/menu-doc-trigger-width.browser.mjs
       - run: node tests/page-layout-docs.browser.mjs
       - run: node tests/container.browser.mjs

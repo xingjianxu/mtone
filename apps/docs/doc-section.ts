@@ -8,6 +8,7 @@ export interface OutlineEntry {
 
 export interface DocSection extends OutlineEntry {
   Demo?: ComponentType;
+  playground?: boolean;
   source?: string;
   note?: string;
   relatedLink?: { href: string; label: string };

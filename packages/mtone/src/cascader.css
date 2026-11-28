@@ -166,6 +166,10 @@
   background: var(--mt-hover, #f1f1ef);
   color: var(--mt-fg, #37352f);
 }
+.mt-cascader-option:is([data-checked], [aria-selected="true"]):not([data-disabled]) {
+  background: var(--mt-choice-selected-bg, var(--mt-hover, #f1f1ef));
+  color: var(--mt-select-ink, var(--mt-fg, #37352f));
+}
 .mt-cascader-option[data-disabled] {
   opacity: 0.45;
   cursor: not-allowed;
