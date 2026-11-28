@@ -811,3 +811,54 @@ section:not(:where(.example-stage *)) > p {
     display: block;
   }
 }
+
+/* Document-only playground: the settings bar belongs to the demo card. */
+.component-demo-stage--playground { padding: 0; }
+.docs-playground { min-inline-size: 0; }
+.docs-playground-toolbar.mt-toolbar {
+  border: 0;
+  border-block-end: 1px solid var(--docs-border);
+  border-radius: 6px 6px 0 0;
+}
+.docs-playground-toolbar .mt-toolbar-start,
+.docs-playground-toolbar .mt-toolbar-end { flex-wrap: wrap; }
+.docs-playground-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-inline-size: 0;
+  font-size: 13px;
+}
+.docs-playground-control :is(.mt-number-input, .mt-input-wrap, input) { min-inline-size: 0; }
+.docs-playground-control :is(.mt-number, .mt-input-wrap) { inline-size: 7rem; }
+.docs-playground-preview { padding: 16px; min-inline-size: 0; }
+.docs-playground-sample { min-inline-size: 0; }
+.docs-playground-advanced {
+  display: grid;
+  gap: 8px;
+  min-inline-size: min(15rem, 68vw);
+  max-inline-size: min(19rem, 75vw);
+}
+.docs-playground-advanced .docs-playground-control { justify-content: space-between; }
+.docs-playground-box {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  border: 1px solid var(--docs-border);
+  border-radius: 6px;
+  padding: 8px;
+}
+.docs-playground-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+@media (max-width: 680px) {
+  .component-demo-stage--playground { padding: 0; }
+  .docs-playground-preview { padding: 10px; }
+  .docs-playground-toolbar .mt-toolbar-end { justify-content: start; }
+}
+.docs-playground-advanced .mt-check-label {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+.docs-playground-advanced-actions {
+  border-block-start: 1px solid var(--docs-border, var(--mt-border));
+  padding-block-start: 6px;
+}

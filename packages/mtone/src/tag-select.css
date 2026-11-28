@@ -48,7 +48,8 @@
 }
 .mt-tag-select-option[aria-pressed="mixed"],
 .mt-tag-select-option[aria-pressed="true"] {
-  background: var(--mt-hover, #efefed);
+  background: var(--mt-choice-selected-bg, var(--mt-hover, #efefed));
+  color: var(--mt-select-ink, var(--mt-text, var(--mt-fg, #37352f)));
   border-color: var(--mt-border, #e0dfdb);
 }
 .mt-tag-select-option:disabled,

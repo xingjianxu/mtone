@@ -150,3 +150,18 @@ it("applies named theme presets, local overrides and explicit default reset to p
   expect(original).toHaveAttribute("data-mt-theme-preset", "original");
   expect(original.style.getPropertyValue("--mt-nav-selected")).toBe("");
 });
+
+it("uses Azure by default and keeps explicit Original scoped through portalled content", () => {
+  render(
+    <MtoneProvider>
+      <MtoneScope data-testid="default-azure" />
+      <MtoneScope themePreset={mtoneOriginalTheme}>
+        <MtoneScope data-testid="original-descendant" />
+        <Select label="Original scope" defaultOpen options={[{ value: "docs", label: "Docs" }]} />
+      </MtoneScope>
+    </MtoneProvider>,
+  );
+  expect(screen.getByTestId("default-azure")).toHaveAttribute("data-mt-theme-preset", "azure");
+  expect(screen.getByTestId("original-descendant")).toHaveAttribute("data-mt-theme-preset", "original");
+  expect(screen.getByRole("listbox").closest("[data-mt-theme-preset]")).toHaveAttribute("data-mt-theme-preset", "original");
+});

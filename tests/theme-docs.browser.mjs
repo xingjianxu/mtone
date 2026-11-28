@@ -84,10 +84,13 @@ try {
   const preview = page.getByRole("region", { name: "主题预览" });
   const save = preview.getByRole("button", { name: "保存", exact: true });
   const selected = preview.getByRole("button", { name: "文档", exact: true });
-  await expect(preview).toHaveAttribute("data-mt-theme-preset", "original");
+  await expect(preview).toHaveAttribute("data-mt-theme-preset", "azure");
   await expect(save).toHaveCSS("height", "32px");
   await expect(save).toHaveCSS("border-radius", "4px");
-  await expect(selected).toHaveCSS("background-color", "rgb(229, 229, 229)");
+  await expect(selected).toHaveCSS("background-color", "rgb(233, 242, 255)");
+  await expect(selected).toHaveCSS("color", "rgb(37, 97, 173)");
+  await expect(preview.getByRole("switch", { name: "显示快捷入口" })).toHaveCSS("background-color", "rgb(37, 97, 173)");
+  await expect(preview.getByRole("button", { name: "固定视图" })).toHaveCSS("background-color", "rgb(37, 97, 173)");
   await design.getByRole("button", { name: "苔绿（自定义示例）" }).click();
   await expect(preview).toHaveAttribute("data-mt-theme-preset", "meadow");
   await expect(save).toHaveCSS("height", "36px");
@@ -131,7 +134,7 @@ try {
   await expect(semantic.getByRole("columnheader", { name: "浅色" })).toBeVisible({ timeout: 3000 });
   await expect(semantic.getByRole("columnheader", { name: "深色" })).toBeVisible();
   const semanticRows = semantic.locator("tbody tr");
-  await expect(semanticRows).toHaveCount(10);
+  await expect(semanticRows).toHaveCount(13);
   for (const row of await semanticRows.all()) {
     const colors = await row.locator(".semantic-swatch").evaluateAll((samples) =>
       samples.map((sample) => {
@@ -150,8 +153,9 @@ try {
   }
 
   for (const [token, light, dark] of [
-    ["--mt-nav-selected", "#E5E5E5", "#3D3C39"],
-    ["--mt-nav-current-text", "#262626", "#EEECE8"],
+    ["--mt-nav-selected", "#E9F2FF", "#24384F"],
+    ["--mt-nav-current-text", "#2561AD", "#BCD9FF"],
+    ["--mt-toggle-on-bg", "#2561AD", "#4D87CC"],
   ]) {
     const row = semantic.getByRole("row").filter({ has: page.getByRole("cell", { name: token, exact: true }) });
     await expect(row.getByRole("cell").nth(2)).toHaveText(light);

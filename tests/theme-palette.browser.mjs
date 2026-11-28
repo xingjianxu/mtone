@@ -65,8 +65,8 @@ try {
     });
     expect(swatch).toBe(color);
   };
-  const selectedLight = "rgb(233, 238, 244)";
-  const selectedDark = "rgb(41, 55, 70)";
+  const selectedLight = "rgb(233, 242, 255)";
+  const selectedDark = "rgb(36, 56, 79)";
   const expectSelection = async (scope, colorFor) => {
     for (const sink of ["tree", "table", "card", "settings", "panel"]) {
       await expect(page.locator(`${scope} [data-selection="${sink}"]`)).toHaveCSS(
@@ -77,7 +77,7 @@ try {
   await expectSelection("#default", selectedLight);
   await expectSelection("#dark", selectedDark);
   await expectSelection("#system", selectedLight);
-  await expectSelection("#selection-fallback", selectedLight);
+  await expectSelection("#selection-fallback", "rgb(233, 238, 244)");
   await expectSelection("#selection-override", (sink) =>
     ["tree", "table", "panel"].includes(sink) ? "rgb(20, 53, 86)" : selectedLight);
 
@@ -103,7 +103,7 @@ try {
   }
   await expect(page.locator("#dark .mt-btn-solid")).toHaveCSS("background-color", darkText);
   await expect(page.locator("#dark .mt-btn-solid")).toHaveCSS("color", dark);
-  await expect(page.locator("#dark .mt-checkbox")).toHaveCSS("color", dark);
+  await expect(page.locator("#dark .mt-checkbox")).toHaveCSS("color", "rgb(10, 23, 38)");
   await expect(page.locator("#dark .mt-tone-red")).toHaveCSS("background-color", "rgb(73, 47, 45)");
   await expect(page.locator("#dark .mt-tone-red")).toHaveCSS("color", "rgb(255, 170, 164)");
 

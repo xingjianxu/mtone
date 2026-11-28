@@ -7,7 +7,7 @@ import { ComponentExample } from "../apps/docs/examples";
 import { docSections, parseRoute, searchDocs } from "../apps/docs/docs-app";
 // These supporting exports share a component guide instead of having standalone pages.
 const nonStandaloneExports = [
-  "cn", "useMtone", "useToast", "getMentions", "mtoneOriginalTheme",
+  "cn", "useMtone", "useToast", "getMentions", "mtoneOriginalTheme", "mtoneAzureTheme",
   "ShortcutScope", "useShortcut", "formatShortcut", "TooltipProvider",
   "moveTreeItem", "getTreeNodeInfo",
 ];
@@ -126,9 +126,9 @@ describe("documentation", () => {
     const sections = docSections.Tooltip;
     expect(searchDocs("TooltipProvider")).toContainEqual(expect.objectContaining({ name: "Tooltip" }));
     expect(sections.map(({ id }) => id)).toEqual([
-      "usage", "placement", "triggers", "appearance", "disabled", "container",
+      "interactive", "usage", "placement", "triggers", "appearance", "disabled", "container",
     ]);
-    for (const { id, Demo, source } of sections) {
+    for (const { id, Demo, source } of sections.filter(({ playground }) => !playground)) {
       expect(parseRoute(`#/components/Tooltip?section=${id}`)).toEqual({
         kind: "component", name: "Tooltip", section: id,
       });

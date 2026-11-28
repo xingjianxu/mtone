@@ -110,6 +110,7 @@
 .mt-table .mt-table-row-selected > .mt-table-cell,
 .mt-table tr[data-selected] > .mt-table-cell {
   background: var(--mt-table-selected);
+  color: var(--mt-select-ink, inherit);
 }
 .mt-table .mt-table-row-selected > .mt-table-cell-row-hover {
   background: color-mix(
@@ -640,6 +641,7 @@
 }
 .mt-tree-item[aria-selected="true"] {
   background: var(--mt-selected, var(--mt-select-surface, #e9eef4));
+  color: var(--mt-select-ink, inherit);
 }
 .mt-tree-item[aria-disabled="true"] {
   opacity: 0.45;

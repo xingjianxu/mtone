@@ -14,7 +14,8 @@ import PageLayoutUsageSource from "./secondary-demos/page-layout-usage.tsx?raw";
 import PageLayoutComposed from "./secondary-demos/page-layout-composed";
 import PageLayoutComposedSource from "./secondary-demos/page-layout-composed.tsx?raw";
 import PageLayoutSidebar from "./secondary-demos/page-layout-sidebar";
-import PageLayoutSidebarSource from "./secondary-demos/page-layout-sidebar.tsx?raw";
+import PageLayoutSidebarRaw from "./secondary-demos/page-layout-sidebar.tsx?raw";
+import PlaygroundToolbarRaw from "./playgrounds/toolbar-frame.tsx?raw";
 import PageLayoutSidebarResize from "./secondary-demos/page-layout-sidebar-resize";
 import PageLayoutSidebarResizeSource from "./secondary-demos/page-layout-sidebar-resize.tsx?raw";
 import PageLayoutAdmin from "./secondary-demos/page-layout-admin";
@@ -301,8 +302,6 @@ import Tree5 from "./secondary-demos/tree-virtual";
 import Tree5Source from "./secondary-demos/tree-virtual.tsx?raw";
 import Tree6 from "./secondary-demos/tree-sorting";
 import Tree6Source from "./secondary-demos/tree-sorting.tsx?raw";
-import TreePlayground from "./secondary-demos/tree-playground";
-import TreePlaygroundSource from "./secondary-demos/tree-playground.tsx?raw";
 import TreeNodeActions from "./secondary-demos/tree-node-actions";
 import TreeNodeActionsSource from "./secondary-demos/tree-node-actions.tsx?raw";
 import TreeDocumentNavigation from "./secondary-demos/tree-document-navigation";
@@ -312,6 +311,13 @@ const source = (tsx: string) =>
   tsx.replaceAll("../../../packages/mtone/src", "@bixlab/mtone");
 const standaloneSource = (tsx: string) =>
   'import "@bixlab/mtone/styles.css";\n' + source(tsx);
+// Inline the shared frame in the copyable PageLayout demo. Both modules are
+// authored in the docs and the output has no docs-only imports.
+const pageLayoutSidebarSource = standaloneSource(
+  PlaygroundToolbarRaw.replace('import { useState, type ReactNode } from "react";', 'import type { ReactNode } from "react";')
+    .replace('import { Button, Popover, Toolbar }', 'import { Popover, Toolbar }') +
+    PageLayoutSidebarRaw.replace(/import \{ PlaygroundFrame \} from ".*?";\r?\n/, ""),
+);
 export const secondaryDocSections: Record<string, readonly DocSection[]> = {
   NavSubmenu: [
     { id: "usage", title: "内联展开", Demo: NavSubmenuUsage, source: source(NavSubmenuUsageSource) },
@@ -418,7 +424,7 @@ export const secondaryDocSections: Record<string, readonly DocSection[]> = {
     { id: "width-presets", title: "宽度预设", Demo: ContainerPresets, source: source(ContainerPresetsSource) },
   ],
   PageLayout: [
-    { id: "sidebar", title: "布局配置", Demo: PageLayoutSidebar, source: source(PageLayoutSidebarSource), note: "图 A：页头跨整页，标签留在主栏。图 B：仅主栏。两种都可开启边框布局，侧栏会撑满所在列。", },
+    { id: "sidebar", title: "布局配置", Demo: PageLayoutSidebar, playground: true, source: pageLayoutSidebarSource, note: "图 A：页头跨整页，标签留在主栏。图 B：仅主栏。两种都可开启边框布局，侧栏会撑满所在列。", },
     { id: "usage", title: "基础用法", Demo: PageLayoutUsage, source: source(PageLayoutUsageSource) },
     { id: "actions-and-tabs", title: "居中限宽、操作与标签页", Demo: PageLayoutComposed, source: source(PageLayoutComposedSource) },
     { id: "sidebar-resize", title: "侧栏分隔线", Demo: PageLayoutSidebarResize, source: source(PageLayoutSidebarResizeSource), note: "拖动三点手柄，或聚焦后用方向键调宽。关闭页面外框仍保留分隔条两侧的边线；窄容器不显示手柄。" },
@@ -1149,13 +1155,6 @@ export default function Demo() {
     },
   ],
   Tree: [
-    {
-      id: "playground",
-      title: "交互配置",
-      note: "切换外观、选择或目录交互，或调整行高、间距、缩进和可视高度，预览会即时更新。恢复默认会还原展开状态并清除选择和勾选。异步加载、虚拟滚动与拖放见下方独立示例。",
-      Demo: TreePlayground,
-      source: source(TreePlaygroundSource),
-    },
     {
       id: "node-actions",
       title: "节点右侧操作",
