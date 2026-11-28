@@ -37,6 +37,12 @@ export const mtoneOriginalTheme: MtoneThemePreset = Object.freeze({
   id: "original",
   name: "Original",
 });
+/** Default design. Its light and dark palette is resolved by the bundled CSS. */
+export const mtoneAzureTheme: MtoneThemePreset = Object.freeze({
+  id: "azure",
+  name: "澄蓝",
+});
+
 
 const darkModeQuery = "(prefers-color-scheme: dark)";
 const lightSnapshot = () => false;
@@ -59,7 +65,7 @@ type Context = {
 const MtoneContext = React.createContext<Context>({
   locale: "zh",
   theme: "light",
-  themePreset: mtoneOriginalTheme,
+  themePreset: mtoneAzureTheme,
 });
 export const useMtone = () => React.useContext(MtoneContext);
 export interface MtoneScopeProps extends React.ComponentPropsWithRef<"div"> {

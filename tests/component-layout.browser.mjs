@@ -87,11 +87,11 @@ try {
   await page.setViewportSize({ width: 1440, height: 800 });
   await page.goto("http://127.0.0.1:" + port + "/#/components/Table?section=basic");
   await page.getByRole("heading", { level: 1, name: "Table", exact: true }).waitFor();
-  const nativeTable = page.locator("table.mt-native-table").first();
+  const preview = page.locator(".component-doc-section").filter({ has: page.locator("#basic") }).locator(".component-demo-card");
+  const nativeTable = preview.locator("table.mt-native-table");
   await nativeTable.getByRole("columnheader").first().waitFor();
   assert(await nativeTable.locator("tbody > tr > td").count());
   assert.equal(await page.locator(".mt-table-wrap").count(), 0);
-  const preview = page.locator(".component-demo-card").filter({has: nativeTable});
   const body = nativeTable.locator("tbody");
   const cellBackground = (row) => body.locator("tr").nth(row).locator("td").evaluate((cell) => getComputedStyle(cell).backgroundColor);
   const baseline = await cellBackground(0);

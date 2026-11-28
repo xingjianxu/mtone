@@ -25,6 +25,9 @@ const semanticColors = [
   ["导航选中背景", "--mt-nav-selected"],
   ["导航选中文字", "--mt-nav-current-text"],
   ["侧栏当前项标记", "--mt-nav-current-indicator", "var(--mt-blue, #2383e2)"],
+  ["选中文字", "--mt-select-ink", "var(--mt-fg, #37352f)"],
+  ["开启状态底色", "--mt-toggle-on-bg", "var(--mt-primary, #37352f)"],
+  ["开启状态前景", "--mt-toggle-on-ink", "var(--mt-on-primary, #fff)"],
   ["日历当天文字", "--mt-calendar-today-ink", "var(--mt-blue, #2383e2)"],
   ["拖放目标边缘", "--mt-drop-target-edge", "var(--mt-indicator, #5378aa)"],
   ["通知默认图标", "--mt-toast-default-icon-ink", "var(--mt-indicator, #5378aa)"],
@@ -105,7 +108,7 @@ export function ColorPresets() {
       <div className="eyebrow">THEME COLOR PRESETS</div>
       <h1 id={colorPresetsHeading} tabIndex={-1}>颜色预设</h1>
       <p className="lead">
-        这里分为两层：需要让使用者选颜色时，使用共享色板；组件的选中、焦点、提示和操作状态按实际用途引用语义颜色。用顶部的主题开关比较浅色和深色。
+        这里分为两层：需要让使用者选颜色时，使用共享色板；组件的选中、焦点、提示和操作状态按实际用途引用语义颜色。下表显示默认澄蓝主题的浅色和深色。
       </p>
 
       <section aria-labelledby="accent-palette-heading">
@@ -166,7 +169,7 @@ export function ColorPresets() {
                 <div className="accent-palette-swatch" aria-hidden="true" style={{ backgroundColor: "var(--mt-select-surface)" }} />
               </MtoneProvider>
               <strong>{theme === "light" ? "浅色主题" : "深色主题"}</strong>
-              <code>{theme === "light" ? "#E9EEF4" : "#293746"}</code>
+              <code>{theme === "light" ? "#E9F2FF" : "#24384F"}</code>
             </li>
           ))}
         </ul>

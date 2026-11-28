@@ -154,8 +154,9 @@ try {
     await page.getByRole("dialog").waitFor({ state: "detached" });
     await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "搜索组件");
     await page.goto(`${base}#/components/Input`);
-    const editor = page.locator(".example-stage input:not([disabled])").first();
+    const editor = page.getByRole("textbox", { name: "示例输入框", exact: true });
     await editor.focus();
+    assert(await editor.evaluate(el => el === document.activeElement));
     await page.keyboard.press("Control+k");
     assert.equal(await page.getByRole("dialog").count(), 0);
   }
@@ -181,9 +182,13 @@ try {
     };
     const scrollTop = () => scrollport.evaluate((node) => node.scrollTop);
     const assertSectionAnchor = async () => {
-      await direct.waitForFunction(() => document.activeElement?.id === "sorting");
+      await direct.waitForFunction(() => {
+        const heading = document.getElementById("sorting");
+        const y = heading?.getBoundingClientRect().top;
+        return document.activeElement === heading && y >= 60 && y < 200;
+      }, null, { timeout: 5000 });
       const heading = await direct.locator("#sorting").boundingBox();
-      assert(heading.y >= 60 && heading.y < 200, "the requested section remains near the main content start");
+      assert(heading.y >= 60 && heading.y < 200, `requested section top: ${heading.y}px`);
     };
 
     await openDirect("#/components/List?section=sorting", "List");

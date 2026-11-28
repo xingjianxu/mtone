@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import * as M from "../../packages/mtone/src";
 import { componentCategories, componentDocGroups, componentDocs, type ComponentDoc } from "./catalog";
+import { withPlaygrounds } from "./playgrounds";
 import { blockEditorDocSections } from "./block-editor-demos";
 import { ComponentExample } from "./examples";
 import { standaloneTypographySections, focusTypographySection, isTypographySection, typographySectionId, handleTypographyNavigation } from "./typography-navigation";
@@ -137,13 +138,13 @@ function DocDemo({ item, level, owner }: { item: DocSection; level: number; owne
     {item.note && <p>{item.note}</p>}
     {item.relatedLink && <p>另见：<a className="docs-inline-link" href={item.relatedLink.href}>{item.relatedLink.label}</a>。</p>}
     {item.Demo && <div className="component-demo-card">
-      <div className="component-demo-stage example-stage"><item.Demo /></div>
+      <div className={item.playground ? "component-demo-stage example-stage component-demo-stage--playground" : "component-demo-stage example-stage"}><item.Demo /></div>
       {item.source && <DemoSource code={item.source} />}
     </div>}
     {item.children?.map((child) => <DocDemo key={child.id} item={child} level={level + 1} owner={owner} />)}
   </section>;
 }
-export const docSections: Record<string, readonly DocSection[]> = {
+export const docSections = withPlaygrounds({
   ...inlineDocSections,
   ...secondaryDocSections,
   ...aiDocSections,
@@ -152,7 +153,7 @@ export const docSections: Record<string, readonly DocSection[]> = {
   DataTable: dataTableDocSections,
   DataList: dataListDocSections,
   BlockEditor: blockEditorDocSections,
-};
+});
 
 const outlineOffset = () => (document.querySelector(".topbar")?.getBoundingClientRect().bottom ?? 68) + 32;
 
