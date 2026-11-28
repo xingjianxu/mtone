@@ -64,6 +64,7 @@
 
       &[aria-pressed="true"]:not([data-toggle-mode="icon"]) {
         background-color: var(--mt-nav-selected, #e5e5e5);
+        color: var(--mt-select-ink, var(--mt-text, var(--mt-fg, #37352f)));
 
         &:hover:where(:not(:disabled, [data-disabled], [aria-disabled="true"])) {
           background-color: color-mix(
@@ -82,6 +83,25 @@
 
           &:focus-visible {
             outline-color: HighlightText;
+          }
+        }
+      }
+
+      &[data-toggle-mode="background"][aria-pressed="true"] {
+        background-color: var(--mt-toggle-on-bg, var(--mt-nav-selected, #e5e5e5));
+        color: var(--mt-toggle-on-ink, var(--mt-text, var(--mt-fg, #37352f)));
+
+        &:hover:where(:not(:disabled, [data-disabled], [aria-disabled="true"])) {
+          background-color: color-mix(
+            in srgb, var(--mt-toggle-on-bg, var(--mt-nav-selected, #e5e5e5)) 95%, var(--mt-fg, #37352f)
+          );
+        }
+
+        @media (forced-colors: active) {
+          &,
+          &:hover {
+            background-color: Highlight;
+            color: HighlightText;
           }
         }
       }

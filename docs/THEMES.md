@@ -1,10 +1,12 @@
-# mtone themes: Original (原调)
+# mtone themes: Azure (澄蓝) and Original (原调)
 
-Original is the built-in design, not another color mode. It retains the
-current light and dark palettes, warm neutrals and blue emphasis, 32px
-single-line control baseline, 4px control radius, and 3px gap between compact
-options. No Provider prop is needed to opt in. Without a color mode, mtone
-starts in light mode. See the [interactive theme example](https://xingjianxu.github.io/mtone/#/theme)
+Azure is the built-in default design, exported as `mtoneAzureTheme`. It is
+based on Original, retaining the 32px single-line control baseline, 4px
+control radius and 3px compact row gap. Its light-mode selection is pale
+blue (`#e9f2ff`) with deep-blue ink (`#2561ad`); active switches and toggle
+buttons use deep blue. Dark mode uses a blue surface with light blue ink
+for contrast. These designs are not color modes. Without a color mode,
+mtone starts in light mode. See the [interactive theme example](https://xingjianxu.github.io/mtone/#/theme)
 and [semantic color table](https://xingjianxu.github.io/mtone/#/theme/color-presets).
 
 ## Apply a named design
@@ -25,13 +27,13 @@ const reading: MtoneThemePreset = {
 </MtoneProvider>
 ```
 
-The precedence at a scope is: Original CSS → preset `tokens` → preset
+The precedence at a scope is: Original base CSS → built-in design CSS (when applicable) → preset `tokens` → preset
 `light` or `dark` → Provider `tokens` → explicit Scope `style`. Omitted
 `themePreset` inherits the design through React, including mtone portal
-surfaces. Use `themePreset={mtoneOriginalTheme}` to return to the built-in
-design for a nested area. Use `theme` to change the mode independently.
+surfaces. Use `themePreset={mtoneOriginalTheme}` to keep the previous
+palette for the whole app or a nested area. Use `theme` to change the mode independently.
 A custom system-mode palette uses its light map for server rendering, then
-reads and follows the browser preference. The built-in mode is CSS-driven.
+reads and follows the browser preference. Built-in designs and their modes are CSS-driven.
 The library does not persist the user's theme choice.
 
 ## Inventory and boundaries
