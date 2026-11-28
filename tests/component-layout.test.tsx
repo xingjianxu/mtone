@@ -104,8 +104,8 @@ test("every canonical doc link lands on a labeled page or nested section with so
         expect(ids.has(item.id), `${route.name} #${item.id}`).toBe(false);
         ids.add(item.id);
         expect(item.title).not.toBe("");
-        if (item.Demo) expect(item.source).toContain("@bixlab/mtone");
-        else expect(item.children?.length).toBeGreaterThan(0);
+        if (item.Demo && !item.playground) expect(item.source).toContain("@bixlab/mtone");
+        else if (!item.Demo) expect(item.children?.length).toBeGreaterThan(0);
         if (item.children) visit(item.children);
       }
     };
@@ -168,6 +168,7 @@ test("demo disclosure uses Typography.Code and copies the exact source", async (
     expect(disclosure.open).toBe(true);
     const block = disclosure.querySelector("pre");
     const expected = docSections.PageLayout.find(({ id }) => id === "sidebar")!.source;
+    expect(expected).not.toContain("../playgrounds/");
     expect(block).toHaveClass("mt-typography-code-block");
     expect(block).toHaveAttribute("tabindex", "0");
     expect(block?.querySelector("code")?.textContent).toBe(expected);
@@ -207,7 +208,7 @@ test("PageLayout puts the combined playground first and reuses the old topbar de
   fireEvent.click(section.getByRole("switch", { name: "侧栏" }));
   expect(section.queryByRole("complementary", { name: "资料分类" })).not.toBeInTheDocument();
   expect(section.getByRole("button", { name: "侧栏：左侧" })).toBeDisabled();
-  fireEvent.click(section.getByRole("button", { name: "恢复默认" }));
+  fireEvent.click(section.getByRole("button", { name: "重置" }));
   expect(topbar).toBeChecked();
   expect(section.getByRole("tablist")).toBeInTheDocument();
   expect(section.getByRole("complementary", { name: "资料分类" })).toBeInTheDocument();

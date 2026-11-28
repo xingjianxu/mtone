@@ -13,7 +13,7 @@ This file describes this package checkout, not necessarily the latest published 
 - Consumers do not need to install/configure Tailwind or copy component source. Base UI and Lucide are package dependencies.
 - Optional provider: <MtoneProvider locale="zh"><Button>保存</Button></MtoneProvider>. Locale: zh | en. Default single-line controls use a unified 32px baseline; density is no longer a provider prop. Independent size variants and CSS token customization remain available. Provider tokens are CSS custom properties.
 - Color theme: <MtoneProvider theme="system">…</MtoneProvider> follows the OS in real time. Use light or dark to override. Without an explicit theme, top-level providers remain light; nested MtoneScope can override and floats inherit their React scope. The library does not store the choice.
-- Theme presets: Original (原调) is the default, exported as mtoneOriginalTheme. Pass themePreset={{ id, name, tokens, light, dark }} to MtoneProvider or MtoneScope. Shared tokens apply in both modes, mode-specific overrides follow theme, and Provider tokens win as local overrides. Defaults retain a 32px control height, 4px radius and a shared 3px compact option-row gap. See https://xingjianxu.github.io/mtone/#/theme for an interactive example.
+- Theme presets: Azure (澄蓝), exported as mtoneAzureTheme, is the default. Set themePreset={mtoneOriginalTheme} to opt into the previous Original (原调) palette. Azure uses a pale-blue selection surface, deep-blue selected ink and deep-blue on-state controls in light mode; dark mode uses a contrast-matched counterpart. Pass themePreset={{ id, name, tokens, light, dark }} to MtoneProvider or MtoneScope. Shared tokens apply in both modes, mode-specific overrides follow theme, and Provider tokens win as local overrides. Defaults retain a 32px control height, 4px radius and a shared 3px compact option-row gap. See https://xingjianxu.github.io/mtone/#/theme for an interactive example.
 - Interactive components need a client boundary in React Server Component frameworks.
 
 ## AI coding guidance
@@ -2092,7 +2092,7 @@ export default function Demo() {
 - directory / expandAction: boolean / false | "click" | "doubleClick" (default: false / "click"). 设置 directory 开启目录模式；默认点击展开，false 禁用标题触发展开但保留箭头 / 方向键。
 - label / className / style: string / string / CSSProperties. 可访问名称、根类名与样式；支持其余不冲突的 div 属性。
 - ref: React.Ref<TreeRef>. 暴露 nativeElement、focus()、scrollTo({ key, align?, offset?, autoExpand? })；align 为 top / bottom / auto。autoExpand 只在非受控展开模式生效。
-- 文档的交互配置示例可切换连接线、节点图标、整行铺满、复选框、独立勾选、多选、选择、禁用与目录模式，调整目录标题展开方式、行高、间距、缩进和可视高度。恢复默认会还原展开状态并清除选择和勾选；异步加载、虚拟滚动、拖放和节点渲染见独立示例。
+- 文档首例用工具栏切换连接线、图标、勾选、选择方式及目录模式。更多设置可调整缩进、行间距、可视高度、长标题滚动及整行高亮；重置会恢复初始节点状态。异步加载、虚拟滚动、拖放和节点操作仍有独立示例。
 - TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。
 - 勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。
 - 支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。
@@ -3339,12 +3339,13 @@ export default function Demo() {
 ### MtoneProvider
 
 - [MtoneProvider](https://xingjianxu.github.io/mtone/#/components/MtoneProvider): 为组件及其浮层配置颜色模式、语言和主题变量。
-- Import: MtoneProvider, Button from @bixlab/mtone
+- Import: MtoneProvider, mtoneAzureTheme, mtoneOriginalTheme, Button from @bixlab/mtone
 - children: ReactNode. 组件内容。
 - locale: "zh" | "en" (default: zh). 内置控件文案语言。
 - theme: MtoneTheme ("light" | "dark" | "system") (default: 最外层为 light). 浅色、深色或实时跟随设备设置；省略时继承上层主题。
+- themePreset: MtoneThemePreset (default: 继承上层；最外层为 mtoneAzureTheme（澄蓝）). 独立于明暗模式的设计预设。显式传入 mtoneOriginalTheme 可切回原调。
 - tokens: Tokens. CSS 自定义属性与 CSSProperties，常用 --mt-fg、--mt-bg、--mt-primary。
-- 简单组件不使用 Provider 时也可用默认值，保持浅色。
+- 未配置 Provider 时默认使用浅色澄蓝。选中导航和列表使用浅蓝背景、深蓝文字，开启状态使用深蓝；深色模式提供对应的高对比色。主题指南可预览澄蓝、原调和自定义预设。
 - 库分发预编译 CSS，不要求宿主安装 Tailwind。浮层继承 Provider 上下文。
 - 主题通过 CSS 变量传播，不是 Shadow DOM 隔离；自定义层级请检查 z-index 1200–1300。
 
@@ -3361,10 +3362,11 @@ export default function Demo() {
 
 ### MtoneScope
 
-- [MtoneScope](https://xingjianxu.github.io/mtone/#/components/MtoneScope): 把当前 Provider 的主题变量应用到一个 div，可局部覆盖颜色模式。
+- [MtoneScope](https://xingjianxu.github.io/mtone/#/components/MtoneScope): 把当前 Provider 的主题变量应用到一个 div，可局部覆盖颜色模式和设计预设。
 - Import: MtoneScope, MtoneProvider, Button from @bixlab/mtone
 - children: ReactNode. 组件内容。
 - theme: MtoneTheme ("light" | "dark" | "system") (default: 继承上层主题). 仅覆盖此作用域及其浮层的颜色模式。
+- themePreset: MtoneThemePreset (default: 继承上层；最外层为 mtoneAzureTheme). 覆盖当前区域及其浮层的设计预设，例如 mtoneOriginalTheme。
 - 原生属性: HTMLAttributes. 支持对应元素的 className、style 与适用的 DOM 属性；以 TypeScript 定义为准。
 - 通常无需手动使用；库内部用它让 Portal 浮层继承主题。可覆盖颜色模式，仍继承语言和主题变量。
 

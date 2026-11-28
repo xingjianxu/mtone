@@ -21,8 +21,9 @@
 .mt-checkbox[data-checked],
 .mt-checkbox[data-indeterminate],
 .mt-radio[data-checked] {
-  background: var(--mt-primary, #37352f);
-  border-color: var(--mt-primary, #37352f);
+  background: var(--mt-toggle-on-bg, var(--mt-primary, #37352f));
+  border-color: var(--mt-toggle-on-bg, var(--mt-primary, #37352f));
+  color: var(--mt-toggle-on-ink, var(--mt-on-primary, white));
 }
 .mt-check-indicator {
   display: inline-flex;
@@ -63,7 +64,7 @@
   align-items: center;
 }
 .mt-switch[data-checked] {
-  background: var(--mt-primary, #37352f);
+  background: var(--mt-toggle-on-bg, var(--mt-primary, #37352f));
 }
 .mt-switch-thumb {
   height: 14px;
@@ -74,7 +75,7 @@
 }
 .mt-switch[data-checked] .mt-switch-thumb {
   transform: translateX(12px);
-  background: var(--mt-on-primary, white);
+  background: var(--mt-toggle-on-ink, var(--mt-on-primary, white));
 }
 .mt-select,
 .mt-select-multiple,
@@ -405,6 +406,14 @@
 .mt-menu-item[data-highlighted] {
   background: var(--mt-hover, #f1f1ef);
 }
+.mt-option:is([aria-selected="true"], [data-selected]):not([data-highlighted]) {
+  background: var(--mt-choice-selected-bg, transparent);
+  color: var(--mt-select-ink, inherit);
+}
+.mt-option:is([aria-selected="true"], [data-selected])[data-highlighted] {
+  background: var(--mt-choice-selected-bg, var(--mt-hover, #f1f1ef));
+  color: var(--mt-select-ink, inherit);
+}
 .mt-option[data-disabled],
 .mt-menu-item[data-disabled],
 [data-disabled].mt-segment {
@@ -561,7 +570,8 @@
   outline: none;
 }
 .mt-segment[data-checked] {
-  background: var(--mt-bg, #fff);
+  background: var(--mt-choice-selected-bg, var(--mt-bg, #fff));
+  color: var(--mt-select-ink, inherit);
   box-shadow: 0 1px 3px var(--mt-handle-shadow, #0000001a);
 }
 .mt-shortcut {

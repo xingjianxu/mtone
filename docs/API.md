@@ -91,7 +91,7 @@ Use the theme-aware `--mt-accent-neutral`, `--mt-accent-blue`, `--mt-accent-gree
 
 ### Semantic color roles (choose a purpose)
 
-Use `--mt-select-surface` for the shared pale-blue selected background and located settings rows: `#E9EEF4` in light mode and `#293746` in dark mode, including system dark. Use it as a CSS background (for example, `background: var(--mt-select-surface)`), not as a new `MtoneAccent` value, focus border, or status color. The Tree, Panel side rail and DataTable retain the component-level `--mt-selected` override. See the [live selection swatches](https://xingjianxu.github.io/mtone/#/theme/color-presets).
+Use `--mt-select-surface` for shared selected backgrounds and located settings rows. In the default Azure theme it is `#E9F2FF` in light mode and `#24384F` in dark mode. Original retains `#E9EEF4` and `#293746`, respectively. `--mt-select-ink` supplies optional selected text; `--mt-toggle-on-bg` and `--mt-toggle-on-ink` are the optional on-state colors for switches, checkboxes, radio buttons and toggle buttons. Use it as a CSS background (for example, `background: var(--mt-select-surface)`), not as a new `MtoneAccent` value, focus border, or status color. The Tree, Panel side rail and DataTable retain the component-level `--mt-selected` override. See the [live selection swatches](https://xingjianxu.github.io/mtone/#/theme/color-presets).
 
 Other independent roles include `--mt-focus` for keyboard focus, `--mt-alert-info-bg` and `--mt-alert-warning-bg` for feedback surfaces, `--mt-nav-current-indicator` for the current navigation rail, `--mt-calendar-today-ink` for Calendar's current date, and `--mt-drop-target-edge` for drag targets. A semantic override applies only to that role. For example:
 

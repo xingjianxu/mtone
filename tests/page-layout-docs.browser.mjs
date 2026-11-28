@@ -48,15 +48,18 @@ try {
     await expect(topbarStage.getByRole("button", { name: "侧栏：左侧" })).toBeDisabled();
     await topbarStage.getByRole("switch", { name: "页头操作" }).click();
     await expect(topbarStage.getByRole("button", { name: "新建资料" })).toHaveCount(0);
-    await topbarStage.getByRole("switch", { name: "页头详情" }).click();
+    await topbarStage.getByRole("button", { name: "更多设置" }).click();
+    const settings = page.getByRole("dialog", { name: "PageLayout 更多设置" });
+    await settings.getByRole("switch", { name: "页头详情" }).click();
     await expect(topbarStage.getByText("本周更新", { exact: true })).toHaveCount(0);
-    await topbarStage.getByRole("combobox", { name: "布局宽度" }).click();
+    await settings.getByRole("combobox", { name: "布局宽度" }).click();
     await page.getByRole("option", { name: "限宽 720px" }).click();
     assert.equal(
       await topbarStage.locator(".mt-page-layout").evaluate((layout) => layout.style.getPropertyValue("--mt-page-layout-max-width")),
       "720px",
     );
-    await topbarStage.getByRole("button", { name: "恢复默认" }).click();
+    await settings.press("Escape");
+    await topbarStage.getByRole("button", { name: "重置" }).click();
     await expect(topbarStage.getByRole("tablist")).toBeVisible();
     await expect(topbarStage.getByRole("complementary", { name: "资料分类" })).toBeVisible();
 
@@ -118,7 +121,9 @@ try {
     assert(viewport === 1440 ? before.side.right < before.body.x : before.side.bottom < before.body.y,
       JSON.stringify(before));
     await sidebarStage.getByRole("button", { name: "侧栏：左侧" }).click();
+    await expect(sidebarStage.getByRole("button", { name: "侧栏：右侧" })).toBeVisible();
     await sidebarStage.getByRole("button", { name: "仅主栏", exact: true }).click();
+    await expect(sidebarStage.getByRole("button", { name: "仅主栏", exact: true })).toHaveAttribute("aria-pressed", "true");
     const after = await layoutBoxes();
     assert(after.fits && after.header.width === after.body.width && after.tabs.width === after.body.width, JSON.stringify(after));
     assert(viewport === 1440 ? after.body.right < after.side.x : after.body.bottom < after.side.y,

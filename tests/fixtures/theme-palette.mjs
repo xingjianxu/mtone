@@ -18,7 +18,7 @@ export const semanticColorMarkup = `
   <div class="mt-scope" data-mt-theme="light" id="semantic-light">${roles}</div>
   <div class="mt-scope" data-mt-theme="dark" id="semantic-dark">${roles}</div>
   <div class="mt-scope" data-mt-theme="system" id="semantic-system">${roles}</div>
-  <div class="mt-scope" style="--mt-blue:#103050; --mt-indicator:#204060; --mt-accent-blue:#305070" id="legacy-roles">
+  <div class="mt-scope" data-mt-theme-preset="original" style="--mt-blue:#103050; --mt-indicator:#204060; --mt-accent-blue:#305070" id="legacy-roles">
     ${roles}
     <div style="--mt-blue:#406080; --mt-indicator:#507090; --mt-drop-target-edge:#6080a0; --mt-panel-current-ink:#7090b0; --mt-action-emphasis-bg:#80a0c0" id="local-roles">
       ${roles}
@@ -46,10 +46,10 @@ const stockLight = {
   treeDrop: "rgb(83, 120, 170)",
   uploadDrop: "rgb(83, 120, 170)",
   toast: "rgb(83, 120, 170)",
-  panel: "rgb(37, 99, 173)",
+  panel: "rgb(37, 97, 173)",
   blue: "rgb(37, 99, 173)",
   alert: "rgb(246, 248, 250)",
-  selection: "rgb(233, 238, 244)",
+  selection: "rgb(233, 242, 255)",
   action: "rgb(39, 131, 222)",
 };
 const stockDark = {
@@ -58,10 +58,10 @@ const stockDark = {
   treeDrop: "rgb(139, 183, 234)",
   uploadDrop: "rgb(139, 183, 234)",
   toast: "rgb(139, 183, 234)",
-  panel: "rgb(134, 181, 237)",
+  panel: "rgb(188, 217, 255)",
   blue: "rgb(134, 181, 237)",
   alert: "rgb(38, 51, 65)",
-  selection: "rgb(41, 55, 70)",
+  selection: "rgb(36, 56, 79)",
   action: "rgb(39, 131, 222)",
 };
 
@@ -79,7 +79,7 @@ export const semanticColorCases = (systemDark) =>
       panel: "rgb(48, 80, 112)",
       blue: "rgb(48, 80, 112)",
       alert: stockLight.alert,
-      selection: stockLight.selection,
+      selection: "rgb(233, 238, 244)",
       action: stockLight.action,
     },
     "local-roles": {
@@ -91,11 +91,12 @@ export const semanticColorCases = (systemDark) =>
       panel: "rgb(112, 144, 176)",
       blue: "rgb(48, 80, 112)",
       alert: stockLight.alert,
-      selection: stockLight.selection,
+      selection: "rgb(233, 238, 244)",
       action: "rgb(128, 160, 192)",
     },
     "nested-roles": {
       ...stockDark,
+      selection: "rgb(41, 55, 70)",
       treeDrop: "rgb(96, 128, 160)",
       uploadDrop: "rgb(96, 128, 160)",
       panel: "rgb(112, 144, 176)",
