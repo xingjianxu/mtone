@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  Button, Input, MtoneScope, NavGroup, NavItem, Select,
-  mtoneOriginalTheme, type MtoneTheme, type MtoneThemePreset,
+  Button, Input, MtoneScope, NavGroup, NavItem, Select, Switch,
+  mtoneAzureTheme, mtoneOriginalTheme, type MtoneTheme, type MtoneThemePreset,
 } from "../../packages/mtone/src";
 import { CodeBlock } from "./code-block";
 
@@ -35,6 +35,12 @@ const meadow: MtoneThemePreset = {
   },
 };
 
+const presets = [
+  [mtoneAzureTheme, "澄蓝（Azure，默认）"],
+  [mtoneOriginalTheme, "原调（Original）"],
+  [meadow, "苔绿（自定义示例）"],
+] as const;
+
 const modes = [
   ["light", "浅色"],
   ["dark", "深色"],
@@ -42,7 +48,7 @@ const modes = [
 ] as const;
 
 export function ThemePlayground() {
-  const [preset, setPreset] = React.useState(mtoneOriginalTheme);
+  const [preset, setPreset] = React.useState(mtoneAzureTheme);
   const [mode, setMode] = React.useState<MtoneTheme>("light");
   const [active, setActive] = React.useState("docs");
   return (
@@ -50,10 +56,10 @@ export function ThemePlayground() {
       <h2 id="theme-playground-heading">主题演示</h2>
       <div className="theme-samples">
         <div className="theme-sample" role="group" aria-label="主题方案">
-          {[mtoneOriginalTheme, meadow].map((option) => (
+          {presets.map(([option, label]) => (
             <Button key={option.id} aria-pressed={preset === option}
               variant={preset === option ? "solid" : "outline"} onClick={() => setPreset(option)}>
-              {option === mtoneOriginalTheme ? "原调（Original）" : "苔绿（自定义示例）"}
+              {label}
             </Button>
           ))}
         </div>
@@ -74,12 +80,18 @@ export function ThemePlayground() {
           </NavGroup>
           <Input aria-label="名称" placeholder="输入名称" />
           <Select label="范围" placeholder="请选择" options={[{ value: "all", label: "所有文档" }, { value: "starred", label: "仅收藏" }]} />
-          <div><Button variant="solid">保存</Button></div>
+          <div className="theme-playground-actions" style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+            <Switch label="显示快捷入口" defaultChecked />
+            <Button toggle defaultPressed>固定视图</Button>
+            <Button variant="solid">保存</Button>
+          </div>
         </div>
       </MtoneScope>
-      <p>「原调」是内置默认主题。苔绿只用来演示自定义，不改变文档站的全局主题。</p>
-      <CodeBlock code={`import { MtoneProvider, type MtoneThemePreset } from "@bixlab/mtone";
+      <p>「澄蓝」是内置默认主题：浅色模式用浅蓝选中背景和深蓝文字，开关及切换按钮开启时用深蓝。仍可选「原调」保留原来的配色。「苔绿」只用于演示自定义配色。</p>
+      <CodeBlock code={`import { MtoneProvider, mtoneOriginalTheme, type MtoneThemePreset } from "@bixlab/mtone";
 
+// 不指定 themePreset 时使用澄蓝（mtoneAzureTheme）。
+// 如需保留原来的配色，设置 themePreset={mtoneOriginalTheme}。
 const meadow: MtoneThemePreset = ${JSON.stringify(meadow, null, 2)};
 
 <MtoneProvider themePreset={meadow} theme="system">

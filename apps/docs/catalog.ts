@@ -4033,7 +4033,7 @@ export default function Demo() {
       },
     ],
     notes: [
-      "文档的交互配置示例可切换连接线、节点图标、整行铺满、复选框、独立勾选、多选、选择、禁用与目录模式，调整目录标题展开方式、行高、间距、缩进和可视高度。恢复默认会还原展开状态并清除选择和勾选；异步加载、虚拟滚动、拖放和节点渲染见独立示例。",
+      "文档首例用工具栏切换连接线、图标、勾选、选择方式及目录模式。更多设置可调整缩进、行间距、可视高度、长标题滚动及整行高亮；重置会恢复初始节点状态。异步加载、虚拟滚动、拖放和节点操作仍有独立示例。",
       "TreeKey 为 string | number；全树键必须唯一且数字有限，缺失或重复键会报错。保留原有 items / id / label、value、expanded 用法；不要混用新旧受控属性。",
       "勾选传导在 disabled、disableCheckbox 或 checkable=false 节点停止；严格模式下父子完全独立。disabled 不会隐藏节点或清除外部传入状态。",
       "支持方向键、Home / End、Enter、Space 和字符首字母定位。Space 在复选模式中切换勾选；目录多选支持 Ctrl / Command 追加、Shift 可见范围选择。",
@@ -6178,7 +6178,7 @@ export default function Demo() {
   {
     name: "MtoneProvider",
     description: "为组件及其浮层配置颜色模式、语言和主题变量。",
-    importNames: ["MtoneProvider", "Button"],
+    importNames: ["MtoneProvider", "mtoneAzureTheme", "mtoneOriginalTheme", "Button"],
     code: 'import { MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider locale="zh" theme="system" tokens={{"--mt-primary":"#446c52"}}><Button variant="solid">保存</Button></MtoneProvider>\n  );\n}',
     props: [
       {
@@ -6199,6 +6199,12 @@ export default function Demo() {
         default: "最外层为 light",
       },
       {
+        name: "themePreset",
+        type: "MtoneThemePreset",
+        description: "独立于明暗模式的设计预设。显式传入 mtoneOriginalTheme 可切回原调。",
+        default: "继承上层；最外层为 mtoneAzureTheme（澄蓝）",
+      },
+      {
         name: "tokens",
         type: "Tokens",
         description:
@@ -6206,14 +6212,14 @@ export default function Demo() {
       },
     ],
     notes: [
-      "简单组件不使用 Provider 时也可用默认值，保持浅色。",
+      "未配置 Provider 时默认使用浅色澄蓝。选中导航和列表使用浅蓝背景、深蓝文字，开启状态使用深蓝；深色模式提供对应的高对比色。主题指南可预览澄蓝、原调和自定义预设。",
       "库分发预编译 CSS，不要求宿主安装 Tailwind。浮层继承 Provider 上下文。",
       "主题通过 CSS 变量传播，不是 Shadow DOM 隔离；自定义层级请检查 z-index 1200–1300。",
     ],
   },
   {
     name: "MtoneScope",
-    description: "把当前 Provider 的主题变量应用到一个 div，可局部覆盖颜色模式。",
+    description: "把当前 Provider 的主题变量应用到一个 div，可局部覆盖颜色模式和设计预设。",
     importNames: ["MtoneScope", "MtoneProvider", "Button"],
     code: 'import { MtoneScope, MtoneProvider, Button } from "@bixlab/mtone";\nimport "@bixlab/mtone/styles.css";\n\nexport default function Demo() {\n  return (\n    <MtoneProvider tokens={{"--mt-primary":"#446c52"}}><MtoneScope theme="dark"><Button variant="solid">主题作用域</Button></MtoneScope></MtoneProvider>\n  );\n}',
     props: [
@@ -6227,6 +6233,12 @@ export default function Demo() {
         type: 'MtoneTheme ("light" | "dark" | "system")',
         description: "仅覆盖此作用域及其浮层的颜色模式。",
         default: "继承上层主题",
+      },
+      {
+        name: "themePreset",
+        type: "MtoneThemePreset",
+        description: "覆盖当前区域及其浮层的设计预设，例如 mtoneOriginalTheme。",
+        default: "继承上层；最外层为 mtoneAzureTheme",
       },
       {
         name: "原生属性",

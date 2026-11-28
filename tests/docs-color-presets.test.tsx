@@ -52,8 +52,8 @@ test("lists the pale blue selection surface separately from the accent colors", 
   const surfaces = within(screen.getByRole("region", { name: "语义颜色" }));
   expect(surfaces.getByText("浅蓝选中背景")).toBeVisible();
   expect(surfaces.getByText("--mt-select-surface")).toBeVisible();
-  expect(surfaces.getByText("#E9EEF4")).toBeVisible();
-  expect(surfaces.getByText("#293746")).toBeVisible();
+  expect(surfaces.getByText("#E9F2FF")).toBeVisible();
+  expect(surfaces.getByText("#24384F")).toBeVisible();
 });
 
 test("lists the three navigation selection roles together in the semantic colors table", () => {
@@ -94,7 +94,7 @@ test("switches only the demo's named design and mode", () => {
   const preview = screen.getByRole("region", { name: "主题预览" });
   const presetGroup = within(screen.getByRole("group", { name: "主题方案" }));
   const modeGroup = within(screen.getByRole("group", { name: "预览模式" }));
-  expect(preview).toHaveAttribute("data-mt-theme-preset", "original");
+  expect(preview).toHaveAttribute("data-mt-theme-preset", "azure");
   fireEvent.click(presetGroup.getByRole("button", { name: "苔绿（自定义示例）" }));
   expect(preview.style.getPropertyValue("--mt-height")).toBe("36px");
   fireEvent.click(modeGroup.getByRole("button", { name: "深色" }));

@@ -1,4 +1,4 @@
-/* Original (原调): built-in defaults. Named presets override these roles at their scope. */
+/* Original (原调): base palette. Azure (澄蓝) is applied by default below. */
 /* Unopted scopes remain light; an explicit nested scope starts a new palette.
  * Only theme-marked nodes opt the document or a portalled surface into color-scheme. */
 :where(.mt-scope, [data-mt-theme="light"], [data-mt-theme="system"]) {
@@ -45,7 +45,7 @@
 /* Select colors at the scope boundary. WebKit can resolve light-dark()
  * through the document scheme after a live system preference change, even
  * for a nested light scope. Literal tokens keep opt-in scopes isolated. */
-:is(.mt-scope, [data-mt-theme]) {
+:is(.mt-scope, [data-mt-theme], [data-mt-theme-preset]) {
   --mt-fg: #37352f;
   --mt-bg: #fff;
   --mt-primary: #37352f;
@@ -303,4 +303,56 @@
 :where([data-mt-theme-preset-boundary]) {
   --mt-option-row-gap: var(--_mt-original-option-row-gap, 3px);
   --mt-nav-current-indicator: initial;
+}
+
+
+/* Optional state roles do not bleed through an explicit Original or custom
+ * scope. Resolve their fallbacks where each component paints the state. */
+:where(:root, .mt-scope, [data-mt-theme], [data-mt-theme-preset]) {
+  --mt-select-ink: initial;
+  --mt-choice-selected-bg: initial;
+  --mt-toggle-on-bg: initial;
+  --mt-toggle-on-ink: initial;
+}
+
+/* Named CSS presets work before hydration and through native system-mode
+ * changes. Unmarked DOM scopes use Azure unless an ancestor named a
+ * different design; React scopes always carry the resolved preset. */
+:is(:root, .mt-scope, [data-mt-theme], [data-mt-theme-preset]):where(
+  [data-mt-theme-preset="azure"],
+  :not([data-mt-theme-preset], [data-mt-theme-preset]:not([data-mt-theme-preset="azure"]) *)
+) {
+  --mt-nav-selected: #e9f2ff;
+  --mt-nav-current-text: #2561ad;
+  --mt-select-surface: #e9f2ff;
+  --mt-select-ink: #2561ad;
+  --mt-choice-selected-bg: var(--mt-select-surface);
+  --mt-toggle-on-bg: #2561ad;
+  --mt-toggle-on-ink: #fff;
+}
+
+[data-mt-theme="dark"]:where(
+  [data-mt-theme-preset="azure"],
+  :not([data-mt-theme-preset], [data-mt-theme-preset]:not([data-mt-theme-preset="azure"]) *)
+) {
+  --mt-nav-selected: #24384f;
+  --mt-nav-current-text: #bcd9ff;
+  --mt-select-surface: #24384f;
+  --mt-select-ink: #bcd9ff;
+  --mt-toggle-on-bg: #4d87cc;
+  --mt-toggle-on-ink: #0a1726;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-mt-theme="system"]:where(
+    [data-mt-theme-preset="azure"],
+    :not([data-mt-theme-preset], [data-mt-theme-preset]:not([data-mt-theme-preset="azure"]) *)
+  ) {
+    --mt-nav-selected: #24384f;
+    --mt-nav-current-text: #bcd9ff;
+    --mt-select-surface: #24384f;
+    --mt-select-ink: #bcd9ff;
+    --mt-toggle-on-bg: #4d87cc;
+    --mt-toggle-on-ink: #0a1726;
+  }
 }
