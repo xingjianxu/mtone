@@ -542,8 +542,23 @@ try {
     await expect(popup).toBeVisible();
     const { x, width } = await popup.boundingBox();
     const field = await input.locator("..").boundingBox();
-    assert(field.width >= 500 && width <= 180, `${name}: short options should stay compact, got ${width}px`);
+    assert(field.width >= 500 && width < 160, `${name}: short options should stay compact, got ${width}px`);
     assert(Math.abs(x - field.x) < 1, `${name}: popup should align to the whole field`);
+    const option = popup.getByRole("option", { name: "产品设计", exact: true });
+    const initial = await option.getAttribute("aria-selected");
+    assert.equal(initial, name === "Compact tags" ? "true" : "false");
+    for (const next of [initial === "true" ? "false" : "true", initial]) {
+      await option.click();
+      await expect(option).toHaveAttribute("aria-selected", next);
+      const alignment = await option.evaluate((row) => {
+        const label = row.querySelector(".mt-select-option-label").getBoundingClientRect();
+        const slot = row.querySelector(".mt-select-popup-check-slot").getBoundingClientRect();
+        return { width: slot.width, gap: parseFloat(getComputedStyle(row).columnGap), separation: slot.left - label.right };
+      });
+      assert.equal(alignment.width, 16);
+      assert(alignment.gap === 12 && alignment.separation >= 11.5, `${name}: option label and check should be separated by 12px`);
+      assert(Math.abs((await popup.boundingBox()).width - width) < 1, `${name}: toggle must not change popup width`);
+    }
     await page.keyboard.press("Escape");
     await expect(page.getByRole("listbox")).toHaveCount(0);
   }

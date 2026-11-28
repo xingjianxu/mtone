@@ -499,7 +499,9 @@ function ComboboxPopup({ data, empty, popupRef, label, searchable, renderOption,
       <Combobox.Item className="mt-option" key={value} value={value} disabled={option?.disabled}>
         {searchPanel && <span className="mt-select-popup-check-slot" aria-hidden="true">{indicator}</span>}
         <span className="mt-select-option-label">{row}</span>
-        {!searchPanel && indicator}
+        {!searchPanel && (chipsAnchor
+          ? <span className="mt-select-popup-check-slot" aria-hidden="true">{indicator}</span>
+          : indicator)}
       </Combobox.Item>
     );
   };
