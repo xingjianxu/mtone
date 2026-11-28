@@ -41,6 +41,8 @@ export interface SplitterProps extends Omit<
   bordered?: boolean;
   /** Outline both edges of each drag separator, independently of the outer frame. */
   separatorBordered?: boolean;
+  /** Show one centered hairline instead of the default separator surface. In line mode, separatorBordered is ignored. */
+  separatorVariant?: "default" | "line";
   sizes?: SplitterSize[];
   /** Remember an uncontrolled layout after user adjustments. */
   storageKey?: string;
@@ -91,6 +93,7 @@ function SplitterRoot(props: SplitterProps) {
     orientation = "horizontal",
     bordered = false,
     separatorBordered = false,
+    separatorVariant = "default",
     sizes,
     storageKey,
     disabled = false,
@@ -809,7 +812,9 @@ function SplitterRoot(props: SplitterProps) {
                 id={`${id}-separator`}
                 className={cn(
                   "mt-splitter-separator",
-                  separatorBordered && "mt-splitter-separator-bordered",
+                  separatorVariant === "line"
+                    ? "mt-splitter-separator-line"
+                    : separatorBordered && "mt-splitter-separator-bordered",
                 )}
                 data-boundary={i}
                 disableDoubleClick

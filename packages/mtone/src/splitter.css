@@ -86,9 +86,37 @@
   outline-offset: -1px;
   z-index: 2;
 }
+/* The 6px hit area is unchanged; only its center hairline is painted. */
+.mt-splitter > .mt-splitter-separator-line {
+  --_mt-splitter-line-ink: var(--mt-border, #e9e9e7);
+  background: linear-gradient(var(--_mt-splitter-line-ink), var(--_mt-splitter-line-ink))
+    center / 1px 100% no-repeat;
+}
+.mt-splitter[data-orientation="vertical"] > .mt-splitter-separator-line {
+  background-size: 100% 1px;
+}
+.mt-splitter > .mt-splitter-separator-line:is(:hover, [data-separator="active"], :focus-visible) {
+  --_mt-splitter-line-ink: var(--mt-accent-blue, #2563ad);
+}
+.mt-splitter > .mt-splitter-separator-line:focus-visible {
+  outline: none;
+}
+.mt-splitter > .mt-splitter-separator-line:is(:hover, [data-separator="active"], :focus-visible)
+  > .mt-splitter-grip {
+  background: var(--_mt-splitter-line-ink);
+}
+
 @media (forced-colors: active) {
   .mt-splitter > .mt-splitter-separator {
     border: 1px solid ButtonText;
+  }
+  .mt-splitter > .mt-splitter-separator-line {
+    forced-color-adjust: none;
+    border: 0;
+    --_mt-splitter-line-ink: ButtonText;
+  }
+  .mt-splitter > .mt-splitter-separator-line:is(:hover, [data-separator="active"], :focus-visible) {
+    --_mt-splitter-line-ink: Highlight;
   }
   .mt-splitter > .mt-splitter-separator > .mt-splitter-grip {
     forced-color-adjust: none;

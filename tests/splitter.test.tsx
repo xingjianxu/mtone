@@ -1,4 +1,4 @@
-import React from 'react';import {render} from '@testing-library/react';import {expect,test} from 'vitest';import {Splitter} from '../packages/mtone/src';
+import React from 'react';import {render,screen} from '@testing-library/react';import {expect,test} from 'vitest';import {PageLayout,Splitter} from '../packages/mtone/src';
 import {validateSplitterSize,splitterSizeToPixels,splitterControlledLayout,splitterLayoutsEqual,splitterPairTarget} from '../packages/mtone/src/splitter-utils';
 test('converts only explicit supported units and rejects invalid dimensions',()=>{expect(splitterSizeToPixels(120,600)).toBe(120);expect(splitterSizeToPixels('25%',600)).toBe(150);expect(splitterSizeToPixels('12.5px',600)).toBe(12.5);for(const value of [-1,NaN,Infinity,'20','auto','-10%','20rem','9'.repeat(400)+'px'])expect(()=>validateSplitterSize(value as never,'test')).toThrow(/Splitter/);validateSplitterSize(undefined,'test');validateSplitterSize(0,'test');});
 test('normalizes fully controlled layouts and checks cardinality and positive total',()=>{expect(splitterControlledLayout(['40%','60%'],['a','b'],594)).toEqual({a:40,b:60});expect(splitterControlledLayout([100,300],['a','b'],600)).toEqual({a:25,b:75});expect(()=>splitterControlledLayout([100],['a','b'],600)).toThrow(/every Panel/);expect(()=>splitterControlledLayout([0,0],['a','b'],600)).toThrow(/positive total/);expect(splitterLayoutsEqual({a:40,b:60},{a:40.0001,b:59.9999})).toBe(true);expect(splitterLayoutsEqual({a:40},{a:40,b:60})).toBe(false);});
@@ -12,3 +12,14 @@ test('cycles pair endpoints without changing the pair total',()=>{expect(splitte
 test('respects collapsed rails and rejects endpoints outside neighbor bounds',()=>{expect(splitterPairTarget(100,.4,'first',{...free,collapsed:5},free)).toEqual([5,95]);expect(splitterPairTarget(100,.4,'first',free,{...free,max:70})).toBeNull();expect(splitterPairTarget(100,.4,'second',{...free,max:70},free)).toBeNull();});
 test('clamps initial pair proportions within feasible expanded limits',()=>{expect(splitterPairTarget(100,.1,'initial',{...free,min:25},free)).toEqual([25,75]);expect(splitterPairTarget(100,.9,'initial',free,{...free,min:30})).toEqual([70,30]);expect(splitterPairTarget(20,.5,'initial',free,free)).toBeNull();});
 test('retains an initially collapsed ratio and rejects nonfinite pair targets',()=>{expect(splitterPairTarget(100,0,'initial',free,free)).toEqual([0,100]);expect(splitterPairTarget(Infinity,.5,'initial',free,free)).toBeNull();});
+
+test("framed PageLayout uses the Splitter line instead of two edge borders", () => {
+  const { rerender } = render(<PageLayout title="Notes" sidebar="Folders" sidebarResize={{ separatorBordered: true }}>Draft</PageLayout>);
+  const getSeparator = () => screen.getByRole("separator");
+  expect(getSeparator()).toHaveClass("mt-splitter-separator-line");
+  expect(getSeparator()).not.toHaveClass("mt-splitter-separator-bordered");
+
+  rerender(<PageLayout bordered={false} title="Notes" sidebar="Folders" sidebarResize={{ separatorBordered: true }}>Draft</PageLayout>);
+  expect(getSeparator()).not.toHaveClass("mt-splitter-separator-line");
+  expect(getSeparator()).toHaveClass("mt-splitter-separator-bordered");
+});

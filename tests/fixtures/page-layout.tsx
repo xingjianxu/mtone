@@ -159,7 +159,7 @@ function BorderedFixture() {
             data-testid={`frame-${headerSpan}`}
             headerSpan={headerSpan}
             sidebarPosition={query.has("right") ? "right" : "left"}
-            sidebarResize={query.has("resize")}
+            sidebarResize={query.has("double-edge") ? { separatorBordered: true } : query.has("resize")}
             sidebar={<Sidebar collapsible aria-label="Framed navigation"><Button>Open</Button></Sidebar>}
             topbar={<Topbar as="div">Workspace path</Topbar>}
             title="Frame title"

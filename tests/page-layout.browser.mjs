@@ -151,7 +151,7 @@ try {
       }
     }
   }
-  for (const configuration of ["", "&rtl&right", "&narrow", "&resize", "&narrow&resize"]) {
+  for (const configuration of ["", "&rtl&right", "&narrow", "&resize", "&resize&rtl&right&double-edge", "&narrow&resize"]) {
     const narrow = configuration.includes("narrow");
     const resize = configuration.includes("resize");
     const right = configuration.includes("right");
@@ -214,6 +214,53 @@ try {
       }
     }
   }
+  await page.goto("http://127.0.0.1:5284/tests/fixtures/page-layout.html?framed&resize&double-edge");
+  const framedSeparator = page.getByTestId("frame-main").getByRole("separator");
+  await framedSeparator.scrollIntoViewIfNeeded();
+  const seamStyle = () => framedSeparator.evaluate(el => {
+    const css = getComputedStyle(el);
+    const box = el.getBoundingClientRect();
+    const dot = el.querySelector(".mt-splitter-grip").getBoundingClientRect();
+    return {
+      image: css.backgroundImage, size: css.backgroundSize,
+      left: css.borderLeftWidth, right: css.borderRightWidth, outline: css.outlineStyle,
+      thickness: box.width,
+      gripOffset: dot.x + dot.width / 2 - (box.x + box.width / 2),
+      focused: el.matches(":focus-visible"),
+    };
+  });
+  await page.mouse.move(1, 1);
+  const idle = await seamStyle();
+  assert.equal(idle.size, "1px 100%");
+  assert.equal(idle.left, "0px");
+  assert.equal(idle.right, "0px");
+  assert.equal(idle.thickness, 6);
+  assert(Math.abs(idle.gripOffset) < 0.5, "Grip and seam share their center");
+  await framedSeparator.hover();
+  const hover = await seamStyle();
+  assert.notEqual(hover.image, idle.image, "Hover recolors the seam");
+  assert.equal(hover.size, idle.size, "Hover does not thicken the seam");
+  const seamBox = await framedSeparator.boundingBox();
+  await page.mouse.down();
+  await page.mouse.move(seamBox.x + 31, seamBox.y + seamBox.height / 2, { steps: 6 });
+  await expect(framedSeparator).toHaveAttribute("data-separator", "active");
+  const drag = await seamStyle();
+  assert.equal(drag.image, hover.image);
+  assert.equal(drag.size, idle.size);
+  await page.mouse.up();
+
+  await page.goto("http://127.0.0.1:5284/tests/fixtures/page-layout.html?framed&resize");
+  await page.mouse.move(1, 1);
+  const keyboardSeparator = page.getByTestId("frame-main").getByRole("separator");
+  await page.keyboard.press("Tab");
+  await keyboardSeparator.focus();
+  await expect(keyboardSeparator).toBeFocused();
+  const focus = await seamStyle();
+  assert(focus.focused, "Keyboard focus is visible");
+  assert.equal(focus.image, hover.image, "Focus recolors the same single line");
+  assert.equal(focus.outline, "none", "Focus does not draw a second frame");
+  assert.equal(focus.size, idle.size);
+
   for (const [width, mode, options] of [
     [1200, "short", ""], [1200, "short", "&no-sidebar&no-footer"],
     [1200, "short", "&resize"], [375, "short", "&resize"],

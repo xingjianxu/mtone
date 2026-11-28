@@ -9,6 +9,7 @@ export function SplitterExample() {
   const [generation, setGeneration] = useState(0);
   const [sizes, setSizes] = useState<Array<number | `${number}%` | `${number}px`>>(["32%", "68%"]);
   const [disabled, setDisabled] = useState(false);
+  const [singleLine, setSingleLine] = useState(true);
   const [notice, setNotice] = useState("拖动调整大小；双击分隔条或聚焦后按 Enter，循环收起导航、恢复初始比例、收起正文。");
   const [vertical, setVertical] = useState(false);
   const [selection, setSelection] = useState("设计原则");
@@ -18,9 +19,10 @@ export function SplitterExample() {
         <Button icon={<RotateCcw size={14} />} onClick={() => { setSizes(["32%", "68%"]); setGeneration(value => value + 1); setNotice("已重置为 32% / 68%。"); }}>重置分栏</Button>
         <Button variant="ghost" onClick={() => { setSizes(["32%", "68%"]); setVertical(value => !value); }}>{vertical ? "切换横向" : "切换纵向"}</Button>
         <Button variant="ghost" onClick={() => setDisabled(value => !value)}>{disabled ? "解锁调整" : "锁定分栏"}</Button>
+        <Button variant="ghost" onClick={() => setSingleLine(value => !value)}>{singleLine ? "切换默认分隔条" : "切换单线分隔条"}</Button>
         <Tag>受控示例</Tag>
       </div>
-      <Splitter bordered key={generation + String(vertical)} orientation={vertical ? "vertical" : "horizontal"} sizes={sizes} onResize={setSizes} onResizeEnd={values => setNotice("调整完成：" + values.map(value => Math.round(value) + "px").join(" / "))} disabled={disabled} style={{ height: 320, borderRadius: 6, overflow: "hidden" }}>
+      <Splitter bordered separatorVariant={singleLine ? "line" : "default"} key={generation + String(vertical)} orientation={vertical ? "vertical" : "horizontal"} sizes={sizes} onResize={setSizes} onResizeEnd={values => setNotice("调整完成：" + values.map(value => Math.round(value) + "px").join(" / "))} disabled={disabled} style={{ height: 320, borderRadius: 6, overflow: "hidden" }}>
         <Splitter.Panel id="library" label="知识库导航" defaultSize="32%" min="20%" collapsible>
           <div style={pane}>
             <strong style={{ display: "flex", alignItems: "center", gap: 6 }}><BookOpen size={16} />知识库</strong>

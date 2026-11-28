@@ -2053,6 +2053,12 @@ export default function Demo() {
       "description": "为每个拖动分隔条的两侧添加 1px 边线：横向分栏画左右两边，纵向分栏画上下两边。与 bordered 外框独立。"
     },
     {
+      "name": "separatorVariant",
+      "type": "'default' | 'line'",
+      "default": "'default'",
+      "description": "line 仅绘制 1px 居中分隔线，保留三点手柄和原有拖动热区；悬停、拖动和键盘聚焦时变色。line 优先于 separatorBordered，不影响外框。"
+    },
+    {
       "name": "sizes",
       "type": "SplitterSize[]",
       "description": "整个布局的受控大小，按面板顺序一一对应；数量必须与面板数一致。数值为 px，字符串仅支持明确的 % 或 px。"
@@ -2315,7 +2321,7 @@ export default function Demo() {
       { name: "tabs", type: "ReactNode", description: "可选，可传入完整 Tabs。省略时不占空间。" },
       { name: "sidebar", type: "ReactNode", description: "页面级侧栏插槽，可传入 Sidebar 或自定义内容。省略时保持原有单栏结构。" },
       { name: "sidebarPosition", type: '"left" | "right"', default: '"left"', description: "侧栏位于主栏的物理左侧或右侧。空间不足时，左侧栏改排在主栏前，右侧栏排在主栏后。" },
-      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度；separatorBordered 可为手柄两侧加边线。" },
+      { name: "sidebarResize", type: "boolean | SidebarResizeOptions", default: "false", description: "可选。复用 Splitter 的指针和方向键调宽；defaultWidth / minWidth / maxWidth 是像素，默认 240 / 160 / 480。窄容器继续上下排列；直接传入的 Sidebar 折叠后隐藏手柄，展开恢复宽度。设置 storageKey 可记住拖拽宽度。带外框时固定用 Splitter 的 1px 居中单线；仅无外框时 separatorBordered 可为手柄两侧加边线。" },
       { name: "headerSpan", type: '"full" | "header" | "main"', default: '"full"', description: "full：页头和标签页均跨整页；header：页头跨整页，标签页与正文留在主栏；main：页头和标签页均留在主栏。页头包含顶栏、标题、图标、副标题、操作、描述和附加信息。无侧栏时忽略。" },
       { name: "maxWidth", type: '"sm" | "md" | "lg" | "xl" | number', description: "可选。sm 为 720px、md 为 960px、lg 为 1200px、xl 为 1440px，也可传入正数像素值。设置后整个布局在父容器内居中，容器窄时随父容器收缩；省略时保持原有铺满行为。" },
       { name: "children", type: "ReactNode", description: "正文。" },
